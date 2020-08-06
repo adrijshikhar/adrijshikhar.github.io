@@ -22,7 +22,7 @@
     "dependencies": {
         "@fortawesome/fontawesome-free": "5.14.0",
         "babel-core": "7.0.0-bridge.0",
-        "bootstrap": "4.5.0",
+        "bootstrap": "4.5.1",
         "gulp-inject": "^5.0.5",
         "jquery": "3.5.1",
         "jquery.easing": "^1.4.1"
