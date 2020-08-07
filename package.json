@@ -20,7 +20,7 @@
         "build": "gulp"
     },
     "dependencies": {
-        "@fortawesome/fontawesome-free": "5.13.0",
+        "@fortawesome/fontawesome-free": "5.14.0",
         "babel-core": "7.0.0-bridge.0",
         "bootstrap": "4.5.1",
         "gulp-inject": "^5.0.5",
