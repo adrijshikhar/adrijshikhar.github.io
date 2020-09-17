@@ -27,7 +27,7 @@
         "fs-extra": "9.0.1",
         "html-webpack-plugin": "4.4.1",
         "identity-obj-proxy": "3.0.0",
-        "inferno": "^7.4.2",
+        "inferno": "^7.4.3",
         "inferno-bootstrap": "^7.3.2",
         "inferno-dev-utils": "^6.0.4",
         "jest": "26.4.2",
