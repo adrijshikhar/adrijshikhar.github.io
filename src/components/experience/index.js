@@ -12,7 +12,7 @@ const Experience = () => {
         <ExpCard
           postition="SDE Intern | Rephrase.ai"
           location="Bangalore"
-          date="Oct 2020 - Present"
+          date="Oct 2020 - March 2021"
         >
           <p class="para-content">
             Use Generative AI to address millions of customers personally,
