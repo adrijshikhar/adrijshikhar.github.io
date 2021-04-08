@@ -59,7 +59,7 @@ h4 {
 p.lead {
   font-size: $normalFontSize;
   font-weight: 400;
-  text-align: justify;
+  text-align: left;
 }
 
 .para-content {
@@ -130,7 +130,8 @@ p.lead {
   .list-item {
     width: fit-content;
     margin-right: $gutterWidth;
-
+    display: flex;
+    align-items: center;
     &:hover,
     svg:hover .icon,
     img:hover .icon {
@@ -176,7 +177,8 @@ p.lead {
   .tooltip-inner {
     @include body-font;
 
-    font-size: $normalFontSize;
+    font-size: $normalFontSize * 0.8;
+    padding: 0.5rem;
     color: white;
     background-color: $primary;
   }

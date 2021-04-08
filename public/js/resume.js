@@ -36,11 +36,4 @@
   $(function () {
     $('[data-toggle="tooltip"]').tooltip();
   });
-  $('#mobile-tooltip').tooltip({
-    placement: function () {
-      if ($(window).width() > 648) {
-        return 'right';
-      } else return 'bottom';
-    },
-  });
 })(jQuery); // End of use strict
