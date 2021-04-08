@@ -240,8 +240,7 @@ const Projects = () => {
                   cycle for user interface.
                 </li>
                 <li>
-                  Built on Open source PHP framework, Laravel with frontend SPA
-                  client in ReactJS and Redux.
+                  Built on Django with frontend SPA client in ReactJS and Redux.
                 </li>
               </ul>
             </ProjectCard.Para>
