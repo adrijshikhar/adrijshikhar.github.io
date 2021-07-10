@@ -7,7 +7,7 @@
     "url": "https://github.com/adrijshikhar/adrijshikhar.github.io.git"
   },
   "dependencies": {
-    "@babel/core": "7.12.3",
+    "@babel/core": "7.14.6",
     "@svgr/webpack": "5.4.0",
     "axios": "^0.21.1",
     "babel-core": "7.0.0-bridge.0",
@@ -19,7 +19,7 @@
     "bootstrap": ">=4.5.3",
     "case-sensitive-paths-webpack-plugin": "2.3.0",
     "chalk": "4.1.0",
-    "css-loader": "5.0.0",
+    "css-loader": "5.2.6",
     "dotenv": "8.2.0",
     "dotenv-expand": "5.1.0",
     "file-loader": "6.1.1",
