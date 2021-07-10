@@ -65,7 +65,7 @@
     "install": "^0.13.0",
     "jest": "26.4.2",
     "jest-pnp-resolver": "1.2.2",
-    "jest-resolve": "26.6.2",
+    "jest-resolve": "27.0.6",
     "lint-staged": "^10.4.0"
   },
   "license": "ISC",
