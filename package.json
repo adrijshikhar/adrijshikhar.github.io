@@ -59,7 +59,7 @@
     "eslint-plugin-flowtype": "5.9.2",
     "eslint-plugin-import": "2.23.4",
     "eslint-plugin-inferno": "^7.24.0",
-    "eslint-plugin-jsx-a11y": "6.3.1",
+    "eslint-plugin-jsx-a11y": "6.4.1",
     "eslint-plugin-prettier": "^3.4.0",
     "gh-pages": "^3.1.0",
     "husky": "^4.3.0",
