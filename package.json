@@ -6,7 +6,7 @@
     "type": "git",
     "url": "https://github.com/adrijshikhar/adrijshikhar.github.io.git"
   },
-  "homepage" : "https://adrijshikhar.github.io",
+  "homepage": "https://adrijshikhar.github.io",
   "dependencies": {
     "@babel/core": "7.14.6",
     "@svgr/webpack": "5.5.0",
