@@ -9,7 +9,7 @@ const ModuleScopePlugin = require('inferno-dev-utils/ModuleScopePlugin');
 const getCSSModuleLocalIdent = require('inferno-dev-utils/getCSSModuleLocalIdent');
 const getClientEnvironment = require('./env');
 const paths = require('./paths');
-const ManifestPlugin = require('webpack-manifest-plugin');
+const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const ModuleNotFoundPlugin = require('inferno-dev-utils/ModuleNotFoundPlugin');
 
 // Webpack uses `publicPath` to determine where the app is being served from.
@@ -363,7 +363,7 @@ module.exports = {
     // Generate a manifest file which contains a mapping of all asset filenames
     // to their corresponding output file so that tools can pick it up without
     // having to parse `index.html`.
-    new ManifestPlugin({
+    new WebpackManifestPlugin({
       fileName: 'asset-manifest.json',
       publicPath: publicPath,
     }),
