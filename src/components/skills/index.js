@@ -13,10 +13,11 @@ const Skills = () => {
             <Tick /> Manjaro i3wm Community Edition
           </li>
           <li>
-            <Tick /> Highly customized VS Code with self crafted theme
+            <Tick /> Highly customized [ VS Code | Intellij ] with self crafted
+            theme
           </li>
           <li>
-            <Tick /> Bash, Oh My Zsh
+            <Tick /> Bash, Oh My Zsh, fish-shell, Oh My Fish
           </li>
         </ul>
 
