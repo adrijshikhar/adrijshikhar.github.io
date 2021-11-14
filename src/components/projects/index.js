@@ -12,24 +12,24 @@ const Projects = () => {
           date="20 Oct 2020 - Present"
         >
           <ProjectCard.Content>
-            <ProjectCard.Para>
+            <ProjectCard.Paragraph>
               Dgraph Labs hosted the ’Hack and Slash GraphQL’ hackathon to
               showcase the power of Slash GraphQL.
-            </ProjectCard.Para>
+            </ProjectCard.Paragraph>
+            <ProjectCard.Paragraph>
+              <ul>
+                <li>
+                  Developed a web scraper using GraphQL to leverage the nesting
+                  power of it.
+                </li>
+                <li>
+                  You have a single query resolver called scrape that takes in a
+                  URL as a parameter and returns a generic defined entity such
+                  as an HtmlNode
+                </li>
+              </ul>
+            </ProjectCard.Paragraph>
           </ProjectCard.Content>
-          <ProjectCard.Para>
-            <ul>
-              <li>
-                Developed a web scraper using GraphQL to leverage the nesting
-                power of it.
-              </li>
-              <li>
-                You have a single query resolver called scrape that takes in a
-                URL as a parameter and returns a generic defined entity such as
-                an HtmlNode
-              </li>
-            </ul>
-          </ProjectCard.Para>
         </ProjectCard>
 
         <ProjectCard
@@ -38,14 +38,14 @@ const Projects = () => {
           date="1 July 2020 - Present"
         >
           <ProjectCard.Content>
-            <ProjectCard.Para>
+            <ProjectCard.Paragraph>
               An initial set up for react and webpack using a single command
-            </ProjectCard.Para>
+            </ProjectCard.Paragraph>
+            <ProjectCard.Paragraph>
+              It is light and minilistic with bare minimum configuration needed
+              to spawn a react app.
+            </ProjectCard.Paragraph>
           </ProjectCard.Content>
-          <ProjectCard.Para>
-            It is light and minilistic with bare minimum configuration needed to
-            spawn a react app.
-          </ProjectCard.Para>
         </ProjectCard>
 
         <ProjectCard
@@ -54,23 +54,23 @@ const Projects = () => {
           date="27 Jun 2020 - 28 Jun 2020"
         >
           <ProjectCard.Content>
-            <ProjectCard.Para>
+            <ProjectCard.Paragraph>
               MLH and Microsoft joined forces to host a hackathon for building
               new and improving existing coding tools.
-            </ProjectCard.Para>
+            </ProjectCard.Paragraph>
+            <ProjectCard.Paragraph>
+              <ul>
+                <li>
+                  Integrated Vega charting library to VSCode, to generate charts
+                  and diagrams on the go.
+                </li>
+                <li>
+                  It reads the config from the JSON schema and shows the output
+                  in the Web View of VSCode
+                </li>
+              </ul>
+            </ProjectCard.Paragraph>
           </ProjectCard.Content>
-          <ProjectCard.Para>
-            <ul>
-              <li>
-                Integrated Vega charting library to VSCode, to generate charts
-                and diagrams on the go.
-              </li>
-              <li>
-                It reads the config from the JSON schema and shows the output in
-                the Web View of VSCode
-              </li>
-            </ul>
-          </ProjectCard.Para>
         </ProjectCard>
 
         <ProjectCard
@@ -79,12 +79,12 @@ const Projects = () => {
           date="1 Jul 2020 - 1 Oct 2020"
         >
           <ProjectCard.Content>
-            <ProjectCard.Para>
+            <ProjectCard.Paragraph>
               It is an indigenous multi-provider authentication framework based
               on OAuth-2. It comprises of two standalone authentication and
               resource server.
-            </ProjectCard.Para>
-            <ProjectCard.Para>
+            </ProjectCard.Paragraph>
+            <ProjectCard.Paragraph>
               <ul>
                 <li>
                   Worked on improving the OAuth flow and containerising the
@@ -95,7 +95,7 @@ const Projects = () => {
                   caching.
                 </li>
               </ul>
-            </ProjectCard.Para>
+            </ProjectCard.Paragraph>
           </ProjectCard.Content>
         </ProjectCard>
 
@@ -105,11 +105,11 @@ const Projects = () => {
           date="1 Apr 2020 - Present"
         >
           <ProjectCard.Content>
-            <ProjectCard.Para>
+            <ProjectCard.Paragraph>
               A cross platform application to track Covid-19 activities, based
               on Flutter framework.
-            </ProjectCard.Para>
-            <ProjectCard.Para>
+            </ProjectCard.Paragraph>
+            <ProjectCard.Paragraph>
               <ul>
                 <li>
                   Integrated maps sdk to pinpoint data for convenient visual
@@ -120,7 +120,7 @@ const Projects = () => {
                   followed to prevent spreading of the same.
                 </li>
               </ul>
-            </ProjectCard.Para>
+            </ProjectCard.Paragraph>
           </ProjectCard.Content>
         </ProjectCard>
 
@@ -130,9 +130,9 @@ const Projects = () => {
           date="1 Apr 2020 - Present"
         >
           <ProjectCard.Content>
-            <ProjectCard.Para>
+            <ProjectCard.Paragraph>
               A self crafted VS Code Theme, for those who like it in dark mode.
-            </ProjectCard.Para>
+            </ProjectCard.Paragraph>
           </ProjectCard.Content>
         </ProjectCard>
 
@@ -142,14 +142,14 @@ const Projects = () => {
           date="29 Jan 2020 - 31 Jan 2020"
         >
           <ProjectCard.Content>
-            <ProjectCard.Para>
+            <ProjectCard.Paragraph>
               A small tactical game in Lua to kill zombies and protect your
               tower before its too late.
-            </ProjectCard.Para>
-            <ProjectCard.Para>
+            </ProjectCard.Paragraph>
+            <ProjectCard.Paragraph>
               Spearheaded and implemented the underlying core features and
               worked on performance optimization.
-            </ProjectCard.Para>
+            </ProjectCard.Paragraph>
           </ProjectCard.Content>
         </ProjectCard>
 
@@ -159,12 +159,12 @@ const Projects = () => {
           date="Jan 2019 - Jan 2020"
         >
           <ProjectCard.Content>
-            <ProjectCard.Para>
+            <ProjectCard.Paragraph>
               E-Summit is an event held to exhibit the entrepreneurial talent
               and creativity through many competitions like business ventures,
               product design competition, etc.
-            </ProjectCard.Para>
-            <ProjectCard.Para>
+            </ProjectCard.Paragraph>
+            <ProjectCard.Paragraph>
               <ul>
                 <li>
                   Developed core pipeline and worked on optimizing user
@@ -175,7 +175,7 @@ const Projects = () => {
                   login & registration forms
                 </li>
               </ul>
-            </ProjectCard.Para>
+            </ProjectCard.Paragraph>
           </ProjectCard.Content>
         </ProjectCard>
 
@@ -185,12 +185,12 @@ const Projects = () => {
           date="Apr 2019 - Present"
         >
           <ProjectCard.Content>
-            <ProjectCard.Para>
+            <ProjectCard.Paragraph>
               Cerebro, a platform for hosting data hackathons exclusively in
               IITR developed by SDSLabs. It's challenges and competitions are
               maintained by members of SDSLabs and Data Science Group.
-            </ProjectCard.Para>
-            <ProjectCard.Para>
+            </ProjectCard.Paragraph>
+            <ProjectCard.Paragraph>
               <ul>
                 <li>
                   Implemented Admin Panel to host and manage machine learning
@@ -205,12 +205,12 @@ const Projects = () => {
                   client in ReactJS and Redux.
                 </li>
               </ul>
-            </ProjectCard.Para>
-            <ProjectCard.Para>
-              For more details, check out the{' '}
+            </ProjectCard.Paragraph>
+            <ProjectCard.Paragraph>
+              For more details, check out the
               <a href="https://blog.sdslabs.co/2018/12/cerebro">blog post</a> on
               Cerebro.
-            </ProjectCard.Para>
+            </ProjectCard.Paragraph>
           </ProjectCard.Content>
         </ProjectCard>
 
@@ -220,12 +220,12 @@ const Projects = () => {
           date="Jan 2019 - Feb 2020"
         >
           <ProjectCard.Content>
-            <ProjectCard.Para>
+            <ProjectCard.Paragraph>
               Cognizance is the Tech Fest organized by IIT Roorkee. It is a
               prgressive web app with conceptualized the ER Diagram and
               implemented the relational database in PSQL.
-            </ProjectCard.Para>
-            <ProjectCard.Para>
+            </ProjectCard.Paragraph>
+            <ProjectCard.Paragraph>
               <ul>
                 <li>
                   Worked on designing the architecture and implementing core
@@ -243,7 +243,7 @@ const Projects = () => {
                   Built on Django with frontend SPA client in ReactJS and Redux.
                 </li>
               </ul>
-            </ProjectCard.Para>
+            </ProjectCard.Paragraph>
           </ProjectCard.Content>
         </ProjectCard>
 
@@ -253,11 +253,11 @@ const Projects = () => {
           date="Dec 2018 - May 2019"
         >
           <ProjectCard.Content>
-            <ProjectCard.Para>
+            <ProjectCard.Paragraph>
               The trust is working to train the village as well as urban
               downtrodden people of the society.
-            </ProjectCard.Para>
-            <ProjectCard.Para>
+            </ProjectCard.Paragraph>
+            <ProjectCard.Paragraph>
               <ul>
                 <li>Lead a team of four, from design to development cycle.</li>
                 <li>
@@ -272,7 +272,7 @@ const Projects = () => {
                   information.
                 </li>
               </ul>
-            </ProjectCard.Para>
+            </ProjectCard.Paragraph>
           </ProjectCard.Content>
         </ProjectCard>
 
@@ -282,12 +282,12 @@ const Projects = () => {
           date="Dec 2018 - May 2019"
         >
           <ProjectCard.Content>
-            <ProjectCard.Para>
+            <ProjectCard.Paragraph>
               A website that provides information regarding the bookings of the
               venues of IIT Roorkee. and gives you a centralized system to book
               the venue for certain events.
-            </ProjectCard.Para>
-            <ProjectCard.Para>
+            </ProjectCard.Paragraph>
+            <ProjectCard.Paragraph>
               <ul>
                 <li>
                   Implemented personalized calender, feedback portal and search
@@ -295,7 +295,7 @@ const Projects = () => {
                 </li>
                 <li>Pure HTML/CSS, JS usage with PHP as backend.</li>
               </ul>
-            </ProjectCard.Para>
+            </ProjectCard.Paragraph>
           </ProjectCard.Content>
         </ProjectCard>
       </div>
