@@ -9,10 +9,10 @@ const About = () => {
         <span class="text-primary">Shikhar</span>
       </h1>
       <p class="lead mb-5">
-        I am a 22-year-old pre final year student enrolled in Chemical
-        Engineering at IIT Roorkee. I developed a passion for development in my
-        freshmen year and since then most of my time goes into reading and
-        writing software.
+        I am a 23-year-old final year student enrolled in Chemical Engineering
+        at IIT Roorkee. I developed a passion for development in my freshmen
+        year and since then most of my time goes into reading and writing
+        software.
       </p>
       <div class="social-icons">
         <a

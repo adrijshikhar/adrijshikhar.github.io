@@ -10,56 +10,282 @@ const Experience = () => {
         <h2 class="mb-5">Experience</h2>
 
         <ExpCard
-          postition="SDE Intern | Rephrase.ai"
+          postition="SDE Intern"
+          companyName="Hevo Data"
+          companyLink="https://hevodata.com/"
+          location="Bangalore"
+          date="Sep 2021 - Oct 2021"
+        >
+          <ExpCard.Content>
+            <ExpCard.Paragraph>
+              Load data from any source into your warehouse
+            </ExpCard.Paragraph>
+            <ExpCard.Paragraph>
+              <ul>
+                <li>
+                  Added support for ‘wal2json’ output plugin for postgres
+                  logical replication.
+                </li>
+                <li>
+                  Reduced WAL processing time taken by the platform, by 60%.
+                </li>
+                <li>
+                  Implemented dynamic plugin selection using Guice dependency
+                  injection.
+                </li>
+                <li>Ensured stability by benchmarks and unit tests.</li>
+                <li>Tech Stack: Java, Postgres</li>
+              </ul>
+            </ExpCard.Paragraph>
+          </ExpCard.Content>
+        </ExpCard>
+
+        <ExpCard
+          postition="SDE Intern"
+          companyName="MTX Global"
+          companyLink="https://www.mtxb2b.com/s/"
+          location="Hydrabad"
+          date="Jun 2021 - Aug 2021"
+        >
+          <ExpCard.Content>
+            <ExpCard.Paragraph>GO DIGITAL. THINK HUMAN.</ExpCard.Paragraph>
+            <ExpCard.Paragraph>
+              <ul>
+                <li>
+                  Worked on curating ETL data pipeline from concept to proof of
+                  concept.
+                </li>
+                <li>
+                  Implemented on-demand data transformations using Apache Spark,
+                  and streaming the same using Apache Kafka onto Google Cloud
+                  Platform.
+                </li>
+                <li>
+                  Containerized individual components of the pipeline for better
+                  development and deployment.
+                </li>
+                <li>
+                  Solely configured and maintained pipeline on Google K8s
+                  Engine.
+                </li>
+                <li>
+                  Orchestrated data visualization service to configure overlayed
+                  charts.
+                </li>
+                <li>
+                  Tech Stack: Python, Apache Spark, Docker, Kubernetes, Google
+                  Cloud Platform
+                </li>
+              </ul>
+            </ExpCard.Paragraph>
+          </ExpCard.Content>
+        </ExpCard>
+
+        <ExpCard
+          postition="Full Stack Developer Intern"
+          companyName="Triomics"
+          companyLink="https://triomics.in/"
+          location="Gurgaon"
+          date="Apr 2021 - May 2021"
+        >
+          <ExpCard.Content>
+            <ExpCard.Paragraph>
+              Making Clinical Trials faster and transparent
+            </ExpCard.Paragraph>
+            <ExpCard.Paragraph>
+              <ul>
+                <li>
+                  Collaborated with the core founding team on the initial stages
+                  of the platform.
+                </li>
+                <li>
+                  Setup infrastructure for the applications, keeping scalability
+                  and security into account.
+                </li>
+                <li>
+                  Developed management dashboard service for micro and macro
+                  level user access across the apps.
+                </li>
+                <li>
+                  Customized D3 for visualization of data, fitting our use case.
+                </li>
+                <li>Tech Stack: React, Django, Postgres</li>
+              </ul>
+            </ExpCard.Paragraph>
+          </ExpCard.Content>
+        </ExpCard>
+
+        <ExpCard
+          postition="SDE Intern"
+          companyName="Rephrase.ai"
+          companyLink="https://www.rephrase.ai/"
           location="Bangalore"
           date="Oct 2020 - March 2021"
         >
-          <p class="para-content">
-            Use Generative AI to address millions of customers personally,
-            through videos.
-          </p>
+          <ExpCard.Content>
+            <ExpCard.Paragraph>
+              Use Generative AI to address millions of customers personally,
+              through videos.
+            </ExpCard.Paragraph>
+            <ExpCard.Paragraph>
+              <ul>
+                <li>
+                  Ensured stability of the product by integrating tests and
+                  error handling.
+                </li>
+                <li>
+                  Optimized uploading and validating data from user's end.
+                </li>
+                <li>
+                  Implemented Stripe, Sentry, Clickup for better development
+                  cycle.
+                </li>
+                <li>
+                  Integrated continuous integration and ensured continuous
+                  delivery among various services.
+                </li>
+                <li>Worked on graphene to optimize API performance.</li>
+                <li>Tech Stack: React, Django, GraphQL, ffmpeg</li>
+              </ul>
+            </ExpCard.Paragraph>
+          </ExpCard.Content>
         </ExpCard>
 
         <ExpCard
-          postition="Software Engineering Intern | Powerplay"
+          postition="Software Engineering Intern"
+          companyName="Powerplay"
+          companyLink="https://www.getpowerplay.in/"
           location="Bangalore"
           date="Apr 2020 - Jun 2020"
         >
-          <p class="para-content">
-            Helping construction contractors track realtime on-site progress
-          </p>
+          <ExpCard.Content>
+            <ExpCard.Paragraph>
+              Helping construction contractors track realtime on-site progress
+            </ExpCard.Paragraph>
+            <ExpCard.Paragraph>
+              <ul>
+                <li>
+                  Implemented core features and structure from concept through
+                  deployment.
+                </li>
+                <li>
+                  Introduced REST API', server-side pagination and JWT based
+                  authentication system.
+                </li>
+                <li>
+                  Standardized UI libraries by enclosing them in highly
+                  customizable wrapper for code reusability.
+                </li>
+                <li>Assessed UX and UI designs for technical feasibility.</li>
+                <li>Developed standard and ad hoc report in table format.</li>
+                <li>
+                  Collaborated with product team members to implement new
+                  feature developments.
+                </li>
+                <li>Tech Stack: React, NodeJS, MongoDB</li>
+              </ul>
+            </ExpCard.Paragraph>
+          </ExpCard.Content>
         </ExpCard>
 
         <ExpCard
-          postition="Developer | SDSLabs"
+          postition="Developer"
+          companyName="SDSLabs"
+          companyLink="https://sdslabs.co/"
           location="IIT Roorkee"
           date="Jan 2019 - Present"
         >
-          <p class="para-content">Think. Build. Ship</p>
+          <ExpCard.Content>
+            <ExpCard.Paragraph>Think. Build. Ship</ExpCard.Paragraph>
+            <ExpCard.Paragraph>
+              <ul>
+                <li>
+                  Under the hood of the group, we promote technical culture on
+                  the campus by conducting hackathons, lecture series, and
+                  competitions.
+                </li>
+                <li>
+                  Responsible for maintaining current applications and server
+                  management.
+                </li>
+                <li>
+                  Mentored freshmen students in their projects for the Winter of
+                  Code program.
+                </li>
+              </ul>
+            </ExpCard.Paragraph>
+          </ExpCard.Content>
         </ExpCard>
 
         <ExpCard
-          postition="Manager | Entrepreneurship Cell"
+          postition="Manager"
+          companyName="Entrepreneurship Cell"
+          companyLink="https://www.ecelliitr.org/"
           location="IIT Roorkee"
           date="Feb 2019 - Feb 2020"
         >
-          <p class="para-content">#inspiringinnovation</p>
+          <ExpCard.Content>
+            <ExpCard.Paragraph>#inspiringinnovation</ExpCard.Paragraph>
+            <ExpCard.Paragraph>
+              <ul>
+                <li>
+                  Conducted meetings, hands-on workshops and events on various
+                  topics related to entrepreneurship and startups.
+                </li>
+                <li>Participated in various case studies regarding SaaS.</li>
+                <li>
+                  Developed core pipeline and worked on optimizing user
+                  experience.
+                </li>
+                <li>
+                  Spearheaded the development of user interface and the flow of
+                  login & registration forms.
+                </li>
+              </ul>
+            </ExpCard.Paragraph>
+          </ExpCard.Content>
         </ExpCard>
 
         <ExpCard
-          postition="Senior Member | XDA Developers"
+          postition="Senior Member"
+          companyName="XDA Developers"
+          companyLink="https://forum.xda-developers.com/"
           location="JB Online Media, LLC"
           date="Feb 2015 - Present"
         >
-          <p class="para-content">Tech Fest</p>
+          <ExpCard.Content>
+            <ExpCard.Paragraph>Open Source Android forum</ExpCard.Paragraph>
+          </ExpCard.Content>
         </ExpCard>
 
         <ExpCard
-          postition="Web Developer | Cognizance"
+          postition="Web Developer"
+          companyName="Cognizance"
+          companyLink="https://cognizance.org.in/"
           location="IIT Roorkee"
           date="Dec 2018 - Jan 2020"
         >
-          <p class="para-content">IIT Roorkee Tech Fest</p>
+          <ExpCard.Content>
+            <ExpCard.Paragraph>IIT Roorkee Tech Fest</ExpCard.Paragraph>
+            <ExpCard.Paragraph>
+              <ul>
+                <li>
+                  Been a part of a 3-tier team of 5+ executive members,
+                  associate members, and co-coordinators to establish web
+                  presence of Cognizance 2019 and 2020.
+                </li>
+                <li>Contributed as a Manager Web in 2019 and 2020</li>
+                <li>
+                  Worked on designing the architecture and implementing core
+                  features of the progressive web app.
+                </li>
+                <li>
+                  Ported the legacy code from webpack v2 to webpack v4 and
+                  restructured the node dependencies.
+                </li>
+              </ul>
+            </ExpCard.Paragraph>
+          </ExpCard.Content>
         </ExpCard>
       </div>
     </section>
