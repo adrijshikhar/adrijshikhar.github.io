@@ -73,7 +73,8 @@
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
     "deploy": "gh-pages -d build -b master",
-    "lint": "eslint src --max-warnings 10000 --fix"
+    "lint": "eslint src --max-warnings 10000 --fix",
+    "prepare": "husky install"
   },
   "browserslist": [
     ">0.2%",
@@ -119,14 +120,6 @@
     ]
   },
   "lint-staged": {
-    "*.js": [
-      "prettier --write",
-      "eslint --fix"
-    ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
+    "*.js": "eslint --cache --fix"
   }
 }
