@@ -31,7 +31,7 @@
     "inferno-bootstrap": "^7.3.2",
     "inferno-dev-utils": "^6.0.4",
     "mini-css-extract-plugin": "1.6.2",
-    "node-forge": "^0.10.0",
+    "node-forge": "^1.0.0",
     "node-sass": "^4.14.1",
     "optimize-css-assets-webpack-plugin": "6.0.1",
     "pnp-webpack-plugin": "1.7.0",
