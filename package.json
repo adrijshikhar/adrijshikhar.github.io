@@ -56,7 +56,7 @@
     "eslint-config-inferno-app": "^7.0.2",
     "eslint-config-prettier": "^8.3.0",
     "eslint-loader": "4.0.2",
-    "eslint-plugin-import": "2.25.3",
+    "eslint-plugin-import": "2.25.4",
     "eslint-plugin-inferno": "^7.24.0",
     "eslint-plugin-jsx-a11y": "6.5.1",
     "eslint-plugin-prettier": "^4.0.0",
