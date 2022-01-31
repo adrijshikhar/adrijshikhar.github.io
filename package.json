@@ -1,125 +1,59 @@
 {
-  "name": "portfolio",
-  "description": "Resume is a simple, yet elegant resume and CV theme using InfernoJs.",
-  "version": "0.1.0",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/adrijshikhar/adrijshikhar.github.io.git"
-  },
-  "homepage": "https://adrijshikhar.github.io",
-  "dependencies": {
-    "@babel/core": "7.16.0",
-    "@svgr/webpack": "6.1.2",
-    "axios": "^0.24.0",
-    "babel-core": "7.0.0-bridge.0",
-    "babel-eslint": "^10.1.0",
-    "babel-jest": "27.4.6",
-    "babel-loader": "8.2.3",
-    "babel-preset-inferno-app": "^8.0.3",
-    "bfj": "7.0.2",
-    "bootstrap": ">=4.5.3",
-    "case-sensitive-paths-webpack-plugin": "2.4.0",
-    "chalk": "4.1.2",
-    "css-loader": "5.2.7",
-    "dotenv": "10.0.0",
-    "dotenv-expand": "5.1.0",
-    "file-loader": "6.2.0",
-    "fs-extra": "10.0.0",
-    "html-webpack-plugin": "4.5.2",
-    "identity-obj-proxy": "3.0.0",
-    "inferno": "^7.4.11",
-    "inferno-bootstrap": "^7.3.2",
-    "inferno-dev-utils": "^6.0.4",
-    "mini-css-extract-plugin": "1.6.2",
-    "node-forge": "^1.0.0",
-    "node-sass": "^4.14.1",
-    "optimize-css-assets-webpack-plugin": "6.0.1",
-    "pnp-webpack-plugin": "1.7.0",
-    "postcss-flexbugs-fixes": "4.2.1",
-    "postcss-loader": "3.0.0",
-    "postcss-preset-env": "6.7.0",
-    "postcss-safe-parser": "5.0.2",
-    "prettier": "^2.5.1",
-    "react-app-polyfill": "^2.0.0",
-    "resolve": "1.20.0",
-    "sass-loader": "10.0.2",
-    "style-loader": "2.0.0",
-    "terser-webpack-plugin": "4.2.3",
-    "url-loader": "4.1.1",
-    "webpack": "4.46.0",
-    "webpack-dev-server": "4.7.2",
-    "webpack-manifest-plugin": "4.0.2",
-    "workbox-webpack-plugin": "6.4.2"
+  "private": true,
+  "name": "adrijshikhar.github.io",
+  "version": "0.0.0",
+  "license": "MIT",
+  "scripts": {
+    "build": "preact build",
+    "serve": "sirv build --port 8080 --cors --single",
+    "dev": "preact watch",
+    "test": "jest",
+    "eslint": "eslint --fix src/**/*.js",
+    "stylelint": "stylelint \"./src/styles/**/*.{css,scss,sass}\" --fix",
+    "prepare": "husky install",
+    "deploy": "gh-pages -d build -b master"
   },
   "devDependencies": {
-    "eslint": "7.32.0",
-    "eslint-config-inferno-app": "^7.0.2",
+    "@aerian/eslint-config-preact": "^13.0.0",
+    "enzyme": "^3.10.0",
+    "enzyme-adapter-preact-pure": "^2.0.0",
+    "eslint": "^8.7.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-preact": "^1.3.0",
     "eslint-config-prettier": "^8.3.0",
-    "eslint-loader": "4.0.2",
     "eslint-plugin-import": "2.25.4",
-    "eslint-plugin-inferno": "^7.24.0",
-    "eslint-plugin-jsx-a11y": "6.5.1",
     "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-simple-import-sort": "^7.0.0",
     "gh-pages": "^3.2.3",
     "husky": "^7.0.4",
-    "install": "^0.13.0",
-    "jest": "27.4.7",
-    "jest-pnp-resolver": "1.2.2",
-    "jest-resolve": "27.4.5",
-    "lint-staged": "^12.1.2"
+    "jest": "^24.9.0",
+    "jest-preset-preact": "^1.0.0",
+    "lint-staged": "^12.3.2",
+    "preact-cli": "^3.0.0",
+    "prettier": "^2.5.1",
+    "sass": "^1.49.0",
+    "sass-loader": "10",
+    "sirv-cli": "1.0.3",
+    "stylelint": "^14.3.0",
+    "stylelint-config-prettier-scss": "^0.0.1",
+    "stylelint-config-sass-guidelines": "^9.0.1",
+    "stylelint-config-standard-scss": "^3.0.0"
   },
-  "license": "ISC",
-  "scripts": {
-    "start": "node scripts/start.js",
-    "build": "node scripts/build.js",
-    "deploy": "gh-pages -d build -b master",
-    "lint": "eslint src --max-warnings 10000 --fix",
-    "prepare": "husky install"
+  "dependencies": {
+    "bootstrap": "^5.1.3",
+    "preact": "^10.3.2",
+    "preact-render-to-string": "^5.1.4",
+    "preact-router": "^3.2.1"
   },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ],
   "jest": {
-    "collectCoverageFrom": [
-      "src/**/*.{js,jsx}"
-    ],
-    "resolver": "jest-pnp-resolver",
+    "preset": "jest-preset-preact",
     "setupFiles": [
-      "react-app-polyfill/jsdom"
-    ],
-    "testMatch": [
-      "<rootDir>/src/**/__tests__/**/*.{js,jsx}",
-      "<rootDir>/src/**/?(*.)(spec|test).{js,jsx}"
-    ],
-    "testEnvironment": "jsdom",
-    "testURL": "http://localhost",
-    "transform": {
-      "^.+\\.(js|jsx)$": "<rootDir>/node_modules/babel-jest",
-      "^.+\\.css$": "<rootDir>/config/jest/cssTransform.js",
-      "^(?!.*\\.(js|jsx|css|json)$)": "<rootDir>/config/jest/fileTransform.js"
-    },
-    "transformIgnorePatterns": [
-      "[/\\\\]node_modules[/\\\\].+\\.(js|jsx)$",
-      "^.+\\.module\\.(css|sass|scss)$"
-    ],
-    "moduleNameMapper": {
-      "^react$": "inferno-compat",
-      "^react-dom$": "inferno-compat",
-      "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy"
-    },
-    "moduleFileExtensions": [
-      "web.js",
-      "js",
-      "json",
-      "web.jsx",
-      "jsx",
-      "node"
+      "<rootDir>/tests/__mocks__/browserMocks.js",
+      "<rootDir>/tests/__mocks__/setupTests.js"
     ]
   },
   "lint-staged": {
-    "*.js": "eslint --cache --fix"
+    "*.js": "eslint --cache --fix",
+    "*.scss": "stylelint --fix"
   }
 }

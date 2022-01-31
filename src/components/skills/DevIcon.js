@@ -1,8 +1,8 @@
-const DevIcon = ({ className, ...props }) => {
-  return (
-    <div class="list-item">
-      {className ? <i class={className}></i> : props.children}
-    </div>
-  );
-};
+import { h } from 'preact';
+
+const DevIcon = ({ className, ...props }) => (
+	<div className="list-item">
+		{className ? <i className={className}></i> : props.children}
+	</div>
+);
 export default DevIcon;

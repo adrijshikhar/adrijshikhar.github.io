@@ -1,5 +1,5 @@
-const Tick = () => {
-  return <i class="fa-li fa fa-check"></i>;
-};
+import { h } from 'preact';
+
+const Tick = () => <i className="fa-li fa fa-check"></i>;
 
 export default Tick;

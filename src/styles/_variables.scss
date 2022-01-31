@@ -13,7 +13,6 @@ $gray-700: #495057 !default;
 $gray-800: #343a40 !default;
 $gray-900: #212529 !default;
 $black: #000 !default;
-
 $blue: #1685d5 !default;
 $indigo: #6610f2 !default;
 $purple: #6f42c1 !default;
@@ -24,7 +23,6 @@ $yellow: #ffc107 !default;
 $green: #28a745 !default;
 $teal: #20c997 !default;
 $cyan: #17a2b8 !default;
-
 $primary: $blue !default;
 $secondary: $gray-600 !default;
 $success: $green !default;
@@ -37,7 +35,5 @@ $dark: #0e5385 !default;
 // Page Variables
 
 $sidebar-base-width: 20rem;
-
-$normalFontSize: 1.2rem;
-
-$gutterWidth: 0.8rem;
+$normal-font-size: 1.2rem;
+$gutter-width: 0.8rem;

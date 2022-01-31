@@ -2,9 +2,38 @@
 
 ![Build](https://github.com/adrijshikhar/adrijshikhar.github.io/workflows/Build/badge.svg) &nbsp; ![Build and Deploy](https://github.com/adrijshikhar/adrijshikhar.github.io/workflows/Build%20and%20Deploy/badge.svg?branch=content)
 
-This portfolio is uses [InfernoJS](https://infernojs.org/) as its tech stack.
+## Setup
 
-## Tasks
+- Install [nvm](https://github.com/nvm-sh/nvm)
+- Install [yvm](https://yvm.js.org/docs/overview)
+- Run `nvm install` to set the node version mentioned in `.nvmrc`
+- Run `yvm install lts` to install latest yarn version
+- Run `yarn dev` to start development
 
-- `yarn start` browserSync opens the project in your default browser and live reloads when changes are made.
-- `yarn build` the default task that builds everything
+
+## Deployment
+
+- Copy `.env.example` to `.env` and specify port
+- Copy respective conf file from `docker` folder
+- Spin up container using `docker-compose up -d`
+
+### CLI Commands
+
+``` bash
+# install dependencies
+yarn install
+
+# serve with hot reload at localhost:8080
+yarn dev
+
+# build for production with minification
+yarn build
+
+# test the production build locally
+yarn serve
+
+# run tests with jest and enzyme
+yarn test
+```
+
+For detailed explanation on how things work, checkout the [CLI Readme](https://github.com/developit/preact-cli/blob/master/README.md).

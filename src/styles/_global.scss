@@ -5,7 +5,7 @@ body {
 
   padding-top: 54px;
   color: $gray-600;
-  font-size: $normalFontSize;
+  font-size: $normal-font-size;
 }
 
 @media (min-width: 992px) {
@@ -21,7 +21,7 @@ h1 {
   text-transform: uppercase;
   color: $gray-900;
   font-weight: 600;
-  font-size: $normalFontSize * 3;
+  font-size: $normal-font-size * 3;
 }
 
 h2 {
@@ -30,7 +30,7 @@ h2 {
   text-transform: uppercase;
   color: $gray-800;
   font-weight: 600;
-  font-size: $normalFontSize * 2.4;
+  font-size: $normal-font-size * 2.4;
 }
 
 h3 {
@@ -38,14 +38,14 @@ h3 {
 
   color: $gray-700;
   font-weight: 600;
-  font-size: $normalFontSize * 1.2;
+  font-size: $normal-font-size * 1.2;
 }
 
 h4 {
   @include body-font;
 
   color: $gray-600;
-  font-size: $normalFontSize * 1.1;
+  font-size: $normal-font-size * 1.1;
 }
 
 .subheading {
@@ -53,17 +53,17 @@ h4 {
 
   @include subtitle-font;
 
-  font-size: $normalFontSize * 0.9;
+  font-size: $normal-font-size * 0.9;
 }
 
 p.lead {
-  font-size: $normalFontSize;
+  font-size: $normal-font-size;
   font-weight: 400;
   text-align: left;
 }
 
 .para-content {
-  font-size: $normalFontSize * 0.9;
+  font-size: $normal-font-size * 0.9;
   text-align: justify;
 }
 
@@ -108,18 +108,17 @@ p.lead {
 
 .dev-icons {
   @media (max-width: 992px) {
-    flex-wrap: wrap;
+    flex-flow:row  wrap;
     justify-content: center;
     width: 100%;
     display: flex;
-    flex-direction: row;
     align-items: center;
   }
 
   font-size: 3rem;
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+    flex-flow:row  wrap;
+
 
   img,
   svg {
@@ -129,9 +128,10 @@ p.lead {
 
   .list-item {
     width: fit-content;
-    margin-right: $gutterWidth;
+    margin-right: $gutter-width;
     display: flex;
     align-items: center;
+
     &:hover,
     svg:hover .icon,
     img:hover .icon {
@@ -177,7 +177,7 @@ p.lead {
   .tooltip-inner {
     @include body-font;
 
-    font-size: $normalFontSize * 0.8;
+    font-size: $normal-font-size * 0.8;
     padding: 0.5rem;
     color: white;
     background-color: $primary;
