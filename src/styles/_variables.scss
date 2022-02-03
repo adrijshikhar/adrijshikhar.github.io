@@ -13,8 +13,9 @@ $gray-700: #495057 !default;
 $gray-800: #343a40 !default;
 $gray-900: #212529 !default;
 $black: #000 !default;
-
 $blue: #1685d5 !default;
+$blue-light: #63b4ff;
+$blue-dark: #0059a3;
 $indigo: #6610f2 !default;
 $purple: #6f42c1 !default;
 $pink: #e83e8c !default;
@@ -24,7 +25,6 @@ $yellow: #ffc107 !default;
 $green: #28a745 !default;
 $teal: #20c997 !default;
 $cyan: #17a2b8 !default;
-
 $primary: $blue !default;
 $secondary: $gray-600 !default;
 $success: $green !default;
@@ -37,7 +37,17 @@ $dark: #0e5385 !default;
 // Page Variables
 
 $sidebar-base-width: 20rem;
+$normal-font-size: 1.2rem;
+$gutter-width: 0.8rem;
+$theme-colors: (
+  "primary": $primary,
+  "secondary": $secondary,
+  "success": $success,
+  "info" :$info,
+  "warning": $warning,
+  "danger": $danger,
+  "light" :$light,
+  "dark" :$dark
+);
 
-$normalFontSize: 1.2rem;
-
-$gutterWidth: 0.8rem;
+@import "~bootstrap/scss/bootstrap";

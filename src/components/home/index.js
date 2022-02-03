@@ -1,7 +1,7 @@
-import { Container } from 'inferno-bootstrap';
+import { h } from 'preact';
 
-const Home = props => {
-  return <Container class="container-fluid p-0">{props.children}</Container>;
-};
+const Home = props => (
+	<div className="container-fluid p-0">{props.children}</div>
+);
 
 export default Home;

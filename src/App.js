@@ -1,43 +1,36 @@
-import { Component } from 'inferno';
+import { h } from 'preact';
 
 import {
-  SideNavigationBar,
-  Home,
-  About,
-  Education,
-  Skills,
-  Experience,
-  Projects,
-  Interests,
-  Achievements,
+	About,
+	Achievements,
+	Education,
+	Experience,
+	Home,
+	Interests,
+	Projects,
+	SideNavigationBar,
+	Skills,
 } from './components';
-import { getUser } from './api/githubApi';
-class App extends Component {
-  componentWillMount() {
-    getUser('adrijshikhar');
-  }
-  render() {
-    return (
-      <div id="page-top">
-        <SideNavigationBar />
-        <Home>
-          <About />
-          <hr class="m-0" />
-          <Education />
-          <hr class="m-0" />
-          <Skills />
-          <hr class="m-0" />
-          <Experience />
-          <hr class="m-0" />
-          <Projects />
-          <hr class="m-0" />
-          <Achievements />
-          <hr class="m-0" />
-          <Interests />
-        </Home>
-      </div>
-    );
-  }
-}
+
+const App = () => (
+	<div id="page-top">
+		<SideNavigationBar />
+		<Home>
+			<About />
+			<hr className="m-0" />
+			<Education />
+			<hr className="m-0" />
+			<Skills />
+			<hr className="m-0" />
+			<Experience />
+			<hr className="m-0" />
+			<Projects />
+			<hr className="m-0" />
+			<Achievements />
+			<hr className="m-0" />
+			<Interests />
+		</Home>
+	</div>
+);
 
 export default App;
