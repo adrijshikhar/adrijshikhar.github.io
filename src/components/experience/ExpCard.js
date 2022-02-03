@@ -15,7 +15,7 @@ const ExpCard = ({
 		<div className="resume-content mr-3 ">
 			<h3 className="mb-1">
 				{postition} |{' '}
-				<a href={companyLink} target="_blank">
+				<a href={companyLink} target="_blank" referrerPolicy="no-referrer">
 					{companyName}
 				</a>
 			</h3>

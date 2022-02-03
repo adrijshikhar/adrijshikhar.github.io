@@ -67,6 +67,10 @@ p.lead {
   text-align: justify;
 }
 
+.mobile-icon {
+  color: $gray-700;
+}
+
 .social-icons {
   .icon {
     @media (max-width: 992px) {
@@ -108,7 +112,7 @@ p.lead {
 
 .dev-icons {
   @media (max-width: 992px) {
-    flex-flow:row  wrap;
+    flex-flow: row  wrap;
     justify-content: center;
     width: 100%;
     display: flex;
@@ -117,8 +121,7 @@ p.lead {
 
   font-size: 3rem;
   display: flex;
-    flex-flow:row  wrap;
-
+  flex-flow: row  wrap;
 
   img,
   svg {

@@ -9,10 +9,14 @@ const About = () => (
 			<span className="mr-1">Adrij</span>
 			<span className="text-primary">Shikhar</span>
 		</h1>
-		<p className="lead mb-5">
+		<p className="lead mb-3">
 			I am a 23-year-old final year student enrolled in Chemical Engineering at
 			IIT Roorkee. I developed a passion for development in my freshmen year and
 			since then most of my time goes into reading and writing software.
+		</p>
+		<p className="lead mb-5">
+			<i className="fa fa-mobile mobile-icon me-2"></i>
+			+91 (821) 805 8928
 		</p>
 		<div className="social-icons">
 			<a
@@ -63,13 +67,6 @@ const About = () => (
 			>
 				<i className="fab fa-facebook-f"></i>
 			</a>
-			<button
-				type="button"
-				className="icon fa fa-mobile"
-				data-toggle="tooltip"
-				data-placement="bottom"
-				title="+91 (821) 805-8928"
-			></button>
 			<a
 				className="icon"
 				data-toggle="tooltip"

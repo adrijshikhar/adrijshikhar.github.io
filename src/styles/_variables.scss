@@ -14,6 +14,8 @@ $gray-800: #343a40 !default;
 $gray-900: #212529 !default;
 $black: #000 !default;
 $blue: #1685d5 !default;
+$blue-light: #63b4ff;
+$blue-dark: #0059a3;
 $indigo: #6610f2 !default;
 $purple: #6f42c1 !default;
 $pink: #e83e8c !default;
@@ -37,3 +39,15 @@ $dark: #0e5385 !default;
 $sidebar-base-width: 20rem;
 $normal-font-size: 1.2rem;
 $gutter-width: 0.8rem;
+$theme-colors: (
+  "primary": $primary,
+  "secondary": $secondary,
+  "success": $success,
+  "info" :$info,
+  "warning": $warning,
+  "danger": $danger,
+  "light" :$light,
+  "dark" :$dark
+);
+
+@import "~bootstrap/scss/bootstrap";
