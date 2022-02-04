@@ -21,7 +21,7 @@ const ExpCard = ({
 							className="text-decoration-none"
 							href={companyLink}
 							target="_blank"
-							referrerPolicy="no-referrer"
+							rel="noreferrer"
 						>
 							{companyName}
 							<i className="fs-5 fas fa-external-link-alt ms-2"></i>

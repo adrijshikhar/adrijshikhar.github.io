@@ -13,7 +13,7 @@ const ProjectCard = ({ title, company, date, children, link }) => (
 							className="text-decoration-none"
 							href={link}
 							target="_blank"
-							referrerPolicy="no-referrer"
+							rel="noreferrer"
 						>
 							<h3 className="mb-0">
 								{title}
