@@ -7,7 +7,7 @@ const Achievements = () => (
 	>
 		<div className="my-auto">
 			<h2 className="mb-5">Achievements</h2>
-			<ul className="fa-ul mb-0">
+			<ul className="fa-ul mb-0 fs-5">
 				<li>
 					<span className="fa-li">
 						<i className="fas fa-trophy text-warning"></i>

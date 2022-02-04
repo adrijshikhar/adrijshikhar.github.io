@@ -21,7 +21,7 @@ const About = () => (
 		<div className="social-icons">
 			<a
 				className="icon"
-				href="https://www.linkedin.com/in/adrij-shikhar-460a89111/"
+				href="https://www.linkedin.com/in/adrij-shikhar"
 				target="_blank"
 				rel="noreferrer noopener"
 			>
