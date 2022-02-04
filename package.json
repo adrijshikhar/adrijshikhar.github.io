@@ -53,7 +53,7 @@
     ]
   },
   "lint-staged": {
-    "*.js": "eslint --cache --fix",
-    "*.scss": "stylelint --fix"
+    "*.js": "eslint --cache --fix src/**/*.js",
+    "*.scss": "stylelint \"./src/styles/**/*.{css,scss,sass}\" --fix --config .stylelintrc.json"
   }
 }

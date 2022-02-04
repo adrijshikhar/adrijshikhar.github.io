@@ -1,4 +1,4 @@
-import { h } from 'preact';
+import { Fragment, h } from 'preact';
 
 import {
 	About,
@@ -13,7 +13,7 @@ import {
 } from './components';
 
 const App = () => (
-	<div id="page-top">
+	<Fragment>
 		<SideNavigationBar />
 		<Home>
 			<About />
@@ -30,7 +30,7 @@ const App = () => (
 			<hr className="m-0" />
 			<Interests />
 		</Home>
-	</div>
+	</Fragment>
 );
 
 export default App;

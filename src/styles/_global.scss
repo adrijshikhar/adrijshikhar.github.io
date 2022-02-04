@@ -3,7 +3,6 @@
 body {
   @include body-font;
 
-  padding-top: 54px;
   color: $gray-600;
   font-size: $normal-font-size;
 }
@@ -30,7 +29,7 @@ h2 {
   text-transform: uppercase;
   color: $gray-800;
   font-weight: 600;
-  font-size: $normal-font-size * 2.4;
+  font-size: $normal-font-size * 2.25;
 }
 
 h3 {
@@ -38,14 +37,14 @@ h3 {
 
   color: $gray-700;
   font-weight: 600;
-  font-size: $normal-font-size * 1.2;
+  font-size: $normal-font-size * 1.5;
 }
 
 h4 {
   @include body-font;
 
   color: $gray-600;
-  font-size: $normal-font-size * 1.1;
+  font-size: $normal-font-size * 1.25;
 }
 
 .subheading {
@@ -53,17 +52,17 @@ h4 {
 
   @include subtitle-font;
 
-  font-size: $normal-font-size * 0.9;
+  font-size: $normal-font-size;
 }
 
 p.lead {
-  font-size: $normal-font-size;
+  font-size: $normal-font-size * 1.25;
   font-weight: 400;
   text-align: left;
 }
 
 .para-content {
-  font-size: $normal-font-size * 0.9;
+  font-size: $normal-font-size * 1.15;
   text-align: justify;
 }
 
@@ -141,48 +140,5 @@ p.lead {
       fill: $primary;
       color: $primary;
     }
-  }
-}
-
-.tooltip {
-  &.show {
-    opacity: 1;
-  }
-
-  &.bs-tooltip-right {
-    .arrow::before {
-      border-right-color: $primary;
-      border-left-color: $primary;
-    }
-  }
-
-  &.bs-tooltip-left {
-    .arrow::before {
-      border-right-color: $primary;
-      border-left-color: $primary;
-    }
-  }
-
-  &.bs-tooltip-top {
-    .arrow::before {
-      border-top-color: $primary;
-      border-bottom-color: $primary;
-    }
-  }
-
-  &.bs-tooltip-bottom {
-    .arrow::before {
-      border-top-color: $primary;
-      border-bottom-color: $primary;
-    }
-  }
-
-  .tooltip-inner {
-    @include body-font;
-
-    font-size: $normal-font-size * 0.8;
-    padding: 0.5rem;
-    color: white;
-    background-color: $primary;
   }
 }

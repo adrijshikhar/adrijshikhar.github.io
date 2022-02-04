@@ -12,18 +12,28 @@ const ExpCard = ({
 	...props
 }) => (
 	<div className="resume-item d-flex justify-content-between mb-5">
-		<div className="resume-content mr-3 ">
-			<h3 className="mb-1">
-				{postition} |{' '}
-				<a href={companyLink} target="_blank" referrerPolicy="no-referrer">
-					{companyName}
-				</a>
-			</h3>
-			<div className="subheading mb-3 font-italic">{location}</div>
+		<div className="resume-content me-3 ">
+			<div className="resume-heading-container mb-2">
+				<div className="resume-heading">
+					<h3 className="mb-0">
+						{postition} |{' '}
+						<a
+							className="text-decoration-none"
+							href={companyLink}
+							target="_blank"
+							referrerPolicy="no-referrer"
+						>
+							{companyName}
+							<i className="fs-5 fas fa-external-link-alt ms-2"></i>
+						</a>
+					</h3>
+					<div className="subheading mb-2 font-italic">{location}</div>
+				</div>
+				<div className="resume-date px-4 mb-2">
+					<span className="text-primary">{date}</span>
+				</div>
+			</div>
 			{props.children}
-		</div>
-		<div className="resume-date px-4">
-			<span className="text-primary">{date}</span>
 		</div>
 	</div>
 );

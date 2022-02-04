@@ -28,7 +28,7 @@ const SideNavigationBar = () => (
 				<span className="navbar-toggler-icon"></span>
 			</button>
 			<div className="collapse navbar-collapse" id="navbarSupportedContent">
-				<ul className="navbar-nav">
+				<ul className="navbar-nav nav-pills">
 					<li className="nav-item">
 						<a className="nav-link js-scroll-trigger" href="#about">
 							About

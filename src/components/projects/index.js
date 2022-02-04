@@ -11,9 +11,62 @@ const Projects = () => (
 			<h2 className="mb-5">Projects</h2>
 
 			<ProjectCard
+				title="Coderunner 2.0"
+				company="SDSLabs"
+				date="Oct 2019 - Present"
+			>
+				<ProjectCard.Content>
+					<ProjectCard.Paragraph>
+						Program code compiler is written in Golang.
+					</ProjectCard.Paragraph>
+					<ProjectCard.Paragraph>
+						<ul>
+							<li>Implemented core functionality CLI and exposed as API.</li>
+							<li>
+								Designed central agent to govern micro services, optimise cost &
+								increase reliability
+							</li>
+							<li>
+								Added GRPC server to spawn runners in docker environment with
+								custom log factory.
+							</li>
+						</ul>
+					</ProjectCard.Paragraph>
+				</ProjectCard.Content>
+			</ProjectCard>
+			<ProjectCard
+				title="Accounts"
+				company="SDSLabs"
+				date="Jul 2020 - Oct 2020"
+			>
+				<ProjectCard.Content>
+					<ProjectCard.Paragraph>
+						It is an indigenous multi-provider authentication framework based on
+						OAuth-2. It comprises of two standalone authentication and resource
+						server.
+					</ProjectCard.Paragraph>
+					<ProjectCard.Paragraph>
+						<ul>
+							<li>
+								Worked on improving the OAuth flow and containerising the
+								applications for better stability and scaling.
+							</li>
+							<li>
+								Setup containerised infrastructure for developement as well as
+								production environment.
+							</li>
+							<li>
+								Worked on additional features such as server-side redis caching.
+							</li>
+						</ul>
+					</ProjectCard.Paragraph>
+				</ProjectCard.Content>
+			</ProjectCard>
+			<ProjectCard
 				title="ScraperQL"
 				company="Dgraph Labs"
-				date="20 Oct 2020 - Present"
+				date="Oct 2020 - Nov 2020"
+				link="https://github.com/adrijshikhar/scraper-ql"
 			>
 				<ProjectCard.Content>
 					<ProjectCard.Paragraph>
@@ -37,9 +90,88 @@ const Projects = () => (
 			</ProjectCard>
 
 			<ProjectCard
+				title="Issue Labeler Bot"
+				company="SDSLabs"
+				date="Jul 2020 - Oct 2020"
+				link="https://github.com/sdslabs/SDSLabs-Issue-Labeler"
+			>
+				<ProjectCard.Content>
+					<ProjectCard.Paragraph>
+						It is a github bot which uses machine learning to automate the
+						labelling of issues on Github by critical analysis of its contentC
+					</ProjectCard.Paragraph>
+					<ProjectCard.Paragraph>
+						<ul>
+							<li>
+								Generated training dataset by scraping around 20,000 issues on
+								Github.
+							</li>
+							<li>
+								Fine-Tuned the Google Bert Model on the dataset. Exported the
+								trained model to integrate it with the Github bot.
+							</li>
+						</ul>
+					</ProjectCard.Paragraph>
+				</ProjectCard.Content>
+			</ProjectCard>
+
+			<ProjectCard title="Cerebro" company="SDSLabs" date="Apr 2019 - Present">
+				<ProjectCard.Content>
+					<ProjectCard.Paragraph>
+						Cerebro, a platform for hosting data hackathons exclusively in IITR
+						developed by SDSLabs. It&apos;s challenges and competitions are
+						maintained by members of SDSLabs and Data Science Group.
+					</ProjectCard.Paragraph>
+					<ProjectCard.Paragraph>
+						<ul>
+							<li>
+								Implemented Admin Panel to host and manage machine learning
+								competitions with submissions and managing posts.
+							</li>
+							<li>
+								Worked on additional features such as edit post and lazy loading
+								of news feed.
+							</li>
+							<li>
+								Built on Open source PHP framework, Laravel with frontend SPA
+								client in ReactJS and Redux.
+							</li>
+						</ul>
+					</ProjectCard.Paragraph>
+					<ProjectCard.Paragraph>
+						For more details, check out the{' '}
+						<a href="https://blog.sdslabs.co/2018/12/cerebro">blog post</a> on
+						Cerebro.
+					</ProjectCard.Paragraph>
+				</ProjectCard.Content>
+			</ProjectCard>
+
+			<ProjectCard
+				title="Slackbot"
+				company="SDSLabs"
+				date="July 2021 - Dec 2021"
+			>
+				<ProjectCard.Content>
+					<ProjectCard.Paragraph>
+						A simple yet extensive bot written in Golang, which uses Sockets to
+						communicate to Slack API.
+					</ProjectCard.Paragraph>
+					<ProjectCard.Paragraph>
+						<ul>
+							<li>
+								Developed core features with plugin layer for attaching
+								different bots onto one single point.
+							</li>
+							<li>Integrated with Google APIs for real-time chat features.</li>
+						</ul>
+					</ProjectCard.Paragraph>
+				</ProjectCard.Content>
+			</ProjectCard>
+
+			<ProjectCard
 				title="Create React App Webpack"
 				company="SDSLabs"
-				date="1 July 2020 - Present"
+				date="July 2020 - Aug 2020"
 			>
 				<ProjectCard.Content>
 					<ProjectCard.Paragraph>
@@ -55,7 +187,7 @@ const Projects = () => (
 			<ProjectCard
 				title="Vega VS Code Extension"
 				company="Major League Hacking"
-				date="27 Jun 2020 - 28 Jun 2020"
+				date="Jun 2020 - Jun 2020"
 			>
 				<ProjectCard.Content>
 					<ProjectCard.Paragraph>
@@ -77,61 +209,7 @@ const Projects = () => (
 				</ProjectCard.Content>
 			</ProjectCard>
 
-			<ProjectCard
-				title="Accounts"
-				company="SDSLabs"
-				date="1 Jul 2020 - 1 Oct 2020"
-			>
-				<ProjectCard.Content>
-					<ProjectCard.Paragraph>
-						It is an indigenous multi-provider authentication framework based on
-						OAuth-2. It comprises of two standalone authentication and resource
-						server.
-					</ProjectCard.Paragraph>
-					<ProjectCard.Paragraph>
-						<ul>
-							<li>
-								Worked on improving the OAuth flow and containerising the
-								applications for better stability and scaling.
-							</li>
-							<li>
-								Worked on additional features such as server-side redis caching.
-							</li>
-						</ul>
-					</ProjectCard.Paragraph>
-				</ProjectCard.Content>
-			</ProjectCard>
-
-			<ProjectCard
-				title="Covid 19 Tracker"
-				company="SDSLabs"
-				date="1 Apr 2020 - Present"
-			>
-				<ProjectCard.Content>
-					<ProjectCard.Paragraph>
-						A cross platform application to track Covid-19 activities, based on
-						Flutter framework.
-					</ProjectCard.Paragraph>
-					<ProjectCard.Paragraph>
-						<ul>
-							<li>
-								Integrated maps sdk to pinpoint data for convenient visual
-								understanding across India.
-							</li>
-							<li>
-								Lead the effort to introduce Government Protocols to be followed
-								to prevent spreading of the same.
-							</li>
-						</ul>
-					</ProjectCard.Paragraph>
-				</ProjectCard.Content>
-			</ProjectCard>
-
-			<ProjectCard
-				title="DarkDev"
-				company="SDSLabs"
-				date="1 Apr 2020 - Present"
-			>
+			<ProjectCard title="DarkDev" company="SDSLabs" date="Apr 2020 - Present">
 				<ProjectCard.Content>
 					<ProjectCard.Paragraph>
 						A self crafted VS Code Theme, for those who like it in dark mode.
@@ -142,7 +220,8 @@ const Projects = () => (
 			<ProjectCard
 				title="Kill-Zee"
 				company="Global Game Jam 2020"
-				date="29 Jan 2020 - 31 Jan 2020"
+				date="Jan 2020 - Jan 2020"
+				link="https://github.com/adrijshikhar/kill-zee"
 			>
 				<ProjectCard.Content>
 					<ProjectCard.Paragraph>
@@ -182,37 +261,6 @@ const Projects = () => (
 				</ProjectCard.Content>
 			</ProjectCard>
 
-			<ProjectCard title="Cerebro" company="SDSLabs" date="Apr 2019 - Present">
-				<ProjectCard.Content>
-					<ProjectCard.Paragraph>
-						Cerebro, a platform for hosting data hackathons exclusively in IITR
-						developed by SDSLabs. It&apos;s challenges and competitions are
-						maintained by members of SDSLabs and Data Science Group.
-					</ProjectCard.Paragraph>
-					<ProjectCard.Paragraph>
-						<ul>
-							<li>
-								Implemented Admin Panel to host and manage machine learning
-								competitions with submissions and managing posts.
-							</li>
-							<li>
-								Worked on additional features such as edit post and lazy loading
-								of news feed.
-							</li>
-							<li>
-								Built on Open source PHP framework, Laravel with frontend SPA
-								client in ReactJS and Redux.
-							</li>
-						</ul>
-					</ProjectCard.Paragraph>
-					<ProjectCard.Paragraph>
-						For more details, check out the
-						<a href="https://blog.sdslabs.co/2018/12/cerebro">blog post</a> on
-						Cerebro.
-					</ProjectCard.Paragraph>
-				</ProjectCard.Content>
-			</ProjectCard>
-
 			<ProjectCard
 				title="Cognizance"
 				company="IIT Roorkee"
@@ -247,6 +295,30 @@ const Projects = () => (
 			</ProjectCard>
 
 			<ProjectCard
+				title="Covid 19 Tracker"
+				company="SDSLabs"
+				date="Apr 2020 - May 2020"
+			>
+				<ProjectCard.Content>
+					<ProjectCard.Paragraph>
+						A cross platform application to track Covid-19 activities, based on
+						Flutter framework.
+					</ProjectCard.Paragraph>
+					<ProjectCard.Paragraph>
+						<ul>
+							<li>
+								Integrated maps sdk to pinpoint data for convenient visual
+								understanding across India.
+							</li>
+							<li>
+								Lead the effort to introduce Government Protocols to be followed
+								to prevent spreading of the same.
+							</li>
+						</ul>
+					</ProjectCard.Paragraph>
+				</ProjectCard.Content>
+			</ProjectCard>
+			<ProjectCard
 				title="Hidden Stone"
 				company="Utthan Foundation Trust"
 				date="Dec 2018 - May 2019"
@@ -273,7 +345,7 @@ const Projects = () => (
 				</ProjectCard.Content>
 			</ProjectCard>
 
-			<ProjectCard title="evem" company="SDSWoC 19" date="Dec 2018 - May 2019">
+			<ProjectCard title="evem" company="SDSWoC 19" date="Dec 2018 - Jan 2019">
 				<ProjectCard.Content>
 					<ProjectCard.Paragraph>
 						A website that provides information regarding the bookings of the

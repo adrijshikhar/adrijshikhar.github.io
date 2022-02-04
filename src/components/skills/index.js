@@ -11,14 +11,18 @@ const Skills = () => (
 			<h4 className="mb-3">Development Environment</h4>
 			<ul className="fa-ul mb-4">
 				<li>
-					<Tick /> Manjaro i3wm Community Edition
+					<i className="fa-li fab fa-linux"></i>
+					<span className="me-2"> OS:</span> Manjaro i3wm Community Edition
 				</li>
 				<li>
-					<Tick /> Highly customized [ VS Code | Intellij ] with self crafted
-					theme
+					<i className="fa-li fas fa-code"></i>
+					<span className="me-2"> IDE:</span> Highly customized [ VS Code |
+					Intellij ] with self crafted theme
 				</li>
 				<li>
-					<Tick /> Bash, Oh My Zsh, fish-shell, Oh My Fish
+					<i className="fa-li fas fa-terminal fs-6"></i>
+					<span className="me-2"> Shell:</span> Bash, Oh My Zsh, fish-shell, Oh
+					My Fish
 				</li>
 			</ul>
 
@@ -64,6 +68,7 @@ const Skills = () => (
 					</svg>
 				</DevIcon>
 				<DevIcon className="fab fa-java" />
+				<DevIcon className="fab fa-aws" />
 				<DevIcon>
 					<svg viewBox="0 0 128 128">
 						<path

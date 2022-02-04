@@ -6,7 +6,7 @@ const About = () => (
 		id="about"
 	>
 		<h1 className="mb-4 d-flex flex-wrap">
-			<span className="mr-1">Adrij</span>
+			<span className="me-2">Adrij</span>
 			<span className="text-primary">Shikhar</span>
 		</h1>
 		<p className="lead mb-3">

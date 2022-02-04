@@ -9,22 +9,35 @@ section.resume-section {
 
       .resume-content {
         margin: 0 !important;
+
+        .resume-heading-container {
+          display: block !important;
+        }
       }
 
       .resume-date {
-        padding-right: 0 !important;
+        padding: 0 !important;
+        text-align: start !important;
+        font-size: $normal-font-size * 1.15 !important;
       }
     }
 
     flex-direction: row;
+    width: 100%;
 
     .resume-content {
-      max-width: 60rem;
+      width: 100%;
+
+      .resume-heading-container {
+        display: flex;
+        justify-content: space-between;
+      }
     }
 
     .resume-date {
       text-align: end;
       min-width: 12rem;
+      font-size: $normal-font-size * 1.2;
     }
   }
 }

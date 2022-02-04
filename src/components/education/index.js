@@ -9,7 +9,7 @@ const Education = () => (
 			<h2 className="mb-5">Education</h2>
 
 			<div className="resume-item d-flex justify-content-between mb-5">
-				<div className="resume-content mr-3 ">
+				<div className="resume-content me-3 ">
 					<h3 className="mb-0">Indian Institute of Technology, Roorkee</h3>
 					<div className="subheading mb-3">Bachelor of technology</div>
 					<p className="para-content">Chemical Engineering</p>
@@ -20,7 +20,7 @@ const Education = () => (
 			</div>
 
 			<div className="resume-item d-flex justify-content-between mb-5">
-				<div className="resume-content mr-3 ">
+				<div className="resume-content me-3 ">
 					<h3 className="mb-0">Gulab Rai Montessori</h3>
 					<div className="subheading mb-3">PCM with Computer Science</div>
 				</div>
