@@ -1,6 +1,8 @@
 # Portfolio
 
-![Build](https://github.com/adrijshikhar/adrijshikhar.github.io/workflows/Build/badge.svg) &nbsp; ![Build and Deploy](https://github.com/adrijshikhar/adrijshikhar.github.io/workflows/Build%20and%20Deploy/badge.svg?branch=content)
+[![Build](https://github.com/adrijshikhar/adrijshikhar.github.io/actions/workflows/build.yml/badge.svg?branch=content)](https://github.com/adrijshikhar/adrijshikhar.github.io/actions/workflows/build.yml)
+[![Build and Deploy](https://github.com/adrijshikhar/adrijshikhar.github.io/actions/workflows/deploy.yml/badge.svg?branch=content)](https://github.com/adrijshikhar/adrijshikhar.github.io/actions/workflows/deploy.yml)
+[![CodeQL](https://github.com/adrijshikhar/adrijshikhar.github.io/actions/workflows/codeql-analysis.yml/badge.svg?branch=content)](https://github.com/adrijshikhar/adrijshikhar.github.io/actions/workflows/codeql-analysis.yml)
 
 ## Setup
 
@@ -9,7 +11,6 @@
 - Run `nvm install` to set the node version mentioned in `.nvmrc`
 - Run `yvm install lts` to install latest yarn version
 - Run `yarn dev` to start development
-
 
 ## Deployment
 
