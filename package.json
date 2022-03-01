@@ -16,7 +16,7 @@
   "devDependencies": {
     "@aerian/eslint-config-preact": "^13.0.0",
     "enzyme": "^3.10.0",
-    "enzyme-adapter-preact-pure": "^2.0.0",
+    "enzyme-adapter-preact-pure": "^3.4.0",
     "eslint": "^8.7.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-preact": "^1.3.0",
