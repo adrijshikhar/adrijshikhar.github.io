@@ -34,7 +34,7 @@
     "sass": "^1.49.0",
     "sass-loader": "10",
     "sirv-cli": "1.0.3",
-    "stylelint": "^14.3.0",
+    "stylelint": "^14.11.0",
     "stylelint-config-sass-guidelines": "^9.0.1",
     "stylelint-config-standard-scss": "^3.0.0",
     "stylelint-scss": "^4.1.0"
