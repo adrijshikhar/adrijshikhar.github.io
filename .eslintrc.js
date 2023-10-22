@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const prettierOptions = JSON.parse(
-	fs.readFileSync(path.resolve(__dirname, '.prettierrc'), 'utf8')
+	fs.readFileSync(path.resolve(__dirname, '.prettierrc'), 'utf8'),
 );
 
 module.exports = {
@@ -13,7 +13,7 @@ module.exports = {
 		'eslint:recommended',
 		'plugin:react/recommended',
 	],
-	plugins: ['react', 'prettier', 'import', 'simple-import-sort'],
+	plugins: ['react', 'react-hooks', 'prettier', 'import', 'simple-import-sort'],
 	ignorePatterns: ['build/', 'assets/'],
 	rules: {
 		'prettier/prettier': ['error', prettierOptions],
