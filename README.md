@@ -14,7 +14,6 @@
 ## Deployment
 
 - Copy `.env.example` to `.env` and specify port
-- Copy respective conf file from `docker` folder
 - Spin up container using `docker-compose up -d`
 
 ### CLI Commands
