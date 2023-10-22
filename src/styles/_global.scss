@@ -7,7 +7,7 @@ body {
   font-size: $normal-font-size;
 }
 
-@media (min-width: 992px) {
+@media (width >= 992px) {
   body {
     padding-top: 0;
     padding-left: $sidebar-base-width;
@@ -56,7 +56,7 @@ h4 {
 }
 
 p.lead {
-  font-size: $normal-font-size * 1.25;
+  font-size: $normal-font-size * 1.2;
   font-weight: 400;
   text-align: left;
 }
@@ -72,7 +72,7 @@ p.lead {
 
 .social-icons {
   .icon {
-    @media (max-width: 992px) {
+    @media (width <= 992px) {
       margin-bottom: 1rem;
     }
 
@@ -110,7 +110,7 @@ p.lead {
 }
 
 .dev-icons {
-  @media (max-width: 992px) {
+  @media (width <= 992px) {
     flex-flow: row  wrap;
     justify-content: center;
     width: 100%;

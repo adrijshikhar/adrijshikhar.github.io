@@ -35,18 +35,13 @@ const SideNavigationBar = () => (
 						</a>
 					</li>
 					<li className="nav-item">
-						<a className="nav-link js-scroll-trigger" href="#education">
-							Education
+						<a className="nav-link js-scroll-trigger" href="#experience">
+							Experience
 						</a>
 					</li>
 					<li className="nav-item">
 						<a className="nav-link js-scroll-trigger" href="#skills">
 							Skills
-						</a>
-					</li>
-					<li className="nav-item">
-						<a className="nav-link js-scroll-trigger" href="#experience">
-							Experience
 						</a>
 					</li>
 					<li className="nav-item">
@@ -57,6 +52,11 @@ const SideNavigationBar = () => (
 					<li className="nav-item">
 						<a className="nav-link js-scroll-trigger" href="#achievements">
 							Achievements
+						</a>
+					</li>
+					<li className="nav-item">
+						<a className="nav-link js-scroll-trigger" href="#education">
+							Education
 						</a>
 					</li>
 					<li className="nav-item">
