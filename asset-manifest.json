@@ -1,0 +1,19 @@
+{
+  "bundle.css": "bundle.53c67.css",
+  "bundle.js": "bundle.daa87.esm.js",
+  "bundle.js.map": "bundle.daa87.esm.js.map",
+  "polyfills.js": "polyfills.306aa.esm.js",
+  "polyfills.js.map": "polyfills.306aa.esm.js.map",
+  "assets/favicon.ico": "assets/favicon.ico",
+  "assets/images/profile.jpeg": "assets/images/profile.jpeg",
+  "assets/js/resume.js": "assets/js/resume.js",
+  "assets/manifest.json": "assets/manifest.json",
+  "assets/resume.pdf": "assets/resume.pdf",
+  "assets/vendor/jquery-easing/jquery.easing.compatibility.js": "assets/vendor/jquery-easing/jquery.easing.compatibility.js",
+  "assets/vendor/jquery-easing/jquery.easing.min.js": "assets/vendor/jquery-easing/jquery.easing.min.js",
+  "bundle.53c67.css.map": "bundle.53c67.css.map",
+  "sw-esm.js": "sw-esm.js",
+  "sw-esm.js.map": "sw-esm.js.map",
+  "sw.js": "sw.js",
+  "sw.js.map": "sw.js.map"
+}
