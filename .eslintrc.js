@@ -7,7 +7,6 @@ const prettierOptions = JSON.parse(
 
 module.exports = {
 	extends: [
-		'airbnb',
 		'prettier',
 		'preact',
 		'eslint:recommended',

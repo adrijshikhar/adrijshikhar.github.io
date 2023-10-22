@@ -18,15 +18,15 @@ const App = () => (
 		<Home>
 			<About />
 			<hr className="m-0" />
-			<Education />
+			<Experience />
 			<hr className="m-0" />
 			<Skills />
-			<hr className="m-0" />
-			<Experience />
 			<hr className="m-0" />
 			<Projects />
 			<hr className="m-0" />
 			<Achievements />
+			<hr className="m-0" />
+			<Education />
 			<hr className="m-0" />
 			<Interests />
 		</Home>

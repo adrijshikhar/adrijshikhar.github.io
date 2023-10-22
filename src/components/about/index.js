@@ -10,9 +10,26 @@ const About = () => (
 			<span className="text-primary">Shikhar</span>
 		</h1>
 		<p className="lead mb-3">
-			I am a 23-year-old final year student enrolled in Chemical Engineering at
-			IIT Roorkee. I developed a passion for development in my freshmen year and
-			since then most of my time goes into reading and writing software.
+			Welcome to my portfolio! I&apos;m a 25-year-old recent graduate of
+			Chemical Engineering from IIT Roorkee. While my academic journey began in
+			the world of chemistry, I quickly discovered my true passion for software
+			development during my freshman year.
+		</p>
+		<p className="lead mb-3">
+			Over the past year, I&apos;ve been honing my skills and working on
+			exciting projects. My time is now dedicated to reading, writing, and
+			crafting software solutions that not only solve problems but also push the
+			boundaries of innovation.
+		</p>
+		<p className="lead mb-3">
+			Explore my portfolio to see the fruits of my labor, from web applications
+			to mobile apps and everything in between. I&apos;m excited to share my
+			journey and the projects that have shaped my development career. If you
+			have any questions or would like to collaborate, don&apos;t hesitate to
+			get in touch!
+		</p>
+		<p className="lead mb-3">
+			Let&apos;s embark on this coding adventure together!
 		</p>
 		<p className="lead mb-5">
 			<i className="fa fa-mobile mobile-icon me-2"></i>
