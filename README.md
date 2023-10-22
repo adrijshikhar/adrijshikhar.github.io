@@ -9,7 +9,6 @@
 - Install [nvm](https://github.com/nvm-sh/nvm)
 - Run `nvm install` to set the node version mentioned in `.nvmrc`
 - Run `corepack enable` to enable yarn shipped by node
-- Run `yvm install lts` to install latest yarn version
 - Run `yarn dev` to start development
 
 ## Deployment
