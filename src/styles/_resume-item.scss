@@ -4,7 +4,7 @@ section.resume-section {
   padding-bottom: 5rem !important;
 
   .resume-item {
-    @media (max-width: 992px) {
+    @media (width <= 992px) {
       flex-direction: column;
 
       .resume-content {
