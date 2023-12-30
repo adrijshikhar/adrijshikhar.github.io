@@ -4,7 +4,7 @@ import CardContent from '../common/CardContent';
 import CardParagraph from '../common/CardParagraph';
 
 const ExpCard = ({
-	postition,
+	position,
 	companyName,
 	companyLink,
 	location,
@@ -16,7 +16,7 @@ const ExpCard = ({
 			<div className="resume-heading-container mb-2">
 				<div className="resume-heading">
 					<h3 className="mb-0">
-						{postition} |{' '}
+						{position} |{' '}
 						<a
 							className="text-decoration-none"
 							href={companyLink}

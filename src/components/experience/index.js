@@ -11,7 +11,41 @@ const Experience = () => (
 			<h2 className="mb-5">Experience</h2>
 
 			<ExpCard
-				postition="SDE Intern"
+				position="SDE ll"
+				companyName="Hevo Data"
+				companyLink="https://hevodata.com/"
+				location="Bangalore"
+				date="Jun 2022 - Current"
+			>
+				<ExpCard.Content>
+					<ExpCard.Paragraph>
+						Load data from any source into your warehouse
+					</ExpCard.Paragraph>
+					<ExpCard.Paragraph>
+						<ul>
+							<li>
+								Spearheaded the implementation of MySQL binary log replication
+								using Debezium DDL parser, significantly enhancing data
+								synchronization and ensuring seamless real-time updates.
+							</li>
+							<li>
+								Achieved a remarkable 5x boost in data ingestion speed
+								throughput within the MySQL connector, optimizing overall system
+								efficiency.
+							</li>
+							<li>
+								Engineered substantial improvements in core database
+								interactions, yielding an outstanding 15x performance
+								enhancement in critical operational components.
+							</li>
+							<li>Tech Stack: Java, MySQL</li>
+						</ul>
+					</ExpCard.Paragraph>
+				</ExpCard.Content>
+			</ExpCard>
+
+			<ExpCard
+				position="SDE Intern"
 				companyName="Hevo Data"
 				companyLink="https://hevodata.com/"
 				location="Bangalore"
@@ -34,7 +68,9 @@ const Experience = () => (
 								Implemented dynamic plugin selection using Guice dependency
 								injection.
 							</li>
-							<li>Ensured stability by benchmarks and unit tests.</li>
+							<li>
+								Implemented OAuth 2.0 feature for accessing protected Rest APIs
+							</li>
 							<li>Tech Stack: Java, Postgres</li>
 						</ul>
 					</ExpCard.Paragraph>
@@ -42,7 +78,7 @@ const Experience = () => (
 			</ExpCard>
 
 			<ExpCard
-				postition="SDE Intern"
+				position="SDE Intern"
 				companyName="MTX Global"
 				companyLink="https://www.mtxb2b.com/s/"
 				location="Hydrabad"
@@ -82,7 +118,7 @@ const Experience = () => (
 			</ExpCard>
 
 			<ExpCard
-				postition="Full Stack Developer Intern"
+				position="Full Stack Developer Intern"
 				companyName="Triomics"
 				companyLink="https://triomics.in/"
 				location="Gurgaon"
@@ -116,7 +152,7 @@ const Experience = () => (
 			</ExpCard>
 
 			<ExpCard
-				postition="SDE Intern"
+				position="SDE Intern"
 				companyName="Rephrase.ai"
 				companyLink="https://www.rephrase.ai/"
 				location="Bangalore"
@@ -152,7 +188,7 @@ const Experience = () => (
 			</ExpCard>
 
 			<ExpCard
-				postition="Software Engineering Intern"
+				position="Software Engineering Intern"
 				companyName="Powerplay"
 				companyLink="https://www.getpowerplay.in/"
 				location="Bangalore"
@@ -189,7 +225,7 @@ const Experience = () => (
 			</ExpCard>
 
 			<ExpCard
-				postition="Developer"
+				position="Developer"
 				companyName="SDSLabs"
 				companyLink="https://sdslabs.co/"
 				location="IIT Roorkee"
@@ -218,7 +254,7 @@ const Experience = () => (
 			</ExpCard>
 
 			<ExpCard
-				postition="Manager"
+				position="Manager"
 				companyName="Entrepreneurship Cell"
 				companyLink="https://www.ecelliitr.org/"
 				location="IIT Roorkee"
@@ -247,7 +283,7 @@ const Experience = () => (
 			</ExpCard>
 
 			<ExpCard
-				postition="Senior Member"
+				position="Senior Member"
 				companyName="XDA Developers"
 				companyLink="https://forum.xda-developers.com/"
 				location="JB Online Media, LLC"
@@ -259,7 +295,7 @@ const Experience = () => (
 			</ExpCard>
 
 			<ExpCard
-				postition="Web Developer"
+				position="Web Developer"
 				companyName="Cognizance"
 				companyLink="https://cognizance.org.in/"
 				location="IIT Roorkee"
