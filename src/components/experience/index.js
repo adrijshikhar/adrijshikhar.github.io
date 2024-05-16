@@ -48,10 +48,11 @@ const Experience = () => (
 								Integrated Temporal based task execution system for better
 								reliability and streamlined hierarchical DAG processes.
 							</li>
-							Engineered YAML-powered template engine for intricate UI
-							rendering, supporting multi-level logic conditions, validations
-							based on input from.
-							<li></li>
+							<li>
+								Engineered YAML-powered template engine for intricate UI
+								rendering, supporting multi-level logic conditions, validations
+								based on input from.
+							</li>
 							<li>Tech Stack: Java, MySQL, AWS</li>
 						</ul>
 					</ExpCard.Paragraph>
