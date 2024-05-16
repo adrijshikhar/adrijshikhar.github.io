@@ -38,7 +38,21 @@ const Experience = () => (
 								interactions, yielding an outstanding 15x performance
 								enhancement in critical operational components.
 							</li>
-							<li>Tech Stack: Java, MySQL</li>
+							<li>
+								Implemented user-facing logs in near real-time with PII
+								redaction using AWS S3 and AWS Comprehend.
+							</li>
+							Worked on integrating micro-services architecture on AWS Fargate
+							with Otel observability.
+							<li>
+								Integrated Temporal based task execution system for better
+								reliability and streamlined hierarchical DAG processes.
+							</li>
+							Engineered YAML-powered template engine for intricate UI
+							rendering, supporting multi-level logic conditions, validations
+							based on input from.
+							<li></li>
+							<li>Tech Stack: Java, MySQL, AWS</li>
 						</ul>
 					</ExpCard.Paragraph>
 				</ExpCard.Content>
