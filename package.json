@@ -31,7 +31,7 @@
     "lint-staged": "^15.2.2",
     "preact-cli": "^3.5.1",
     "prettier": "^3.2.5",
-    "sass": "^1.77.1",
+    "sass": "^1.77.2",
     "sass-loader": "10",
     "sirv-cli": "2.0.2",
     "stylelint": "^15.11.0",
