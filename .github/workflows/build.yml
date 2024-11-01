@@ -25,5 +25,5 @@ jobs:
       # Runs a single command using the runners shell
       - name: Create build
         run: |
-          yarn install
-          yarn build
+          npm install
+          npm run build

@@ -8,8 +8,7 @@
 
 - Install [nvm](https://github.com/nvm-sh/nvm)
 - Run `nvm install` to set the node version mentioned in `.nvmrc`
-- Run `corepack enable` to enable yarn shipped by node
-- Run `yarn dev` to start development
+- Run `npm run dev` to start development
 
 ## Deployment
 
@@ -20,19 +19,19 @@
 
 ``` bash
 # install dependencies
-yarn install
+npm install
 
 # serve with hot reload at localhost:8080
-yarn dev
+npm run dev
 
 # build for production with minification
-yarn build
+npm run build
 
 # test the production build locally
-yarn serve
+npm run serve
 
 # run tests with jest and enzyme
-yarn test
+npm run test
 ```
 
 For detailed explanation on how things work, checkout the [CLI Readme](https://github.com/developit/preact-cli/blob/master/README.md).
