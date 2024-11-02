@@ -9,10 +9,10 @@ const About = () => (
 			<span className="text-primary">Adrij Shikhar</span>
 		</h1>
 		<p className="lead mb-3">
-			Welcome to my portfolio! I&apos;m a 25-year-old recent graduate of
-			Chemical Engineering from IIT Roorkee. While my academic journey began in
-			the world of chemistry, I quickly discovered my true passion for software
-			development during my freshman year.
+			Welcome to my portfolio! I&apos;m a 26-year-old graduate from IIT Roorkee.
+			While my academic journey began in the world of chemistry, I quickly
+			discovered my true passion for software development during my freshman
+			year.
 		</p>
 		<p className="lead mb-3">
 			Over the past year, I&apos;ve been honing my skills and working on

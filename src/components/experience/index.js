@@ -11,7 +11,7 @@ const Experience = () => (
 			<h2 className="mb-5">Experience</h2>
 
 			<ExpCard
-				position="SDE ll"
+				position="SDE lll"
 				companyName="Hevo Data"
 				companyLink="https://hevodata.com/"
 				location="Bangalore"
@@ -22,45 +22,125 @@ const Experience = () => (
 						Load data from any source into your warehouse
 					</ExpCard.Paragraph>
 					<ExpCard.Paragraph>
-						<ul>
-							<li>
-								Spearheaded the implementation of MySQL binary log replication
-								using Debezium DDL parser, significantly enhancing data
-								synchronization and ensuring seamless real-time updates.
-							</li>
-							<li>
-								Achieved a remarkable 5x boost in data ingestion speed
-								throughput within the MySQL connector, optimizing overall system
-								efficiency.
-							</li>
-							<li>
-								Engineered substantial improvements in core database
-								interactions, yielding an outstanding 15x performance
-								enhancement in critical operational components.
-							</li>
-							<li>
-								Implemented user-facing logs in near real-time with PII
-								redaction using AWS S3 and AWS Comprehend.
-							</li>
-							Worked on integrating micro-services architecture on AWS Fargate
-							with Otel observability.
-							<li>
-								Integrated Temporal based task execution system for better
-								reliability and streamlined hierarchical DAG processes.
-							</li>
-							<li>
-								Engineered YAML-powered template engine for intricate UI
-								rendering, supporting multi-level logic conditions, validations
-								based on input from.
-							</li>
-							<li>Tech Stack: Java, MySQL, AWS</li>
-						</ul>
+						<p>
+							<p className="fw-bold mb-1">CDC Framework Project:</p>
+							<ul>
+								<li>
+									Ownership and Execution: Led the complete implementation of
+									real-time CDC framework using Debezium Engine (open source)
+									which significantly enhanced data synchronization and ensured
+									seamless real-time updates.
+								</li>
+								<li>
+									Performance Boost: Achieved a 5x increase in data ingestion
+									speed within the MySQL connector, optimizing system
+									efficiency.
+								</li>
+								<li>
+									Database Interaction Optimization: Engineered improvements in
+									core database interactions, by implementing a metadata system
+									that allowed us to scale our ETL platform by 15x.
+								</li>
+								<li>
+									Schema Catalog Service:
+									<ul>
+										<li>
+											Designed and built a generic schema service from scratch
+											to manage and validate data schemas in ETL pipelines, with
+											seamless integration and testing using Debezium
+											connectors.
+										</li>
+										<li>
+											Supported source-specific features, including handling
+											unchanged toast datum from PostgreSQL and diverse data
+											types from various data sources, ensuring flexibility
+											across different ETL environments.
+										</li>
+										<li>
+											Implemented schema versioning, metadata management, and
+											compatibility checks to maintain data quality, streamline
+											data processing, and accommodate schema evolution.
+										</li>
+									</ul>
+								</li>
+							</ul>
+						</p>
+						<p>
+							<p className="fw-bold mb-1">
+								System Optimization and Security Enhancements:
+							</p>
+
+							<ul>
+								<li>
+									Source Object Generation Flow: Optimized the source object
+									generation process, resulting in a 10x improvement in pipeline
+									performance, enabling support for larger datasets.
+								</li>
+								<li>
+									REST API Security Enhancements: Enhanced the REST API
+									connector by implementing OAuth 2.0 authorization, improving
+									security and user management.
+								</li>
+							</ul>
+						</p>
+						<p>
+							<p className="fw-bold mb-1">
+								SurveyMonkey Connector Development:
+							</p>
+							<ul>
+								<li>
+									Spearheaded the development and launch of the SurveyMonkey
+									connector, contributing to the expansion of Hevo&apos;s
+									connector ecosystem.
+								</li>
+							</ul>
+						</p>
+						<p>
+							<p className="fw-bold mb-1">
+								Critical Customer Issue Resolution:
+							</p>
+							<ul>
+								<li>
+									Managed and resolved several complex customer issues for key
+									clients, significantly improving customer satisfaction.
+								</li>
+							</ul>
+						</p>
+						<p>
+							<p className="fw-bold mb-1">Innovative System Enhancements:</p>
+							<ul>
+								<li>
+									Real-time Logs Implementation: Implemented data governance
+									tool to handle PII redaction in near real-time using AWS S3
+									and AWS Comprehend, ensuring data privacy and enhancing user
+									experience.
+								</li>
+								<li>
+									Microservices and Task Execution: Worked on integrating a
+									microservices architecture on AWS Fargate and implemented a
+									Temporal-based task execution system, improving reliability
+									and streamlining hierarchical DAG processes.
+								</li>
+							</ul>
+						</p>
+						<p>
+							<p className="fw-bold mb-1">
+								Documentation and Knowledge Sharing:
+							</p>
+							<ul>
+								<li>
+									Regularly contributed to improving documentation quality and
+									conducted knowledge transfer sessions, fostering team
+									collaboration.
+								</li>
+							</ul>
+						</p>
 					</ExpCard.Paragraph>
 				</ExpCard.Content>
 			</ExpCard>
 
 			<ExpCard
-				position="SDE Intern"
+				position="Software Development Intern"
 				companyName="Hevo Data"
 				companyLink="https://hevodata.com/"
 				location="Bangalore"
@@ -73,8 +153,8 @@ const Experience = () => (
 					<ExpCard.Paragraph>
 						<ul>
 							<li>
-								Added support for ‘wal2json’ output plugin for postgres logical
-								replication.
+								Added support for &apos; wal2json&apos; output plugin for
+								postgres replication.
 							</li>
 							<li>
 								Reduced WAL processing time taken by the platform, by 60%.
@@ -93,7 +173,7 @@ const Experience = () => (
 			</ExpCard>
 
 			<ExpCard
-				position="SDE Intern"
+				position="Software Development Intern"
 				companyName="MTX Global"
 				companyLink="https://www.mtxb2b.com/s/"
 				location="Hydrabad"
@@ -133,7 +213,7 @@ const Experience = () => (
 			</ExpCard>
 
 			<ExpCard
-				position="Full Stack Developer Intern"
+				position="Software Development Intern"
 				companyName="Triomics"
 				companyLink="https://triomics.in/"
 				location="Gurgaon"
@@ -167,11 +247,11 @@ const Experience = () => (
 			</ExpCard>
 
 			<ExpCard
-				position="SDE Intern"
+				position="Software Development Intern"
 				companyName="Rephrase.ai"
 				companyLink="https://www.rephrase.ai/"
 				location="Bangalore"
-				date="Oct 2020 - March 2021"
+				date="Oct 2020 - Mar 2021"
 			>
 				<ExpCard.Content>
 					<ExpCard.Paragraph>
@@ -244,7 +324,7 @@ const Experience = () => (
 				companyName="SDSLabs"
 				companyLink="https://sdslabs.co/"
 				location="IIT Roorkee"
-				date="Jan 2019 - Present"
+				date="Jan 2019 - Jul 2020"
 			>
 				<ExpCard.Content>
 					<ExpCard.Paragraph>Think. Build. Ship</ExpCard.Paragraph>
@@ -294,18 +374,6 @@ const Experience = () => (
 							</li>
 						</ul>
 					</ExpCard.Paragraph>
-				</ExpCard.Content>
-			</ExpCard>
-
-			<ExpCard
-				position="Senior Member"
-				companyName="XDA Developers"
-				companyLink="https://forum.xda-developers.com/"
-				location="JB Online Media, LLC"
-				date="Feb 2015 - Present"
-			>
-				<ExpCard.Content>
-					<ExpCard.Paragraph>Open Source Android forum</ExpCard.Paragraph>
 				</ExpCard.Content>
 			</ExpCard>
 

@@ -9,11 +9,81 @@ const Projects = () => (
 	>
 		<div className="my-auto">
 			<h2 className="mb-5">Projects</h2>
+			<ProjectCard
+				title="ScraperQL"
+				company="Dgraph Labs"
+				date="Oct 2020"
+				link="https://github.com/adrijshikhar/scraper-ql"
+			>
+				<ProjectCard.Content>
+					<ProjectCard.Paragraph>
+						Dgraph Labs hosted the &apos;Hack and Slash GraphQL&apos; hackathon
+						to showcase the power of Slash GraphQL.
+					</ProjectCard.Paragraph>
+					<ProjectCard.Paragraph>
+						<ul>
+							<li>
+								Developed a web scraper using GraphQL to leverage the nesting
+								power of it.
+							</li>
+							<li>
+								You have a single query resolver called scrape that takes in a
+								URL as a parameter and returns a generic defined entity such as
+								an HtmlNode
+							</li>
+						</ul>
+					</ProjectCard.Paragraph>
+				</ProjectCard.Content>
+			</ProjectCard>
+
+			<ProjectCard
+				title="Kill-Zee"
+				company="Global Game Jam 2020"
+				date="Jan 2020"
+				link="https://github.com/adrijshikhar/kill-zee"
+			>
+				<ProjectCard.Content>
+					<ProjectCard.Paragraph>
+						A small tactical game in Lua to kill zombies and protect your tower
+						before its too late.
+					</ProjectCard.Paragraph>
+					<ProjectCard.Paragraph>
+						Spearheaded and implemented the underlying core features and worked
+						on performance optimization.
+					</ProjectCard.Paragraph>
+				</ProjectCard.Content>
+			</ProjectCard>
+
+			<ProjectCard
+				title="Issue Labeler Bot"
+				company="SDSLabs"
+				date="Jul 2020 - Oct 2020"
+				link="https://github.com/sdslabs/SDSLabs-Issue-Labeler"
+			>
+				<ProjectCard.Content>
+					<ProjectCard.Paragraph>
+						It is a github bot which uses machine learning to automate the
+						labelling of issues on Github by critical analysis of its contentC
+					</ProjectCard.Paragraph>
+					<ProjectCard.Paragraph>
+						<ul>
+							<li>
+								Generated training dataset by scraping around 20,000 issues on
+								Github.
+							</li>
+							<li>
+								Fine-Tuned the Google Bert Model on the dataset. Exported the
+								trained model to integrate it with the Github bot.
+							</li>
+						</ul>
+					</ProjectCard.Paragraph>
+				</ProjectCard.Content>
+			</ProjectCard>
 
 			<ProjectCard
 				title="Coderunner 2.0"
 				company="SDSLabs"
-				date="Oct 2019 - Present"
+				date="Oct 2019 - Mar 2020"
 			>
 				<ProjectCard.Content>
 					<ProjectCard.Paragraph>
@@ -62,60 +132,8 @@ const Projects = () => (
 					</ProjectCard.Paragraph>
 				</ProjectCard.Content>
 			</ProjectCard>
-			<ProjectCard
-				title="ScraperQL"
-				company="Dgraph Labs"
-				date="Oct 2020 - Nov 2020"
-				link="https://github.com/adrijshikhar/scraper-ql"
-			>
-				<ProjectCard.Content>
-					<ProjectCard.Paragraph>
-						Dgraph Labs hosted the ’Hack and Slash GraphQL’ hackathon to
-						showcase the power of Slash GraphQL.
-					</ProjectCard.Paragraph>
-					<ProjectCard.Paragraph>
-						<ul>
-							<li>
-								Developed a web scraper using GraphQL to leverage the nesting
-								power of it.
-							</li>
-							<li>
-								You have a single query resolver called scrape that takes in a
-								URL as a parameter and returns a generic defined entity such as
-								an HtmlNode
-							</li>
-						</ul>
-					</ProjectCard.Paragraph>
-				</ProjectCard.Content>
-			</ProjectCard>
 
-			<ProjectCard
-				title="Issue Labeler Bot"
-				company="SDSLabs"
-				date="Jul 2020 - Oct 2020"
-				link="https://github.com/sdslabs/SDSLabs-Issue-Labeler"
-			>
-				<ProjectCard.Content>
-					<ProjectCard.Paragraph>
-						It is a github bot which uses machine learning to automate the
-						labelling of issues on Github by critical analysis of its contentC
-					</ProjectCard.Paragraph>
-					<ProjectCard.Paragraph>
-						<ul>
-							<li>
-								Generated training dataset by scraping around 20,000 issues on
-								Github.
-							</li>
-							<li>
-								Fine-Tuned the Google Bert Model on the dataset. Exported the
-								trained model to integrate it with the Github bot.
-							</li>
-						</ul>
-					</ProjectCard.Paragraph>
-				</ProjectCard.Content>
-			</ProjectCard>
-
-			<ProjectCard title="Cerebro" company="SDSLabs" date="Apr 2019 - Present">
+			<ProjectCard title="Cerebro" company="SDSLabs" date="Apr 2019 - Dec 2019">
 				<ProjectCard.Content>
 					<ProjectCard.Paragraph>
 						Cerebro, a platform for hosting data hackathons exclusively in IITR
@@ -172,6 +190,7 @@ const Projects = () => (
 				title="Create React App Webpack"
 				company="SDSLabs"
 				date="July 2020 - Aug 2020"
+				link="https://github.com/adrijshikhar/create-react-app-webpack"
 			>
 				<ProjectCard.Content>
 					<ProjectCard.Paragraph>
@@ -188,6 +207,7 @@ const Projects = () => (
 				title="Vega VS Code Extension"
 				company="Major League Hacking"
 				date="Jun 2020 - Jun 2020"
+				link="https://github.com/adrijshikhar/vega-vscode-extension"
 			>
 				<ProjectCard.Content>
 					<ProjectCard.Paragraph>
@@ -209,28 +229,15 @@ const Projects = () => (
 				</ProjectCard.Content>
 			</ProjectCard>
 
-			<ProjectCard title="DarkDev" company="SDSLabs" date="Apr 2020 - Present">
-				<ProjectCard.Content>
-					<ProjectCard.Paragraph>
-						A self crafted VS Code Theme, for those who like it in dark mode.
-					</ProjectCard.Paragraph>
-				</ProjectCard.Content>
-			</ProjectCard>
-
 			<ProjectCard
-				title="Kill-Zee"
-				company="Global Game Jam 2020"
-				date="Jan 2020 - Jan 2020"
-				link="https://github.com/adrijshikhar/kill-zee"
+				title="DarkDev"
+				company="SDSLabs"
+				date="Apr 2020 - Present"
+				link="https://github.com/adrijshikhar/darkdev"
 			>
 				<ProjectCard.Content>
 					<ProjectCard.Paragraph>
-						A small tactical game in Lua to kill zombies and protect your tower
-						before its too late.
-					</ProjectCard.Paragraph>
-					<ProjectCard.Paragraph>
-						Spearheaded and implemented the underlying core features and worked
-						on performance optimization.
+						A self crafted VS Code Theme, for those who like it in dark mode.
 					</ProjectCard.Paragraph>
 				</ProjectCard.Content>
 			</ProjectCard>
