@@ -42,7 +42,7 @@
   "dependencies": {
     "bootstrap": "^5.3.3",
     "preact": "^10.25.1",
-    "preact-render-to-string": "^6.5.11",
+    "preact-render-to-string": "^6.5.12",
     "preact-router": "^4.1.2"
   },
   "jest": {
