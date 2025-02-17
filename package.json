@@ -30,7 +30,7 @@
     "jest-preset-preact": "^4.1.1",
     "lint-staged": "^15.4.3",
     "preact-cli": "^3.5.1",
-    "prettier": "^3.5.0",
+    "prettier": "^3.5.1",
     "sass": "^1.85.0",
     "sass-loader": "10",
     "sirv-cli": "3.0.0",
