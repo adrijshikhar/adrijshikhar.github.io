@@ -23,7 +23,7 @@ const App = () => {
 	useEffect(() => {
 		const performHealthCheck = async () => {
 			try {
-				await fetch(HEALTH_CHECK_URL, {
+				const response = await fetch(HEALTH_CHECK_URL, {
 					method: 'GET',
 					mode: 'no-cors',
 				});
