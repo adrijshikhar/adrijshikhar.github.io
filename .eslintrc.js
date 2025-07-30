@@ -6,13 +6,26 @@ const prettierOptions = JSON.parse(
 );
 
 module.exports = {
-	extends: [
-		'prettier',
-		'preact',
-		'eslint:recommended',
-		'plugin:react/recommended',
-	],
+	env: {
+		browser: true,
+		es6: true,
+		node: true,
+	},
+	parserOptions: {
+		ecmaVersion: 2020,
+		sourceType: 'module',
+		ecmaFeatures: {
+			jsx: true,
+		},
+	},
+	extends: ['prettier', 'eslint:recommended', 'plugin:react/recommended'],
 	plugins: ['react', 'react-hooks', 'prettier', 'import', 'simple-import-sort'],
+	settings: {
+		react: {
+			pragma: 'h',
+			version: '16.0',
+		},
+	},
 	ignorePatterns: ['build/', 'assets/'],
 	rules: {
 		'prettier/prettier': ['error', prettierOptions],
