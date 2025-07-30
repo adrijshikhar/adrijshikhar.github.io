@@ -16,7 +16,7 @@ import {
 // Health check configuration
 const HEALTH_CHECK_URL = 'https://n8n-2550.onrender.com/healthz';
 const MIN_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes in milliseconds
-const MAX_INTERVAL_MS = 15 * 60 * 1000; // 15 minutes in milliseconds
+const MAX_INTERVAL_MS = 12 * 60 * 1000; // 15 minutes in milliseconds
 
 const App = () => {
 	// Health check loop - runs every 5-15 minutes
