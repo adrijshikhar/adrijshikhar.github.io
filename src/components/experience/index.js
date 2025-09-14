@@ -11,7 +11,7 @@ const Experience = () => (
 			<h2 className="mb-5">Experience</h2>
 
 			<ExpCard
-				position="SDE lll"
+				position="Senior Software Engineer"
 				companyName="Hevo Data"
 				companyLink="https://hevodata.com/"
 				location="Bangalore"
