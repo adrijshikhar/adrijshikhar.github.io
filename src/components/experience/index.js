@@ -15,13 +15,46 @@ const Experience = () => (
 				companyName="Hevo Data"
 				companyLink="https://hevodata.com/"
 				location="Bangalore"
-				date="Jun 2022 - Current"
+				date="Jun 2022 - Present"
 			>
 				<ExpCard.Content>
 					<ExpCard.Paragraph>
 						Load data from any source into your warehouse
 					</ExpCard.Paragraph>
 					<ExpCard.Paragraph>
+						<p>
+							<p className="fw-bold mb-1">Scalability and Performance:</p>
+							<ul>
+								<li>
+									Architected for Scale: Led key initiatives that enabled the
+									platform to support a <strong>2500% increase</strong> in
+									object handling, from 1,000 to 25,000 objects.
+								</li>
+								<li>
+									Optimized Data Ingestion: Achieved a{' '}
+									<strong>5x increase</strong> in data ingestion speed within
+									the MySQL connector, significantly boosting system efficiency
+									and throughput.
+								</li>
+								<li>
+									Database Interaction at Scale: Engineered a metadata system
+									that scaled the ETL platform by <strong>15x</strong>, allowing
+									for massive improvements in core database interactions.
+								</li>
+								<li>
+									Source Object Generation: Optimized the source object
+									generation flow, resulting in a{' '}
+									<strong>10x improvement</strong> in pipeline performance and
+									enabling support for larger datasets.
+								</li>
+								<li>
+									Reduced Catalog Document Size: Drove efforts to reduce the
+									catalog document size, leading to{' '}
+									<strong>improved performance and scalability</strong> across
+									the platform.
+								</li>
+							</ul>
+						</p>
 						<p>
 							<p className="fw-bold mb-1">CDC Framework Project:</p>
 							<ul>
@@ -30,16 +63,6 @@ const Experience = () => (
 									real-time CDC framework using Debezium Engine (open source)
 									which significantly enhanced data synchronization and ensured
 									seamless real-time updates.
-								</li>
-								<li>
-									Performance Boost: Achieved a 5x increase in data ingestion
-									speed within the MySQL connector, optimizing system
-									efficiency.
-								</li>
-								<li>
-									Database Interaction Optimization: Engineered improvements in
-									core database interactions, by implementing a metadata system
-									that allowed us to scale our ETL platform by 15x.
 								</li>
 								<li>
 									Schema Catalog Service:
@@ -72,9 +95,15 @@ const Experience = () => (
 
 							<ul>
 								<li>
-									Source Object Generation Flow: Optimized the source object
-									generation process, resulting in a 10x improvement in pipeline
-									performance, enabling support for larger datasets.
+									Standardized Error Handling: Spearheaded the initiative to
+									create a unified standard for HTTP and gRPC request failures
+									across the control plane, which improved user experience and{' '}
+									<strong>reduced support overhead</strong>.
+								</li>
+								<li>
+									Enhanced Security and Governance: Implemented
+									source/destination whitelisting and played a key role in the
+									Connectors Flag GA for Hevo 1.0.
 								</li>
 								<li>
 									REST API Security Enhancements: Enhanced the REST API
@@ -85,9 +114,14 @@ const Experience = () => (
 						</p>
 						<p>
 							<p className="fw-bold mb-1">
-								SurveyMonkey Connector Development:
+								Feature Development and Integrations:
 							</p>
 							<ul>
+								<li>
+									Led the implementation of several new features including
+									Session Logs, YML template support, advanced scheduler with
+									Cron support, and Terraform integration.
+								</li>
 								<li>
 									Spearheaded the development and launch of the SurveyMonkey
 									connector, contributing to the expansion of Hevo&apos;s
@@ -102,7 +136,9 @@ const Experience = () => (
 							<ul>
 								<li>
 									Managed and resolved several complex customer issues for key
-									clients, significantly improving customer satisfaction.
+									clients,{' '}
+									<strong>significantly improving customer satisfaction</strong>
+									.
 								</li>
 							</ul>
 						</p>
@@ -125,7 +161,7 @@ const Experience = () => (
 						</p>
 						<p>
 							<p className="fw-bold mb-1">
-								Documentation and Knowledge Sharing:
+								Team Contribution and Documentation:
 							</p>
 							<ul>
 								<li>
@@ -157,7 +193,8 @@ const Experience = () => (
 								postgres replication.
 							</li>
 							<li>
-								Reduced WAL processing time taken by the platform, by 60%.
+								Reduced WAL processing time taken by the platform, by{' '}
+								<strong>60%</strong>.
 							</li>
 							<li>
 								Implemented dynamic plugin selection using Guice dependency
