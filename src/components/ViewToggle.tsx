@@ -72,9 +72,9 @@ export default function ViewToggle() {
 
   return (
     <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[1100] flex items-center gap-2">
-      <div className={`flex gap-4 px-3 py-2 rounded-full backdrop-blur-md font-mono text-sm transition-all duration-500 ${
+      <div className={`flex gap-4 px-3 py-2 rounded-sm backdrop-blur-md font-mono text-sm transition-all duration-500 ${
         mode === 'machine'
-          ? 'bg-[#2a2a3e]/90 border border-[#3a3a52]'
+          ? 'bg-[#181818]/90 border border-[#434343]'
           : 'bg-[#112240]/90 border border-[#233554]'
       }`}>
         <button
@@ -85,10 +85,10 @@ export default function ViewToggle() {
           }`}
         >
           <span className={`size-[6px] inline-block rounded-full transition-all duration-500 ${
-            mode === 'human' ? 'bg-[#64ffda] outline outline-1 outline-offset-1 outline-[#64ffda]' : 'outline outline-1 outline-offset-1 outline-[#8892b0]/30'
+            mode === 'human' ? 'bg-current outline outline-1 outline-offset-1 outline-current' : 'outline outline-1 outline-offset-1 outline-[#858483]/30'
           }`} />
           <span className={`uppercase text-xs tracking-wider transition-colors duration-300 ${
-            mode === 'human' ? 'text-[#ccd6f6]' : 'text-[#8892b0]/50'
+            mode === 'human' ? 'text-white' : 'text-[#858483]/50'
           }`}>Human</span>
         </button>
         <button
@@ -99,10 +99,10 @@ export default function ViewToggle() {
           }`}
         >
           <span className={`size-[6px] inline-block rounded-full transition-all duration-500 ${
-            mode === 'machine' ? 'bg-[#7b68ee] outline outline-1 outline-offset-1 outline-[#7b68ee]' : 'outline outline-1 outline-offset-1 outline-[#8892b0]/30'
+            mode === 'machine' ? 'bg-current outline outline-1 outline-offset-1 outline-current' : 'outline outline-1 outline-offset-1 outline-[#858483]/30'
           }`} />
           <span className={`uppercase text-xs tracking-wider transition-colors duration-300 ${
-            mode === 'machine' ? 'text-[#e0e0f0]' : 'text-[#8892b0]/50'
+            mode === 'machine' ? 'text-white' : 'text-[#858483]/50'
           }`}>Machine</span>
         </button>
       </div>

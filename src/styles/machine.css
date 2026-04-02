@@ -1,6 +1,5 @@
 /* === Parallel.ai-style height + opacity animation === */
 
-/* Both views always in DOM, controlled via height/opacity */
 .human-view,
 .machine-view {
   transition: height 0.8s cubic-bezier(0.4, 0, 0.2, 1),
@@ -22,6 +21,7 @@
 .machine-view {
   height: 0;
   opacity: 0;
+  overflow: hidden;
   pointer-events: none;
 }
 
@@ -29,16 +29,17 @@
   height: auto;
   opacity: 1;
   pointer-events: auto;
+  overflow: visible;
 }
 
-/* === Machine mode: background + sidebar transition === */
+/* === Machine mode — parallel.ai palette === */
 
 body {
   transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body.machine-mode {
-  background-color: #1a1a2e;
+  background-color: #101010;
 }
 
 body.machine-mode header {
@@ -54,35 +55,41 @@ header {
   transition: opacity 0.6s ease, transform 0.6s ease, height 0.6s ease;
 }
 
-/* === Machine content container === */
+/* === Machine content — matches parallel.ai exactly === */
 
 .machine-content-wrapper {
-  max-width: 72ch;
+  max-width: 640px;
   margin: 0 auto;
-  padding: 3rem 2rem;
+  padding: 3rem 1.5rem;
 }
 
-/* === Machine pre styling — dark grey palette === */
-
 .machine-pre {
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  font-size: 0.85rem;
-  line-height: 1.8;
-  color: #a0a0b8;
+  font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.23;
+  color: #858483;
   white-space: pre-wrap;
   word-wrap: break-word;
+  letter-spacing: -0.01em;
 }
 
 .machine-pre a {
-  color: #7b68ee;
-  text-decoration: underline;
-  text-underline-offset: 2px;
+  color: #fb631b;
+  text-decoration: none;
 }
 
 .machine-pre a:hover {
-  color: #9d8bff;
+  color: #f4793f;
+  text-decoration: underline;
 }
 
 .machine-pre strong {
-  color: #e0e0f0;
+  color: #d6d6d5;
+  font-weight: 500;
+}
+
+.machine-pre h1,
+.machine-pre h2,
+.machine-pre h3 {
+  color: #adadac;
 }
