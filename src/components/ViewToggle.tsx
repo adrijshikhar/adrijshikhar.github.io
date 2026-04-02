@@ -48,9 +48,9 @@ export default function ViewToggle() {
       tl.to(header, { x: 150, opacity: 0, duration: 0.8 }, 0);
     }
 
-    // Right column (main content) slides LEFT and fades
+    // Right column (main content) slides LEFT and fades — slight delay so it trails the sidebar
     if (main) {
-      tl.to(main, { x: -150, opacity: 0, duration: 0.8 }, 0);
+      tl.to(main, { x: -150, opacity: 0, duration: 0.8, ease: 'power1.inOut' }, 0.05);
     }
 
     // Background darkens simultaneously
