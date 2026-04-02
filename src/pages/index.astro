@@ -77,12 +77,18 @@ const rawMarkdown = [
             <h2 class="text-sm font-bold uppercase tracking-widest text-slate-lightest lg:sr-only">Experience</h2>
           </div>
           <ul class="group/list">
-            {experience.meta.entries.map((exp: any) => (
+            {experience.meta.entries.slice(0, 1).map((exp: any) => (
               <ExpCard {...exp}>
                 <div set:html={marked.parse(expSections[exp.slug] || '')} />
               </ExpCard>
             ))}
           </ul>
+          <div class="mt-12">
+            <a class="inline-flex items-center font-medium leading-tight text-slate-lightest group" href="/experience">
+              <span class="border-b border-transparent pb-px transition group-hover:border-accent">View Full Résumé</span>
+              <span class="ml-2 text-accent transition-transform group-hover:translate-x-1">&rarr;</span>
+            </a>
+          </div>
         </section>
 
         <!-- Projects -->
@@ -91,7 +97,7 @@ const rawMarkdown = [
             <h2 class="text-sm font-bold uppercase tracking-widest text-slate-lightest lg:sr-only">Projects</h2>
           </div>
           <ul class="group/list">
-            {projects.meta.entries.slice(0, 3).map((proj: any) => (
+            {projects.meta.entries.slice(0, 2).map((proj: any) => (
               <ProjectCard {...proj}>
                 <div set:html={marked.parse(projSections[proj.slug] || '')} />
               </ProjectCard>
