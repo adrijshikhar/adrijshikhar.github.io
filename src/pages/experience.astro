@@ -39,32 +39,32 @@ function getFirstLine(slug: string): string {
       <span class="mr-1 transition-transform group-hover:-translate-x-1">&larr;</span>
       <span>Adrij Shikhar</span>
     </a>
-    <h1 class="text-4xl font-bold tracking-tight text-slate-lightest sm:text-5xl">All Experience</h1>
+    <h1 class="text-4xl font-bold tracking-tight text-slate-200 sm:text-5xl">All Experience</h1>
 
     <table class="mt-12 w-full border-collapse text-left">
-      <thead class="sticky top-0 z-10 border-b border-slate/20 bg-navy/90 backdrop-blur-sm">
+      <thead class="sticky top-0 z-10 border-b border-slate-400/20 bg-slate-900/90 backdrop-blur-sm">
         <tr>
-          <th class="py-4 pr-8 text-sm font-semibold text-slate-lightest whitespace-nowrap">Period</th>
-          <th class="py-4 pr-8 text-sm font-semibold text-slate-lightest">Role</th>
-          <th class="py-4 pr-8 text-sm font-semibold text-slate-lightest">Company</th>
-          <th class="hidden py-4 pr-8 text-sm font-semibold text-slate-lightest lg:table-cell">Description</th>
-          <th class="hidden py-4 text-sm font-semibold text-slate-lightest sm:table-cell">Location</th>
+          <th class="py-4 pr-8 text-sm font-semibold text-slate-200 whitespace-nowrap">Period</th>
+          <th class="py-4 pr-8 text-sm font-semibold text-slate-200">Role</th>
+          <th class="py-4 pr-8 text-sm font-semibold text-slate-200">Company</th>
+          <th class="hidden py-4 pr-8 text-sm font-semibold text-slate-200 lg:table-cell">Description</th>
+          <th class="hidden py-4 text-sm font-semibold text-slate-200 sm:table-cell">Location</th>
         </tr>
       </thead>
       <tbody>
         {experience.meta.entries.map((exp: any) => (
-          <tr class="border-b border-slate/10">
-            <td class="py-4 pr-8 align-top text-sm text-slate/60 whitespace-nowrap">{exp.startDate} — {exp.endDate}</td>
-            <td class="py-4 pr-8 align-top text-base font-semibold text-slate-lightest">{exp.position}</td>
+          <tr class="border-b border-slate-400/10">
+            <td class="py-4 pr-8 align-top text-sm text-slate-400/60 whitespace-nowrap">{exp.startDate} — {exp.endDate}</td>
+            <td class="py-4 pr-8 align-top text-base font-semibold text-slate-200">{exp.position}</td>
             <td class="py-4 pr-8 align-top text-sm">
               {exp.companyLink ? (
                 <a href={exp.companyLink} target="_blank" rel="noreferrer noopener" class="text-accent hover:text-accent/80 transition-colors">
                   {exp.company} <span class="text-xs">&#8599;</span>
                 </a>
-              ) : <span class="text-slate-light">{exp.company}</span>}
+              ) : <span class="text-slate-300">{exp.company}</span>}
             </td>
-            <td class="hidden py-4 pr-8 align-top text-sm text-slate/70 lg:table-cell max-w-[300px] leading-snug">{getFirstLine(exp.slug)}</td>
-            <td class="hidden py-4 align-top text-sm text-slate/60 sm:table-cell whitespace-nowrap">{exp.location}</td>
+            <td class="hidden py-4 pr-8 align-top text-sm text-slate-400/70 lg:table-cell max-w-[300px] leading-snug">{getFirstLine(exp.slug)}</td>
+            <td class="hidden py-4 align-top text-sm text-slate-400/60 sm:table-cell whitespace-nowrap">{exp.location}</td>
           </tr>
         ))}
       </tbody>

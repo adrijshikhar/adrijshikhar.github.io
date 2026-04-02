@@ -6,13 +6,9 @@ export default {
   theme: {
     extend: {
       colors: {
-        navy: '#0a192f',
-        'navy-light': '#112240',
-        'navy-lighter': '#233554',
-        slate: '#94a3b8',
-        'slate-light': '#cbd5e1',
-        'slate-lightest': '#e2e8f0',
-        white: '#f1f5f9',
+        navy: '#0f172a',
+        'navy-light': '#1e293b',
+        'navy-lighter': '#334155',
         accent: '#64ffda',
         border: 'oklch(var(--border))',
         ring: 'oklch(var(--ring))',

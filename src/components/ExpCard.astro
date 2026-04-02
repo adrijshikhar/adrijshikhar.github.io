@@ -12,26 +12,26 @@ interface Props {
 const { position, company, companyLink, location, startDate, endDate, tagline } = Astro.props;
 ---
 
-<li class="group/card mb-2">
-  <div class="relative rounded-lg p-6 transition-all duration-200 lg:group-hover/list:opacity-50 lg:hover:!opacity-100 border border-transparent hover:border-slate/10 hover:bg-navy-light/40 hover:shadow-[inset_0_1px_0_0_rgba(148,163,184,0.1)] hover:drop-shadow-lg">
-    <div class="flex flex-col md:flex-row justify-between mb-3">
-      <div class="flex-1">
-        <h3 class="text-lg font-medium text-slate-lightest group-hover/card:text-accent transition-colors">{position}</h3>
-        <div class="text-sm">
-          {companyLink ? (
-            <a href={companyLink} target="_blank" rel="noreferrer noopener" class="text-slate-light hover:text-accent">{company}</a>
-          ) : <span class="text-slate-light">{company}</span>}
-          <span class="text-slate/50 mx-2">&middot;</span>
-          <span class="text-slate/70">{location}</span>
-        </div>
+<li class="mb-12">
+  <div class="group relative grid gap-4 pb-1 transition-all sm:grid-cols-8 sm:gap-8 md:gap-4 lg:hover:!opacity-100 lg:group-hover/list:opacity-50">
+    <div class="absolute -inset-x-4 -inset-y-4 z-0 hidden rounded-md transition motion-reduce:transition-none lg:-inset-x-6 lg:block lg:group-hover:bg-slate-800/50 lg:group-hover:shadow-[inset_0_1px_0_0_rgba(148,163,184,0.1)] lg:group-hover:drop-shadow-lg"></div>
+    <header class="z-10 mb-2 mt-1 text-xs font-semibold uppercase tracking-wide text-slate-400/60 sm:col-span-2" aria-label="{startDate} to {endDate}">
+      {startDate} — {endDate}
+    </header>
+    <div class="z-10 sm:col-span-6">
+      <h3 class="font-medium leading-snug text-slate-200">
+        <span class="group-hover:text-accent transition-colors">{position}</span>
+        <span class="mx-1">·</span>
+        {companyLink ? (
+          <a href={companyLink} target="_blank" rel="noreferrer noopener" class="text-inherit hover:text-inherit inline-flex items-baseline">
+            {company}<span class="ml-1 text-xs text-slate-400/60 group-hover:text-accent transition-colors">&#8599;</span>
+          </a>
+        ) : <span>{company}</span>}
+      </h3>
+      {tagline && <p class="text-slate-400/60 text-sm mt-1">{tagline}</p>}
+      <div class="mt-2 text-sm leading-normal text-slate-400">
+        <slot />
       </div>
-      <div class="md:text-right mt-1 md:mt-0 shrink-0">
-        <span class="font-mono text-xs text-slate/60 uppercase">{startDate} — {endDate}</span>
-      </div>
-    </div>
-    {tagline && <p class="text-slate/70 text-sm italic mb-3">{tagline}</p>}
-    <div class="prose prose-invert prose-sm max-w-none prose-a:text-accent prose-strong:text-slate-lightest">
-      <slot />
     </div>
   </div>
 </li>

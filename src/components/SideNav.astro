@@ -10,13 +10,13 @@ const sections = [
 
 <header class="lg:sticky lg:top-0 lg:flex lg:max-h-screen lg:w-1/2 lg:flex-col lg:justify-between lg:py-24">
   <div>
-    <h1 class="text-[2.5rem] font-bold tracking-tight text-slate-lightest leading-none sm:text-[2.75rem]">
+    <h1 class="text-[2.5rem] font-bold tracking-tight text-slate-200 leading-none sm:text-[2.75rem]">
       <a href="/" class="text-inherit hover:text-accent">Adrij Shikhar</a>
     </h1>
-    <h2 class="mt-3 text-base font-medium tracking-tight text-slate-lightest sm:text-lg">
+    <h2 class="mt-3 text-base font-medium tracking-tight text-slate-200 sm:text-lg">
       Senior Software Engineer
     </h2>
-    <p class="mt-4 max-w-xs text-sm leading-normal text-slate">
+    <p class="mt-4 max-w-xs text-sm leading-normal text-slate-400">
       I build scalable data platforms and craft software that pushes boundaries.
     </p>
     <nav class="nav hidden lg:block" aria-label="In-page jump links">
@@ -28,8 +28,8 @@ const sections = [
               href={`#${s.id}`}
               data-section={s.id}
             >
-              <span class="nav-indicator mr-4 h-px w-8 bg-slate-light/30 transition-all group-hover:w-16 group-hover:bg-slate-lightest group-focus-visible:w-16 group-focus-visible:bg-slate-lightest"></span>
-              <span class="nav-text text-xs font-bold uppercase tracking-widest text-slate group-hover:text-slate-lightest group-focus-visible:text-slate-lightest">
+              <span class="nav-indicator mr-4 h-px w-8 bg-slate-600 transition-all group-hover:w-16 group-hover:bg-slate-200 group-focus-visible:w-16 group-focus-visible:bg-slate-200"></span>
+              <span class="nav-text text-xs font-bold uppercase tracking-widest text-slate-400 group-hover:text-slate-200 group-focus-visible:text-slate-200">
                 {s.label}
               </span>
             </a>
@@ -49,7 +49,7 @@ const sections = [
       ].map((s) => (
         <li class="text-xs shrink-0">
           <a
-            class="block text-slate hover:text-slate-lightest transition-colors"
+            class="block text-slate-400 hover:text-slate-200 transition-colors"
             href={s.url}
             target="_blank"
             rel="noreferrer noopener"
@@ -62,7 +62,7 @@ const sections = [
       ))}
     </ul>
     <a
-      class="text-slate hover:text-accent transition-colors mr-6"
+      class="text-slate-400 hover:text-accent transition-colors mr-6"
       href="/assets/resume.pdf"
       download="Adrij Shikhar Resume.pdf"
       title="Download Resume"
@@ -91,11 +91,11 @@ const sections = [
             if (isActive) {
               indicator?.classList.add('w-16', 'bg-slate-lightest');
               indicator?.classList.remove('w-8');
-              text?.classList.add('text-slate-lightest');
+              text?.classList.add('text-slate-200');
             } else {
               indicator?.classList.remove('w-16', 'bg-slate-lightest');
               indicator?.classList.add('w-8');
-              text?.classList.remove('text-slate-lightest');
+              text?.classList.remove('text-slate-200');
             }
           });
         }
