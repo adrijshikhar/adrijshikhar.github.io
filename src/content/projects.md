@@ -4,68 +4,98 @@ entries:
     title: "ScraperQL"
     company: "Dgraph Labs"
     date: "Oct 2020"
+    year: 2020
     link: "https://github.com/adrijshikhar/scraper-ql"
+    builtWith: ["GraphQL", "Slash GraphQL", "Node.js"]
   - slug: kill-zee
     title: "Kill-Zee"
     company: "Global Game Jam 2020"
     date: "Jan 2020"
+    year: 2020
     link: "https://github.com/adrijshikhar/kill-zee"
+    builtWith: ["Lua", "LÖVE"]
   - slug: issue-labeler
     title: "Issue Labeler Bot"
     company: "SDSLabs"
     date: "Jul 2020 - Oct 2020"
+    year: 2020
     link: "https://github.com/sdslabs/SDSLabs-Issue-Labeler"
-  - slug: coderunner
-    title: "Coderunner 2.0"
-    company: "SDSLabs"
-    date: "Oct 2019 - Mar 2020"
-  - slug: accounts
-    title: "Accounts"
-    company: "SDSLabs"
-    date: "Jul 2020 - Oct 2020"
-  - slug: cerebro
-    title: "Cerebro"
-    company: "SDSLabs"
-    date: "Apr 2019 - Dec 2019"
+    builtWith: ["Python", "BERT", "GitHub API"]
   - slug: slackbot
     title: "Slackbot"
     company: "SDSLabs"
     date: "July 2021 - Dec 2021"
+    year: 2021
+    builtWith: ["Golang", "Slack API", "WebSockets"]
+  - slug: accounts
+    title: "Accounts"
+    company: "SDSLabs"
+    date: "Jul 2020 - Oct 2020"
+    year: 2020
+    builtWith: ["OAuth 2.0", "Docker", "Redis"]
   - slug: cra-webpack
     title: "Create React App Webpack"
     company: "SDSLabs"
     date: "July 2020 - Aug 2020"
+    year: 2020
     link: "https://github.com/adrijshikhar/create-react-app-webpack"
+    builtWith: ["React", "Webpack"]
   - slug: vega-vscode
     title: "Vega VS Code Extension"
     company: "Major League Hacking"
     date: "Jun 2020"
+    year: 2020
     link: "https://github.com/adrijshikhar/vega-vscode-extension"
+    builtWith: ["VS Code API", "Vega", "TypeScript"]
   - slug: darkdev
     title: "DarkDev"
     company: "SDSLabs"
-    date: "Apr 2020 - Present"
+    date: "Apr 2020"
+    year: 2020
     link: "https://github.com/adrijshikhar/darkdev"
-  - slug: esummit
-    title: "E-Summit PWA"
-    company: "IIT Roorkee"
-    date: "Jan 2019 - Jan 2020"
-  - slug: cognizance
-    title: "Cognizance"
-    company: "IIT Roorkee"
-    date: "Jan 2019 - Feb 2020"
+    builtWith: ["VS Code Theme"]
   - slug: covid-tracker
     title: "Covid 19 Tracker"
     company: "SDSLabs"
     date: "Apr 2020 - May 2020"
+    year: 2020
+    builtWith: ["Flutter", "Dart", "Maps SDK"]
+  - slug: coderunner
+    title: "Coderunner 2.0"
+    company: "SDSLabs"
+    date: "Oct 2019 - Mar 2020"
+    year: 2019
+    builtWith: ["Golang", "gRPC", "Docker"]
+  - slug: cerebro
+    title: "Cerebro"
+    company: "SDSLabs"
+    date: "Apr 2019 - Dec 2019"
+    year: 2019
+    builtWith: ["Laravel", "React", "Redux"]
+  - slug: cognizance
+    title: "Cognizance"
+    company: "IIT Roorkee"
+    date: "Jan 2019 - Feb 2020"
+    year: 2019
+    builtWith: ["Django", "React", "Redux", "PostgreSQL"]
+  - slug: esummit
+    title: "E-Summit PWA"
+    company: "IIT Roorkee"
+    date: "Jan 2019 - Jan 2020"
+    year: 2019
+    builtWith: ["React", "PWA"]
   - slug: hidden-stone
     title: "Hidden Stone"
     company: "Utthan Foundation Trust"
     date: "Dec 2018 - May 2019"
+    year: 2018
+    builtWith: ["React", "Redux", "Material UI", "Google Sheets API"]
   - slug: evem
     title: "evem"
     company: "SDSWoC 19"
     date: "Dec 2018 - Jan 2019"
+    year: 2018
+    builtWith: ["HTML", "CSS", "JavaScript", "PHP"]
 ---
 
 <!-- scraperql -->
