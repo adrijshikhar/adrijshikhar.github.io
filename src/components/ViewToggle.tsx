@@ -6,6 +6,19 @@ export default function ViewToggle() {
   const [transitioning, setTransitioning] = useState(false);
   const machineLoadedRef = useRef(false);
 
+  const loadMachineContent = (machineView: HTMLElement) => {
+    if (machineLoadedRef.current) return;
+    const raw: string = (window as any).__RAW_MARKDOWN__ || '';
+    const processed = raw
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noreferrer noopener">$1</a>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/^(### .+)$/gm, '<span class="machine-h3">$1</span>')
+      .replace(/^(## .+)$/gm, '<span class="machine-h2">$1</span>')
+      .replace(/^(# .+)$/gm, '<span class="machine-h1">$1</span>');
+    machineView.innerHTML = `<div class="machine-content-wrapper"><pre class="machine-pre">${processed}</pre></div>`;
+    machineLoadedRef.current = true;
+  };
+
   const toMachine = useCallback(() => {
     if (transitioning) return;
     setTransitioning(true);
@@ -13,43 +26,38 @@ export default function ViewToggle() {
     const humanView = document.querySelector('.human-view') as HTMLElement;
     const machineView = document.querySelector('.machine-view') as HTMLElement;
     const header = document.querySelector('header') as HTMLElement;
+    const main = document.querySelector('#content') as HTMLElement;
     if (!humanView || !machineView) return;
 
-    // Load machine content once
-    if (!machineLoadedRef.current) {
-      const raw: string = (window as any).__RAW_MARKDOWN__ || '';
-      const processed = raw
-        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noreferrer noopener">$1</a>')
-        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-        .replace(/^(### .+)$/gm, '<span class="machine-h3">$1</span>')
-        .replace(/^(## .+)$/gm, '<span class="machine-h2">$1</span>')
-        .replace(/^(# .+)$/gm, '<span class="machine-h1">$1</span>');
-      machineView.innerHTML = `<div class="machine-content-wrapper"><pre class="machine-pre">${processed}</pre></div>`;
-      machineLoadedRef.current = true;
-    }
-
+    loadMachineContent(machineView);
     window.scrollTo({ top: 0, behavior: 'instant' });
+
+    // Prepare machine view
+    gsap.set(machineView, { position: 'relative', opacity: 0, pointerEvents: 'none' });
 
     const tl = gsap.timeline({
       onComplete: () => {
-        humanView.style.position = 'absolute';
-        humanView.style.inset = '0';
-        humanView.style.pointerEvents = 'none';
+        gsap.set(humanView, { display: 'none' });
         setMode('machine');
         setTransitioning(false);
       },
     });
 
-    // Fade out sidebar
+    // Squeeze: sidebar slides right, content slides left — converge to center
     if (header) {
-      tl.to(header, { opacity: 0, x: -30, duration: 0.3, ease: 'power2.in' }, 0);
+      tl.to(header, { x: '40%', opacity: 0, duration: 0.5, ease: 'power3.in' }, 0);
+    }
+    if (main) {
+      tl.to(main, { x: '-30%', opacity: 0, duration: 0.5, ease: 'power3.in' }, 0);
     }
 
-    // Fade out human, bg color change, fade in machine — all overlapping
-    tl.to(humanView, { opacity: 0, scale: 0.98, duration: 0.4, ease: 'power2.in' }, 0.1);
-    tl.to(document.body, { backgroundColor: '#101010', duration: 0.5, ease: 'power1.inOut' }, 0.1);
-    tl.set(machineView, { position: 'relative', pointerEvents: 'auto' }, 0.3);
-    tl.to(machineView, { opacity: 1, duration: 0.4, ease: 'power2.out' }, 0.3);
+    // Background darkens as content squeezes
+    tl.to(document.body, { backgroundColor: '#101010', duration: 0.6, ease: 'power1.inOut' }, 0);
+
+    // After squeeze, hide human and reveal machine from center
+    tl.set(humanView, { pointerEvents: 'none' }, 0.45);
+    tl.set(machineView, { pointerEvents: 'auto' }, 0.45);
+    tl.to(machineView, { opacity: 1, duration: 0.35, ease: 'power2.out' }, 0.45);
   }, [transitioning]);
 
   const toHuman = useCallback(() => {
@@ -59,30 +67,38 @@ export default function ViewToggle() {
     const humanView = document.querySelector('.human-view') as HTMLElement;
     const machineView = document.querySelector('.machine-view') as HTMLElement;
     const header = document.querySelector('header') as HTMLElement;
+    const main = document.querySelector('#content') as HTMLElement;
     if (!humanView || !machineView) return;
 
     window.scrollTo({ top: 0, behavior: 'instant' });
 
+    // Restore human view for animation
+    gsap.set(humanView, { display: '', pointerEvents: 'none' });
+
     const tl = gsap.timeline({
       onComplete: () => {
-        machineView.style.position = 'absolute';
-        machineView.style.inset = '0';
-        machineView.style.pointerEvents = 'none';
+        gsap.set(machineView, { position: 'absolute', inset: 0, pointerEvents: 'none' });
+        gsap.set(humanView, { pointerEvents: 'auto' });
         setMode('human');
         setTransitioning(false);
       },
     });
 
-    // Fade out machine, bg color change, fade in human — all overlapping
+    // Fade out machine
     tl.to(machineView, { opacity: 0, duration: 0.3, ease: 'power2.in' }, 0);
-    tl.to(document.body, { backgroundColor: '#0f172a', duration: 0.5, ease: 'power1.inOut' }, 0.1);
-    tl.set(humanView, { position: 'relative', pointerEvents: 'auto', clearProps: 'inset' }, 0.2);
-    tl.to(humanView, { opacity: 1, scale: 1, duration: 0.4, ease: 'power2.out' }, 0.2);
 
-    // Fade sidebar back
+    // Background lightens
+    tl.to(document.body, { backgroundColor: '#0f172a', duration: 0.6, ease: 'power1.inOut' }, 0);
+
+    // Expand: sidebar slides back from center-right, content from center-left
     if (header) {
-      tl.to(header, { opacity: 1, x: 0, duration: 0.3, ease: 'power2.out' }, 0.3);
+      tl.to(header, { x: 0, opacity: 1, duration: 0.5, ease: 'power3.out' }, 0.25);
     }
+    if (main) {
+      tl.to(main, { x: 0, opacity: 1, duration: 0.5, ease: 'power3.out' }, 0.25);
+    }
+
+    tl.set(humanView, { pointerEvents: 'auto' }, 0.3);
   }, [transitioning]);
 
   return (
