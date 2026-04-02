@@ -15,12 +15,12 @@ const { title, company, date, link } = Astro.props;
       <div class="flex-1">
         <h3 class="text-lg font-medium text-slate-lightest group-hover/card:text-accent transition-colors">
           {link ? (
-            <a href={link} target="_blank" rel="noreferrer noopener" class="hover:underline">
+            <a href={link} target="_blank" rel="noreferrer noopener" class="text-inherit hover:text-inherit">
               {title} <span class="text-xs">&#8599;</span>
             </a>
           ) : title}
         </h3>
-        <div class="text-sm text-accent/80">{company}</div>
+        <div class="text-sm text-slate/70">{company}</div>
       </div>
       <div class="md:text-right mt-1 md:mt-0 shrink-0">
         <span class="font-mono text-xs text-slate/60">{date}</span>

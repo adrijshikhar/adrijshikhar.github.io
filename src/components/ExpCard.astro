@@ -19,8 +19,8 @@ const { position, company, companyLink, location, startDate, endDate, tagline } 
         <h3 class="text-lg font-medium text-slate-lightest group-hover/card:text-accent transition-colors">{position}</h3>
         <div class="text-sm">
           {companyLink ? (
-            <a href={companyLink} target="_blank" rel="noreferrer noopener">{company}</a>
-          ) : <span class="text-accent">{company}</span>}
+            <a href={companyLink} target="_blank" rel="noreferrer noopener" class="text-slate-light hover:text-accent">{company}</a>
+          ) : <span class="text-slate-light">{company}</span>}
           <span class="text-slate/50 mx-2">&middot;</span>
           <span class="text-slate/70">{location}</span>
         </div>
