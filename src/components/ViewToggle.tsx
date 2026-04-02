@@ -45,26 +45,26 @@ export default function ViewToggle() {
 
     // Left column (header/sidebar) slides RIGHT and fades
     if (header) {
-      tl.to(header, { x: 150, opacity: 0, duration: 0.55 }, 0);
+      tl.to(header, { x: 150, opacity: 0, duration: 0.8 }, 0);
     }
 
     // Right column (main content) slides LEFT and fades
     if (main) {
-      tl.to(main, { x: -150, opacity: 0, duration: 0.55 }, 0);
+      tl.to(main, { x: -150, opacity: 0, duration: 0.8 }, 0);
     }
 
     // Background darkens simultaneously
-    tl.to(document.body, { backgroundColor: '#101010', duration: 0.7, ease: 'power1.inOut' }, 0);
+    tl.to(document.body, { backgroundColor: '#101010', duration: 1, ease: 'power1.inOut' }, 0);
 
     // Machine fades in from center after columns converge
-    tl.set(humanView, { pointerEvents: 'none' }, 0.4);
+    tl.set(humanView, { pointerEvents: 'none' }, 0.6);
     tl.to(machineView, {
       opacity: 1,
       y: 0,
       pointerEvents: 'auto',
-      duration: 0.4,
+      duration: 0.6,
       ease: 'power2.out',
-    }, 0.45);
+    }, 0.6);
   }, [transitioning]);
 
   const toHuman = useCallback(() => {
@@ -90,18 +90,19 @@ export default function ViewToggle() {
       },
     });
 
-    // Everything starts immediately, overlapped
-    tl.to(machineView, { opacity: 0, y: 10, duration: 0.25, ease: 'power2.in' }, 0);
-    tl.to(document.body, { backgroundColor: '#0f172a', duration: 0.5, ease: 'power1.inOut' }, 0);
+    // Machine fades out
+    tl.to(machineView, { opacity: 0, y: 10, duration: 0.5, ease: 'power2.in' }, 0);
+    tl.to(document.body, { backgroundColor: '#0f172a', duration: 1, ease: 'power1.inOut' }, 0);
 
+    // Columns expand back out
     if (header) {
-      tl.to(header, { x: 0, opacity: 1, duration: 0.4 }, 0.1);
+      tl.to(header, { x: 0, opacity: 1, duration: 0.7 }, 0.3);
     }
     if (main) {
-      tl.to(main, { x: 0, opacity: 1, duration: 0.4 }, 0.1);
+      tl.to(main, { x: 0, opacity: 1, duration: 0.7 }, 0.3);
     }
 
-    tl.set(humanView, { pointerEvents: 'auto' }, 0.15);
+    tl.set(humanView, { pointerEvents: 'auto' }, 0.4);
   }, [transitioning]);
 
   return (
