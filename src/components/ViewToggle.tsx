@@ -42,14 +42,14 @@ export default function ViewToggle() {
       },
     });
 
-    // Left column slides right and fades
+    // Left column slides right and fades — power1.out decelerates into disappearance
     if (header) {
-      tl.to(header, { x: 150, opacity: 0, duration: 0.6, ease: 'sine.in' }, 0);
+      tl.to(header, { x: 150, opacity: 0, duration: 0.75, ease: 'power1.out' }, 0);
     }
 
     // Right column slides left and fades
     if (main) {
-      tl.to(main, { x: -150, opacity: 0, duration: 0.6, ease: 'sine.in' }, 0.05);
+      tl.to(main, { x: -150, opacity: 0, duration: 0.75, ease: 'power1.out' }, 0.05);
     }
 
     // Background darkens — longest, smoothest
