@@ -48,8 +48,8 @@ export default function ViewToggle() {
           machineView.classList.add('expanded');
           window.scrollTo({ top: 0, behavior: 'instant' });
           setMode(next);
-          setTimeout(() => setTransitioning(false), 800);
-        }, 500);
+          setTimeout(() => setTransitioning(false), 300);
+        }, 250);
       });
     } else {
       // Collapse machine view
@@ -65,8 +65,8 @@ export default function ViewToggle() {
         window.scrollTo({ top: 0, behavior: 'instant' });
 
         setMode(next);
-        setTimeout(() => setTransitioning(false), 800);
-      }, 500);
+        setTimeout(() => setTransitioning(false), 300);
+      }, 250);
     }
   };
 
