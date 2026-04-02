@@ -24,7 +24,12 @@ export default function ViewToggle() {
           '<a href="$2" target="_blank" rel="noreferrer noopener">$1</a>',
         );
         const withBold = withLinks.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-        machineView.innerHTML = `<div class="machine-content-wrapper"><pre class="machine-pre">${withBold}</pre></div>`;
+        // Convert markdown headings to styled spans
+        const withHeadings = withBold
+          .replace(/^# (.+)$/gm, '<span class="machine-h1">$1</span>')
+          .replace(/^## (.+)$/gm, '<span class="machine-h2">$1</span>')
+          .replace(/^### (.+)$/gm, '<span class="machine-h3">$1</span>');
+        machineView.innerHTML = `<div class="machine-content-wrapper"><pre class="machine-pre">${withHeadings}</pre></div>`;
         machineLoadedRef.current = true;
       }
 

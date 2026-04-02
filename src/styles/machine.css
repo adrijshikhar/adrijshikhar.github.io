@@ -91,24 +91,28 @@ header {
   font-weight: 500;
 }
 
-.machine-pre h1 {
+.machine-h1 {
   color: #e0e0e0;
   font-size: 15px;
-  margin-bottom: 1em;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.5em;
 }
 
-.machine-pre h2 {
+.machine-h2 {
   color: #d6d6d5;
   font-size: 14px;
-  margin-top: 2em;
-  margin-bottom: 0.5em;
-  padding-bottom: 0.3em;
+  font-weight: 500;
+  display: block;
+  margin-top: 1em;
+  padding-bottom: 0.2em;
   border-bottom: 1px solid #2a2a2a;
 }
 
-.machine-pre h3 {
+.machine-h3 {
   color: #c0c0bf;
   font-size: 13px;
-  margin-top: 1.5em;
-  margin-bottom: 0.3em;
+  font-weight: 500;
+  display: block;
+  margin-top: 0.8em;
 }
