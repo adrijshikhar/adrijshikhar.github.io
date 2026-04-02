@@ -9,12 +9,14 @@
 **Tech Stack:** Astro 5, @astrojs/mdx, @astrojs/react, @astrojs/tailwind, React 19, Tailwind CSS 4, shadcn/ui, Bun (package manager), fnm (Node version manager), Node 22, GitHub Pages deployment.
 
 **Design:** Brittany Chiang-inspired dark minimal layout:
-- **Palette:** Dark slate background (`#0a192f`), light slate text (`#8892b0`), lightest slate headings (`#ccd6f6`), teal accent (`#64ffda`) for links/highlights
-- **Layout:** Fixed left sidebar (40% on desktop) with name, title, nav links, social icons. Right side (60%) scrolls through sections.
-- **Nav:** Scroll-spy highlights current section. Compact numbered links (`01. About`, `02. Experience`, etc.)
-- **Typography:** Inter for body, monospace (JetBrains Mono) for accents/labels
+- **Layout:** Two-column flexbox. Left column is `sticky top-0 h-screen` with name, title, tagline, nav, social icons. Right column scrolls through sections. NOT a fixed sidebar — both columns live inside the same scrollable container.
+- **Human palette:** Navy background (`#0a192f`), slate text (`#8892b0`), lightest slate headings (`#ccd6f6`), teal accent (`#64ffda`)
+- **Machine palette:** Dark grey background (`#1a1a2e`), lavender-grey text (`#a0a0b8`), near-white headings (`#e0e0f0`), purple accent (`#7b68ee`)
+- **Nav:** Scroll-spy highlights current section. Three links: About, Experience, Projects (minimal like brittanychiang.com)
+- **Typography:** Inter for body, monospace (JetBrains Mono) for accents/labels/machine mode
 - **Cards:** Subtle hover lift with teal left-border accent on experience/project entries
-- **Mobile:** Sidebar collapses to fixed top bar with hamburger menu
+- **Toggle animation:** Human view shrinks (scale 0.92) + fades → background transitions navy→grey → machine view fades up with clip-path typewriter reveal. Toggle pill changes teal→purple.
+- **Mobile:** Single column, sticky section headers visible on scroll
 
 ---
 
