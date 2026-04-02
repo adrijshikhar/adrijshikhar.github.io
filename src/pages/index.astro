@@ -163,33 +163,37 @@ const rawMarkdown = [
       }
     });
 
-    // Hide spotlight in machine mode
-    const observer = new MutationObserver(() => {
+    // Hide spotlight and cursor in machine mode
+    const cursorEl = document.getElementById('cursor');
+    const modeObserver = new MutationObserver(() => {
       const isMachine = document.body.classList.contains('machine-mode');
       if (spotlight) spotlight.style.opacity = isMachine ? '0' : '1';
+      if (cursorEl) cursorEl.style.display = isMachine ? 'none' : '';
     });
-    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    modeObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
-    // Section fade-in on scroll
-    const sections = document.querySelectorAll('section[id]');
-    sections.forEach((s) => {
-      s.style.opacity = '0';
-      s.style.transform = 'translateY(20px)';
-      s.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-    });
-    const fadeObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const el = entry.target as HTMLElement;
-            el.style.opacity = '1';
-            el.style.transform = 'translateY(0)';
-            fadeObserver.unobserve(el);
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-    sections.forEach((s) => fadeObserver.observe(s));
+    // Section fade-in on scroll (progressive enhancement — visible by default if observer unsupported)
+    if ('IntersectionObserver' in window) {
+      const sections = document.querySelectorAll('section[id]');
+      sections.forEach((s) => {
+        (s as HTMLElement).style.opacity = '0';
+        (s as HTMLElement).style.transform = 'translateY(20px)';
+        (s as HTMLElement).style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+      });
+      const fadeObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const el = entry.target as HTMLElement;
+              el.style.opacity = '1';
+              el.style.transform = 'translateY(0)';
+              fadeObserver.unobserve(el);
+            }
+          });
+        },
+        { threshold: 0.1 }
+      );
+      sections.forEach((s) => fadeObserver.observe(s));
+    }
   </script>
 </BaseLayout>
