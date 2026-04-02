@@ -1,5 +1,8 @@
 import { useState, useRef, useCallback } from 'react';
-import gsap from 'gsap';
+import { gsap, CustomEase } from '../lib/gsap';
+
+// Smooth ease for the squeeze
+CustomEase.create('squeeze', '0.65, 0, 0.35, 1');
 
 export default function ViewToggle() {
   const [mode, setMode] = useState<'human' | 'machine'>('human');
@@ -32,10 +35,10 @@ export default function ViewToggle() {
     loadMachineContent(machineView);
     window.scrollTo({ top: 0, behavior: 'instant' });
 
-    // Prepare machine view
-    gsap.set(machineView, { position: 'relative', opacity: 0, pointerEvents: 'none' });
+    gsap.set(machineView, { position: 'relative', opacity: 0, pointerEvents: 'none', y: 20 });
 
     const tl = gsap.timeline({
+      defaults: { ease: 'squeeze' },
       onComplete: () => {
         gsap.set(humanView, { display: 'none' });
         setMode('machine');
@@ -43,21 +46,28 @@ export default function ViewToggle() {
       },
     });
 
-    // Squeeze: sidebar slides right, content slides left — converge to center
+    // Left column (header/sidebar) slides RIGHT and fades
     if (header) {
-      tl.to(header, { x: '40%', opacity: 0, duration: 0.5, ease: 'power3.in' }, 0);
+      tl.to(header, { x: 150, opacity: 0, duration: 0.55 }, 0);
     }
+
+    // Right column (main content) slides LEFT and fades
     if (main) {
-      tl.to(main, { x: '-30%', opacity: 0, duration: 0.5, ease: 'power3.in' }, 0);
+      tl.to(main, { x: -150, opacity: 0, duration: 0.55 }, 0);
     }
 
-    // Background darkens as content squeezes
-    tl.to(document.body, { backgroundColor: '#101010', duration: 0.6, ease: 'power1.inOut' }, 0);
+    // Background darkens simultaneously
+    tl.to(document.body, { backgroundColor: '#101010', duration: 0.7, ease: 'power1.inOut' }, 0);
 
-    // After squeeze, hide human and reveal machine from center
-    tl.set(humanView, { pointerEvents: 'none' }, 0.45);
-    tl.set(machineView, { pointerEvents: 'auto' }, 0.45);
-    tl.to(machineView, { opacity: 1, duration: 0.35, ease: 'power2.out' }, 0.45);
+    // Machine fades in from center after columns converge
+    tl.set(humanView, { pointerEvents: 'none' }, 0.4);
+    tl.to(machineView, {
+      opacity: 1,
+      y: 0,
+      pointerEvents: 'auto',
+      duration: 0.4,
+      ease: 'power2.out',
+    }, 0.45);
   }, [transitioning]);
 
   const toHuman = useCallback(() => {
@@ -71,11 +81,10 @@ export default function ViewToggle() {
     if (!humanView || !machineView) return;
 
     window.scrollTo({ top: 0, behavior: 'instant' });
-
-    // Restore human view for animation
     gsap.set(humanView, { display: '', pointerEvents: 'none' });
 
     const tl = gsap.timeline({
+      defaults: { ease: 'squeeze' },
       onComplete: () => {
         gsap.set(machineView, { position: 'absolute', inset: 0, pointerEvents: 'none' });
         gsap.set(humanView, { pointerEvents: 'auto' });
@@ -84,21 +93,23 @@ export default function ViewToggle() {
       },
     });
 
-    // Fade out machine
-    tl.to(machineView, { opacity: 0, duration: 0.3, ease: 'power2.in' }, 0);
+    // Machine fades out and drifts down
+    tl.to(machineView, { opacity: 0, y: 20, duration: 0.35, ease: 'power2.in' }, 0);
 
     // Background lightens
-    tl.to(document.body, { backgroundColor: '#0f172a', duration: 0.6, ease: 'power1.inOut' }, 0);
+    tl.to(document.body, { backgroundColor: '#0f172a', duration: 0.7, ease: 'power1.inOut' }, 0);
 
-    // Expand: sidebar slides back from center-right, content from center-left
+    // Left column (header) slides back LEFT from right
     if (header) {
-      tl.to(header, { x: 0, opacity: 1, duration: 0.5, ease: 'power3.out' }, 0.25);
-    }
-    if (main) {
-      tl.to(main, { x: 0, opacity: 1, duration: 0.5, ease: 'power3.out' }, 0.25);
+      tl.to(header, { x: 0, opacity: 1, duration: 0.55 }, 0.3);
     }
 
-    tl.set(humanView, { pointerEvents: 'auto' }, 0.3);
+    // Right column (main) slides back RIGHT from left
+    if (main) {
+      tl.to(main, { x: 0, opacity: 1, duration: 0.55 }, 0.3);
+    }
+
+    tl.set(humanView, { pointerEvents: 'auto' }, 0.4);
   }, [transitioning]);
 
   return (
