@@ -1,11 +1,7 @@
-/* === Simple crossfade — both views stacked, opacity swap === */
-
-.view-container {
-  position: relative;
-}
+/* === Views — GSAP handles all transitions === */
 
 .human-view {
-  transition: opacity 0.4s ease;
+  will-change: opacity, transform;
 }
 
 .machine-view {
@@ -13,41 +9,14 @@
   inset: 0;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.4s ease;
+  will-change: opacity;
 }
 
-.machine-view.active {
-  position: relative;
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.human-view.inactive {
-  opacity: 0;
-  pointer-events: none;
-  position: absolute;
-  inset: 0;
-}
-
-/* === Background === */
-
-body {
-  transition: background-color 0.6s ease;
-}
-
-body.machine-mode {
-  background-color: #101010;
-}
+/* === Background handled by GSAP on body === */
 
 /* === Sidebar === */
-
 header {
-  transition: opacity 0.4s ease;
-}
-
-body.machine-mode header {
-  opacity: 0;
-  pointer-events: none;
+  will-change: opacity, transform;
 }
 
 /* === Machine content === */
