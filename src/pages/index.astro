@@ -56,6 +56,7 @@ const rawMarkdown = [
 ---
 
 <BaseLayout title="Adrij Shikhar">
+  <div class="pointer-events-none fixed inset-0 z-30 transition-opacity duration-300" id="spotlight"></div>
   <ViewToggle client:load />
   <div class="machine-view" />
 
@@ -146,5 +147,20 @@ const rawMarkdown = [
 
   <script define:vars={{ rawMarkdown }}>
     window.__RAW_MARKDOWN__ = rawMarkdown;
+  </script>
+  <script>
+    const spotlight = document.getElementById('spotlight');
+    document.addEventListener('mousemove', (e) => {
+      if (spotlight && !document.body.classList.contains('machine-mode')) {
+        spotlight.style.background = `radial-gradient(600px at ${e.clientX}px ${e.clientY}px, rgba(29, 78, 216, 0.15), transparent 80%)`;
+      }
+    });
+    // Hide spotlight in machine mode
+    const observer = new MutationObserver(() => {
+      if (spotlight) {
+        spotlight.style.opacity = document.body.classList.contains('machine-mode') ? '0' : '1';
+      }
+    });
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
   </script>
 </BaseLayout>
