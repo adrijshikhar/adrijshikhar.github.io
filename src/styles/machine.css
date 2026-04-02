@@ -1,30 +1,66 @@
-/* === Views — GSAP handles all transitions === */
+/* === Parallel.ai-style height + opacity animation === */
+
+.human-view,
+.machine-view {
+  transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.25s ease;
+}
 
 .human-view {
-  will-change: opacity, transform;
+  height: auto;
+  opacity: 1;
+}
+
+.human-view.collapsed {
+  overflow: hidden;
+  height: 0 !important;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .machine-view {
-  position: absolute;
-  inset: 0;
+  height: 0;
   opacity: 0;
+  overflow: hidden;
   pointer-events: none;
-  will-change: opacity;
 }
 
-/* === Background handled by GSAP on body === */
+.machine-view.expanded {
+  height: auto;
+  opacity: 1;
+  pointer-events: auto;
+  overflow: visible;
+}
 
-/* === Sidebar === */
+/* === Machine mode — parallel.ai palette === */
+
+body {
+  transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.machine-mode {
+  background-color: #101010;
+}
+
+body.machine-mode header {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  opacity: 0;
+  transform: translateX(-20px);
+  pointer-events: none;
+  height: 0;
+  overflow: hidden;
+}
+
 header {
-  will-change: opacity, transform;
+  transition: opacity 0.3s ease, transform 0.3s ease, height 0.3s ease;
 }
 
-/* === Machine content === */
+/* === Machine content — matches parallel.ai exactly === */
 
 .machine-content-wrapper {
   max-width: 640px;
   margin: 0 auto;
-  padding: 3rem 1.5rem 6rem;
+  padding: 3rem 1.5rem;
 }
 
 .machine-pre {
@@ -37,9 +73,23 @@ header {
   letter-spacing: -0.01em;
 }
 
-.machine-pre a { color: #fb631b; text-decoration: none; }
-.machine-pre a:hover { color: #f4793f; text-decoration: underline; }
-.machine-pre strong { color: #d6d6d5; font-weight: 500; }
-.machine-h1 { color: #e8e8e8; }
-.machine-h2 { color: #c0c0bf; }
-.machine-h3 { color: #a0a09f; }
+.machine-pre a {
+  color: #fb631b;
+  text-decoration: none;
+}
+
+.machine-pre a:hover {
+  color: #f4793f;
+  text-decoration: underline;
+}
+
+.machine-pre strong {
+  color: #d6d6d5;
+  font-weight: 500;
+}
+
+.machine-pre h1,
+.machine-pre h2,
+.machine-pre h3 {
+  color: #adadac;
+}
