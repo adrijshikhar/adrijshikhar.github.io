@@ -22,14 +22,6 @@ function splitBySlug(content: string): Record<string, string> {
 
 const experience = readContent('experience.md');
 const expSections = splitBySlug(experience.content);
-
-function getFirstLine(slug: string): string {
-  const content = expSections[slug] || '';
-  const lines = content.split('\n').filter((l: string) => l.trim() && !l.startsWith('#'));
-  // Get first non-heading, non-empty line — strip leading "- "
-  const first = lines[0]?.trim().replace(/^-\s*/, '') || '';
-  return first.length > 120 ? first.slice(0, 117) + '...' : first;
-}
 ---
 
 <BaseLayout title="All Experience | Adrij Shikhar">
@@ -39,36 +31,28 @@ function getFirstLine(slug: string): string {
       <span class="mr-1 transition-transform group-hover:-translate-x-1">&larr;</span>
       <span>Adrij Shikhar</span>
     </a>
-    <h1 class="text-4xl font-bold tracking-tight text-slate-200 sm:text-5xl">All Experience</h1>
+    <h1 class="text-4xl font-bold tracking-tight text-slate-200 sm:text-5xl mb-12">All Experience</h1>
 
-    <table class="mt-12 w-full border-collapse text-left">
-      <thead class="sticky top-0 z-10 border-b border-slate-400/20 bg-slate-900/90 backdrop-blur-sm">
-        <tr>
-          <th class="py-4 pr-8 text-sm font-semibold text-slate-200 whitespace-nowrap">Period</th>
-          <th class="py-4 pr-8 text-sm font-semibold text-slate-200">Role</th>
-          <th class="py-4 pr-8 text-sm font-semibold text-slate-200">Company</th>
-          <th class="hidden py-4 pr-8 text-sm font-semibold text-slate-200 lg:table-cell">Description</th>
-          <th class="hidden py-4 text-sm font-semibold text-slate-200 sm:table-cell">Location</th>
-        </tr>
-      </thead>
-      <tbody>
-        {experience.meta.entries.map((exp: any) => (
-          <tr class="border-b border-slate-400/10">
-            <td class="py-4 pr-8 align-top text-sm text-slate-400/60 whitespace-nowrap">{exp.startDate} — {exp.endDate}</td>
-            <td class="py-4 pr-8 align-top text-base font-semibold text-slate-200">{exp.position}</td>
-            <td class="py-4 pr-8 align-top text-sm">
+    <div class="space-y-12">
+      {experience.meta.entries.map((exp: any) => (
+        <div class="border-b border-slate-400/10 pb-12">
+          <div class="flex items-baseline justify-between gap-4 mb-1">
+            <h2 class="text-lg font-semibold text-slate-200">
+              {exp.position}
+              <span class="mx-2 text-slate-400/40">·</span>
               {exp.companyLink ? (
-                <a href={exp.companyLink} target="_blank" rel="noreferrer noopener" class="text-accent hover:text-accent/80 transition-colors">
-                  {exp.company} <span class="text-xs">&#8599;</span>
+                <a href={exp.companyLink} target="_blank" rel="noreferrer noopener" class="text-slate-300 hover:text-accent transition-colors">
+                  {exp.company}<span class="ml-1 text-xs">&#8599;</span>
                 </a>
               ) : <span class="text-slate-300">{exp.company}</span>}
-            </td>
-            <td class="hidden py-4 pr-8 align-top text-sm text-slate-400/70 lg:table-cell max-w-[300px] leading-snug">{getFirstLine(exp.slug)}</td>
-            <td class="hidden py-4 align-top text-sm text-slate-400/60 sm:table-cell whitespace-nowrap">{exp.location}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+            </h2>
+            <span class="shrink-0 text-xs font-mono uppercase tracking-wide text-slate-400/60">{exp.startDate} — {exp.endDate}</span>
+          </div>
+          <div class="text-xs text-slate-400/50 mb-3">{exp.location}</div>
+          <div class="text-sm leading-normal text-slate-400 prose prose-invert prose-sm max-w-none prose-headings:text-slate-200 prose-headings:text-sm prose-headings:font-semibold prose-headings:mt-4 prose-headings:mb-2 prose-li:my-0.5 prose-ul:my-1 prose-a:text-accent prose-strong:text-slate-200" set:html={marked.parse(expSections[exp.slug] || '')} />
+        </div>
+      ))}
+    </div>
   </main>
   <script>
     const spotlight = document.getElementById('spotlight');

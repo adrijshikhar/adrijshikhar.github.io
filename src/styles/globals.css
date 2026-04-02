@@ -8,8 +8,24 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
   body {
     @apply bg-slate-900 font-sans text-slate-400 antialiased;
+  }
+
+  @media (min-width: 1024px) {
+    body, a, button {
+      cursor: none;
+    }
   }
 
   h1, h2, h3, h4, h5, h6 {
