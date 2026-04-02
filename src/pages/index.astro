@@ -1,0 +1,172 @@
+---
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import matter from 'gray-matter';
+import { marked } from 'marked';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SideNav from '../components/SideNav.astro';
+import Section from '../components/Section.astro';
+import ExpCard from '../components/ExpCard.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import ViewToggle from '../components/ViewToggle.tsx';
+
+function readContent(filename: string) {
+  const raw = readFileSync(join(process.cwd(), 'src/content', filename), 'utf-8');
+  const { data, content } = matter(raw);
+  return { meta: data, content };
+}
+
+function splitBySlug(content: string): Record<string, string> {
+  const sections: Record<string, string> = {};
+  const parts = content.split(/<!--\s*([\w-]+)\s*-->/);
+  for (let i = 1; i < parts.length; i += 2) {
+    sections[parts[i]] = parts[i + 1]?.trim() || '';
+  }
+  return sections;
+}
+
+const about = readContent('about.md');
+const experience = readContent('experience.md');
+const projects = readContent('projects.md');
+const education = readContent('education.md');
+// skills.md removed from rendered sections
+const achievements = readContent('achievements.md');
+const interests = readContent('interests.md');
+
+const expSections = splitBySlug(experience.content);
+const projSections = splitBySlug(projects.content);
+
+function formatExpEntry(entry: any, body: string): string {
+  return `### ${entry.position} @ ${entry.company} (${entry.startDate} — ${entry.endDate})\n\n${body}`;
+}
+
+function formatProjEntry(entry: any, body: string): string {
+  const header = entry.link ? `### [${entry.title}](${entry.link}) — ${entry.company}` : `### ${entry.title} — ${entry.company}`;
+  return `${header}\n\n${body}`;
+}
+
+const rawMarkdown = [
+  `# ${about.meta.name}\n\n${about.content}`,
+  `\n---\n\n## Experience\n\n${experience.meta.entries.map((e: any) => formatExpEntry(e, expSections[e.slug] || '')).join('\n\n---\n\n')}`,
+  `\n---\n\n## Projects\n\n${projects.meta.entries.map((p: any) => formatProjEntry(p, projSections[p.slug] || '')).join('\n\n---\n\n')}`,
+  `\n---\n\n## Achievements\n\n${achievements.content}`,
+  `\n---\n\n## Education\n\n${education.meta.entries.map((e: any) => `### ${e.institution}\n\n${e.degree}${e.field ? ` — ${e.field}` : ''}`).join('\n\n')}`,
+  `\n---\n\n## Interests\n\n${interests.content}`,
+].join('\n');
+---
+
+<BaseLayout title="Adrij Shikhar">
+  <div class="pointer-events-none fixed inset-0 z-30 transition-opacity duration-300" id="spotlight"></div>
+  <ViewToggle client:load />
+  <div class="machine-view" />
+
+  <div class="human-view mx-auto min-h-screen max-w-screen-xl px-6 py-12 md:px-12 md:py-20 lg:px-16 lg:py-0">
+    <div class="lg:flex lg:justify-between lg:gap-4">
+      <SideNav />
+
+      <main id="content" class="pt-24 lg:w-[55%] lg:py-24">
+
+        <!-- About -->
+        <section id="about" class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24">
+          <div class="prose prose-invert prose-sm max-w-none text-slate-400" set:html={marked.parse(about.content)} />
+        </section>
+
+        <!-- Experience -->
+        <section id="experience" class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24">
+          <div class="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-slate-900/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:px-0 lg:py-0 lg:opacity-0">
+            <h2 class="text-sm font-bold uppercase tracking-widest text-slate-200 lg:sr-only">Experience</h2>
+          </div>
+          <ul class="group/list">
+            {experience.meta.entries.slice(0, 1).map((exp: any) => (
+              <ExpCard {...exp}>
+                <div set:html={marked.parse(expSections[exp.slug] || '')} />
+              </ExpCard>
+            ))}
+          </ul>
+          <div class="mt-12">
+            <a class="inline-flex items-center font-medium leading-tight text-slate-200 group" href="/experience">
+              <span class="border-b border-transparent pb-px transition group-hover:border-accent">View Full Work Experience</span>
+              <span class="ml-2 text-accent transition-transform group-hover:translate-x-1">&rarr;</span>
+            </a>
+          </div>
+        </section>
+
+        <!-- Projects -->
+        <section id="projects" class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24">
+          <div class="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-slate-900/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:px-0 lg:py-0 lg:opacity-0">
+            <h2 class="text-sm font-bold uppercase tracking-widest text-slate-200 lg:sr-only">Projects</h2>
+          </div>
+          <ul class="group/list">
+            {projects.meta.entries.slice(0, 2).map((proj: any) => (
+              <ProjectCard {...proj}>
+                <div set:html={marked.parse(projSections[proj.slug] || '')} />
+              </ProjectCard>
+            ))}
+          </ul>
+          <div class="mt-12">
+            <a class="inline-flex items-center font-medium leading-tight text-slate-200 group" href="/archive">
+              <span class="border-b border-transparent pb-px transition group-hover:border-accent">View Full Project Archive</span>
+              <span class="ml-2 text-accent transition-transform group-hover:translate-x-1">&rarr;</span>
+            </a>
+          </div>
+        </section>
+
+        <!-- Education -->
+        <section id="education" class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24">
+          <div class="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-slate-900/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:px-0 lg:py-0 lg:opacity-0">
+            <h2 class="text-sm font-bold uppercase tracking-widest text-slate-200 lg:sr-only">Education</h2>
+          </div>
+          {education.meta.entries.map((edu: any) => (
+            <div class="group flex flex-col md:flex-row justify-between mb-8 p-4 rounded-md hover:bg-slate-800/50 transition-all">
+              <div class="flex-1">
+                <h3 class="text-lg font-medium text-slate-200">{edu.institution}</h3>
+                <div class="text-accent text-sm">{edu.degree}</div>
+                {edu.field && <p class="text-slate-400/70 text-sm">{edu.field}</p>}
+              </div>
+              <div class="md:text-right mt-1 md:mt-0">
+                <span class="font-mono text-xs text-slate-400/60">{edu.startDate} — {edu.endDate}</span>
+              </div>
+            </div>
+          ))}
+        </section>
+
+        <!-- Achievements -->
+        <section id="achievements" class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24">
+          <div class="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-slate-900/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:px-0 lg:py-0 lg:opacity-0">
+            <h2 class="text-sm font-bold uppercase tracking-widest text-slate-200 lg:sr-only">Achievements</h2>
+          </div>
+          <div class="prose prose-invert max-w-none prose-a:text-accent" set:html={marked.parse(achievements.content)} />
+        </section>
+
+        <!-- Interests -->
+        <section id="interests" class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24">
+          <div class="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-slate-900/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:px-0 lg:py-0 lg:opacity-0">
+            <h2 class="text-sm font-bold uppercase tracking-widest text-slate-200 lg:sr-only">Interests</h2>
+          </div>
+          <div class="prose prose-invert max-w-none text-slate-400" set:html={marked.parse(interests.content)} />
+        </section>
+
+
+      </main>
+    </div>
+  </div>
+
+  <script define:vars={{ rawMarkdown }}>
+    window.__RAW_MARKDOWN__ = rawMarkdown;
+  </script>
+  <script>
+    const spotlight = document.getElementById('spotlight');
+    document.addEventListener('mousemove', (e) => {
+      if (spotlight && !document.body.classList.contains('machine-mode')) {
+        spotlight.style.background = `radial-gradient(600px at ${e.clientX}px ${e.clientY}px, rgba(29, 78, 216, 0.15), transparent 80%)`;
+      }
+    });
+    // Hide spotlight in machine mode
+    const observer = new MutationObserver(() => {
+      if (spotlight) {
+        spotlight.style.opacity = document.body.classList.contains('machine-mode') ? '0' : '1';
+      }
+    });
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  </script>
+</BaseLayout>

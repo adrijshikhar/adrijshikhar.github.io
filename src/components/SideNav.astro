@@ -2,87 +2,81 @@
 const sections = [
   { id: 'about', label: 'About' },
   { id: 'experience', label: 'Experience' },
-  { id: 'skills', label: 'Skills' },
   { id: 'projects', label: 'Projects' },
-  { id: 'achievements', label: 'Achievements' },
   { id: 'education', label: 'Education' },
-  { id: 'interests', label: 'Interests' },
+  { id: 'achievements', label: 'Achievements' },
 ];
 ---
 
-<aside class="fixed top-0 left-0 z-50 h-screen w-[40vw] max-w-md bg-navy flex-col justify-between p-12 hidden lg:flex">
+<header class="lg:sticky lg:top-0 lg:flex lg:max-h-screen lg:w-1/2 lg:flex-col lg:justify-between lg:py-24">
   <div>
-    <h1 class="text-5xl font-bold text-slate-lightest mb-2">Adrij Shikhar</h1>
-    <h2 class="text-xl text-slate-light mb-4">Senior Software Engineer</h2>
-    <p class="text-slate text-sm max-w-xs mb-8">
+    <h1 class="text-[2.5rem] font-bold tracking-tight text-slate-200 leading-none sm:text-[2.75rem]">
+      <a href="/" class="text-inherit hover:text-accent">Adrij Shikhar</a>
+    </h1>
+    <h2 class="mt-3 text-base font-medium tracking-tight text-slate-200 sm:text-lg">
+      Senior Software Engineer
+    </h2>
+    <p class="mt-4 max-w-xs text-sm leading-normal text-slate-400">
       I build scalable data platforms and craft software that pushes boundaries.
     </p>
-    <nav>
-      <ul class="flex flex-col gap-1">
-        {sections.map((s, i) => (
+    <nav class="nav hidden lg:block" aria-label="In-page jump links">
+      <ul class="mt-16 w-max">
+        {sections.map((s) => (
           <li>
             <a
-              class="group flex items-center gap-3 py-2 text-sm text-slate hover:text-slate-lightest transition-colors nav-link"
+              class="group flex items-center py-3 nav-link"
               href={`#${s.id}`}
               data-section={s.id}
             >
-              <span class="h-px w-8 bg-slate-light/30 group-hover:w-16 group-hover:bg-slate-lightest transition-all"></span>
-              <span class="font-mono text-xs text-slate/60">0{i + 1}.</span>
-              <span class="uppercase tracking-widest text-xs">{s.label}</span>
+              <span class="nav-indicator mr-4 h-px w-8 bg-slate-600 transition-all group-hover:w-16 group-hover:bg-slate-200 group-focus-visible:w-16 group-focus-visible:bg-slate-200"></span>
+              <span class="nav-text text-xs font-bold uppercase tracking-widest text-slate-400 group-hover:text-slate-200 group-focus-visible:text-slate-200">
+                {s.label}
+              </span>
             </a>
           </li>
         ))}
       </ul>
     </nav>
   </div>
-  <div class="flex flex-col gap-4">
-    <div class="flex gap-4">
+  <div class="ml-1 mt-8 flex items-center justify-between">
+    <ul class="flex items-center gap-5" aria-label="Social media">
       {[
-        { icon: 'fab fa-github', url: 'https://github.com/adrijshikhar/' },
-        { icon: 'fab fa-linkedin-in', url: 'https://www.linkedin.com/in/adrij-shikhar' },
-        { icon: 'fab fa-dev', url: 'https://dev.to/adrijshikhar' },
-        { icon: 'fa fa-envelope', url: 'mailto:ashikhar@ee.iitr.ac.in' },
+        { icon: 'fab fa-github', url: 'https://github.com/adrijshikhar/', label: 'GitHub' },
+        { icon: 'fab fa-linkedin-in', url: 'https://www.linkedin.com/in/adrij-shikhar', label: 'LinkedIn' },
+        { icon: 'fab fa-dev', url: 'https://dev.to/adrijshikhar', label: 'DEV' },
+        { icon: 'fa fa-envelope', url: 'mailto:ashikhar@ee.iitr.ac.in', label: 'Email' },
+        { icon: 'fab fa-reddit', url: 'https://www.reddit.com/user/nemesis0009', label: 'Reddit' },
       ].map((s) => (
-        <a class="text-slate hover:text-accent transition-colors text-lg" href={s.url} target="_blank" rel="noreferrer noopener">
-          <i class={s.icon}></i>
-        </a>
-      ))}
-    </div>
-    <a class="text-accent text-sm font-mono hover:underline" href="/assets/resume.pdf" download="Adrij Shikhar Resume.pdf">
-      Download Resume &darr;
-    </a>
-  </div>
-</aside>
-
-<!-- Mobile nav -->
-<nav class="fixed top-0 left-0 right-0 z-50 bg-navy/95 backdrop-blur-md border-b border-navy-light lg:hidden">
-  <div class="flex items-center justify-between px-6 py-4">
-    <span class="font-mono text-accent text-sm">AS</span>
-    <button id="mobile-menu-btn" class="text-slate hover:text-accent transition-colors" aria-label="Toggle navigation">
-      <i class="fas fa-bars text-lg"></i>
-    </button>
-  </div>
-  <div id="mobile-menu" class="hidden px-6 pb-4">
-    <ul class="flex flex-col gap-1">
-      {sections.map((s, i) => (
-        <li>
-          <a class="block py-2 text-slate hover:text-accent transition-colors text-sm" href={`#${s.id}`}>
-            <span class="font-mono text-accent/60 mr-2">0{i + 1}.</span>{s.label}
+        <li class="text-xs shrink-0">
+          <a
+            class="block text-slate-400 hover:text-slate-200 transition-colors"
+            href={s.url}
+            target="_blank"
+            rel="noreferrer noopener"
+            title={s.label}
+            aria-label={`${s.label} (opens in new tab)`}
+          >
+            <i class={`${s.icon} text-xl`}></i>
           </a>
         </li>
       ))}
     </ul>
+    <a
+      class="text-slate-400 hover:text-accent transition-colors mr-6"
+      href="/assets/resume.pdf"
+      download="Adrij Shikhar Resume.pdf"
+      title="Download Resume"
+      aria-label="Download Resume"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3v12m0 0l-4-4m4 4l4-4" />
+        <path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" />
+      </svg>
+    </a>
   </div>
-</nav>
+</header>
 
 <script>
-  const btn = document.getElementById('mobile-menu-btn');
-  const menu = document.getElementById('mobile-menu');
-  btn?.addEventListener('click', () => menu?.classList.toggle('hidden'));
-  menu?.querySelectorAll('a').forEach((a) =>
-    a.addEventListener('click', () => menu?.classList.add('hidden'))
-  );
-
   // Scroll-spy for desktop nav
   const navLinks = document.querySelectorAll('.nav-link');
   const sectionEls = document.querySelectorAll('section[id]');
@@ -92,9 +86,17 @@ const sections = [
         if (entry.isIntersecting) {
           navLinks.forEach((link) => {
             const isActive = link.getAttribute('data-section') === entry.target.id;
-            link.classList.toggle('text-slate-lightest', isActive);
-            link.querySelector('span:first-child')?.classList.toggle('w-16', isActive);
-            link.querySelector('span:first-child')?.classList.toggle('bg-slate-lightest', isActive);
+            const indicator = link.querySelector('.nav-indicator');
+            const text = link.querySelector('.nav-text');
+            if (isActive) {
+              indicator?.classList.add('w-16', 'bg-slate-lightest');
+              indicator?.classList.remove('w-8');
+              text?.classList.add('text-slate-200');
+            } else {
+              indicator?.classList.remove('w-16', 'bg-slate-lightest');
+              indicator?.classList.add('w-8');
+              text?.classList.remove('text-slate-200');
+            }
           });
         }
       });

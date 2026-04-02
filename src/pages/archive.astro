@@ -1,0 +1,85 @@
+---
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import matter from 'gray-matter';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+function readContent(filename: string) {
+  const raw = readFileSync(join(process.cwd(), 'src/content', filename), 'utf-8');
+  const { data, content } = matter(raw);
+  return { meta: data, content };
+}
+
+function splitBySlug(content: string): Record<string, string> {
+  const sections: Record<string, string> = {};
+  const parts = content.split(/<!--\s*([\w-]+)\s*-->/);
+  for (let i = 1; i < parts.length; i += 2) {
+    sections[parts[i]] = parts[i + 1]?.trim() || '';
+  }
+  return sections;
+}
+
+const projects = readContent('projects.md');
+const projSections = splitBySlug(projects.content);
+
+function getDescription(slug: string): string {
+  const content = projSections[slug] || '';
+  const firstLine = content.split('\n').find((l: string) => l.trim() && !l.startsWith('-') && !l.startsWith('#'));
+  return firstLine?.trim() || '';
+}
+---
+
+<BaseLayout title="All Projects | Adrij Shikhar">
+  <div class="pointer-events-none fixed inset-0 z-30" id="spotlight"></div>
+  <main class="mx-auto min-h-screen max-w-screen-xl px-6 py-12 md:px-12 md:py-20 lg:px-24">
+    <a class="group mb-2 inline-flex items-center font-semibold leading-tight text-accent" href="/">
+      <span class="mr-1 transition-transform group-hover:-translate-x-1">&larr;</span>
+      <span>Adrij Shikhar</span>
+    </a>
+    <h1 class="text-4xl font-bold tracking-tight text-slate-200 sm:text-5xl">All Projects</h1>
+
+    <table class="mt-12 w-full border-collapse text-left">
+      <thead class="sticky top-0 z-10 border-b border-slate-400/20 bg-slate-900/90 backdrop-blur-sm">
+        <tr>
+          <th class="py-4 pr-8 text-sm font-semibold text-slate-200 whitespace-nowrap">Year</th>
+          <th class="py-4 pr-8 text-sm font-semibold text-slate-200">Project</th>
+          <th class="hidden py-4 pr-8 text-sm font-semibold text-slate-200 xl:table-cell">Description</th>
+          <th class="hidden py-4 pr-8 text-sm font-semibold text-slate-200 lg:table-cell">Built with</th>
+          <th class="py-4 text-sm font-semibold text-slate-200">Link</th>
+        </tr>
+      </thead>
+      <tbody>
+        {projects.meta.entries.map((proj: any) => (
+          <tr class="border-b border-slate-400/10">
+            <td class="py-4 pr-8 align-top text-sm tabular-nums text-slate-400/60 whitespace-nowrap">{proj.year}</td>
+            <td class="py-4 pr-8 align-top text-base font-semibold text-slate-200">{proj.title}</td>
+            <td class="hidden py-4 pr-8 align-top text-sm text-slate-400/70 xl:table-cell max-w-[300px] leading-snug">{getDescription(proj.slug)}</td>
+            <td class="hidden py-4 pr-8 align-top lg:table-cell">
+              <div class="flex flex-wrap gap-2">
+                {(proj.builtWith || []).map((tech: string) => (
+                  <span class="rounded-full bg-accent/10 px-3 py-1 text-xs font-medium leading-5 text-accent whitespace-nowrap">{tech}</span>
+                ))}
+              </div>
+            </td>
+            <td class="py-4 align-top text-sm whitespace-nowrap">
+              {proj.link ? (
+                <a href={proj.link} target="_blank" rel="noreferrer noopener" class="inline-flex items-center text-slate-400/70 hover:text-accent transition-colors">
+                  <span>{proj.link.replace('https://github.com/', '').replace('https://', '')}</span>
+                  <span class="ml-1.5 text-xs">&#8599;</span>
+                </a>
+              ) : <span class="text-slate-400/20">—</span>}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </main>
+  <script>
+    const spotlight = document.getElementById('spotlight');
+    document.addEventListener('mousemove', (e) => {
+      if (spotlight) {
+        spotlight.style.background = `radial-gradient(600px at ${e.clientX}px ${e.clientY}px, rgba(29, 78, 216, 0.15), transparent 80%)`;
+      }
+    });
+  </script>
+</BaseLayout>

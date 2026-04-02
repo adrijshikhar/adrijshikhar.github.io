@@ -1,0 +1,81 @@
+---
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import matter from 'gray-matter';
+import { marked } from 'marked';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+function readContent(filename: string) {
+  const raw = readFileSync(join(process.cwd(), 'src/content', filename), 'utf-8');
+  const { data, content } = matter(raw);
+  return { meta: data, content };
+}
+
+function splitBySlug(content: string): Record<string, string> {
+  const sections: Record<string, string> = {};
+  const parts = content.split(/<!--\s*([\w-]+)\s*-->/);
+  for (let i = 1; i < parts.length; i += 2) {
+    sections[parts[i]] = parts[i + 1]?.trim() || '';
+  }
+  return sections;
+}
+
+const experience = readContent('experience.md');
+const expSections = splitBySlug(experience.content);
+
+function getFirstLine(slug: string): string {
+  const content = expSections[slug] || '';
+  const lines = content.split('\n').filter((l: string) => l.trim() && !l.startsWith('#'));
+  // Get first non-heading, non-empty line — strip leading "- "
+  const first = lines[0]?.trim().replace(/^-\s*/, '') || '';
+  return first.length > 120 ? first.slice(0, 117) + '...' : first;
+}
+---
+
+<BaseLayout title="All Experience | Adrij Shikhar">
+  <div class="pointer-events-none fixed inset-0 z-30" id="spotlight"></div>
+  <main class="mx-auto min-h-screen max-w-screen-xl px-6 py-12 md:px-12 md:py-20 lg:px-24">
+    <a class="group mb-2 inline-flex items-center font-semibold leading-tight text-accent" href="/">
+      <span class="mr-1 transition-transform group-hover:-translate-x-1">&larr;</span>
+      <span>Adrij Shikhar</span>
+    </a>
+    <h1 class="text-4xl font-bold tracking-tight text-slate-200 sm:text-5xl">All Experience</h1>
+
+    <table class="mt-12 w-full border-collapse text-left">
+      <thead class="sticky top-0 z-10 border-b border-slate-400/20 bg-slate-900/90 backdrop-blur-sm">
+        <tr>
+          <th class="py-4 pr-8 text-sm font-semibold text-slate-200 whitespace-nowrap">Period</th>
+          <th class="py-4 pr-8 text-sm font-semibold text-slate-200">Role</th>
+          <th class="py-4 pr-8 text-sm font-semibold text-slate-200">Company</th>
+          <th class="hidden py-4 pr-8 text-sm font-semibold text-slate-200 lg:table-cell">Description</th>
+          <th class="hidden py-4 text-sm font-semibold text-slate-200 sm:table-cell">Location</th>
+        </tr>
+      </thead>
+      <tbody>
+        {experience.meta.entries.map((exp: any) => (
+          <tr class="border-b border-slate-400/10">
+            <td class="py-4 pr-8 align-top text-sm text-slate-400/60 whitespace-nowrap">{exp.startDate} — {exp.endDate}</td>
+            <td class="py-4 pr-8 align-top text-base font-semibold text-slate-200">{exp.position}</td>
+            <td class="py-4 pr-8 align-top text-sm">
+              {exp.companyLink ? (
+                <a href={exp.companyLink} target="_blank" rel="noreferrer noopener" class="text-accent hover:text-accent/80 transition-colors">
+                  {exp.company} <span class="text-xs">&#8599;</span>
+                </a>
+              ) : <span class="text-slate-300">{exp.company}</span>}
+            </td>
+            <td class="hidden py-4 pr-8 align-top text-sm text-slate-400/70 lg:table-cell max-w-[300px] leading-snug">{getFirstLine(exp.slug)}</td>
+            <td class="hidden py-4 align-top text-sm text-slate-400/60 sm:table-cell whitespace-nowrap">{exp.location}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </main>
+  <script>
+    const spotlight = document.getElementById('spotlight');
+    document.addEventListener('mousemove', (e) => {
+      if (spotlight) {
+        spotlight.style.background = `radial-gradient(600px at ${e.clientX}px ${e.clientY}px, rgba(29, 78, 216, 0.15), transparent 80%)`;
+      }
+    });
+  </script>
+</BaseLayout>
