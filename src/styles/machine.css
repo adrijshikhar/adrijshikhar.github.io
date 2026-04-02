@@ -1,18 +1,57 @@
-body.machine-mode nav,
-body.machine-mode aside {
+/* === View transition animations === */
+
+.human-view,
+.machine-view {
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.human-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.human-view.fade-out {
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+}
+
+.human-view.view-hidden {
   display: none !important;
 }
 
-body.machine-mode main {
-  margin-left: 0 !important;
-  max-width: 100% !important;
-}
-
 .machine-view {
+  opacity: 0;
+  transform: translateY(-12px);
+  pointer-events: none;
   max-width: 80ch;
   margin: 0 auto;
   padding: 4rem 2rem;
 }
+
+.machine-view.view-hidden {
+  display: none !important;
+}
+
+.machine-view.fade-in {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* === Machine mode: hide sidebar === */
+
+body.machine-mode header {
+  transition: opacity 0.4s ease;
+  opacity: 0;
+  pointer-events: none;
+}
+
+body.machine-mode .human-view {
+  display: none !important;
+}
+
+/* === Machine pre styling === */
 
 .machine-pre {
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
@@ -34,8 +73,4 @@ body.machine-mode main {
 
 .machine-pre strong {
   color: #ccd6f6;
-}
-
-.hidden {
-  display: none !important;
 }
