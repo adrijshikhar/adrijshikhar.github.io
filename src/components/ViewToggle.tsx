@@ -1,8 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
-import { gsap, CustomEase } from '../lib/gsap';
-
-// Smooth ease for the squeeze
-CustomEase.create('squeeze', '0.65, 0, 0.35, 1');
+import { gsap } from '../lib/gsap';
 
 export default function ViewToggle() {
   const [mode, setMode] = useState<'human' | 'machine'>('human');
@@ -38,7 +35,7 @@ export default function ViewToggle() {
     gsap.set(machineView, { position: 'relative', opacity: 0, pointerEvents: 'none', y: 20 });
 
     const tl = gsap.timeline({
-      defaults: { ease: 'squeeze' },
+      defaults: { ease: 'power2.inOut' },
       onComplete: () => {
         gsap.set(humanView, { display: 'none' });
         setMode('machine');
@@ -84,7 +81,7 @@ export default function ViewToggle() {
     gsap.set(humanView, { display: '', pointerEvents: 'none' });
 
     const tl = gsap.timeline({
-      defaults: { ease: 'squeeze' },
+      defaults: { ease: 'power2.inOut' },
       onComplete: () => {
         gsap.set(machineView, { position: 'absolute', inset: 0, pointerEvents: 'none' });
         gsap.set(humanView, { pointerEvents: 'auto' });

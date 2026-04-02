@@ -2,6 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import matter from 'gray-matter';
+import { marked } from 'marked';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 function readContent(filename: string) {
@@ -21,12 +22,6 @@ function splitBySlug(content: string): Record<string, string> {
 
 const projects = readContent('projects.md');
 const projSections = splitBySlug(projects.content);
-
-function getDescription(slug: string): string {
-  const content = projSections[slug] || '';
-  const firstLine = content.split('\n').find((l: string) => l.trim() && !l.startsWith('-') && !l.startsWith('#'));
-  return firstLine?.trim() || '';
-}
 ---
 
 <BaseLayout title="All Projects | Adrij Shikhar">
@@ -36,43 +31,33 @@ function getDescription(slug: string): string {
       <span class="mr-1 transition-transform group-hover:-translate-x-1">&larr;</span>
       <span>Adrij Shikhar</span>
     </a>
-    <h1 class="text-4xl font-bold tracking-tight text-slate-200 sm:text-5xl">All Projects</h1>
+    <h1 class="text-4xl font-bold tracking-tight text-slate-200 sm:text-5xl mb-12">All Projects</h1>
 
-    <table class="mt-12 w-full border-collapse text-left">
-      <thead class="sticky top-0 z-10 border-b border-slate-400/20 bg-slate-900/90 backdrop-blur-sm">
-        <tr>
-          <th class="py-4 pr-8 text-sm font-semibold text-slate-200 whitespace-nowrap">Year</th>
-          <th class="py-4 pr-8 text-sm font-semibold text-slate-200">Project</th>
-          <th class="hidden py-4 pr-8 text-sm font-semibold text-slate-200 xl:table-cell">Description</th>
-          <th class="hidden py-4 pr-8 text-sm font-semibold text-slate-200 lg:table-cell">Built with</th>
-          <th class="py-4 text-sm font-semibold text-slate-200">Link</th>
-        </tr>
-      </thead>
-      <tbody>
-        {projects.meta.entries.map((proj: any) => (
-          <tr class="border-b border-slate-400/10">
-            <td class="py-4 pr-8 align-top text-sm tabular-nums text-slate-400/60 whitespace-nowrap">{proj.year}</td>
-            <td class="py-4 pr-8 align-top text-base font-semibold text-slate-200">{proj.title}</td>
-            <td class="hidden py-4 pr-8 align-top text-sm text-slate-400/70 xl:table-cell max-w-[300px] leading-snug">{getDescription(proj.slug)}</td>
-            <td class="hidden py-4 pr-8 align-top lg:table-cell">
-              <div class="flex flex-wrap gap-2">
-                {(proj.builtWith || []).map((tech: string) => (
-                  <span class="rounded-full bg-accent/10 px-3 py-1 text-xs font-medium leading-5 text-accent whitespace-nowrap">{tech}</span>
-                ))}
-              </div>
-            </td>
-            <td class="py-4 align-top text-sm whitespace-nowrap">
+    <div class="space-y-12">
+      {projects.meta.entries.map((proj: any) => (
+        <div class="border-b border-slate-400/10 pb-12">
+          <div class="flex items-baseline justify-between gap-4 mb-1">
+            <h2 class="text-lg font-semibold text-slate-200">
               {proj.link ? (
-                <a href={proj.link} target="_blank" rel="noreferrer noopener" class="inline-flex items-center text-slate-400/70 hover:text-accent transition-colors">
-                  <span>{proj.link.replace('https://github.com/', '').replace('https://', '')}</span>
-                  <span class="ml-1.5 text-xs">&#8599;</span>
+                <a href={proj.link} target="_blank" rel="noreferrer noopener" class="text-inherit hover:text-accent transition-colors">
+                  {proj.title}<span class="ml-1 text-xs text-slate-400/60">&#8599;</span>
                 </a>
-              ) : <span class="text-slate-400/20">—</span>}
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+              ) : proj.title}
+            </h2>
+            <span class="shrink-0 text-xs font-mono uppercase tracking-wide text-slate-400/60">{proj.date}</span>
+          </div>
+          <div class="text-xs text-slate-400/50 mb-1">{proj.company}</div>
+          {(proj.builtWith || []).length > 0 && (
+            <div class="flex flex-wrap gap-1.5 mb-3">
+              {proj.builtWith.map((tech: string) => (
+                <span class="rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-medium text-accent">{tech}</span>
+              ))}
+            </div>
+          )}
+          <div class="text-sm leading-normal text-slate-400 prose prose-invert prose-sm max-w-none prose-headings:text-slate-200 prose-headings:text-sm prose-headings:font-semibold prose-headings:mt-4 prose-headings:mb-2 prose-li:my-0.5 prose-ul:my-1 prose-a:text-accent prose-strong:text-slate-200" set:html={marked.parse(projSections[proj.slug] || '')} />
+        </div>
+      ))}
+    </div>
   </main>
   <script>
     const spotlight = document.getElementById('spotlight');
