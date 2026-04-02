@@ -57,6 +57,9 @@ const rawMarkdown = [
 
 <BaseLayout title="Adrij Shikhar">
   <div class="pointer-events-none fixed inset-0 z-30 transition-opacity duration-300" id="spotlight"></div>
+  <div class="pointer-events-none fixed z-[9999] hidden lg:block" id="cursor">
+    <div class="relative -left-2 -top-2 h-4 w-4 rounded-full border border-slate-400/80 transition-transform duration-150 ease-out" id="cursor-dot"></div>
+  </div>
   <ViewToggle client:load />
   <div class="machine-view" />
 
@@ -156,17 +159,52 @@ const rawMarkdown = [
   </script>
   <script>
     const spotlight = document.getElementById('spotlight');
+    const cursor = document.getElementById('cursor');
+    const cursorDot = document.getElementById('cursor-dot');
+
     document.addEventListener('mousemove', (e) => {
       if (spotlight && !document.body.classList.contains('machine-mode')) {
         spotlight.style.background = `radial-gradient(600px at ${e.clientX}px ${e.clientY}px, rgba(29, 78, 216, 0.15), transparent 80%)`;
       }
-    });
-    // Hide spotlight in machine mode
-    const observer = new MutationObserver(() => {
-      if (spotlight) {
-        spotlight.style.opacity = document.body.classList.contains('machine-mode') ? '0' : '1';
+      if (cursor) {
+        cursor.style.left = `${e.clientX}px`;
+        cursor.style.top = `${e.clientY}px`;
       }
     });
+
+    // Scale cursor on interactive elements
+    document.querySelectorAll('a, button').forEach((el) => {
+      el.addEventListener('mouseenter', () => cursorDot?.classList.add('scale-[2.5]', 'border-accent/60'));
+      el.addEventListener('mouseleave', () => cursorDot?.classList.remove('scale-[2.5]', 'border-accent/60'));
+    });
+
+    // Hide spotlight in machine mode
+    const observer = new MutationObserver(() => {
+      const isMachine = document.body.classList.contains('machine-mode');
+      if (spotlight) spotlight.style.opacity = isMachine ? '0' : '1';
+    });
     observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
+    // Section fade-in on scroll
+    const sections = document.querySelectorAll('section[id]');
+    sections.forEach((s) => {
+      s.style.opacity = '0';
+      s.style.transform = 'translateY(20px)';
+      s.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    });
+    const fadeObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const el = entry.target as HTMLElement;
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0)';
+            fadeObserver.unobserve(el);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+    sections.forEach((s) => fadeObserver.observe(s));
   </script>
 </BaseLayout>
