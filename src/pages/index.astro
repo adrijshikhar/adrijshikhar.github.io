@@ -57,77 +57,106 @@ const rawMarkdown = [
 ---
 
 <BaseLayout title="Adrij Shikhar">
-  <SideNav />
   <ViewToggle client:load />
   <div class="machine-view hidden" />
 
-  <main class="lg:ml-[40vw] lg:max-w-2xl px-6 lg:px-12 py-24">
-    <div class="human-view">
+  <div class="human-view mx-auto min-h-screen max-w-screen-xl px-6 py-12 md:px-12 md:py-20 lg:px-24 lg:py-0">
+    <div class="lg:flex lg:justify-between lg:gap-4">
+      <SideNav />
 
-      <!-- About -->
-      <section class="min-h-[60vh] flex flex-col justify-center mb-24" id="about">
-        <p class="font-mono text-accent mb-5">Hi, my name is</p>
-        <h1 class="text-5xl lg:text-6xl font-bold text-slate-lightest mb-4">{about.meta.name}.</h1>
-        <h2 class="text-3xl lg:text-4xl font-bold text-slate mb-6">{about.meta.tagline}</h2>
-        <div class="prose prose-invert prose-lg max-w-xl text-slate mb-8" set:html={marked.parse(about.content)} />
-      </section>
+      <main id="content" class="pt-24 lg:w-1/2 lg:py-24">
 
-      <!-- Experience -->
-      <Section id="experience" title="Experience" index={1}>
-        {experience.meta.entries.map((exp: any) => (
-          <ExpCard {...exp}>
-            <div set:html={marked.parse(expSections[exp.slug] || '')} />
-          </ExpCard>
-        ))}
-      </Section>
+        <!-- About -->
+        <section id="about" class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24">
+          <div class="prose prose-invert prose-lg max-w-none text-slate" set:html={marked.parse(about.content)} />
+        </section>
 
-      <!-- Skills -->
-      <Section id="skills" title="Skills" index={2}>
-        <div class="prose prose-invert max-w-none prose-a:text-accent" set:html={marked.parse(skills.content)} />
-      </Section>
-
-      <!-- Projects -->
-      <Section id="projects" title="Projects" index={3}>
-        {projects.meta.entries.map((proj: any) => (
-          <ProjectCard {...proj}>
-            <div set:html={marked.parse(projSections[proj.slug] || '')} />
-          </ProjectCard>
-        ))}
-      </Section>
-
-      <!-- Achievements -->
-      <Section id="achievements" title="Achievements" index={4}>
-        <div class="prose prose-invert max-w-none prose-a:text-accent" set:html={marked.parse(achievements.content)} />
-      </Section>
-
-      <!-- Education -->
-      <Section id="education" title="Education" index={5}>
-        {education.meta.entries.map((edu: any) => (
-          <div class="group flex flex-col md:flex-row justify-between mb-8 p-4 rounded-md hover:bg-navy-light/50 transition-all">
-            <div class="flex-1">
-              <h3 class="text-lg font-medium text-slate-lightest">{edu.institution}</h3>
-              <div class="text-accent text-sm">{edu.degree}</div>
-              {edu.field && <p class="text-slate/70 text-sm">{edu.field}</p>}
-            </div>
-            <div class="md:text-right mt-1 md:mt-0">
-              <span class="font-mono text-xs text-slate/60">{edu.startDate} — {edu.endDate}</span>
-            </div>
+        <!-- Experience -->
+        <section id="experience" class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24">
+          <div class="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-navy/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:px-0 lg:py-0 lg:opacity-0">
+            <h2 class="text-sm font-bold uppercase tracking-widest text-slate-lightest lg:sr-only">Experience</h2>
           </div>
-        ))}
-      </Section>
+          <div>
+            {experience.meta.entries.map((exp: any) => (
+              <ExpCard {...exp}>
+                <div set:html={marked.parse(expSections[exp.slug] || '')} />
+              </ExpCard>
+            ))}
+          </div>
+          <div class="mt-12">
+            <a class="inline-flex items-center font-medium leading-tight text-slate-lightest group" href="/assets/resume.pdf" download="Adrij Shikhar Resume.pdf">
+              <span class="border-b border-transparent pb-px transition group-hover:border-accent">View Full Résumé</span>
+              <span class="ml-1 text-accent">&#8599;</span>
+            </a>
+          </div>
+        </section>
 
-      <!-- Interests -->
-      <Section id="interests" title="Interests" index={6}>
-        <div class="prose prose-invert max-w-none text-slate" set:html={marked.parse(interests.content)} />
-      </Section>
+        <!-- Projects -->
+        <section id="projects" class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24">
+          <div class="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-navy/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:px-0 lg:py-0 lg:opacity-0">
+            <h2 class="text-sm font-bold uppercase tracking-widest text-slate-lightest lg:sr-only">Projects</h2>
+          </div>
+          <div>
+            {projects.meta.entries.map((proj: any) => (
+              <ProjectCard {...proj}>
+                <div set:html={marked.parse(projSections[proj.slug] || '')} />
+              </ProjectCard>
+            ))}
+          </div>
+        </section>
 
-      <!-- Footer -->
-      <footer class="text-center py-12 text-slate/50 text-xs font-mono">
-        <p>Built with Astro &amp; Tailwind</p>
-      </footer>
+        <!-- Skills -->
+        <section id="skills" class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24">
+          <div class="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-navy/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:px-0 lg:py-0 lg:opacity-0">
+            <h2 class="text-sm font-bold uppercase tracking-widest text-slate-lightest lg:sr-only">Skills</h2>
+          </div>
+          <div class="prose prose-invert max-w-none prose-a:text-accent" set:html={marked.parse(skills.content)} />
+        </section>
 
+        <!-- Achievements -->
+        <section id="achievements" class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24">
+          <div class="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-navy/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:px-0 lg:py-0 lg:opacity-0">
+            <h2 class="text-sm font-bold uppercase tracking-widest text-slate-lightest lg:sr-only">Achievements</h2>
+          </div>
+          <div class="prose prose-invert max-w-none prose-a:text-accent" set:html={marked.parse(achievements.content)} />
+        </section>
+
+        <!-- Education -->
+        <section id="education" class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24">
+          <div class="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-navy/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:px-0 lg:py-0 lg:opacity-0">
+            <h2 class="text-sm font-bold uppercase tracking-widest text-slate-lightest lg:sr-only">Education</h2>
+          </div>
+          {education.meta.entries.map((edu: any) => (
+            <div class="group flex flex-col md:flex-row justify-between mb-8 p-4 rounded-md hover:bg-navy-light/50 transition-all">
+              <div class="flex-1">
+                <h3 class="text-lg font-medium text-slate-lightest">{edu.institution}</h3>
+                <div class="text-accent text-sm">{edu.degree}</div>
+                {edu.field && <p class="text-slate/70 text-sm">{edu.field}</p>}
+              </div>
+              <div class="md:text-right mt-1 md:mt-0">
+                <span class="font-mono text-xs text-slate/60">{edu.startDate} — {edu.endDate}</span>
+              </div>
+            </div>
+          ))}
+        </section>
+
+        <!-- Interests -->
+        <section id="interests" class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24">
+          <div class="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-navy/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:px-0 lg:py-0 lg:opacity-0">
+            <h2 class="text-sm font-bold uppercase tracking-widest text-slate-lightest lg:sr-only">Interests</h2>
+          </div>
+          <div class="prose prose-invert max-w-none text-slate" set:html={marked.parse(interests.content)} />
+        </section>
+
+        <!-- Footer -->
+        <footer class="max-w-md pb-16 text-sm text-slate/50">
+          <p>Built with <a class="font-medium text-slate-lightest hover:text-accent" href="https://astro.build/" target="_blank" rel="noreferrer noopener">Astro</a> and <a class="font-medium text-slate-lightest hover:text-accent" href="https://tailwindcss.com/" target="_blank" rel="noreferrer noopener">Tailwind CSS</a>. Content driven by Markdown.</p>
+        </footer>
+
+      </main>
     </div>
-  </main>
+  </div>
+
   <script define:vars={{ rawMarkdown }}>
     window.__RAW_MARKDOWN__ = rawMarkdown;
   </script>
