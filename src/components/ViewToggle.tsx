@@ -90,23 +90,18 @@ export default function ViewToggle() {
       },
     });
 
-    // Machine fades out and drifts down
-    tl.to(machineView, { opacity: 0, y: 20, duration: 0.35, ease: 'power2.in' }, 0);
+    // Everything starts immediately, overlapped
+    tl.to(machineView, { opacity: 0, y: 10, duration: 0.25, ease: 'power2.in' }, 0);
+    tl.to(document.body, { backgroundColor: '#0f172a', duration: 0.5, ease: 'power1.inOut' }, 0);
 
-    // Background lightens
-    tl.to(document.body, { backgroundColor: '#0f172a', duration: 0.7, ease: 'power1.inOut' }, 0);
-
-    // Left column (header) slides back LEFT from right
     if (header) {
-      tl.to(header, { x: 0, opacity: 1, duration: 0.55 }, 0.3);
+      tl.to(header, { x: 0, opacity: 1, duration: 0.4 }, 0.1);
     }
-
-    // Right column (main) slides back RIGHT from left
     if (main) {
-      tl.to(main, { x: 0, opacity: 1, duration: 0.55 }, 0.3);
+      tl.to(main, { x: 0, opacity: 1, duration: 0.4 }, 0.1);
     }
 
-    tl.set(humanView, { pointerEvents: 'auto' }, 0.4);
+    tl.set(humanView, { pointerEvents: 'auto' }, 0.15);
   }, [transitioning]);
 
   return (
