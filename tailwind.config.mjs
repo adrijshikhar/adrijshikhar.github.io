@@ -12,6 +12,8 @@ export default {
         'slate-lightest': '#ccd6f6',
         white: '#e6f1ff',
         accent: '#64ffda',
+        border: 'oklch(var(--border))',
+        ring: 'oklch(var(--ring))',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],

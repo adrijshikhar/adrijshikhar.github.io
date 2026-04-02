@@ -1,14 +1,109 @@
 ---
-import '../styles/globals.css';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import matter from 'gray-matter';
+import { marked } from 'marked';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SideNav from '../components/SideNav.astro';
+import Section from '../components/Section.astro';
+import ExpCard from '../components/ExpCard.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+
+function readContent(filename: string) {
+  const raw = readFileSync(join(process.cwd(), 'src/content', filename), 'utf-8');
+  const { data, content } = matter(raw);
+  return { meta: data, content };
+}
+
+function splitBySlug(content: string): Record<string, string> {
+  const sections: Record<string, string> = {};
+  const parts = content.split(/<!--\s*([\w-]+)\s*-->/);
+  for (let i = 1; i < parts.length; i += 2) {
+    sections[parts[i]] = parts[i + 1]?.trim() || '';
+  }
+  return sections;
+}
+
+const about = readContent('about.md');
+const experience = readContent('experience.md');
+const projects = readContent('projects.md');
+const education = readContent('education.md');
+const skills = readContent('skills.md');
+const achievements = readContent('achievements.md');
+const interests = readContent('interests.md');
+
+const expSections = splitBySlug(experience.content);
+const projSections = splitBySlug(projects.content);
 ---
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Adrij Shikhar</title>
-  </head>
-  <body>
-    <h1 class="text-4xl text-slate-lightest p-8">Migration in progress</h1>
-    <p class="text-accent px-8">Accent color test</p>
-  </body>
-</html>
+
+<BaseLayout title="Adrij Shikhar">
+  <SideNav />
+
+  <main class="lg:ml-[40vw] lg:max-w-2xl px-6 lg:px-12 py-24">
+    <div class="human-view">
+
+      <!-- About -->
+      <section class="min-h-[60vh] flex flex-col justify-center mb-24" id="about">
+        <p class="font-mono text-accent mb-5">Hi, my name is</p>
+        <h1 class="text-5xl lg:text-6xl font-bold text-slate-lightest mb-4">{about.meta.name}.</h1>
+        <h2 class="text-3xl lg:text-4xl font-bold text-slate mb-6">{about.meta.tagline}</h2>
+        <div class="prose prose-invert prose-lg max-w-xl text-slate mb-8" set:html={marked.parse(about.content)} />
+      </section>
+
+      <!-- Experience -->
+      <Section id="experience" title="Experience" index={1}>
+        {experience.meta.entries.map((exp: any) => (
+          <ExpCard {...exp}>
+            <div set:html={marked.parse(expSections[exp.slug] || '')} />
+          </ExpCard>
+        ))}
+      </Section>
+
+      <!-- Skills -->
+      <Section id="skills" title="Skills" index={2}>
+        <div class="prose prose-invert max-w-none prose-a:text-accent" set:html={marked.parse(skills.content)} />
+      </Section>
+
+      <!-- Projects -->
+      <Section id="projects" title="Projects" index={3}>
+        {projects.meta.entries.map((proj: any) => (
+          <ProjectCard {...proj}>
+            <div set:html={marked.parse(projSections[proj.slug] || '')} />
+          </ProjectCard>
+        ))}
+      </Section>
+
+      <!-- Achievements -->
+      <Section id="achievements" title="Achievements" index={4}>
+        <div class="prose prose-invert max-w-none prose-a:text-accent" set:html={marked.parse(achievements.content)} />
+      </Section>
+
+      <!-- Education -->
+      <Section id="education" title="Education" index={5}>
+        {education.meta.entries.map((edu: any) => (
+          <div class="group flex flex-col md:flex-row justify-between mb-8 p-4 rounded-md hover:bg-navy-light/50 transition-all">
+            <div class="flex-1">
+              <h3 class="text-lg font-medium text-slate-lightest">{edu.institution}</h3>
+              <div class="text-accent text-sm">{edu.degree}</div>
+              {edu.field && <p class="text-slate/70 text-sm">{edu.field}</p>}
+            </div>
+            <div class="md:text-right mt-1 md:mt-0">
+              <span class="font-mono text-xs text-slate/60">{edu.startDate} — {edu.endDate}</span>
+            </div>
+          </div>
+        ))}
+      </Section>
+
+      <!-- Interests -->
+      <Section id="interests" title="Interests" index={6}>
+        <div class="prose prose-invert max-w-none text-slate" set:html={marked.parse(interests.content)} />
+      </Section>
+
+      <!-- Footer -->
+      <footer class="text-center py-12 text-slate/50 text-xs font-mono">
+        <p>Built with Astro &amp; Tailwind</p>
+      </footer>
+
+    </div>
+  </main>
+</BaseLayout>
