@@ -13,22 +13,22 @@ const { position, company, companyLink, location, startDate, endDate, tagline } 
 ---
 
 <li class="mb-12">
-  <div class="group relative grid gap-4 pb-1 transition-all sm:grid-cols-8 sm:gap-8 md:gap-4 lg:hover:!opacity-100 lg:group-hover/list:opacity-50">
+  <div class="group relative pb-1 transition-all lg:hover:!opacity-100 lg:group-hover/list:opacity-50">
     <div class="absolute -inset-x-4 -inset-y-4 z-0 hidden rounded-md transition motion-reduce:transition-none lg:-inset-x-6 lg:block lg:group-hover:bg-slate-800/50 lg:group-hover:shadow-[inset_0_1px_0_0_rgba(148,163,184,0.1)] lg:group-hover:drop-shadow-lg"></div>
-    <header class="z-10 mb-2 mt-1 text-xs font-semibold uppercase tracking-wide text-slate-400/60 sm:col-span-2" aria-label="{startDate} to {endDate}">
-      {startDate} — {endDate}
-    </header>
-    <div class="z-10 sm:col-span-6">
-      <h3 class="font-medium leading-snug text-slate-200">
-        <span class="group-hover:text-accent transition-colors">{position}</span>
-        <span class="mx-1">·</span>
-        {companyLink ? (
-          <a href={companyLink} target="_blank" rel="noreferrer noopener" class="text-inherit hover:text-inherit inline-flex items-baseline">
-            {company}<span class="ml-1 text-xs text-slate-400/60 group-hover:text-accent transition-colors">&#8599;</span>
-          </a>
-        ) : <span>{company}</span>}
-      </h3>
-      {tagline && <p class="text-slate-400/60 text-sm mt-1">{tagline}</p>}
+    <div class="relative z-10">
+      <div class="flex items-baseline justify-between gap-4 mb-1">
+        <h3 class="font-medium leading-snug text-slate-200">
+          <span class="group-hover:text-accent transition-colors">{position}</span>
+          <span class="mx-1 text-slate-400/40">·</span>
+          {companyLink ? (
+            <a href={companyLink} target="_blank" rel="noreferrer noopener" class="text-inherit hover:text-inherit inline-flex items-baseline">
+              {company}<span class="ml-1 text-xs text-slate-400/60 group-hover:text-accent transition-colors">&#8599;</span>
+            </a>
+          ) : <span>{company}</span>}
+        </h3>
+        <span class="shrink-0 text-xs font-mono uppercase tracking-wide text-slate-400/60">{startDate} — {endDate}</span>
+      </div>
+      {tagline && <p class="text-slate-400/60 text-sm">{tagline}</p>}
       <div class="mt-2 text-sm leading-normal text-slate-400">
         <slot />
       </div>
