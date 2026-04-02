@@ -163,12 +163,10 @@ const rawMarkdown = [
       }
     });
 
-    // Hide spotlight and cursor in machine mode
-    const cursorEl = document.getElementById('cursor');
+    // Hide spotlight in machine mode
     const modeObserver = new MutationObserver(() => {
       const isMachine = document.body.classList.contains('machine-mode');
       if (spotlight) spotlight.style.opacity = isMachine ? '0' : '1';
-      if (cursorEl) cursorEl.style.display = isMachine ? 'none' : '';
     });
     modeObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
