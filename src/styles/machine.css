@@ -14,6 +14,9 @@
 .human-view.collapsed {
   overflow: hidden;
   height: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
   opacity: 0;
   pointer-events: none;
 }
@@ -60,7 +63,7 @@ header {
 .machine-content-wrapper {
   max-width: 640px;
   margin: 0 auto;
-  padding: 3rem 1.5rem;
+  padding: 3rem 1.5rem 5rem;
 }
 
 .machine-pre {
