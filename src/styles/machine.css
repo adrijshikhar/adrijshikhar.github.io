@@ -1,62 +1,53 @@
-/* === Crossfade transition — both views visible during switch === */
+/* === Simple crossfade — both views stacked, opacity swap === */
 
-.human-view,
-.machine-view {
-  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+.view-container {
+  position: relative;
 }
 
 .human-view {
-  opacity: 1;
-  transform: scale(1);
-}
-
-.human-view.fade-out {
-  opacity: 0;
-  transform: scale(0.97);
-  pointer-events: none;
-}
-
-.human-view.hidden-final {
-  display: none !important;
+  transition: opacity 0.4s ease;
 }
 
 .machine-view {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
+  inset: 0;
   opacity: 0;
   pointer-events: none;
+  transition: opacity 0.4s ease;
 }
 
-.machine-view.visible {
+.machine-view.active {
   position: relative;
   opacity: 1;
   pointer-events: auto;
 }
 
-/* === Background color — smooth long transition === */
+.human-view.inactive {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+}
+
+/* === Background === */
 
 body {
-  transition: background-color 0.7s ease;
+  transition: background-color 0.6s ease;
 }
 
 body.machine-mode {
   background-color: #101010;
 }
 
-/* === Sidebar fade === */
+/* === Sidebar === */
 
 header {
-  transition: opacity 0.4s ease, transform 0.4s ease;
+  transition: opacity 0.4s ease;
 }
 
 body.machine-mode header {
   opacity: 0;
-  transform: translateX(-20px);
   pointer-events: none;
-  height: 0;
-  overflow: hidden;
 }
 
 /* === Machine content === */
@@ -77,21 +68,9 @@ body.machine-mode header {
   letter-spacing: -0.01em;
 }
 
-.machine-pre a {
-  color: #fb631b;
-  text-decoration: none;
-}
-
-.machine-pre a:hover {
-  color: #f4793f;
-  text-decoration: underline;
-}
-
-.machine-pre strong {
-  color: #d6d6d5;
-  font-weight: 500;
-}
-
+.machine-pre a { color: #fb631b; text-decoration: none; }
+.machine-pre a:hover { color: #f4793f; text-decoration: underline; }
+.machine-pre strong { color: #d6d6d5; font-weight: 500; }
 .machine-h1 { color: #e8e8e8; }
 .machine-h2 { color: #c0c0bf; }
 .machine-h3 { color: #a0a09f; }

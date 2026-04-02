@@ -58,9 +58,10 @@ const rawMarkdown = [
 <BaseLayout title="Adrij Shikhar">
   <div class="pointer-events-none fixed inset-0 z-30 transition-opacity duration-300" id="spotlight"></div>
   <ViewToggle client:load />
-  <div class="machine-view" />
 
-  <div class="human-view mx-auto min-h-screen max-w-screen-xl px-6 py-12 md:px-12 md:py-20 lg:px-16 lg:py-0">
+  <div class="view-container">
+    <div class="machine-view" />
+    <div class="human-view mx-auto min-h-screen max-w-screen-xl px-6 py-12 md:px-12 md:py-20 lg:px-16 lg:py-0">
     <div class="lg:flex lg:justify-between lg:gap-4">
       <SideNav />
 
@@ -149,6 +150,7 @@ const rawMarkdown = [
 
       </main>
     </div>
+  </div>
   </div>
 
   <script define:vars={{ rawMarkdown }}>
