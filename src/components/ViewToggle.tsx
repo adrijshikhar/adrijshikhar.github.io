@@ -42,28 +42,28 @@ export default function ViewToggle() {
       },
     });
 
-    // Left column slides right and fades — gentle sine ease
+    // Left column slides right and fades
     if (header) {
-      tl.to(header, { x: 150, opacity: 0, duration: 1, ease: 'sine.inOut' }, 0);
+      tl.to(header, { x: 150, opacity: 0, duration: 0.6, ease: 'sine.in' }, 0);
     }
 
-    // Right column slides left and fades — same gentle ease, tiny stagger
+    // Right column slides left and fades
     if (main) {
-      tl.to(main, { x: -150, opacity: 0, duration: 1, ease: 'sine.inOut' }, 0.05);
+      tl.to(main, { x: -150, opacity: 0, duration: 0.6, ease: 'sine.in' }, 0.05);
     }
 
     // Background darkens — longest, smoothest
     tl.to(document.body, { backgroundColor: '#101010', duration: 1.2, ease: 'sine.inOut' }, 0);
 
-    // Machine fades in gently after columns are mostly gone
-    tl.set(humanView, { pointerEvents: 'none' }, 0.7);
+    // Machine fades in after columns are mostly gone
+    tl.set(humanView, { pointerEvents: 'none' }, 0.45);
     tl.to(machineView, {
       opacity: 1,
       y: 0,
       pointerEvents: 'auto',
       duration: 0.7,
       ease: 'sine.out',
-    }, 0.7);
+    }, 0.45);
   }, [transitioning]);
 
   const toHuman = useCallback(() => {
