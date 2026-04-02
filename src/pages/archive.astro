@@ -22,7 +22,6 @@ function splitBySlug(content: string): Record<string, string> {
 const projects = readContent('projects.md');
 const projSections = splitBySlug(projects.content);
 
-// Extract first line of each project description as summary
 function getDescription(slug: string): string {
   const content = projSections[slug] || '';
   const firstLine = content.split('\n').find((l: string) => l.trim() && !l.startsWith('-') && !l.startsWith('#'));
@@ -40,35 +39,35 @@ function getDescription(slug: string): string {
     <h1 class="text-4xl font-bold tracking-tight text-slate-lightest sm:text-5xl">All Projects</h1>
 
     <table class="mt-12 w-full border-collapse text-left">
-      <thead class="sticky top-0 z-10 border-b border-navy-lighter/50 bg-navy/75 px-6 py-5 backdrop-blur">
+      <thead class="sticky top-0 z-10 border-b border-slate/20 bg-navy/90 backdrop-blur-sm">
         <tr>
-          <th class="py-4 pr-8 text-sm font-semibold text-slate-lightest">Year</th>
+          <th class="py-4 pr-8 text-sm font-semibold text-slate-lightest whitespace-nowrap">Year</th>
           <th class="py-4 pr-8 text-sm font-semibold text-slate-lightest">Project</th>
-          <th class="hidden py-4 pr-8 text-sm font-semibold text-slate-lightest lg:table-cell">Description</th>
-          <th class="hidden py-4 pr-8 text-sm font-semibold text-slate-lightest sm:table-cell">Built with</th>
+          <th class="hidden py-4 pr-8 text-sm font-semibold text-slate-lightest xl:table-cell">Description</th>
+          <th class="hidden py-4 pr-8 text-sm font-semibold text-slate-lightest lg:table-cell">Built with</th>
           <th class="py-4 text-sm font-semibold text-slate-lightest">Link</th>
         </tr>
       </thead>
       <tbody>
         {projects.meta.entries.map((proj: any) => (
-          <tr class="border-b border-navy-lighter/30 transition-colors hover:bg-navy-light/30">
-            <td class="py-4 pr-8 align-top text-sm text-slate/60">{proj.year}</td>
-            <td class="py-4 pr-8 align-top font-medium text-slate-lightest">{proj.title}</td>
-            <td class="hidden py-4 pr-8 align-top text-sm text-slate/80 lg:table-cell max-w-xs">{getDescription(proj.slug)}</td>
-            <td class="hidden py-4 pr-8 align-top sm:table-cell">
-              <div class="flex flex-wrap gap-1.5">
+          <tr class="border-b border-slate/10">
+            <td class="py-4 pr-8 align-top text-sm tabular-nums text-slate/60 whitespace-nowrap">{proj.year}</td>
+            <td class="py-4 pr-8 align-top text-base font-semibold text-slate-lightest">{proj.title}</td>
+            <td class="hidden py-4 pr-8 align-top text-sm text-slate/70 xl:table-cell max-w-[300px] leading-snug">{getDescription(proj.slug)}</td>
+            <td class="hidden py-4 pr-8 align-top lg:table-cell">
+              <div class="flex flex-wrap gap-2">
                 {(proj.builtWith || []).map((tech: string) => (
-                  <span class="rounded-full bg-accent/10 px-3 py-1 text-xs font-medium leading-5 text-accent">{tech}</span>
+                  <span class="rounded-full bg-accent/10 px-3 py-1 text-xs font-medium leading-5 text-accent whitespace-nowrap">{tech}</span>
                 ))}
               </div>
             </td>
-            <td class="py-4 align-top text-sm">
+            <td class="py-4 align-top text-sm whitespace-nowrap">
               {proj.link ? (
-                <a href={proj.link} target="_blank" rel="noreferrer noopener" class="inline-flex items-center text-slate/80 hover:text-accent transition-colors">
-                  <span class="truncate max-w-[180px]">{proj.link.replace('https://github.com/', '')}</span>
-                  <span class="ml-1 text-xs">&#8599;</span>
+                <a href={proj.link} target="_blank" rel="noreferrer noopener" class="inline-flex items-center text-slate/70 hover:text-accent transition-colors">
+                  <span>{proj.link.replace('https://github.com/', '').replace('https://', '')}</span>
+                  <span class="ml-1.5 text-xs">&#8599;</span>
                 </a>
-              ) : <span class="text-slate/30">—</span>}
+              ) : <span class="text-slate/20">—</span>}
             </td>
           </tr>
         ))}
