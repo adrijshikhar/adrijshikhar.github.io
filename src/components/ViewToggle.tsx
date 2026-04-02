@@ -35,7 +35,6 @@ export default function ViewToggle() {
     gsap.set(machineView, { position: 'relative', opacity: 0, pointerEvents: 'none', y: 20 });
 
     const tl = gsap.timeline({
-      defaults: { ease: 'power2.inOut' },
       onComplete: () => {
         gsap.set(humanView, { display: 'none' });
         setMode('machine');
@@ -43,28 +42,28 @@ export default function ViewToggle() {
       },
     });
 
-    // Left column (header/sidebar) slides RIGHT and fades
+    // Left column slides right and fades — gentle sine ease
     if (header) {
-      tl.to(header, { x: 150, opacity: 0, duration: 0.8 }, 0);
+      tl.to(header, { x: 150, opacity: 0, duration: 1, ease: 'sine.inOut' }, 0);
     }
 
-    // Right column (main content) slides LEFT and fades — slight delay so it trails the sidebar
+    // Right column slides left and fades — same gentle ease, tiny stagger
     if (main) {
-      tl.to(main, { x: -150, opacity: 0, duration: 0.8, ease: 'power1.inOut' }, 0.05);
+      tl.to(main, { x: -150, opacity: 0, duration: 1, ease: 'sine.inOut' }, 0.05);
     }
 
-    // Background darkens simultaneously
-    tl.to(document.body, { backgroundColor: '#101010', duration: 1, ease: 'power1.inOut' }, 0);
+    // Background darkens — longest, smoothest
+    tl.to(document.body, { backgroundColor: '#101010', duration: 1.2, ease: 'sine.inOut' }, 0);
 
-    // Machine fades in from center after columns converge
-    tl.set(humanView, { pointerEvents: 'none' }, 0.6);
+    // Machine fades in gently after columns are mostly gone
+    tl.set(humanView, { pointerEvents: 'none' }, 0.7);
     tl.to(machineView, {
       opacity: 1,
       y: 0,
       pointerEvents: 'auto',
-      duration: 0.6,
-      ease: 'power2.out',
-    }, 0.6);
+      duration: 0.7,
+      ease: 'sine.out',
+    }, 0.7);
   }, [transitioning]);
 
   const toHuman = useCallback(() => {
@@ -81,7 +80,6 @@ export default function ViewToggle() {
     gsap.set(humanView, { display: '', pointerEvents: 'none' });
 
     const tl = gsap.timeline({
-      defaults: { ease: 'power2.inOut' },
       onComplete: () => {
         gsap.set(machineView, { position: 'absolute', inset: 0, pointerEvents: 'none' });
         gsap.set(humanView, { pointerEvents: 'auto' });
@@ -90,19 +88,19 @@ export default function ViewToggle() {
       },
     });
 
-    // Machine fades out
-    tl.to(machineView, { opacity: 0, y: 10, duration: 0.5, ease: 'power2.in' }, 0);
-    tl.to(document.body, { backgroundColor: '#0f172a', duration: 1, ease: 'power1.inOut' }, 0);
+    // Machine fades out gently
+    tl.to(machineView, { opacity: 0, y: 10, duration: 0.6, ease: 'sine.in' }, 0);
+    tl.to(document.body, { backgroundColor: '#0f172a', duration: 1.2, ease: 'sine.inOut' }, 0);
 
-    // Columns expand back out
+    // Columns expand back out from center
     if (header) {
-      tl.to(header, { x: 0, opacity: 1, duration: 0.7 }, 0.3);
+      tl.to(header, { x: 0, opacity: 1, duration: 0.8, ease: 'sine.out' }, 0.4);
     }
     if (main) {
-      tl.to(main, { x: 0, opacity: 1, duration: 0.7 }, 0.3);
+      tl.to(main, { x: 0, opacity: 1, duration: 0.8, ease: 'sine.out' }, 0.35);
     }
 
-    tl.set(humanView, { pointerEvents: 'auto' }, 0.4);
+    tl.set(humanView, { pointerEvents: 'auto' }, 0.5);
   }, [transitioning]);
 
   return (
