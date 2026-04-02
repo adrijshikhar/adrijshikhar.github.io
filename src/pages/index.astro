@@ -76,13 +76,13 @@ const rawMarkdown = [
           <div class="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-navy/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:px-0 lg:py-0 lg:opacity-0">
             <h2 class="text-sm font-bold uppercase tracking-widest text-slate-lightest lg:sr-only">Experience</h2>
           </div>
-          <div>
+          <ul class="group/list">
             {experience.meta.entries.map((exp: any) => (
               <ExpCard {...exp}>
                 <div set:html={marked.parse(expSections[exp.slug] || '')} />
               </ExpCard>
             ))}
-          </div>
+          </ul>
           <div class="mt-12">
             <a class="inline-flex items-center font-medium leading-tight text-slate-lightest group" href="/assets/resume.pdf" download="Adrij Shikhar Resume.pdf">
               <span class="border-b border-transparent pb-px transition group-hover:border-accent">View Full Résumé</span>
@@ -96,13 +96,13 @@ const rawMarkdown = [
           <div class="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-navy/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:px-0 lg:py-0 lg:opacity-0">
             <h2 class="text-sm font-bold uppercase tracking-widest text-slate-lightest lg:sr-only">Projects</h2>
           </div>
-          <div>
+          <ul class="group/list">
             {projects.meta.entries.map((proj: any) => (
               <ProjectCard {...proj}>
                 <div set:html={marked.parse(projSections[proj.slug] || '')} />
               </ProjectCard>
             ))}
-          </div>
+          </ul>
         </section>
 
         <!-- Achievements -->

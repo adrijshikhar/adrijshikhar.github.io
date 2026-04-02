@@ -9,23 +9,25 @@ interface Props {
 const { title, company, date, link } = Astro.props;
 ---
 
-<div class="group relative mb-8 rounded-md p-6 transition-all hover:bg-navy-light/50 hover:shadow-lg border-l-2 border-transparent hover:border-accent">
-  <div class="flex flex-col md:flex-row justify-between mb-3">
-    <div class="flex-1">
-      <h3 class="text-lg font-medium text-slate-lightest group-hover:text-accent transition-colors">
-        {link ? (
-          <a href={link} target="_blank" rel="noreferrer noopener" class="hover:underline">
-            {title} <span class="text-xs">&#8599;</span>
-          </a>
-        ) : title}
-      </h3>
-      <div class="text-sm text-accent/80">{company}</div>
+<li class="group/card mb-2">
+  <div class="relative rounded-md p-6 transition-all duration-200 lg:group-hover/list:opacity-50 lg:hover:!opacity-100 hover:bg-navy-light/50 hover:shadow-[inset_0_1px_0_0_rgba(148,163,184,0.1)] hover:drop-shadow-lg border-l-2 border-transparent hover:border-accent">
+    <div class="flex flex-col md:flex-row justify-between mb-3">
+      <div class="flex-1">
+        <h3 class="text-lg font-medium text-slate-lightest group-hover/card:text-accent transition-colors">
+          {link ? (
+            <a href={link} target="_blank" rel="noreferrer noopener" class="hover:underline">
+              {title} <span class="text-xs">&#8599;</span>
+            </a>
+          ) : title}
+        </h3>
+        <div class="text-sm text-accent/80">{company}</div>
+      </div>
+      <div class="md:text-right mt-1 md:mt-0 shrink-0">
+        <span class="font-mono text-xs text-slate/60">{date}</span>
+      </div>
     </div>
-    <div class="md:text-right mt-1 md:mt-0 shrink-0">
-      <span class="font-mono text-xs text-slate/60">{date}</span>
+    <div class="prose prose-invert prose-sm max-w-none prose-a:text-accent prose-strong:text-slate-lightest">
+      <slot />
     </div>
   </div>
-  <div class="prose prose-invert prose-sm max-w-none prose-a:text-accent prose-strong:text-slate-lightest">
-    <slot />
-  </div>
-</div>
+</li>
