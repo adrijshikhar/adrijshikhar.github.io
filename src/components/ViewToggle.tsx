@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 export default function ViewToggle() {
   const [mode, setMode] = useState<'human' | 'machine'>('human');
   const [transitioning, setTransitioning] = useState(false);
+  const machineLoadedRef = useRef(false);
 
   const toggle = () => {
     if (transitioning) return;
@@ -12,83 +13,99 @@ export default function ViewToggle() {
     const humanView = document.querySelector('.human-view') as HTMLElement | null;
     const machineView = document.querySelector('.machine-view') as HTMLElement | null;
 
+    if (!humanView || !machineView) return;
+
     if (next === 'machine') {
       // Load machine content on first toggle
-      if (machineView && !machineView.getAttribute('data-loaded')) {
+      if (!machineLoadedRef.current) {
         const raw: string = (window as any).__RAW_MARKDOWN__ || '';
         const withLinks = raw.replace(
           /\[([^\]]+)\]\(([^)]+)\)/g,
           '<a href="$2" target="_blank" rel="noreferrer noopener">$1</a>',
         );
         const withBold = withLinks.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-        machineView.innerHTML = `<pre class="machine-pre">${withBold}</pre>`;
-        machineView.setAttribute('data-loaded', 'true');
+        machineView.innerHTML = `<div class="machine-content-wrapper"><pre class="machine-pre">${withBold}</pre></div>`;
+        machineLoadedRef.current = true;
       }
 
-      // Phase 1: shrink + fade out human view, start bg color transition
+      // Capture current heights for smooth animation
+      const humanHeight = humanView.scrollHeight;
+      humanView.style.height = `${humanHeight}px`;
+
+      // Force reflow
+      humanView.offsetHeight;
+
+      // Start background transition
       document.body.classList.add('machine-mode');
-      humanView?.classList.add('shrink-out');
 
-      setTimeout(() => {
-        // Phase 2: swap views
-        humanView?.classList.add('view-hidden');
-        machineView?.classList.remove('view-hidden');
-        window.scrollTo({ top: 0, behavior: 'instant' });
+      // Collapse human view
+      requestAnimationFrame(() => {
+        humanView.classList.add('collapsed');
+        humanView.style.height = '0px';
 
-        // Phase 3: fade in machine (next frame)
-        requestAnimationFrame(() => {
-          machineView?.classList.add('fade-in');
+        // After human collapses, expand machine
+        setTimeout(() => {
+          machineView.classList.add('expanded');
+          window.scrollTo({ top: 0, behavior: 'instant' });
           setMode(next);
-          setTimeout(() => setTransitioning(false), 700);
-        });
-      }, 700);
+          setTimeout(() => setTransitioning(false), 800);
+        }, 500);
+      });
     } else {
-      // Phase 1: fade out machine
-      machineView?.classList.remove('fade-in');
-      document.body.classList.remove('machine-mode');
+      // Collapse machine view
+      machineView.classList.remove('expanded');
 
       setTimeout(() => {
-        // Phase 2: swap views
-        machineView?.classList.add('view-hidden');
-        humanView?.classList.remove('view-hidden');
+        // Restore background
+        document.body.classList.remove('machine-mode');
+
+        // Expand human view
+        humanView.classList.remove('collapsed');
+        humanView.style.height = '';
         window.scrollTo({ top: 0, behavior: 'instant' });
 
-        // Phase 3: expand human view back in
-        requestAnimationFrame(() => {
-          humanView?.classList.remove('shrink-out');
-          setMode(next);
-          setTimeout(() => setTransitioning(false), 700);
-        });
-      }, 600);
+        setMode(next);
+        setTimeout(() => setTransitioning(false), 800);
+      }, 500);
     }
   };
 
   return (
-    <button
-      onClick={toggle}
-      disabled={transitioning}
-      className={`fixed top-4 right-4 z-[1100] flex items-center gap-2 rounded-full px-4 py-2 cursor-pointer backdrop-blur-md font-mono text-sm transition-all duration-500 ${
+    <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[1100] flex items-center gap-2">
+      <div className={`flex gap-4 px-3 py-2 rounded-full backdrop-blur-md font-mono text-sm transition-all duration-500 ${
         mode === 'machine'
           ? 'bg-[#2a2a3e]/90 border border-[#3a3a52]'
           : 'bg-[#112240]/90 border border-[#233554]'
-      } ${transitioning ? 'opacity-50 cursor-wait' : ''}`}
-      aria-label="Toggle human/machine view"
-    >
-      <span className={`transition-colors duration-300 ${mode === 'human' ? 'text-[#ccd6f6] font-bold' : 'text-[#a0a0b8]/50'}`}>
-        human
-      </span>
-      <span className={`relative w-10 h-5 rounded-full transition-colors duration-500 ${
-        mode === 'machine' ? 'bg-[#3a3a52]' : 'bg-[#233554]'
       }`}>
-        <span
-          className={`absolute top-0.5 w-4 h-4 rounded-full transition-all duration-500 ease-in-out ${
-            mode === 'machine' ? 'left-[22px] bg-[#7b68ee]' : 'left-0.5 bg-[#64ffda]'
+        <button
+          onClick={mode === 'human' ? undefined : toggle}
+          disabled={transitioning}
+          className={`flex items-center gap-2 cursor-pointer transition-colors duration-300 ${
+            transitioning ? 'opacity-50 cursor-wait' : ''
           }`}
-        />
-      </span>
-      <span className={`transition-colors duration-300 ${mode === 'machine' ? 'text-[#e0e0f0] font-bold' : 'text-[#8892b0]/50'}`}>
-        machine
-      </span>
-    </button>
+        >
+          <span className={`size-[6px] inline-block rounded-full transition-all duration-500 ${
+            mode === 'human' ? 'bg-[#64ffda] outline outline-1 outline-offset-1 outline-[#64ffda]' : 'outline outline-1 outline-offset-1 outline-[#8892b0]/30'
+          }`} />
+          <span className={`uppercase text-xs tracking-wider transition-colors duration-300 ${
+            mode === 'human' ? 'text-[#ccd6f6]' : 'text-[#8892b0]/50'
+          }`}>Human</span>
+        </button>
+        <button
+          onClick={mode === 'machine' ? undefined : toggle}
+          disabled={transitioning}
+          className={`flex items-center gap-2 cursor-pointer transition-colors duration-300 ${
+            transitioning ? 'opacity-50 cursor-wait' : ''
+          }`}
+        >
+          <span className={`size-[6px] inline-block rounded-full transition-all duration-500 ${
+            mode === 'machine' ? 'bg-[#7b68ee] outline outline-1 outline-offset-1 outline-[#7b68ee]' : 'outline outline-1 outline-offset-1 outline-[#8892b0]/30'
+          }`} />
+          <span className={`uppercase text-xs tracking-wider transition-colors duration-300 ${
+            mode === 'machine' ? 'text-[#e0e0f0]' : 'text-[#8892b0]/50'
+          }`}>Machine</span>
+        </button>
+      </div>
+    </div>
   );
 }

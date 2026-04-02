@@ -1,45 +1,40 @@
-/* === View transition animations === */
+/* === Parallel.ai-style height + opacity animation === */
 
-.human-view {
-  opacity: 1;
-  transform: scale(1);
-  transform-origin: top center;
-  transition: opacity 0.6s ease, transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+/* Both views always in DOM, controlled via height/opacity */
+.human-view,
+.machine-view {
+  overflow: hidden;
+  transition: height 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.6s ease;
 }
 
-.human-view.shrink-out {
+.human-view {
+  height: auto;
+  opacity: 1;
+}
+
+.human-view.collapsed {
+  height: 0 !important;
   opacity: 0;
-  transform: scale(0.92);
   pointer-events: none;
 }
 
-.human-view.view-hidden {
-  display: none !important;
-}
-
 .machine-view {
+  height: 0;
   opacity: 0;
-  max-width: 80ch;
-  margin: 0 auto;
-  padding: 4rem 2rem;
-  transform: translateY(20px);
-  transition: opacity 0.7s ease 0.1s, transform 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+  pointer-events: none;
 }
 
-.machine-view.view-hidden {
-  display: none !important;
-}
-
-.machine-view.fade-in {
+.machine-view.expanded {
+  height: auto;
   opacity: 1;
-  transform: translateY(0);
   pointer-events: auto;
 }
 
-/* === Machine mode: dark grey palette + hide sidebar === */
+/* === Machine mode: background + sidebar transition === */
 
 body {
-  transition: background-color 0.8s ease;
+  transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body.machine-mode {
@@ -47,10 +42,24 @@ body.machine-mode {
 }
 
 body.machine-mode header {
-  transition: opacity 0.5s ease, transform 0.5s ease;
+  transition: opacity 0.6s ease, transform 0.6s ease;
   opacity: 0;
   transform: translateX(-20px);
   pointer-events: none;
+  height: 0;
+  overflow: hidden;
+}
+
+header {
+  transition: opacity 0.6s ease, transform 0.6s ease, height 0.6s ease;
+}
+
+/* === Machine content container === */
+
+.machine-content-wrapper {
+  max-width: 72ch;
+  margin: 0 auto;
+  padding: 3rem 2rem;
 }
 
 /* === Machine pre styling — dark grey palette === */
@@ -62,18 +71,6 @@ body.machine-mode header {
   color: #a0a0b8;
   white-space: pre-wrap;
   word-wrap: break-word;
-  animation: typeIn 0.6s ease 0.3s both;
-}
-
-@keyframes typeIn {
-  from {
-    opacity: 0;
-    clip-path: inset(0 0 100% 0);
-  }
-  to {
-    opacity: 1;
-    clip-path: inset(0 0 0 0);
-  }
 }
 
 .machine-pre a {
@@ -88,9 +85,4 @@ body.machine-mode header {
 
 .machine-pre strong {
   color: #e0e0f0;
-}
-
-/* Horizontal rules in machine view */
-.machine-pre hr {
-  border-color: #2a2a3e;
 }

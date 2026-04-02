@@ -57,7 +57,7 @@ const rawMarkdown = [
 
 <BaseLayout title="Adrij Shikhar">
   <ViewToggle client:load />
-  <div class="machine-view view-hidden" />
+  <div class="machine-view" />
 
   <div class="human-view mx-auto min-h-screen max-w-screen-xl px-6 py-12 md:px-12 md:py-20 lg:px-24 lg:py-0">
     <div class="lg:flex lg:justify-between lg:gap-4">
@@ -139,10 +139,6 @@ const rawMarkdown = [
           <div class="prose prose-invert max-w-none text-slate" set:html={marked.parse(interests.content)} />
         </section>
 
-        <!-- Footer -->
-        <footer class="max-w-md pb-16 text-sm text-slate/50">
-          <p>Built with <a class="font-medium text-slate-lightest hover:text-accent" href="https://astro.build/" target="_blank" rel="noreferrer noopener">Astro</a> and <a class="font-medium text-slate-lightest hover:text-accent" href="https://tailwindcss.com/" target="_blank" rel="noreferrer noopener">Tailwind CSS</a>. Content driven by Markdown.</p>
-        </footer>
 
       </main>
     </div>
