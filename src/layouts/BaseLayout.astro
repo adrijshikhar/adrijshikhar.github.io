@@ -30,6 +30,10 @@ const { title } = Astro.props;
     <script>
       const cursor = document.getElementById('cursor');
       const cursorDot = document.getElementById('cursor-dot');
+      if (cursor) {
+        cursor.style.left = `${window.innerWidth / 2}px`;
+        cursor.style.top = `${window.innerHeight / 2}px`;
+      }
       document.addEventListener('mousemove', (e) => {
         if (cursor) {
           cursor.style.left = `${e.clientX}px`;
