@@ -24,7 +24,6 @@ export default function ViewToggle() {
           '<a href="$2" target="_blank" rel="noreferrer noopener">$1</a>',
         );
         const withBold = withLinks.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-        // Brighten heading lines but keep raw markdown syntax visible
         const withHeadings = withBold
           .replace(/^(### .+)$/gm, '<span class="machine-h3">$1</span>')
           .replace(/^(## .+)$/gm, '<span class="machine-h2">$1</span>')
@@ -33,45 +32,38 @@ export default function ViewToggle() {
         machineLoadedRef.current = true;
       }
 
-      // Capture current heights for smooth animation
-      const humanHeight = humanView.scrollHeight;
-      humanView.style.height = `${humanHeight}px`;
-
-      // Force reflow
-      humanView.offsetHeight;
-
-      // Start background transition
+      // Start bg transition immediately
       document.body.classList.add('machine-mode');
+      window.scrollTo({ top: 0, behavior: 'instant' });
 
-      // Collapse human view
-      requestAnimationFrame(() => {
-        humanView.classList.add('collapsed');
-        humanView.style.height = '0px';
+      // Show machine view underneath, start fading human out
+      machineView.classList.add('visible');
+      humanView.classList.add('fade-out');
 
-        // After human collapses, expand machine
-        setTimeout(() => {
-          machineView.classList.add('expanded');
-          window.scrollTo({ top: 0, behavior: 'instant' });
-          setMode(next);
-          setTimeout(() => setTransitioning(false), 300);
-        }, 250);
-      });
-    } else {
-      // Collapse machine view
-      machineView.classList.remove('expanded');
-
+      // After crossfade completes, hide human fully
       setTimeout(() => {
-        // Restore background
+        humanView.classList.add('hidden-final');
+        setMode(next);
+        setTransitioning(false);
+      }, 500);
+
+    } else {
+      // Show human view, start fading machine out
+      humanView.classList.remove('hidden-final');
+      window.scrollTo({ top: 0, behavior: 'instant' });
+
+      // Small delay to let display:none removal take effect
+      requestAnimationFrame(() => {
+        humanView.classList.remove('fade-out');
         document.body.classList.remove('machine-mode');
 
-        // Expand human view
-        humanView.classList.remove('collapsed');
-        humanView.style.height = '';
-        window.scrollTo({ top: 0, behavior: 'instant' });
-
-        setMode(next);
-        setTimeout(() => setTransitioning(false), 300);
-      }, 250);
+        // After crossfade, hide machine
+        setTimeout(() => {
+          machineView.classList.remove('visible');
+          setMode(next);
+          setTransitioning(false);
+        }, 500);
+      });
     }
   };
 

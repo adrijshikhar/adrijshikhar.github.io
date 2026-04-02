@@ -1,52 +1,57 @@
-/* === Parallel.ai-style height + opacity animation === */
+/* === Crossfade transition — both views visible during switch === */
 
 .human-view,
 .machine-view {
-  transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-              opacity 0.25s ease;
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .human-view {
-  height: auto;
   opacity: 1;
+  transform: scale(1);
 }
 
-.human-view.collapsed {
-  overflow: hidden;
-  height: 0 !important;
-  min-height: 0 !important;
-  padding: 0 !important;
-  margin: 0 !important;
+.human-view.fade-out {
   opacity: 0;
+  transform: scale(0.97);
   pointer-events: none;
+}
+
+.human-view.hidden-final {
+  display: none !important;
 }
 
 .machine-view {
-  height: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
   opacity: 0;
-  overflow: hidden;
   pointer-events: none;
 }
 
-.machine-view.expanded {
-  height: auto;
+.machine-view.visible {
+  position: relative;
   opacity: 1;
   pointer-events: auto;
-  overflow: visible;
 }
 
-/* === Machine mode — parallel.ai palette === */
+/* === Background color — smooth long transition === */
 
 body {
-  transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background-color 0.7s ease;
 }
 
 body.machine-mode {
   background-color: #101010;
 }
 
+/* === Sidebar fade === */
+
+header {
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
 body.machine-mode header {
-  transition: opacity 0.25s ease, transform 0.25s ease;
   opacity: 0;
   transform: translateX(-20px);
   pointer-events: none;
@@ -54,11 +59,7 @@ body.machine-mode header {
   overflow: hidden;
 }
 
-header {
-  transition: opacity 0.3s ease, transform 0.3s ease, height 0.3s ease;
-}
-
-/* === Machine content — matches parallel.ai exactly === */
+/* === Machine content === */
 
 .machine-content-wrapper {
   max-width: 640px;
