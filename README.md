@@ -1,37 +1,44 @@
 # Portfolio
 
-[![Build](https://github.com/adrijshikhar/adrijshikhar.github.io/actions/workflows/build.yml/badge.svg?branch=content)](https://github.com/adrijshikhar/adrijshikhar.github.io/actions/workflows/build.yml)
-[![Build and Deploy](https://github.com/adrijshikhar/adrijshikhar.github.io/actions/workflows/deploy.yml/badge.svg?branch=content)](https://github.com/adrijshikhar/adrijshikhar.github.io/actions/workflows/deploy.yml)
-[![CodeQL](https://github.com/adrijshikhar/adrijshikhar.github.io/actions/workflows/codeql-analysis.yml/badge.svg?branch=content)](https://github.com/adrijshikhar/adrijshikhar.github.io/actions/workflows/codeql-analysis.yml)
+[![Deploy](https://github.com/adrijshikhar/adrijshikhar.github.io/actions/workflows/deploy.yml/badge.svg?branch=content)](https://github.com/adrijshikhar/adrijshikhar.github.io/actions/workflows/deploy.yml)
+
+Personal portfolio site with a human/machine view toggle — switch between a styled resume and raw markdown.
+
+**Live:** [adrijshikhar.github.io](https://adrijshikhar.github.io)
+
+## Stack
+
+- **Framework:** Astro 6 + React 19
+- **Styling:** Tailwind CSS 3 + shadcn/ui
+- **Content:** Markdown files (no CMS)
+- **Package Manager:** Bun
+- **Node:** 22 (via fnm)
+- **Deploy:** GitHub Pages via GitHub Actions
 
 ## Setup
 
-- Install [nvm](https://github.com/nvm-sh/nvm)
-- Run `nvm install` to set the node version mentioned in `.nvmrc`
-- Run `npm run dev` to start development
-
-## Deployment
-
-- Copy `.env.example` to `.env` and specify port
-- Spin up container using `docker-compose up -d`
-
-### CLI Commands
-
-``` bash
-# install dependencies
-npm install
-
-# serve with hot reload at localhost:8080
-npm run dev
-
-# build for production with minification
-npm run build
-
-# test the production build locally
-npm run serve
-
-# run tests with jest and enzyme
-npm run test
+```bash
+fnm install    # Install Node 22 from .node-version
+bun install    # Install dependencies
+bun run dev    # Start dev server at localhost:4321
 ```
 
-For detailed explanation on how things work, checkout the [CLI Readme](https://github.com/developit/preact-cli/blob/master/README.md).
+## Build & Deploy
+
+```bash
+bun run build    # Production build to dist/
+bun run preview  # Preview locally
+bun run deploy   # Manual deploy to GitHub Pages
+```
+
+Pushes to `content` branch auto-deploy via GitHub Actions.
+
+## Content
+
+All content lives in `src/content/` as markdown files — edit those to update the site. Experience and project entries use `<!-- slug -->` comment delimiters to associate descriptions with YAML frontmatter entries.
+
+## Human/Machine Toggle
+
+The bottom-center toggle switches between:
+- **Human mode** — dark minimal layout (Brittany Chiang-inspired)
+- **Machine mode** — raw monospace markdown (parallel.ai-inspired)
