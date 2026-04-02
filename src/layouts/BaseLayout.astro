@@ -23,6 +23,29 @@ const { title } = Astro.props;
     />
   </head>
   <body class="antialiased bg-slate-900 text-slate-400">
+    <div class="pointer-events-none fixed z-[9999] hidden lg:block" id="cursor">
+      <div class="relative -left-2 -top-2 h-4 w-4 rounded-full border-2 border-slate-300/80 transition-all duration-150 ease-out" id="cursor-dot"></div>
+    </div>
     <slot />
+    <script>
+      const cursor = document.getElementById('cursor');
+      const cursorDot = document.getElementById('cursor-dot');
+      document.addEventListener('mousemove', (e) => {
+        if (cursor) {
+          cursor.style.left = `${e.clientX}px`;
+          cursor.style.top = `${e.clientY}px`;
+        }
+      });
+      document.querySelectorAll('a, button').forEach((el) => {
+        el.addEventListener('mouseenter', () => {
+          cursorDot?.classList.add('scale-[2.5]', 'border-accent/80');
+          cursorDot?.classList.remove('border-slate-300/80');
+        });
+        el.addEventListener('mouseleave', () => {
+          cursorDot?.classList.remove('scale-[2.5]', 'border-accent/80');
+          cursorDot?.classList.add('border-slate-300/80');
+        });
+      });
+    </script>
   </body>
 </html>
