@@ -91,6 +91,6 @@ header {
   font-weight: 500;
 }
 
-.machine-heading {
-  color: #d6d6d5;
-}
+.machine-h1 { color: #e8e8e8; }
+.machine-h2 { color: #c0c0bf; }
+.machine-h3 { color: #a0a09f; }
