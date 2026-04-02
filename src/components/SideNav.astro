@@ -1,0 +1,105 @@
+---
+const sections = [
+  { id: 'about', label: 'About' },
+  { id: 'experience', label: 'Experience' },
+  { id: 'skills', label: 'Skills' },
+  { id: 'projects', label: 'Projects' },
+  { id: 'achievements', label: 'Achievements' },
+  { id: 'education', label: 'Education' },
+  { id: 'interests', label: 'Interests' },
+];
+---
+
+<aside class="fixed top-0 left-0 z-50 h-screen w-[40vw] max-w-md bg-navy flex-col justify-between p-12 hidden lg:flex">
+  <div>
+    <h1 class="text-5xl font-bold text-slate-lightest mb-2">Adrij Shikhar</h1>
+    <h2 class="text-xl text-slate-light mb-4">Senior Software Engineer</h2>
+    <p class="text-slate text-sm max-w-xs mb-8">
+      I build scalable data platforms and craft software that pushes boundaries.
+    </p>
+    <nav>
+      <ul class="flex flex-col gap-1">
+        {sections.map((s, i) => (
+          <li>
+            <a
+              class="group flex items-center gap-3 py-2 text-sm text-slate hover:text-slate-lightest transition-colors nav-link"
+              href={`#${s.id}`}
+              data-section={s.id}
+            >
+              <span class="h-px w-8 bg-slate-light/30 group-hover:w-16 group-hover:bg-slate-lightest transition-all"></span>
+              <span class="font-mono text-xs text-slate/60">0{i + 1}.</span>
+              <span class="uppercase tracking-widest text-xs">{s.label}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+  <div class="flex flex-col gap-4">
+    <div class="flex gap-4">
+      {[
+        { icon: 'fab fa-github', url: 'https://github.com/adrijshikhar/' },
+        { icon: 'fab fa-linkedin-in', url: 'https://www.linkedin.com/in/adrij-shikhar' },
+        { icon: 'fab fa-dev', url: 'https://dev.to/adrijshikhar' },
+        { icon: 'fa fa-envelope', url: 'mailto:ashikhar@ee.iitr.ac.in' },
+      ].map((s) => (
+        <a class="text-slate hover:text-accent transition-colors text-lg" href={s.url} target="_blank" rel="noreferrer noopener">
+          <i class={s.icon}></i>
+        </a>
+      ))}
+    </div>
+    <a class="text-accent text-sm font-mono hover:underline" href="/assets/resume.pdf" download="Adrij Shikhar Resume.pdf">
+      Download Resume &darr;
+    </a>
+  </div>
+</aside>
+
+<!-- Mobile nav -->
+<nav class="fixed top-0 left-0 right-0 z-50 bg-navy/95 backdrop-blur-md border-b border-navy-light lg:hidden">
+  <div class="flex items-center justify-between px-6 py-4">
+    <span class="font-mono text-accent text-sm">AS</span>
+    <button id="mobile-menu-btn" class="text-slate hover:text-accent transition-colors" aria-label="Toggle navigation">
+      <i class="fas fa-bars text-lg"></i>
+    </button>
+  </div>
+  <div id="mobile-menu" class="hidden px-6 pb-4">
+    <ul class="flex flex-col gap-1">
+      {sections.map((s, i) => (
+        <li>
+          <a class="block py-2 text-slate hover:text-accent transition-colors text-sm" href={`#${s.id}`}>
+            <span class="font-mono text-accent/60 mr-2">0{i + 1}.</span>{s.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</nav>
+
+<script>
+  const btn = document.getElementById('mobile-menu-btn');
+  const menu = document.getElementById('mobile-menu');
+  btn?.addEventListener('click', () => menu?.classList.toggle('hidden'));
+  menu?.querySelectorAll('a').forEach((a) =>
+    a.addEventListener('click', () => menu?.classList.add('hidden'))
+  );
+
+  // Scroll-spy for desktop nav
+  const navLinks = document.querySelectorAll('.nav-link');
+  const sectionEls = document.querySelectorAll('section[id]');
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          navLinks.forEach((link) => {
+            const isActive = link.getAttribute('data-section') === entry.target.id;
+            link.classList.toggle('text-slate-lightest', isActive);
+            link.querySelector('span:first-child')?.classList.toggle('w-16', isActive);
+            link.querySelector('span:first-child')?.classList.toggle('bg-slate-lightest', isActive);
+          });
+        }
+      });
+    },
+    { rootMargin: '-40% 0px -60% 0px' }
+  );
+  sectionEls.forEach((s) => observer.observe(s));
+</script>
