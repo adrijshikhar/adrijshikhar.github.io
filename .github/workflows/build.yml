@@ -3,8 +3,6 @@ name: Build
 on:
   pull_request:
     branches: [content]
-  push:
-    branches: [content, 'feat/**']
 
 jobs:
   build:
