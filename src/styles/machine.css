@@ -2,8 +2,8 @@
 
 .human-view,
 .machine-view {
-  transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-              opacity 0.25s ease;
+  transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.3s ease;
 }
 
 .human-view {
@@ -15,8 +15,6 @@
   overflow: hidden;
   height: 0 !important;
   min-height: 0 !important;
-  padding: 0 !important;
-  margin: 0 !important;
   opacity: 0;
   pointer-events: none;
 }
@@ -38,25 +36,13 @@
 /* === Machine mode — parallel.ai palette === */
 
 body {
-  transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background-color 0.3s ease;
 }
 
 body.machine-mode {
   background-color: #101010;
 }
 
-body.machine-mode header {
-  transition: opacity 0.25s ease, transform 0.25s ease;
-  opacity: 0;
-  transform: translateX(-20px);
-  pointer-events: none;
-  height: 0;
-  overflow: hidden;
-}
-
-header {
-  transition: opacity 0.3s ease, transform 0.3s ease, height 0.3s ease;
-}
 
 /* === Machine content — matches parallel.ai exactly === */
 
