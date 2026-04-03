@@ -1,22 +1,7 @@
-/* === Parallel.ai-style height + opacity animation === */
-
-.human-view,
-.machine-view {
-  transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              opacity 0.3s ease;
-}
+/* === Initial states for GSAP-driven toggle === */
 
 .human-view {
-  height: auto;
   opacity: 1;
-}
-
-.human-view.collapsed {
-  overflow: hidden;
-  height: 0 !important;
-  min-height: 0 !important;
-  opacity: 0;
-  pointer-events: none;
 }
 
 .machine-view {
@@ -25,24 +10,6 @@
   overflow: hidden;
   pointer-events: none;
 }
-
-.machine-view.expanded {
-  height: auto;
-  opacity: 1;
-  pointer-events: auto;
-  overflow: visible;
-}
-
-/* === Machine mode — parallel.ai palette === */
-
-body {
-  transition: background-color 0.3s ease;
-}
-
-body.machine-mode {
-  background-color: #101010;
-}
-
 
 /* === Machine content — matches parallel.ai exactly === */
 
