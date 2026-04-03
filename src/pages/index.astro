@@ -6,8 +6,8 @@ import { marked } from 'marked';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SideNav from '../components/SideNav.astro';
 import Section from '../components/Section.astro';
-import ExpCard from '../components/ExpCard.astro';
-import ProjectCard from '../components/ProjectCard.astro';
+import ExpCard from '../components/ExpCard.tsx';
+import ProjectCard from '../components/ProjectCard.tsx';
 import ViewToggle from '../components/ViewToggle.tsx';
 
 function readContent(filename: string) {
@@ -78,9 +78,7 @@ const rawMarkdown = [
           </div>
           <ul class="group/list">
             {experience.meta.entries.slice(0, 1).map((exp: any) => (
-              <ExpCard {...exp}>
-                <div set:html={marked.parse(expSections[exp.slug] || '')} />
-              </ExpCard>
+              <ExpCard {...exp} contentHtml={marked.parse(expSections[exp.slug] || '') as string} />
             ))}
           </ul>
           <div class="mt-12">
@@ -98,9 +96,7 @@ const rawMarkdown = [
           </div>
           <ul class="group/list">
             {projects.meta.entries.slice(0, 2).map((proj: any) => (
-              <ProjectCard {...proj}>
-                <div set:html={marked.parse(projSections[proj.slug] || '')} />
-              </ProjectCard>
+              <ProjectCard {...proj} contentHtml={marked.parse(projSections[proj.slug] || '') as string} />
             ))}
           </ul>
           <div class="mt-12">

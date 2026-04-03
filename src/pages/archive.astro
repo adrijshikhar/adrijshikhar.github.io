@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import matter from 'gray-matter';
 import { marked } from 'marked';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import ProjectCard from '../components/ProjectCard.tsx';
 
 function readContent(filename: string) {
   const raw = readFileSync(join(process.cwd(), 'src/content', filename), 'utf-8');
@@ -33,31 +34,11 @@ const projSections = splitBySlug(projects.content);
     </a>
     <h1 class="text-4xl font-bold tracking-tight text-slate-200 sm:text-5xl mb-12">All Projects</h1>
 
-    <div class="space-y-12">
+    <ul class="space-y-4">
       {projects.meta.entries.map((proj: any) => (
-        <div class="border-b border-slate-400/10 pb-12">
-          <div class="flex items-baseline justify-between gap-4 mb-1">
-            <h2 class="text-lg font-semibold text-slate-200">
-              {proj.link ? (
-                <a href={proj.link} target="_blank" rel="noreferrer noopener" class="text-inherit hover:text-accent transition-colors">
-                  {proj.title}<span class="ml-1 text-xs text-slate-400/60">&#8599;</span>
-                </a>
-              ) : proj.title}
-            </h2>
-            <span class="shrink-0 text-xs font-mono uppercase tracking-wide text-slate-400/60">{proj.date}</span>
-          </div>
-          <div class="text-xs text-slate-400/50 mb-1">{proj.company}</div>
-          {(proj.builtWith || []).length > 0 && (
-            <div class="flex flex-wrap gap-1.5 mb-3">
-              {proj.builtWith.map((tech: string) => (
-                <span class="rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-medium text-accent">{tech}</span>
-              ))}
-            </div>
-          )}
-          <div class="text-sm leading-normal text-slate-400 prose prose-invert prose-sm max-w-none prose-headings:text-slate-200 prose-headings:text-sm prose-headings:font-semibold prose-headings:mt-4 prose-headings:mb-2 prose-li:my-0.5 prose-ul:my-1 prose-a:text-accent prose-strong:text-slate-200" set:html={marked.parse(projSections[proj.slug] || '')} />
-        </div>
+        <ProjectCard {...proj} contentHtml={marked.parse(projSections[proj.slug] || '') as string} />
       ))}
-    </div>
+    </ul>
   </main>
   <script>
     const spotlight = document.getElementById('spotlight');
