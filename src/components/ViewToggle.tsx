@@ -1,9 +1,11 @@
 import { useState, useRef } from 'react';
+import { gsap } from '../lib/gsap';
 
 export default function ViewToggle() {
   const [mode, setMode] = useState<'human' | 'machine'>('human');
   const [transitioning, setTransitioning] = useState(false);
   const machineLoadedRef = useRef(false);
+  const islandRef = useRef<HTMLDivElement>(null);
 
   const toggle = () => {
     if (transitioning) return;
@@ -28,61 +30,137 @@ export default function ViewToggle() {
         machineLoadedRef.current = true;
       }
 
-      // Capture current heights for smooth animation
-      const humanHeight = humanView.scrollHeight;
-      humanView.style.height = `${humanHeight}px`;
+      // Update toggle indicator immediately
+      setMode(next);
 
-      // Force reflow
-      humanView.offsetHeight;
+      const tl = gsap.timeline({
+        onComplete: () => {
+          setTransitioning(false);
+        },
+      });
 
-      // Start background transition
-      document.body.classList.add('machine-mode');
+      // Island transitions first
+      if (islandRef.current) {
+        tl.to(islandRef.current, {
+          backgroundColor: 'rgba(24, 24, 24, 0.95)',
+          borderColor: '#555555',
+          duration: 0.15,
+          ease: 'power1.inOut',
+        }, 0);
+      }
 
       // Collapse human view
-      requestAnimationFrame(() => {
-        humanView.classList.add('collapsed');
-        humanView.style.height = '0px';
+      tl.to(humanView, {
+        height: 0,
+        opacity: 0,
+        duration: 0.25,
+        ease: 'power2.inOut',
+        onStart: () => {
+          humanView.style.overflow = 'hidden';
+          gsap.set(humanView, { height: humanView.scrollHeight });
+        },
+        onComplete: () => {
+          humanView.style.pointerEvents = 'none';
+          humanView.style.minHeight = '0';
+        },
+      }, 0);
 
-        // After human collapses, expand machine
-        setTimeout(() => {
-          machineView.classList.add('expanded');
+      // Background transition
+      tl.to(document.body, {
+        backgroundColor: '#101010',
+        duration: 0.2,
+        ease: 'power1.inOut',
+        onStart: () => {
+          document.body.classList.add('machine-mode');
+        },
+      }, '-=0.1');
+
+      // Expand machine view
+      tl.fromTo(machineView, {
+        height: 0,
+        opacity: 0,
+        overflow: 'hidden',
+      }, {
+        height: 'auto',
+        opacity: 1,
+        duration: 0.25,
+        ease: 'power2.inOut',
+        onStart: () => {
+          machineView.style.pointerEvents = 'auto';
+          machineView.style.overflow = 'visible';
           window.scrollTo({ top: 0, behavior: 'instant' });
-          setMode(next);
-          setTimeout(() => setTransitioning(false), 300);
-        }, 250);
-      });
+        },
+      }, '-=0.05');
+
     } else {
+      // Update toggle indicator immediately
+      setMode(next);
+
+      const tl = gsap.timeline({
+        onComplete: () => {
+          setTransitioning(false);
+        },
+      });
+
+      // Island transitions first
+      if (islandRef.current) {
+        tl.to(islandRef.current, {
+          backgroundColor: 'rgba(10, 25, 47, 0.95)',
+          borderColor: 'rgba(100, 116, 139, 0.4)',
+          duration: 0.15,
+          ease: 'power1.inOut',
+        }, 0);
+      }
+
       // Collapse machine view
-      machineView.classList.remove('expanded');
+      tl.to(machineView, {
+        height: 0,
+        opacity: 0,
+        duration: 0.25,
+        ease: 'power2.inOut',
+        onStart: () => {
+          machineView.style.overflow = 'hidden';
+        },
+        onComplete: () => {
+          machineView.style.pointerEvents = 'none';
+        },
+      }, 0);
 
-      setTimeout(() => {
-        // Restore background
-        document.body.classList.remove('machine-mode');
+      // Background transition
+      tl.to(document.body, {
+        backgroundColor: '#0f172a',
+        duration: 0.2,
+        ease: 'power1.inOut',
+        onStart: () => {
+          document.body.classList.remove('machine-mode');
+        },
+      }, '-=0.1');
 
-        // Expand human view
-        humanView.classList.remove('collapsed');
-        humanView.style.height = '';
-        window.scrollTo({ top: 0, behavior: 'instant' });
-
-        setMode(next);
-        setTimeout(() => setTransitioning(false), 200);
-      }, 150);
+      // Expand human view
+      tl.to(humanView, {
+        height: 'auto',
+        opacity: 1,
+        duration: 0.25,
+        ease: 'power2.inOut',
+        onStart: () => {
+          humanView.style.overflow = '';
+          humanView.style.pointerEvents = '';
+          humanView.style.minHeight = '';
+          window.scrollTo({ top: 0, behavior: 'instant' });
+        },
+      }, '-=0.05');
     }
   };
 
   return (
     <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[1100] flex items-center gap-2">
-      <div className={`flex gap-4 px-4 py-2.5 rounded-md backdrop-blur-xl font-mono text-sm transition-all duration-300 ${
-        mode === 'machine'
-          ? 'bg-[#181818]/95 border border-[#555]'
-          : 'bg-[#0a192f]/95 border border-slate-500/40'
-      }`}>
+      <div
+        ref={islandRef}
+        className="flex gap-4 px-4 py-2.5 rounded-md backdrop-blur-xl font-mono text-sm bg-[#0a192f]/95 border border-slate-500/40"
+      >
         <button
           onClick={mode === 'human' ? undefined : toggle}
-          disabled={transitioning}
-          className={`flex items-center gap-2 transition-colors duration-300 ${
-            transitioning ? 'opacity-50' : ''
-          }`}
+          className="flex items-center gap-2 transition-colors duration-300"
         >
           <span className={`size-[6px] inline-block rounded-full transition-all duration-500 ${
             mode === 'human' ? 'bg-current outline outline-1 outline-offset-1 outline-current' : 'outline outline-1 outline-offset-1 outline-[#858483]/30'
@@ -93,10 +171,7 @@ export default function ViewToggle() {
         </button>
         <button
           onClick={mode === 'machine' ? undefined : toggle}
-          disabled={transitioning}
-          className={`flex items-center gap-2 transition-colors duration-300 ${
-            transitioning ? 'opacity-50' : ''
-          }`}
+          className="flex items-center gap-2 transition-colors duration-300"
         >
           <span className={`size-[6px] inline-block rounded-full transition-all duration-500 ${
             mode === 'machine' ? 'bg-current outline outline-1 outline-offset-1 outline-current' : 'outline outline-1 outline-offset-1 outline-[#858483]/30'
