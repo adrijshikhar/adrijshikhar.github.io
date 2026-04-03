@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { gsap } from '../lib/gsap';
+import { Toggle } from './ui/toggle';
 
 export default function ViewToggle() {
   const [mode, setMode] = useState<'human' | 'machine'>('human');
@@ -158,9 +159,10 @@ export default function ViewToggle() {
         ref={islandRef}
         className="flex gap-4 px-4 py-2.5 rounded-md backdrop-blur-xl font-mono text-sm bg-[#0a192f]/95 border border-slate-500/40"
       >
-        <button
-          onClick={mode === 'human' ? undefined : toggle}
-          className="flex items-center gap-2 transition-colors duration-300"
+        <Toggle
+          pressed={mode === 'human'}
+          onPressedChange={(pressed) => { if (pressed && mode !== 'human') toggle(); }}
+          className="!bg-transparent !h-auto !min-w-0 !px-0 !py-0 !rounded-none flex items-center gap-2 transition-colors duration-300 hover:!bg-transparent data-[state=on]:!bg-transparent"
         >
           <span className={`size-[6px] inline-block rounded-full transition-all duration-500 ${
             mode === 'human' ? 'bg-current outline outline-1 outline-offset-1 outline-current' : 'outline outline-1 outline-offset-1 outline-[#858483]/30'
@@ -168,10 +170,11 @@ export default function ViewToggle() {
           <span className={`uppercase text-xs tracking-wider transition-colors duration-300 ${
             mode === 'human' ? 'text-white' : 'text-[#858483]/50'
           }`}>Human</span>
-        </button>
-        <button
-          onClick={mode === 'machine' ? undefined : toggle}
-          className="flex items-center gap-2 transition-colors duration-300"
+        </Toggle>
+        <Toggle
+          pressed={mode === 'machine'}
+          onPressedChange={(pressed) => { if (pressed && mode !== 'machine') toggle(); }}
+          className="!bg-transparent !h-auto !min-w-0 !px-0 !py-0 !rounded-none flex items-center gap-2 transition-colors duration-300 hover:!bg-transparent data-[state=on]:!bg-transparent"
         >
           <span className={`size-[6px] inline-block rounded-full transition-all duration-500 ${
             mode === 'machine' ? 'bg-current outline outline-1 outline-offset-1 outline-current' : 'outline outline-1 outline-offset-1 outline-[#858483]/30'
@@ -179,7 +182,7 @@ export default function ViewToggle() {
           <span className={`uppercase text-xs tracking-wider transition-colors duration-300 ${
             mode === 'machine' ? 'text-white' : 'text-[#858483]/50'
           }`}>Machine</span>
-        </button>
+        </Toggle>
       </div>
     </div>
   );
