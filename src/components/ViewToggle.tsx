@@ -65,23 +65,23 @@ export default function ViewToggle() {
         window.scrollTo({ top: 0, behavior: 'instant' });
 
         setMode(next);
-        setTimeout(() => setTransitioning(false), 300);
-      }, 250);
+        setTimeout(() => setTransitioning(false), 200);
+      }, 150);
     }
   };
 
   return (
     <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[1100] flex items-center gap-2">
-      <div className={`flex gap-4 px-3 py-2 rounded-sm backdrop-blur-md font-mono text-sm transition-all duration-500 ${
+      <div className={`flex gap-4 px-4 py-2.5 rounded-md backdrop-blur-xl font-mono text-sm transition-all duration-300 ${
         mode === 'machine'
-          ? 'bg-[#181818]/90 border border-[#434343]'
-          : 'bg-[#112240]/90 border border-[#233554]'
+          ? 'bg-[#181818]/95 border border-[#555]'
+          : 'bg-[#0a192f]/95 border border-slate-500/40'
       }`}>
         <button
           onClick={mode === 'human' ? undefined : toggle}
           disabled={transitioning}
-          className={`flex items-center gap-2 cursor-pointer transition-colors duration-300 ${
-            transitioning ? 'opacity-50 cursor-wait' : ''
+          className={`flex items-center gap-2 transition-colors duration-300 ${
+            transitioning ? 'opacity-50' : ''
           }`}
         >
           <span className={`size-[6px] inline-block rounded-full transition-all duration-500 ${
@@ -94,8 +94,8 @@ export default function ViewToggle() {
         <button
           onClick={mode === 'machine' ? undefined : toggle}
           disabled={transitioning}
-          className={`flex items-center gap-2 cursor-pointer transition-colors duration-300 ${
-            transitioning ? 'opacity-50 cursor-wait' : ''
+          className={`flex items-center gap-2 transition-colors duration-300 ${
+            transitioning ? 'opacity-50' : ''
           }`}
         >
           <span className={`size-[6px] inline-block rounded-full transition-all duration-500 ${
