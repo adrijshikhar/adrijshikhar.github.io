@@ -1,0 +1,57 @@
+# resume-ops configuration — Adrij Shikhar
+
+user:
+  name: "Adrij Shikhar"
+  github_username: "adrijshikhar"
+  target_role: "Senior Software Engineer"
+
+role_history:
+  - title: "Software Development Engineer"
+    start: "2021-09-01"
+    end: "present"
+
+sources:
+  github:
+    enabled: true
+    orgs: ["hevoio"]
+    since: "2022-06-01"
+    include_reviews: true
+    exclude_repos: []
+
+  jira:
+    enabled: true
+    project_keys: ["H2", "HEVO", "INT"]
+    assignee: "613055cef0bf52006951d6c2"
+    ignore_labels:
+      - "chore"
+      - "housekeeping"
+
+  slack:
+    enabled: false
+  cues:
+    enabled: false
+  confluence:
+    enabled: false
+  gmail:
+    enabled: false
+
+synthesis:
+  focus_areas:
+    - "data pipeline infrastructure"
+    - "destination loaders"
+    - "CDC / change data capture"
+    - "connector framework"
+  highlight_keywords:
+    - "SCD Type 2"
+    - "history mode"
+    - "Snowflake"
+    - "BigQuery"
+    - "Redshift"
+    - "Debezium"
+    - "SDP"
+  max_bullets_per_theme: 5
+  team_size:
+    - period: "2021-2022"
+      size: 8
+    - period: "2023-present"
+      size: 12
