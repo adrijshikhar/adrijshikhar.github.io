@@ -4,24 +4,30 @@ title: "Skills"
 
 ## Development Environment
 
-- **OS:** Manjaro i3wm Community Edition
-- **IDE:** Highly customized [ VS Code | Intellij ] with self crafted theme
-- **Shell:** Bash, Oh My Zsh, fish-shell, Oh My Fish
+- **OS:** macOS / Manjaro i3wm
+- **IDE:** Highly customized [ VS Code | IntelliJ ] with self crafted theme
+- **Shell:** fish-shell, Oh My Fish, Bash, Zsh
 
-## Frameworks & Tools
+## Languages & Frameworks
 
-Java, AWS, Golang, Python, Django, Docker, Kubernetes, JavaScript, React, Node.js, GraphQL, TypeScript, Dart, Sass, npm, HTML5, CSS3
+Java 8/17, Dropwizard, Spring, gRPC/Protobuf, Kotlin, Python, Django, TypeScript, React, Node.js, GraphQL, Golang, Lua, Dart
+
+## Data & Infrastructure
+
+MySQL CDC (Debezium), PostgreSQL WAL, Oracle Log Mining, SQL Server CT, Snowflake, BigQuery, Redshift, MongoDB, Redis, Apache Kafka, Apache Spark
+
+## Cloud & DevOps
+
+AWS (ECS/Fargate, S3), Docker, Kubernetes, Terraform, Ansible, CircleCI, Temporal, Fluent-bit, InfluxDB/Telegraf/Grafana, OpenTelemetry
+
+## Testing & Observability
+
+JUnit 5, Testcontainers, k6, JFR Profiling, GC Logging, Coralogix, Sentry, Playwright
 
 ## And More...
 
-- Redux
-- Dartlang
-- MongoDB
-- PHP
-- C++
-- SQL
-- MySQL
-- PostgreSQL
-- Git
-- Linux
-- Java Server Pages
+- Git, Linux, Shell Scripting
+- HTML5, CSS3, Sass, Tailwind CSS
+- Redux, Flutter
+- SQL, PostgreSQL, MySQL
+- PHP, C++

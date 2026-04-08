@@ -76,45 +76,32 @@ entries:
 
 <!-- hevo-senior -->
 
-### Scalability and Performance
+### Scale & Performance
 
-- Architected for Scale: Led key initiatives that enabled the platform to support a **2500% increase** in object handling, from 1,000 to 25,000 objects.
-- Optimized Data Ingestion: Achieved a **5x increase** in data ingestion speed within the MySQL connector, significantly boosting system efficiency and throughput.
-- Database Interaction at Scale: Engineered a metadata system that scaled the ETL platform by **15x**, allowing for massive improvements in core database interactions.
-- Source Object Generation: Optimized the source object generation flow, resulting in a **10x improvement** in pipeline performance and enabling support for larger datasets.
-- Reduced Catalog Document Size: Drove efforts to reduce the catalog document size, leading to **improved performance and scalability** across the platform.
+- Scaled data pipeline platform to support **25,000+ source objects per pipeline** by profiling and optimizing ingestion across MySQL, Postgres, SQL Server connectors and Snowflake/BigQuery loaders.
+- Reduced object listing API latency from **60+ seconds to sub-second** by replacing N+1 mapping fetches with bulk APIs and paginated catalog queries.
+- Optimized source object generation by decoupling SO/SOTR/CT insertion from synchronous pipeline creation, cutting pipeline creation time for large integrations.
+- Built performance testing infrastructure using **k6** with Grafana dashboards for continuous pipeline lifecycle benchmarking.
 
-### CDC Framework Project
+### CDC Framework & System Design
 
-- Ownership and Execution: Led the complete implementation of real-time CDC framework using Debezium Engine (open source) which significantly enhanced data synchronization and ensured seamless real-time updates.
-- Schema Catalog Service:
-  - Designed and built a generic schema service from scratch to manage and validate data schemas in ETL pipelines, with seamless integration and testing using Debezium connectors.
-  - Supported source-specific features, including handling unchanged toast datum from PostgreSQL and diverse data types from various data sources, ensuring flexibility across different ETL environments.
-  - Implemented schema versioning, metadata management, and compatibility checks to maintain data quality, streamline data processing, and accommodate schema evolution.
+- Architected and shipped **Binlog V2** (Debezium-based MySQL CDC) from ground up — DDL parser, large transaction handling, skipped table management, new polling strategy, and GTID support. Rolled out to **100% of MySQL pipelines** over 12 months.
+- Built **Hermes**, Hevo 2.0's control plane from scratch — Java 17, Dropwizard, Groot auth, Caffeine/Redis caching, Temporal orchestration, RBAC. Owned full lifecycle across **5 environments** (preview, gamma, US, EU, Asia).
+- Designed the **log-router sidecar** for session log collection — fluent-bit wrapper routing structured logs to S3, integrated across **8+ data plane services**.
+- Shipped **Failure Classifier Phase 1** — error classification engine across all connectors and loaders, replacing generic errors with actionable diagnostics.
+- Implemented **SCD Type 2 (History Mode)** for Redshift and BigQuery loaders.
 
-### System Optimization and Security Enhancements
+### Reliability & Incident Response
 
-- Standardized Error Handling: Spearheaded the initiative to create a unified standard for HTTP and gRPC request failures across the control plane, which improved user experience and **reduced support overhead**.
-- Enhanced Security and Governance: Implemented source/destination whitelisting and played a key role in the Connectors Flag GA for Hevo 1.0.
-- REST API Security Enhancements: Enhanced the REST API connector by implementing OAuth 2.0 authorization, improving security and user management.
+- Resolved **200+ P0/P1 production incidents** across US, EU, India, AU regions — binlog failures, WAL slot issues, data mismatches, and ingestion lag.
+- Fixed critical data integrity issues: unsigned types, geometry columns, timestamp-with-timezone, binary PKs, and table map cache corruption in CDC pipelines.
+- Hardened API security: eliminated plaintext password exposure, missing auth checks, and OAuth credential leakage.
 
-### Feature Development and Integrations
+### Leadership & Impact
 
-- Led the implementation of several new features including Session Logs, YML template support, advanced scheduler with Cron support, and Terraform integration.
-- Spearheaded the development and launch of the SurveyMonkey connector, contributing to the expansion of Hevo's connector ecosystem.
-
-### Critical Customer Issue Resolution
-
-- Managed and resolved several complex customer issues for key clients, **significantly improving customer satisfaction**.
-
-### Innovative System Enhancements
-
-- Real-time Logs Implementation: Implemented data governance tool to handle PII redaction in near real-time using AWS S3 and AWS Comprehend, ensuring data privacy and enhancing user experience.
-- Microservices and Task Execution: Worked on integrating a microservices architecture on AWS Fargate and implemented a Temporal-based task execution system, improving reliability and streamlining hierarchical DAG processes.
-
-### Team Contribution and Documentation
-
-- Regularly contributed to improving documentation quality and conducted knowledge transfer sessions, fostering team collaboration.
+- Provided **1,889 code reviews** across **47 repositories** over 4 years, averaging 40+ reviews/month.
+- Owned **4 major epics**: Debezium MySQL Connector, 25K Source Object Handling (24 child issues), Failure Classifier (9 issues), Hermes Optimizations (63 issues).
+- Built developer tooling: hevo-2-starter local dev, MCP servers, JFR profiling, InfluxDB+Telegraf metrics, connector-generator scaffolding.
 
 <!-- hevo-intern -->
 
