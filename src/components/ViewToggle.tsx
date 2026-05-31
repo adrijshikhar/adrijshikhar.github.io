@@ -93,9 +93,25 @@ export default function ViewToggle() {
     } else {
       setMode(next);
 
+      // Restore the human canvas IMMEDIATELY (front-loaded) so we never show the dark terminal
+      // over a light page: drop machine-mode + clear the inline body bg up front. The CURRENT
+      // mode's html --bg (light or dark) shows right away; the dark machine layer fades out fast.
+      document.body.classList.remove('machine-mode');
+      document.body.style.backgroundColor = '';
+
       const tl = gsap.timeline({ onComplete: () => setTransitioning(false) });
 
-      // Crossfade: expand human IN and collapse machine OUT simultaneously (both at t=0).
+      // Machine layer fades out FAST so the dark terminal doesn't linger on the restored canvas.
+      tl.to(machineView, {
+        height: 0,
+        opacity: 0,
+        duration: 0.18,
+        ease: 'power2.in',
+        onStart: () => { machineView.style.overflow = 'hidden'; },
+        onComplete: () => { machineView.style.pointerEvents = 'none'; },
+      }, 0);
+
+      // Human view expands/fades in over the (now correct-mode) canvas.
       tl.to(humanView, {
         height: 'auto',
         opacity: 1,
@@ -107,22 +123,6 @@ export default function ViewToggle() {
           humanView.style.minHeight = '';
         },
       }, 0);
-
-      tl.to(machineView, {
-        height: 0,
-        opacity: 0,
-        duration: 0.3,
-        ease: 'power2.in',
-        onStart: () => { machineView.style.overflow = 'hidden'; },
-        onComplete: () => { machineView.style.pointerEvents = 'none'; },
-      }, 0);
-
-      // Restore the human canvas at the crossfade midpoint: drop machine-mode + clear the inline
-      // body bg so the CURRENT mode's html --bg (light or dark) shows and the aurora returns.
-      tl.add(() => {
-        document.body.classList.remove('machine-mode');
-        document.body.style.backgroundColor = '';
-      }, 0.16);
     }
   };
 
