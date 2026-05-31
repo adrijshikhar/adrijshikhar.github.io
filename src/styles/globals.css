@@ -188,6 +188,15 @@
     background: var(--bg);
     pointer-events: none;
   }
+  /* Readability veil: fade the glow back to the dark --bg over the central
+     content zone (keeps the aurora at the edges, content stays legible — D's approach). */
+  .aurora-stage::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(125% 88% at 50% 16%, transparent 0%, transparent 26%, var(--bg) 78%);
+    pointer-events: none;
+  }
 
   .aurora-blob {
     position: absolute;
@@ -200,7 +209,7 @@
   .aurora-blob--1 {
     width: 50vw; height: 50vw;
     top: -18vw; left: -12vw;
-    opacity: 0.55;
+    opacity: 0.5;
     background: radial-gradient(circle at 30% 30%, var(--aurora-1), transparent 68%);
     animation: aurora-drift1 30s ease-in-out infinite alternate;
   }
