@@ -29,6 +29,11 @@
   --accent: #fb631b;
   --accent-contrast: #0e0e0e;
 
+  /* Ambient aurora trio (3 distinct hues, ported from D). Overridden per [data-theme]. */
+  --aurora-1: #fb631b; /* orange */
+  --aurora-2: #ff9d5c; /* amber */
+  --aurora-3: #ffd089; /* gold */
+
   /* Typography */
   --font-heading: 'Geist Variable', 'Inter', system-ui, sans-serif;
   --font-sans: 'Geist Variable', 'Inter', system-ui, sans-serif;
@@ -59,29 +64,35 @@
 [data-theme="parallel"] {
   --accent: #fb631b;
   --accent-contrast: #0e0e0e;
+  --aurora-1: #fb631b; --aurora-2: #ff9d5c; --aurora-3: #ffd089;
 }
 [data-theme="teal"] {
   --accent: #64ffda;
   --accent-contrast: #0e0e0e;
+  --aurora-1: #3dd7c9; --aurora-2: #6b8cff; --aurora-3: #b06bff;
 }
 [data-theme="rausch"] {
   --accent: #ff385c;
   --accent-contrast: #0e0e0e;
+  --aurora-1: #ff385c; --aurora-2: #ff7aa8; --aurora-3: #ffba6b;
 }
 [data-theme="violet"] {
   /* lightened from #5241d4 so AA text-on-bg holds (≥4.5:1) */
   --accent: #8b7dff;
   --accent-contrast: #0e0e0e;
+  --aurora-1: #5241d4; --aurora-2: #8a6bff; --aurora-3: #d06bff;
 }
 [data-theme="hyperlink"] {
   /* lightened from #0000ee — pure blue on near-black fails AA badly */
   --accent: #6f8cff;
   --accent-contrast: #0e0e0e;
+  --aurora-1: #2f4dff; --aurora-2: #6f8bff; --aurora-3: #4bd6ff;
 }
 [data-theme="signal"] {
   /* lightened from #d12222 to clear AA on near-black */
   --accent: #ff5247;
   --accent-contrast: #0e0e0e;
+  --aurora-1: #d12222; --aurora-2: #ff6b4a; --aurora-3: #ffb04a;
 }
 
 @layer base {
@@ -190,7 +201,7 @@
     width: 50vw; height: 50vw;
     top: -18vw; left: -12vw;
     opacity: 0.55;
-    background: radial-gradient(circle at 30% 30%, var(--accent), transparent 68%);
+    background: radial-gradient(circle at 30% 30%, var(--aurora-1), transparent 68%);
     animation: aurora-drift1 30s ease-in-out infinite alternate;
   }
   /* cooler accent-toward-white tail — top-right */
@@ -198,7 +209,7 @@
     width: 44vw; height: 44vw;
     top: 6vw; right: -16vw;
     opacity: 0.38;
-    background: radial-gradient(circle at 60% 40%, color-mix(in srgb, var(--accent) 70%, #ffffff), transparent 70%);
+    background: radial-gradient(circle at 60% 40%, var(--aurora-2), transparent 70%);
     animation: aurora-drift2 36s ease-in-out infinite alternate;
   }
   /* dim accent-toward-bg anchor — bottom */
@@ -206,7 +217,7 @@
     width: 46vw; height: 46vw;
     bottom: -22vw; left: 22vw;
     opacity: 0.34;
-    background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--accent) 55%, #000000), transparent 70%);
+    background: radial-gradient(circle at 50% 50%, var(--aurora-3), transparent 70%);
     animation: aurora-drift3 42s ease-in-out infinite alternate;
   }
 
