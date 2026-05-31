@@ -1,6 +1,7 @@
 ---
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { getCollection } from 'astro:content';
 import matter from 'gray-matter';
 import { marked } from 'marked';
 import BaseLayout from '../layouts/BaseLayout.astro';
@@ -35,6 +36,11 @@ const interests = readContent('interests.md');
 
 const expSections = splitBySlug(experience.content);
 const projSections = splitBySlug(projects.content);
+
+const latestPosts = (await getCollection('blog', ({ data }) => import.meta.env.PROD ? !data.draft : true))
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, 3);
+const fmtPostDate = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
 
 function formatExpEntry(entry: any, body: string): string {
   return `### ${entry.position} @ ${entry.company} (${entry.startDate} — ${entry.endDate})\n\n${body}`;
@@ -102,6 +108,36 @@ const rawMarkdown = [
           <div class="mt-12">
             <a class="inline-flex items-center font-medium leading-tight text-slate-200 group" href="/archive">
               <span class="border-b border-transparent pb-px transition group-hover:border-accent">View Full Project Archive</span>
+              <span class="ml-2 text-accent transition-transform group-hover:translate-x-1">&rarr;</span>
+            </a>
+          </div>
+        </section>
+
+        <!-- Writing -->
+        <section id="writing" class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24">
+          <div class="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-slate-900/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:px-0 lg:py-0 lg:opacity-0">
+            <h2 class="text-sm font-bold uppercase tracking-widest text-slate-200 lg:sr-only">Writing</h2>
+          </div>
+          {latestPosts.length === 0 ? (
+            <p class="text-slate-400">No posts yet.</p>
+          ) : (
+            <ul class="group/list">
+              {latestPosts.map((post) => (
+                <li class="mb-4">
+                  <a
+                    class="group flex flex-col gap-1 rounded-md p-4 transition-all hover:bg-slate-800/50 lg:hover:!opacity-100 lg:group-hover/list:opacity-50"
+                    href={`/blogs/${post.id}`}
+                  >
+                    <span class="font-mono text-xs text-slate-400/60">{fmtPostDate(post.data.date)}</span>
+                    <h3 class="font-medium leading-snug text-slate-200 group-hover:text-accent">{post.data.title}</h3>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+          <div class="mt-12">
+            <a class="inline-flex items-center font-medium leading-tight text-slate-200 group" href="/blogs">
+              <span class="border-b border-transparent pb-px transition group-hover:border-accent">View all posts</span>
               <span class="ml-2 text-accent transition-transform group-hover:translate-x-1">&rarr;</span>
             </a>
           </div>
