@@ -38,7 +38,9 @@
   --card-tint: color-mix(in srgb, var(--accent) 6%, var(--surface));
   --card-tint-2: color-mix(in srgb, var(--accent) 9%, var(--surface));
   --card-radius: 10px;
-  --card-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  /* C's airy shadow geometry (0 8px 30px base / 0 18px 50px hover), dark alpha for the near-black bg */
+  --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.40);
+  --card-shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.50);
   --card-edge: inset 0 1px 0 rgba(255, 255, 255, 0.05);
   /* Springy easing (from C) */
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -123,7 +125,8 @@
 
   --card-tint: color-mix(in srgb, var(--accent) 5%, var(--surface));
   --card-tint-2: color-mix(in srgb, var(--accent) 8%, var(--surface));
-  --card-shadow: 0 8px 26px rgba(40, 36, 30, 0.10), 0 1px 3px rgba(40, 36, 30, 0.06);
+  --card-shadow: 0 8px 30px rgba(31, 27, 18, 0.07);
+  --card-shadow-lg: 0 18px 50px rgba(31, 27, 18, 0.11);
   --card-edge: inset 0 1px 0 rgba(255, 255, 255, 0.7);
 
   /* shadcn token bridge — flip to light so ui/* components adapt */
@@ -242,7 +245,7 @@
     .atelier-card:hover {
       transform: translateY(-4px);
       border-color: rgb(var(--border) / 0.22);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), var(--card-edge);
+      box-shadow: var(--card-shadow-lg), var(--card-edge);
     }
   }
   @media (prefers-reduced-motion: reduce) {
