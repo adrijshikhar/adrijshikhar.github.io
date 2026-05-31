@@ -17,9 +17,9 @@ const prose =
 
 export default function ProjectCard({ title, company, date, link, builtWith = [], contentHtml }: ProjectCardProps) {
   const Title = (
-    <span className="transition-colors duration-[120ms] group-hover:text-accent">
+    <span className="transition-colors duration-[120ms] group-hover/list-item:text-accent">
       {title}
-      {link && <span className="ml-1 text-xs text-muted transition-colors group-hover:text-accent">&#8599;</span>}
+      {link && <span className="ml-1 text-xs text-muted transition-colors group-hover/list-item:text-accent">&#8599;</span>}
     </span>
   );
 

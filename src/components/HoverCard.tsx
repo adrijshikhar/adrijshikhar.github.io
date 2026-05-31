@@ -1,19 +1,20 @@
 import type { ReactNode } from 'react';
 
 /**
- * Flat Swiss-terminal list block. Hairline left rule + index-style ticks.
- * The whole list dims siblings on hover (group/list), the active card stays lit.
- * No glow, no shadow, no rounding — borders do the work.
+ * Terminal Atelier card — A's hairline precision + C's soft premium feel.
+ * Medium-soft (~10px) rounded surface, accent-derived tint wash, soft shadow +
+ * top-edge highlight, springy lift on hover. Alternating tint by index.
  */
-export default function HoverCard({ children }: { children: ReactNode }) {
+export default function HoverCard({ children, index = 0 }: { children: ReactNode; index?: number }) {
   return (
-    <li className="group relative border-t border-border transition-opacity duration-[120ms] ease-out last:border-b lg:group-hover/list:opacity-40 lg:hover:!opacity-100">
-      {/* accent edge that grows in on hover */}
-      <span
-        aria-hidden
-        className="pointer-events-none absolute left-0 top-0 h-full w-px scale-y-0 bg-accent transition-transform duration-[120ms] ease-out group-hover:scale-y-100"
-      />
-      <div className="relative py-6 pl-5 pr-2 transition-colors duration-[120ms] ease-out group-hover:bg-surface lg:py-7">
+    <li className="group/list-item mb-4 break-inside-avoid last:mb-0 sm:mb-5">
+      <div className={`atelier-card relative px-5 py-6 lg:px-6 lg:py-7 ${index % 2 === 1 ? 'is-alt' : ''}`}>
+        {/* accent left-edge that brightens on hover */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute left-0 top-3 bottom-3 w-px scale-y-0 bg-accent opacity-0 transition-all duration-300 group-hover/list-item:scale-y-100 group-hover/list-item:opacity-100"
+          style={{ borderTopRightRadius: '2px', borderBottomRightRadius: '2px' }}
+        />
         {children}
       </div>
     </li>

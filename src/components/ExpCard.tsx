@@ -26,7 +26,7 @@ export default function ExpCard({ position, company, companyLink, location, star
         </span>
       </div>
       <h3 className="mt-2 font-heading text-base font-medium leading-snug tracking-tighter text-heading">
-        <span className="transition-colors duration-[120ms] group-hover:text-accent">{position}</span>
+        <span className="transition-colors duration-[120ms] group-hover/list-item:text-accent">{position}</span>
         <span className="mx-1.5 text-muted">/</span>
         {companyLink ? (
           <a
@@ -36,7 +36,7 @@ export default function ExpCard({ position, company, companyLink, location, star
             className="inline-flex items-baseline text-heading no-underline hover:text-accent"
           >
             {company}
-            <span className="ml-1 text-xs text-muted transition-colors group-hover:text-accent">&#8599;</span>
+            <span className="ml-1 text-xs text-muted transition-colors group-hover/list-item:text-accent">&#8599;</span>
           </a>
         ) : (
           <span className="text-heading">{company}</span>
