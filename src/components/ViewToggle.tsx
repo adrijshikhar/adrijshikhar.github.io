@@ -44,6 +44,9 @@ export default function ViewToggle() {
 
     if (!humanView || !machineView) return;
 
+    // Reset scroll ONCE, synchronously, before any height churn (no mid-animation jump).
+    window.scrollTo({ top: 0, behavior: 'instant' });
+
     if (next === 'machine') {
       // Load machine content on first toggle
       if (!machineLoadedRef.current) {
@@ -51,23 +54,28 @@ export default function ViewToggle() {
         machineLoadedRef.current = true;
       }
 
-      // Update toggle indicator immediately
       setMode(next);
 
-      const tl = gsap.timeline({
-        onComplete: () => {
-          setTransitioning(false);
-        },
-      });
+      const tl = gsap.timeline({ onComplete: () => setTransitioning(false) });
 
-      // Island styling is CSS-driven (bg-surface adapts to light/dark/machine) — no gsap color override.
+      // Crossfade: expand machine IN and collapse human OUT simultaneously (both at t=0)
+      // so something always occupies space — no empty-screen gap.
+      tl.fromTo(machineView,
+        { height: 0, opacity: 0, overflow: 'hidden' },
+        {
+          height: 'auto',
+          opacity: 1,
+          duration: 0.4,
+          ease: 'power2.out',
+          onStart: () => { machineView.style.pointerEvents = 'auto'; },
+          onComplete: () => { machineView.style.overflow = 'visible'; },
+        }, 0);
 
-      // Collapse human view
       tl.to(humanView, {
         height: 0,
         opacity: 0,
-        duration: 0.25,
-        ease: 'power2.inOut',
+        duration: 0.3,
+        ease: 'power2.in',
         onStart: () => {
           humanView.style.overflow = 'hidden';
           gsap.set(humanView, { height: humanView.scrollHeight });
@@ -78,86 +86,43 @@ export default function ViewToggle() {
         },
       }, 0);
 
-      // Background transition
-      tl.to(document.body, {
-        backgroundColor: '#101010',
-        duration: 0.2,
-        ease: 'power1.inOut',
-        onStart: () => {
-          document.body.classList.add('machine-mode');
-        },
-      }, '-=0.1');
-
-      // Expand machine view
-      tl.fromTo(machineView, {
-        height: 0,
-        opacity: 0,
-        overflow: 'hidden',
-      }, {
-        height: 'auto',
-        opacity: 1,
-        duration: 0.25,
-        ease: 'power2.inOut',
-        onStart: () => {
-          machineView.style.pointerEvents = 'auto';
-          machineView.style.overflow = 'visible';
-          window.scrollTo({ top: 0, behavior: 'instant' });
-        },
-      }, '-=0.05');
+      // Flip the canvas to the dark terminal at the crossfade midpoint (not while human is still full).
+      tl.add(() => { document.body.classList.add('machine-mode'); }, 0.16);
+      tl.to(document.body, { backgroundColor: '#101010', duration: 0.25, ease: 'power1.inOut' }, 0.12);
 
     } else {
-      // Update toggle indicator immediately
       setMode(next);
 
-      const tl = gsap.timeline({
-        onComplete: () => {
-          setTransitioning(false);
-        },
-      });
+      const tl = gsap.timeline({ onComplete: () => setTransitioning(false) });
 
-      // Island styling is CSS-driven — no gsap color override.
-
-      // Collapse machine view
-      tl.to(machineView, {
-        height: 0,
-        opacity: 0,
-        duration: 0.25,
-        ease: 'power2.inOut',
-        onStart: () => {
-          machineView.style.overflow = 'hidden';
-        },
-        onComplete: () => {
-          machineView.style.pointerEvents = 'none';
-        },
-      }, 0);
-
-      // Background restore: clear to transparent so the CSS foundation (html --bg)
-      // shows through in the CURRENT mode (light or dark) and the aurora returns.
-      tl.to(document.body, {
-        backgroundColor: 'rgba(0,0,0,0)',
-        duration: 0.2,
-        ease: 'power1.inOut',
-        onStart: () => {
-          document.body.classList.remove('machine-mode');
-        },
-        onComplete: () => {
-          document.body.style.backgroundColor = '';
-        },
-      }, '-=0.1');
-
-      // Expand human view
+      // Crossfade: expand human IN and collapse machine OUT simultaneously (both at t=0).
       tl.to(humanView, {
         height: 'auto',
         opacity: 1,
-        duration: 0.25,
-        ease: 'power2.inOut',
+        duration: 0.4,
+        ease: 'power2.out',
         onStart: () => {
           humanView.style.overflow = '';
           humanView.style.pointerEvents = '';
           humanView.style.minHeight = '';
-          window.scrollTo({ top: 0, behavior: 'instant' });
         },
-      }, '-=0.05');
+      }, 0);
+
+      tl.to(machineView, {
+        height: 0,
+        opacity: 0,
+        duration: 0.3,
+        ease: 'power2.in',
+        onStart: () => { machineView.style.overflow = 'hidden'; },
+        onComplete: () => { machineView.style.pointerEvents = 'none'; },
+      }, 0);
+
+      // Restore the human canvas at the crossfade midpoint: drop machine-mode + clear the inline
+      // body bg so the CURRENT mode's html --bg (light or dark) shows and the aurora returns.
+      tl.add(() => {
+        document.body.classList.remove('machine-mode');
+        document.body.style.backgroundColor = '';
+      }, 0.16);
     }
   };
 
