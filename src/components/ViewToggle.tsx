@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { gsap } from '../lib/gsap';
 import { Toggle } from './ui/toggle';
 
@@ -13,6 +13,14 @@ export default function ViewToggle() {
     setTransitioning(true);
 
     const next = mode === 'human' ? 'machine' : 'human';
+
+    // Sync the URL to reflect the mode we're switching TO, without navigation/reload
+    const params = new URLSearchParams(window.location.search);
+    if (next === 'machine') params.set('machine', 'true');
+    else params.delete('machine');
+    const qs = params.toString();
+    window.history.replaceState({}, '', qs ? `?${qs}` : window.location.pathname);
+
     const humanView = document.querySelector('.human-view') as HTMLElement | null;
     const machineView = document.querySelector('.machine-view') as HTMLElement | null;
 
@@ -152,6 +160,14 @@ export default function ViewToggle() {
       }, '-=0.05');
     }
   };
+
+  // On mount, initialize from the URL: ?machine=true starts in machine view
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('machine') === 'true') {
+      toggle();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[1100] flex items-center gap-2">
