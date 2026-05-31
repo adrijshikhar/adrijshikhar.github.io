@@ -173,6 +173,8 @@
     scroll-behavior: smooth;
     font-family: var(--font-sans);
     background-color: var(--bg);
+    /* ease the canvas on light/dark mode swap (cards already transition) */
+    transition: background-color 0.45s ease;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -194,6 +196,9 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* machine canvas (body bg) darkens/lightens PROMPTLY so terminal content never sits on the
+       wrong-colour canvas; text colour eases slower. (Mode-toggle uses html bg, see html rule.) */
+    transition: color 0.45s ease, background-color 0.28s ease;
   }
 
   @media (min-width: 1024px) {
@@ -207,6 +212,7 @@
     font-family: var(--font-heading);
     font-weight: 600;
     letter-spacing: -0.02em;
+    transition: color 0.45s ease;
   }
 
   a {
@@ -297,6 +303,7 @@
     z-index: -1;
     overflow: hidden;
     background: var(--bg);
+    transition: opacity 0.28s ease, background-color 0.45s ease;
     pointer-events: none;
   }
   /* Readability veil: fade the glow back to the dark --bg over the central
@@ -365,7 +372,7 @@
   /* Machine mode: terminal canvas stays pure — kill the aurora entirely.
      Machine is ALWAYS dark: force the dark foundation tokens even when the
      human view is in light mode, so the terminal canvas never goes light. */
-  body.machine-mode .aurora-stage { display: none; }
+  body.machine-mode .aurora-stage { opacity: 0; }
   body.machine-mode {
     --bg: #0e0e0e;
     --surface: #161616;
@@ -376,7 +383,9 @@
     --border: 255 255 255;
     --border-color: rgba(255, 255, 255, 0.10);
     --hairline: rgba(255, 255, 255, 0.10);
-    background-color: #101010 !important;
+    /* No !important — let the body background-color TRANSITION (set on body base rule)
+       ease the canvas to the terminal instead of snapping. */
+    background-color: #101010;
   }
 
   /* Hero name gradient text (ported from D) — heading → accent → aurora hue. */

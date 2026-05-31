@@ -56,6 +56,10 @@ export default function ViewToggle() {
 
       setMode(next);
 
+      // Flip to the terminal canvas up front; the body background-color CSS transition
+      // (0.45s, set on the body base rule) eases it to #101010 — no snap, no gsap override.
+      document.body.classList.add('machine-mode');
+
       const tl = gsap.timeline({ onComplete: () => setTransitioning(false) });
 
       // Crossfade: expand machine IN and collapse human OUT simultaneously (both at t=0)
@@ -89,18 +93,15 @@ export default function ViewToggle() {
         },
       }, 0);
 
-      // Ease the canvas to the dark terminal, crossing over mid-transition (not a hard cut).
-      tl.add(() => { document.body.classList.add('machine-mode'); }, 0.22);
-      tl.to(document.body, { backgroundColor: '#101010', duration: 0.45, ease: 'power1.inOut' }, 0.08);
+      // (Canvas is handled by the CSS body background-color transition + .machine-mode class above.)
 
     } else {
       setMode(next);
 
-      // Restore the human canvas IMMEDIATELY (front-loaded) so we never show the dark terminal
-      // over a light page: drop machine-mode + clear the inline body bg up front. The CURRENT
-      // mode's html --bg (light or dark) shows right away; the dark machine layer fades out fast.
+      // Restore the human canvas up front: drop .machine-mode so the body background-color
+      // CSS transition eases #101010 → transparent (revealing the current mode's html --bg)
+      // and the aurora fades back in. No inline bg / gsap override.
       document.body.classList.remove('machine-mode');
-      document.body.style.backgroundColor = '';
 
       const tl = gsap.timeline({ onComplete: () => setTransitioning(false) });
 
@@ -153,9 +154,8 @@ export default function ViewToggle() {
     humanView.style.minHeight = '0';
     gsap.set(humanView, { height: 0, opacity: 0 });
 
-    // Body end-state.
+    // Body end-state (canvas comes from the .machine-mode CSS background-color).
     document.body.classList.add('machine-mode');
-    gsap.set(document.body, { backgroundColor: '#101010' });
 
     // Machine view expanded/visible end-state.
     machineView.style.pointerEvents = 'auto';
