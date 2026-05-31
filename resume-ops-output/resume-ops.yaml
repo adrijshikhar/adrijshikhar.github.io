@@ -31,7 +31,10 @@ sources:
   cues:
     enabled: false
   confluence:
-    enabled: false
+    enabled: true
+    username: "613055cef0bf52006951d6c2"
+    space_keys: []          # empty = all spaces, filter by author
+    ignore_labels: []
   gmail:
     enabled: false
 

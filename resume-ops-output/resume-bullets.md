@@ -2,7 +2,7 @@
 Generated: 2026-05-31
 Target Role: Senior Backend Engineer — Data Infrastructure / AI Infra
 Targeting: Airbyte, Fivetran, Confluent, Estuary, dbt Labs, ClickHouse, Databricks, Hugging Face, Modal, Together AI, Sourcegraph, Vercel, Pydantic, Glean
-Source window: 2022-06-01 → 2026-05-31 (4 years) · 1,674 merged PRs · 2,057 reviews · 54 repos · 516 Jira tickets · 4 epics · 295 P0/P1
+Source window: 2022-06-01 → 2026-05-31 (4 years) · 1,674 merged PRs · 2,057 reviews · 54 repos · 516 Jira tickets · 4 epics · 295 P0/P1 · 179 Confluence design docs authored (+51 contributed)
 
 ---
 
@@ -34,6 +34,7 @@ Source window: 2022-06-01 → 2026-05-31 (4 years) · 1,674 merged PRs · 2,057 
 - Owned **4 major epics totaling 102 child issues**: Hermes Service Optimizations (H2-91, 64), 25K Source-Object Handling (INT-4446, 24), Failure Classifier (H2-590, 9), Debezium MySQL Connector (INT-3491, 5).
 - Authored **hevo-ai-plugin** — internal Claude Code plugin (16K+ LOC, 20+ skills) for on-call debugging, TDD workflows, RCA automation, and PR review — adopted org-wide so any repo installs once for consistent AI guidance.
 - Set engineering standards across the connector platform via gradle-bom convention plugins, commit/PR hooks, and Claude Code skills that encode recurring workflows (sentinel test runs, RCA docs, Postman sync).
+- Drove the team's documentation culture: authored RCAs and incident postmortems (Service Keeper Binlog V2 outage, Binlog source-settings-validation outage) plus SOPs and connector research docs that became reference material across Engineering.
 
 ## System Design & Architecture
 
@@ -42,6 +43,7 @@ Source window: 2022-06-01 → 2026-05-31 (4 years) · 1,674 merged PRs · 2,057 
 - Built the **Hermes MCP server** — a FastMCP server that turns the Hevo API (100+ endpoints, generated from Postman collections) into Claude tools, enabling agentic interaction with the platform.
 - Designed the **log-router sidecar** (fluent-bit wrapper) for structured session-log collection to S3, integrated across 8+ data-plane services.
 - Stood up local-dev platform infrastructure: hevo-2-starter one-command stack (lite/standard/chaos resource tiers), dockerized Groot with local OAuth, and a StatsD → Telegraf → InfluxDB → Grafana metrics pipeline.
+- Authored the **design docs (TRDs/LLDs) for the systems I built** — History Mode (SCD Type 2), Connector-owned Runtime Config, SaaS-CDK, Fortress OAuth v2, Dynamic Connector Config Template, 25k-object Scalability, and Session Logs Architecture — among **179 Confluence pages** authored (12 spaces).
 
 ## Customer Impact
 

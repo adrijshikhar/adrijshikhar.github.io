@@ -23,3 +23,6 @@ design-extract-output/
 .superpowers/
 .DS_Store
 **/.DS_Store
+
+# resume-ops raw source data (gathered locally, not versioned)
+resume-ops-output/raw/
