@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import ThemeSwitcher from '../../components/ThemeSwitcher.tsx';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ data }) => import.meta.env.PROD ? !data.draft : true);
@@ -14,11 +15,19 @@ const canonical = post.data.canonicalUrl ?? new URL(`/blogs/${post.id}`, Astro.s
 ---
 
 <BaseLayout title={`${post.data.title} | Adrij Shikhar`} canonical={canonical}>
-  <main class="mx-auto min-h-screen max-w-screen-md px-6 py-12 md:px-12 md:py-20">
-    <a href="/blogs" class="text-sm text-slate-400 hover:text-accent">← All posts</a>
-    <h1 class="mt-6 text-3xl font-bold tracking-tight text-slate-200">{post.data.title}</h1>
-    <div class="mt-2 text-xs font-semibold uppercase tracking-widest text-slate-500">{fmt(post.data.date)}</div>
-    <article class="prose prose-invert mt-8 max-w-none">
+  <ThemeSwitcher client:load />
+  <main class="mx-auto min-h-screen max-w-screen-md px-5 py-12 md:px-10 md:py-20">
+    <a class="group mb-8 inline-flex items-center gap-2 border-2 border-ink bg-surface px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-widest text-ink transition-transform hover:-translate-x-0.5" href="/blogs">
+      <span class="transition-transform group-hover:-translate-x-1">&larr;</span>
+      <span>All posts</span>
+    </a>
+
+    <header class="mt-2 border-l-[6px] border-accent pl-5">
+      <div class="bh-label mb-2 text-accent">{fmt(post.data.date)}</div>
+      <h1 class="text-3xl font-bold leading-[1.05] tracking-tightest text-heading sm:text-4xl">{post.data.title}</h1>
+    </header>
+
+    <article class="prose mt-8 max-w-none text-text prose-headings:font-bold prose-headings:tracking-tightest prose-headings:text-heading prose-strong:text-heading prose-a:text-accent prose-a:font-semibold prose-code:text-ink prose-blockquote:border-l-accent prose-blockquote:text-muted">
       <Content />
     </article>
   </main>

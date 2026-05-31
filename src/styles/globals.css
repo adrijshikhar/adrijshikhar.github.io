@@ -7,68 +7,156 @@
 @tailwind components;
 @tailwind utilities;
 
+/* =========================================================
+   NEO-BAUHAUS COLOR-BLOCK — semantic design tokens
+   Warm paper canvas, ink-black structure, primary blocks.
+   --accent / --accent-contrast are the live, theme-able lead.
+   ========================================================= */
 @layer base {
+  :root {
+    /* canvas + structure */
+    --bg: #f4f1ea;            /* warm paper */
+    --surface: #ffffff;       /* clean panels */
+    --ink: #111111;           /* structural black (frames, type) */
+    --border: #111111;        /* thick frames */
+
+    /* supporting Bauhaus primaries (structural constants) */
+    --block-1: #1d3fb5;       /* blue */
+    --block-2: #f4c20d;       /* yellow */
+    --block-3: #111111;       /* black */
+
+    /* type roles on the light canvas */
+    --text: #2a2622;          /* body ink (AA on paper) */
+    --heading: #111111;       /* headings */
+    --muted: #6b6359;         /* muted labels (AA on paper: ~5.0:1) */
+
+    /* live theme lead — default Bauhaus red (AA-tuned: 5.05:1 on paper, 5.7:1 white-on-fill) */
+    --accent: #c22d1a;
+    --accent-contrast: #ffffff;  /* text color that sits on the accent fill */
+
+    /* shadcn primitives kept so imported UI doesn't break */
+    --font-heading: 'Geist Variable', sans-serif;
+    --font-sans: 'Geist Variable', sans-serif;
+    --radius: 0;
+    --background: 0 0% 100%;
+    --foreground: 0 0% 7%;
+    --ring: var(--accent);
+  }
+
+  /* ---- 6-accent theme switcher (lead primary only) ---- */
+  :root[data-theme="red"]      { --accent: #c22d1a; --accent-contrast: #ffffff; }
+  :root[data-theme="parallel"] { --accent: #c2410c; --accent-contrast: #ffffff; }
+  :root[data-theme="blue"]     { --accent: #1d3fb5; --accent-contrast: #ffffff; }
+  :root[data-theme="teal"]     { --accent: #0c6f5c; --accent-contrast: #ffffff; }
+  :root[data-theme="violet"]   { --accent: #5241d4; --accent-contrast: #ffffff; }
+  :root[data-theme="signal"]   { --accent: #c41616; --accent-contrast: #ffffff; }
+
   html {
     scroll-behavior: smooth;
+    @apply font-sans;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    html {
-      scroll-behavior: auto;
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
     }
   }
 
   body {
-    @apply bg-slate-900 font-sans text-slate-400 antialiased;
+    background-color: var(--bg);
+    color: var(--text);
+    @apply font-sans antialiased;
   }
 
+  /* Custom cursor only when NOT reduced-motion and on large screens */
   @media (min-width: 1024px) {
-    *, *::before, *::after {
-      cursor: none !important;
-    }
+    *, *::before, *::after { cursor: none !important; }
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply text-slate-200 font-semibold;
+    color: var(--heading);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    letter-spacing: -0.02em;
   }
 
   a {
-    @apply text-accent hover:text-accent/80 transition-colors;
+    color: var(--accent);
+    transition: color 0.12s ease, background-color 0.12s ease;
   }
+  a:hover { color: var(--ink); }
 
   ::selection {
-    @apply bg-teal-300/20 text-teal-300;
+    background: var(--accent);
+    color: var(--accent-contrast);
   }
 
-  :root {
-    --font-heading: var(--font-sans);
-    --font-sans: 'Geist Variable', sans-serif;
-    --radius: 0.625rem;
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
+  /* Visible focus rings everywhere */
+  :focus-visible {
+    outline: 3px solid var(--ink);
+    outline-offset: 2px;
+  }
+}
+
+/* =========================================================
+   Bauhaus building blocks (component utilities)
+   ========================================================= */
+@layer components {
+  /* Thick framed panel */
+  .bh-frame {
+    border: 3px solid var(--ink);
+    background: var(--surface);
   }
 
-  * {
-    border-color: oklch(var(--border));
+  .bh-frame-thick { border-width: 4px; }
+
+  /* Hard offset shadow (no blur) — the signature Bauhaus block depth */
+  .bh-shadow { box-shadow: 8px 8px 0 0 var(--ink); }
+  .bh-shadow-sm { box-shadow: 5px 5px 0 0 var(--ink); }
+
+  /* Mono micro-label */
+  .bh-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.6875rem;
   }
 
-  html {
-    @apply font-sans;
+  /* Solid color blocks — each guarantees AA contrast for its text */
+  .bh-block-accent { background: var(--accent); color: var(--accent-contrast); }
+  .bh-block-blue   { background: var(--block-1); color: #ffffff; }
+  .bh-block-yellow { background: var(--block-2); color: #111111; }
+  .bh-block-ink    { background: var(--ink); color: #f4f1ea; }
+  .bh-block-paper  { background: var(--surface); color: var(--ink); }
+
+  /* Section index number — oversized geometric marker */
+  .bh-index {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    line-height: 0.8;
+    letter-spacing: -0.04em;
   }
+}
+
+/* Hard-cut block reveal (snappy, no soft fade) */
+@keyframes bh-wipe-in {
+  0%   { clip-path: inset(0 100% 0 0); transform: translateX(-8px); }
+  100% { clip-path: inset(0 0 0 0);    transform: translateX(0); }
+}
+@keyframes bh-pop-in {
+  0%   { opacity: 0; transform: translateY(14px) scale(0.985); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.bh-reveal {
+  animation: bh-pop-in 0.42s cubic-bezier(0.2, 0.9, 0.25, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bh-reveal { animation: none; }
 }

@@ -3,16 +3,19 @@ import { Card } from './ui/card';
 
 /**
  * Shared card shell used by every list card (Experience, Projects, Writing).
- * Renders the `<li>` + transparent shadcn Card (the `group` for sibling-dim +
- * title hover-accent) and the absolute glassmorphism overlay div. Card-specific
- * content goes in `children` and should use `relative z-10` to sit above the overlay.
+ * Neo-Bauhaus framed panel: thick ink border on a paper surface, with a hard
+ * (no-blur) offset shadow that snaps tighter on hover — a geometric press.
  */
 export default function HoverCard({ children }: { children: ReactNode }) {
   return (
-    <li className="mb-12">
-      <Card className="!gap-0 !overflow-visible !rounded-none !py-0 group relative border-0 bg-transparent p-0 shadow-none !ring-0 text-inherit transition-all lg:hover:!opacity-100 lg:group-hover/list:opacity-50">
-        <div className="absolute -inset-x-4 -inset-y-4 z-0 hidden rounded-md transition motion-reduce:transition-none lg:-inset-x-6 lg:block lg:group-hover:bg-slate-800/50 lg:group-hover:shadow-[inset_0_1px_0_0_rgba(148,163,184,0.1)] lg:group-hover:drop-shadow-lg" />
-        {children}
+    <li className="mb-7">
+      <Card className="group relative !gap-0 !overflow-visible !rounded-none border-[3px] border-ink bg-surface !py-0 p-0 !ring-0 text-inherit shadow-[6px_6px_0_0_var(--ink)] transition-[transform,box-shadow] duration-150 ease-out hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[8px_8px_0_0_var(--accent)] motion-reduce:transition-none motion-reduce:hover:translate-x-0 motion-reduce:hover:translate-y-0">
+        {/* accent corner tab */}
+        <span
+          aria-hidden="true"
+          className="absolute -right-[3px] -top-[3px] h-3 w-3 bg-accent transition-colors duration-150 group-hover:bg-ink"
+        />
+        <div className="p-5">{children}</div>
       </Card>
     </li>
   );

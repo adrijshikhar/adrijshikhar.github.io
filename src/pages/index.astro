@@ -6,11 +6,12 @@ import matter from 'gray-matter';
 import { marked } from 'marked';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SideNav from '../components/SideNav.astro';
-import Section from '../components/Section.astro';
 import ExpCard from '../components/ExpCard.tsx';
 import ProjectCard from '../components/ProjectCard.tsx';
 import BlogCard from '../components/BlogCard.tsx';
 import ViewToggle from '../components/ViewToggle.tsx';
+import ThemeSwitcher from '../components/ThemeSwitcher.tsx';
+import SectionHead from '../components/SectionHead.astro';
 
 function readContent(filename: string) {
   const raw = readFileSync(join(process.cwd(), 'src/content', filename), 'utf-8');
@@ -64,64 +65,69 @@ const rawMarkdown = [
 ---
 
 <BaseLayout title="Adrij Shikhar">
+  <!-- Geometric accent halo (retuned spotlight): a hard-edged accent disc, not a soft blue glow -->
   <div class="pointer-events-none fixed inset-0 z-30 transition-opacity duration-300" id="spotlight"></div>
   <ViewToggle client:load />
+  <ThemeSwitcher client:load />
   <div class="machine-view" />
 
-  <div class="human-view mx-auto min-h-screen max-w-screen-xl px-6 py-12 md:px-12 md:py-20 lg:px-16 lg:py-0">
-    <div class="lg:flex lg:justify-between lg:gap-4">
+  <div class="human-view mx-auto min-h-screen max-w-screen-xl px-5 py-10 md:px-10 md:py-16 lg:px-16 lg:py-0">
+    <div class="lg:flex lg:justify-between lg:gap-10">
       <SideNav />
 
-      <main id="content" class="pt-24 lg:w-[55%] lg:py-24">
+      <main id="content" class="pt-20 lg:w-[58%] lg:py-20">
 
         <!-- About -->
-        <section id="about" class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24">
-          <div class="prose prose-invert prose-sm max-w-none text-slate-400" set:html={marked.parse(about.content)} />
+        <section id="about" class="bh-section mb-12 scroll-mt-16 md:mb-16 lg:scroll-mt-24">
+          <SectionHead index={1} title="About" />
+          <div class="bh-frame bh-shadow-sm border-ink bg-surface p-6">
+            <div
+              class="prose prose-sm max-w-none text-text prose-headings:text-heading prose-strong:text-heading prose-a:text-accent prose-a:font-semibold"
+              set:html={marked.parse(about.content)}
+            />
+          </div>
         </section>
 
         <!-- Experience -->
-        <section id="experience" class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24">
-          <div class="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-slate-900/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:px-0 lg:py-0 lg:opacity-0">
-            <h2 class="text-sm font-bold uppercase tracking-widest text-slate-200 lg:sr-only">Experience</h2>
-          </div>
+        <section id="experience" class="bh-section mb-12 scroll-mt-16 md:mb-16 lg:scroll-mt-24">
+          <SectionHead index={2} title="Experience" />
           <ul class="group/list">
             {experience.meta.entries.slice(0, 1).map((exp: any) => (
               <ExpCard {...exp} contentHtml={marked.parse(expSections[exp.slug] || '') as string} />
             ))}
           </ul>
-          <div class="mt-12">
-            <a class="inline-flex items-center font-medium leading-tight text-slate-200 group" href="/experience">
-              <span class="border-b border-transparent pb-px transition group-hover:border-accent">View Full Work Experience</span>
-              <span class="ml-2 text-accent transition-transform group-hover:translate-x-1">&rarr;</span>
+          <div class="mt-4">
+            <a class="group inline-flex items-center gap-2 border-[3px] border-ink bg-block-2 px-4 py-2 font-mono text-xs font-bold uppercase tracking-widest text-ink transition-transform hover:-translate-y-0.5" href="/experience">
+              View Full Work Experience
+              <span class="transition-transform group-hover:translate-x-1">&rarr;</span>
             </a>
           </div>
         </section>
 
         <!-- Projects -->
-        <section id="projects" class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24">
-          <div class="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-slate-900/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:px-0 lg:py-0 lg:opacity-0">
-            <h2 class="text-sm font-bold uppercase tracking-widest text-slate-200 lg:sr-only">Projects</h2>
-          </div>
+        <section id="projects" class="bh-section mb-12 scroll-mt-16 md:mb-16 lg:scroll-mt-24">
+          <SectionHead index={3} title="Projects" />
           <ul class="group/list">
             {projects.meta.entries.slice(0, 2).map((proj: any) => (
               <ProjectCard {...proj} contentHtml={marked.parse(projSections[proj.slug] || '') as string} />
             ))}
           </ul>
-          <div class="mt-12">
-            <a class="inline-flex items-center font-medium leading-tight text-slate-200 group" href="/archive">
-              <span class="border-b border-transparent pb-px transition group-hover:border-accent">View Full Project Archive</span>
-              <span class="ml-2 text-accent transition-transform group-hover:translate-x-1">&rarr;</span>
+          <div class="mt-4">
+            <a class="group inline-flex items-center gap-2 border-[3px] border-ink bg-block-1 px-4 py-2 font-mono text-xs font-bold uppercase tracking-widest text-white transition-transform hover:-translate-y-0.5" href="/archive">
+              View Full Project Archive
+              <span class="transition-transform group-hover:translate-x-1">&rarr;</span>
             </a>
           </div>
         </section>
 
         <!-- Writing -->
-        <section id="writing" class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24">
-          <div class="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-slate-900/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:px-0 lg:py-0 lg:opacity-0">
-            <h2 class="text-sm font-bold uppercase tracking-widest text-slate-200 lg:sr-only">Writing</h2>
-          </div>
+        <section id="writing" class="bh-section mb-12 scroll-mt-16 md:mb-16 lg:scroll-mt-24">
+          <SectionHead index={4} title="Writing" />
           {latestPosts.length === 0 ? (
-            <p class="text-slate-400">No posts yet.</p>
+            <div class="bh-frame border-ink bg-surface p-6 text-text">
+              <p class="bh-label mb-1 text-accent">Empty stack</p>
+              <p>No posts compiled yet — the ink is still drying.</p>
+            </div>
           ) : (
             <ul class="group/list">
               {latestPosts.map((post) => (
@@ -129,49 +135,50 @@ const rawMarkdown = [
               ))}
             </ul>
           )}
-          <div class="mt-12">
-            <a class="inline-flex items-center font-medium leading-tight text-slate-200 group" href="/blogs">
-              <span class="border-b border-transparent pb-px transition group-hover:border-accent">View all posts</span>
-              <span class="ml-2 text-accent transition-transform group-hover:translate-x-1">&rarr;</span>
+          <div class="mt-4">
+            <a class="group inline-flex items-center gap-2 border-[3px] border-ink bg-accent px-4 py-2 font-mono text-xs font-bold uppercase tracking-widest text-accent-contrast transition-transform hover:-translate-y-0.5" href="/blogs">
+              View all posts
+              <span class="transition-transform group-hover:translate-x-1">&rarr;</span>
             </a>
           </div>
         </section>
 
         <!-- Education -->
-        <section id="education" class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24">
-          <div class="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-slate-900/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:px-0 lg:py-0 lg:opacity-0">
-            <h2 class="text-sm font-bold uppercase tracking-widest text-slate-200 lg:sr-only">Education</h2>
+        <section id="education" class="bh-section mb-12 scroll-mt-16 md:mb-16 lg:scroll-mt-24">
+          <SectionHead index={5} title="Education" />
+          <div class="grid gap-4 sm:grid-cols-2">
+            {education.meta.entries.map((edu: any) => (
+              <div class="group border-[3px] border-ink bg-surface p-5 shadow-[5px_5px_0_0_var(--ink)] transition-[transform,box-shadow] duration-150 hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[7px_7px_0_0_var(--accent)] motion-reduce:transition-none">
+                <span class="bh-label mb-2 inline-block text-accent">{edu.startDate} — {edu.endDate}</span>
+                <h3 class="text-lg font-bold leading-tight tracking-tightest text-heading">{edu.institution}</h3>
+                <div class="mt-1 text-sm font-semibold text-ink">{edu.degree}</div>
+                {edu.field && <p class="text-sm text-muted">{edu.field}</p>}
+              </div>
+            ))}
           </div>
-          {education.meta.entries.map((edu: any) => (
-            <div class="group flex flex-col md:flex-row justify-between mb-8 p-4 rounded-md hover:bg-slate-800/50 transition-all">
-              <div class="flex-1">
-                <h3 class="text-lg font-medium text-slate-200">{edu.institution}</h3>
-                <div class="text-accent text-sm">{edu.degree}</div>
-                {edu.field && <p class="text-slate-400/70 text-sm">{edu.field}</p>}
-              </div>
-              <div class="md:text-right mt-1 md:mt-0">
-                <span class="font-mono text-xs text-slate-400/60">{edu.startDate} — {edu.endDate}</span>
-              </div>
-            </div>
-          ))}
         </section>
 
         <!-- Achievements -->
-        <section id="achievements" class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24">
-          <div class="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-slate-900/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:px-0 lg:py-0 lg:opacity-0">
-            <h2 class="text-sm font-bold uppercase tracking-widest text-slate-200 lg:sr-only">Achievements</h2>
+        <section id="achievements" class="bh-section mb-12 scroll-mt-16 md:mb-16 lg:scroll-mt-24">
+          <SectionHead index={6} title="Achievements" />
+          <div class="bh-frame bh-shadow-sm border-ink bg-surface p-6">
+            <div
+              class="prose prose-sm max-w-none text-text prose-headings:text-heading prose-strong:text-heading prose-a:text-accent prose-a:font-semibold"
+              set:html={marked.parse(achievements.content)}
+            />
           </div>
-          <div class="prose prose-invert max-w-none prose-a:text-accent" set:html={marked.parse(achievements.content)} />
         </section>
 
         <!-- Interests -->
-        <section id="interests" class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24">
-          <div class="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-slate-900/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:px-0 lg:py-0 lg:opacity-0">
-            <h2 class="text-sm font-bold uppercase tracking-widest text-slate-200 lg:sr-only">Interests</h2>
+        <section id="interests" class="bh-section mb-12 scroll-mt-16 md:mb-16 lg:scroll-mt-24">
+          <SectionHead index={7} title="Interests" />
+          <div class="bh-block-ink border-[3px] border-ink p-6">
+            <div
+              class="prose prose-sm prose-invert max-w-none text-bg prose-headings:text-bg prose-strong:text-block-2 prose-a:text-block-2 prose-a:font-semibold"
+              set:html={marked.parse(interests.content)}
+            />
           </div>
-          <div class="prose prose-invert max-w-none text-slate-400" set:html={marked.parse(interests.content)} />
         </section>
-
 
       </main>
     </div>
@@ -182,12 +189,20 @@ const rawMarkdown = [
   </script>
   <script>
     const spotlight = document.getElementById('spotlight');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    document.addEventListener('mousemove', (e) => {
-      if (spotlight && !document.body.classList.contains('machine-mode')) {
-        spotlight.style.background = `radial-gradient(600px at ${e.clientX}px ${e.clientY}px, rgba(29, 78, 216, 0.15), transparent 80%)`;
-      }
-    });
+    // Retuned spotlight: a hard-edged accent disc that tracks the cursor.
+    // Uses the live --accent token so it recolors with the theme switcher.
+    function paint(x, y) {
+      if (!spotlight || document.body.classList.contains('machine-mode')) return;
+      const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#d1331f';
+      // hard radial: solid faint accent disc then a clean cut to transparent
+      spotlight.style.background = `radial-gradient(220px circle at ${x}px ${y}px, color-mix(in srgb, ${accent} 9%, transparent) 0%, color-mix(in srgb, ${accent} 9%, transparent) 60%, transparent 61%)`;
+    }
+
+    if (!reduceMotion) {
+      document.addEventListener('mousemove', (e) => paint(e.clientX, e.clientY));
+    }
 
     // Hide spotlight in machine mode
     const modeObserver = new MutationObserver(() => {
@@ -196,26 +211,28 @@ const rawMarkdown = [
     });
     modeObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
-    // Section fade-in on scroll (progressive enhancement — visible by default if observer unsupported)
-    if ('IntersectionObserver' in window) {
-      const sections = document.querySelectorAll('section[id]');
+    // Hard-cut block reveal on scroll (progressive enhancement).
+    // Content is fully visible by default; we only enhance when supported AND
+    // motion is allowed. No opacity:0 is ever applied without JS.
+    if ('IntersectionObserver' in window && !reduceMotion) {
+      const sections = document.querySelectorAll('.bh-section');
       sections.forEach((s) => {
-        (s as HTMLElement).style.opacity = '0';
-        (s as HTMLElement).style.transform = 'translateY(20px)';
-        (s as HTMLElement).style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        s.style.opacity = '0';
+        s.style.transform = 'translateY(16px)';
+        s.style.transition = 'opacity 0.34s ease, transform 0.34s cubic-bezier(0.2,0.9,0.25,1)';
       });
       const fadeObserver = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
-              const el = entry.target as HTMLElement;
+              const el = entry.target;
               el.style.opacity = '1';
               el.style.transform = 'translateY(0)';
               fadeObserver.unobserve(el);
             }
           });
         },
-        { threshold: 0.1 }
+        { threshold: 0.08 }
       );
       sections.forEach((s) => fadeObserver.observe(s));
     }

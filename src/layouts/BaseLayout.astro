@@ -23,10 +23,28 @@ const { title, canonical } = Astro.props;
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     />
+    <!-- No-FOUC accent theme: applied before first paint -->
+    <script is:inline>
+      (function () {
+        try {
+          var allowed = ['red', 'parallel', 'blue', 'teal', 'violet', 'signal'];
+          var t = localStorage.getItem('theme');
+          if (!allowed.includes(t)) t = 'red';
+          document.documentElement.dataset.theme = t;
+        } catch (e) {
+          document.documentElement.dataset.theme = 'red';
+        }
+      })();
+    </script>
   </head>
-  <body class="antialiased bg-slate-900 text-slate-400">
+  <body class="antialiased">
+    <!-- Geometric Bauhaus cursor: a hard accent quarter-square -->
     <div class="pointer-events-none fixed z-[9999] hidden lg:block" id="cursor">
-      <div class="relative -left-2 -top-2 h-4 w-4 rounded-full border-2 border-slate-300/80 transition-all duration-150 ease-out" id="cursor-dot"></div>
+      <div
+        class="relative -left-[7px] -top-[7px] h-[14px] w-[14px] transition-transform duration-150 ease-out"
+        id="cursor-dot"
+        style="background: var(--accent); box-shadow: 0 0 0 1.5px var(--ink);"
+      ></div>
     </div>
     <slot />
     <script>
@@ -44,12 +62,11 @@ const { title, canonical } = Astro.props;
       });
       document.querySelectorAll('a, button').forEach((el) => {
         el.addEventListener('mouseenter', () => {
-          cursorDot?.classList.add('scale-150', 'border-accent/50');
-          cursorDot?.classList.remove('border-slate-300/80');
+          // hard scale + rotate into a diamond — geometric, snappy
+          cursorDot?.classList.add('scale-[1.9]', 'rotate-45');
         });
         el.addEventListener('mouseleave', () => {
-          cursorDot?.classList.remove('scale-150', 'border-accent/50');
-          cursorDot?.classList.add('border-slate-300/80');
+          cursorDot?.classList.remove('scale-[1.9]', 'rotate-45');
         });
       });
     </script>
