@@ -103,7 +103,9 @@
   }
 
   body {
-    background-color: var(--bg);
+    /* transparent so the fixed .aurora-stage (z-index:-1, carries --bg + glow) shows through;
+       html paints --bg as the base + machine-mode fallback. */
+    background-color: transparent;
     color: var(--text);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
@@ -179,14 +181,15 @@
   .aurora-blob {
     position: absolute;
     border-radius: 50%;
-    filter: blur(90px);
+    filter: blur(100px);
+    mix-blend-mode: screen;
     will-change: transform;
   }
   /* primary accent glow — top-left */
   .aurora-blob--1 {
     width: 50vw; height: 50vw;
     top: -18vw; left: -12vw;
-    opacity: 0.10;
+    opacity: 0.55;
     background: radial-gradient(circle at 30% 30%, var(--accent), transparent 68%);
     animation: aurora-drift1 30s ease-in-out infinite alternate;
   }
@@ -194,7 +197,7 @@
   .aurora-blob--2 {
     width: 44vw; height: 44vw;
     top: 6vw; right: -16vw;
-    opacity: 0.07;
+    opacity: 0.38;
     background: radial-gradient(circle at 60% 40%, color-mix(in srgb, var(--accent) 70%, #ffffff), transparent 70%);
     animation: aurora-drift2 36s ease-in-out infinite alternate;
   }
@@ -202,7 +205,7 @@
   .aurora-blob--3 {
     width: 46vw; height: 46vw;
     bottom: -22vw; left: 22vw;
-    opacity: 0.06;
+    opacity: 0.34;
     background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--accent) 55%, #000000), transparent 70%);
     animation: aurora-drift3 42s ease-in-out infinite alternate;
   }
