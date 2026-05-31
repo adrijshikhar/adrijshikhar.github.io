@@ -2,6 +2,7 @@
 import '../styles/globals.css';
 import '../styles/machine.css';
 import ThemeSwitcher from '../components/ThemeSwitcher.tsx';
+import ModeToggle from '../components/ModeToggle.tsx';
 
 interface Props {
   title: string;
@@ -24,7 +25,7 @@ const { title, canonical } = Astro.props;
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     />
-    <!-- No-FOUC: apply saved accent theme before first paint -->
+    <!-- No-FOUC: apply saved accent theme + light/dark mode before first paint -->
     <script is:inline>
       (function () {
         try {
@@ -34,6 +35,13 @@ const { title, canonical } = Astro.props;
             saved && valid.indexOf(saved) !== -1 ? saved : 'parallel';
         } catch (e) {
           document.documentElement.dataset.theme = 'parallel';
+        }
+        try {
+          var savedMode = localStorage.getItem('mode');
+          document.documentElement.dataset.mode =
+            savedMode === 'light' ? 'light' : 'dark';
+        } catch (e) {
+          document.documentElement.dataset.mode = 'dark';
         }
       })();
     </script>
@@ -54,8 +62,10 @@ const { title, canonical } = Astro.props;
 
     <!-- Accent theme switcher, docked beside the human/machine toggle -->
     <div class="fixed bottom-6 left-1/2 z-[1090] -translate-x-1/2 translate-y-[calc(100%+0.625rem)] sm:translate-y-0 sm:left-auto sm:right-6 sm:bottom-7">
-      <div class="flex items-center border border-border bg-surface/90 px-3 py-2 backdrop-blur-xl">
+      <div class="flex items-center gap-3 border border-border bg-surface/90 px-3 py-2 backdrop-blur-xl">
         <ThemeSwitcher client:load />
+        <span class="h-[14px] w-px bg-border" aria-hidden="true"></span>
+        <ModeToggle client:load />
       </div>
     </div>
 

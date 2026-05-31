@@ -95,6 +95,49 @@
   --aurora-1: #d12222; --aurora-2: #ff6b4a; --aurora-3: #ffb04a;
 }
 
+/* ============================================================================
+   LIGHT MODE — clean light Swiss aesthetic. Dark is the default :root above.
+   Activated via documentElement.dataset.mode = 'light'. Foundation tokens only;
+   the 6 accents are re-tuned per theme below to hold AA (≥4.5:1) on the light bg.
+   Machine view stays dark regardless (see body.machine-mode override).
+   ========================================================================== */
+:root[data-mode="light"] {
+  --bg: #f7f7f5;          /* near-white warm */
+  --surface: #ffffff;
+  --surface-2: #f0f0ee;
+  --text: #3a3a3a;        /* 10.6:1 on bg */
+  --heading: #141414;     /* 17.2:1 on bg */
+  --muted: #6a6a6a;       /* 5.0:1 on bg, 4.7:1 on surface-2 */
+  --border: 0 0 0;        /* black-based borders, used as rgb(var(--border) / a) */
+  --border-color: rgba(0, 0, 0, 0.12);
+  --hairline: rgba(0, 0, 0, 0.12);
+
+  /* shadcn token bridge — flip to light so ui/* components adapt */
+  --background: 60 14% 96%;
+  --foreground: 0 0% 8%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 8%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 8%;
+  --primary: 0 0% 8%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 60 6% 94%;
+  --secondary-foreground: 0 0% 8%;
+  --muted-fg: 0 0% 42%;
+  --input: 0 0% 0% / 14%;
+}
+
+/* Accent re-tune for light bg — bright dark-bg accents fail AA on #f7f7f5.
+   Each value verified ≥4.5:1 against both --bg (#f7f7f5) and --surface (#fff). */
+:root[data-mode="light"][data-theme="parallel"] { --accent: #b8480f; } /* 4.93 / 5.29 */
+:root[data-mode="light"][data-theme="teal"]     { --accent: #0f766e; } /* 5.10 / 5.47 — was #64ffda (fails) */
+:root[data-mode="light"][data-theme="rausch"]   { --accent: #c81d4a; } /* 5.25 / 5.63 */
+:root[data-mode="light"][data-theme="violet"]   { --accent: #6b21d4; } /* 7.01 / 7.52 — was #8b7dff (fails) */
+:root[data-mode="light"][data-theme="hyperlink"]{ --accent: #2348d8; } /* 6.55 / 7.02 — was #6f8cff (fails) */
+:root[data-mode="light"][data-theme="signal"]   { --accent: #d11f1f; } /* 4.99 / 5.35 */
+/* --accent-contrast stays #0e0e0e (dark) — accent swatches are saturated mid-tones,
+   so dark text/selection-fill on an accent fill still reads well in light mode. */
+
 @layer base {
   html {
     scroll-behavior: smooth;
@@ -168,7 +211,7 @@
     background: var(--surface-2);
     border: 2px solid var(--bg);
   }
-  ::-webkit-scrollbar-thumb:hover { background: #2a2a2a; }
+  ::-webkit-scrollbar-thumb:hover { background: rgb(var(--border) / 0.28); }
 }
 
 @layer components {
@@ -247,8 +290,34 @@
     .aurora-blob { animation: none !important; }
   }
 
-  /* Machine mode: terminal canvas stays pure — kill the aurora entirely. */
+  /* LIGHT MODE aurora: pure screen-blend washes out on a light bg (light+light
+     ≈ white, no visible hue). Switch to multiply (darkens toward the tint) and
+     dial opacity way down so it stays a tasteful faint edge-glow and the central
+     content zone keeps AA contrast. Veil already fades back to --bg over content. */
+  :root[data-mode="light"] .aurora-blob {
+    mix-blend-mode: multiply;
+    filter: blur(110px);
+  }
+  :root[data-mode="light"] .aurora-blob--1 { opacity: 0.16; }
+  :root[data-mode="light"] .aurora-blob--2 { opacity: 0.12; }
+  :root[data-mode="light"] .aurora-blob--3 { opacity: 0.11; }
+
+  /* Machine mode: terminal canvas stays pure — kill the aurora entirely.
+     Machine is ALWAYS dark: force the dark foundation tokens even when the
+     human view is in light mode, so the terminal canvas never goes light. */
   body.machine-mode .aurora-stage { display: none; }
+  body.machine-mode {
+    --bg: #0e0e0e;
+    --surface: #161616;
+    --surface-2: #1c1c1c;
+    --text: #a8a8a8;
+    --heading: #e6e6e6;
+    --muted: #828282;
+    --border: 255 255 255;
+    --border-color: rgba(255, 255, 255, 0.10);
+    --hairline: rgba(255, 255, 255, 0.10);
+    background-color: #101010 !important;
+  }
 
   /* Hero name gradient text (ported from D) — heading → accent → aurora hue. */
   .aurora-text {
@@ -258,6 +327,13 @@
     -webkit-text-fill-color: transparent;
     color: transparent;
     transition: background 0.4s ease;
+  }
+  /* Light mode: the bright --aurora-2 tail (tuned for dark bg) is too light on a
+     light bg. End on the AA-safe --accent instead so the whole name stays legible. */
+  :root[data-mode="light"] .aurora-text {
+    background: linear-gradient(110deg, var(--heading) 8%, var(--accent) 70%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
   }
 
   /* Mono eyebrow / section label with terminal motif */
@@ -287,9 +363,33 @@
     transition: border-color 120ms ease-out, background-color 120ms ease-out;
   }
   .flat-block:hover {
-    border-color: rgba(255, 255, 255, 0.22);
+    border-color: rgb(var(--border) / 0.22);
     background: var(--surface);
   }
+}
+
+/* Light mode: the `prose prose-invert` content uses prose-* utility overrides
+   for most colors, but a few Tailwind-typography defaults (bullets, hr, captions,
+   counters, table borders) come from prose-invert's light-on-dark palette and
+   would be near-invisible on the light bg. Re-point those base prose vars to the
+   semantic tokens so all .md/.mdx content stays AA in light mode.
+   (Dark mode keeps prose-invert's defaults — unchanged.) */
+:root[data-mode="light"] .prose {
+  --tw-prose-body: var(--text);
+  --tw-prose-headings: var(--heading);
+  --tw-prose-lead: var(--text);
+  --tw-prose-bold: var(--heading);
+  --tw-prose-counters: var(--muted);
+  --tw-prose-bullets: var(--muted);
+  --tw-prose-hr: var(--border-color);
+  --tw-prose-quotes: var(--muted);
+  --tw-prose-quote-borders: var(--accent);
+  --tw-prose-captions: var(--muted);
+  --tw-prose-code: var(--heading);
+  --tw-prose-pre-code: var(--heading);
+  --tw-prose-pre-bg: var(--surface);
+  --tw-prose-th-borders: var(--border-color);
+  --tw-prose-td-borders: var(--border-color);
 }
 
 /* Reduced-motion: kill section-reveal transforms set inline by scripts */
