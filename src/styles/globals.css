@@ -394,7 +394,8 @@
     background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
-    transition: background 0.4s ease;
+    /* No transition: interpolating between two multi-stop gradients overshoots and FLASHES
+       the name bright mid mode-swap. Snap the gradient instead. */
   }
   /* Light mode: the bright --aurora-2 tail (tuned for dark bg) is too light on a
      light bg. End on the AA-safe --accent instead so the whole name stays legible. */
