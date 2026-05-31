@@ -250,6 +250,16 @@
   /* Machine mode: terminal canvas stays pure — kill the aurora entirely. */
   body.machine-mode .aurora-stage { display: none; }
 
+  /* Hero name gradient text (ported from D) — heading → accent → aurora hue. */
+  .aurora-text {
+    background: linear-gradient(110deg, var(--heading) 8%, var(--accent) 52%, var(--aurora-2) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    transition: background 0.4s ease;
+  }
+
   /* Mono eyebrow / section label with terminal motif */
   .eyebrow {
     font-family: var(--font-mono);
