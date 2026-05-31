@@ -1,9 +1,9 @@
 ---
 name: "Adrij Shikhar"
 title: "Senior Software Engineer"
-tagline: "I build scalable data platforms and craft software that pushes boundaries."
+tagline: "I build real-time data infrastructure — CDC, streaming, and the distributed systems behind them."
 phone: "+91 (821) 805 8928"
-email: "ashikhar@ee.iitr.ac.in"
+email: "adrijshikhar85@gmail.com"
 socials:
   - platform: github
     url: "https://github.com/adrijshikhar/"
@@ -25,10 +25,10 @@ socials:
     icon: "fab fa-facebook-f"
 ---
 
-Welcome to my portfolio! I'm a graduate from IIT Roorkee. While my academic journey began in the world of chemistry, I quickly discovered my true passion for software development during my freshman year.
+I'm a senior backend engineer based in Bengaluru, building real-time data infrastructure at [Hevo Data](https://hevodata.com/). My academic path started in chemical engineering at IIT Roorkee, but I discovered software in my freshman year and never looked back.
 
-Over the past years, I've been honing my skills and working on exciting projects. My time is now dedicated to reading, writing, and crafting software solutions that not only solve problems but also push the boundaries of innovation.
+Over the past four years I've gone deep on **distributed systems, change data capture, and ETL at scale** — shipping a Debezium-based MySQL CDC framework, scaling our pipeline platform to **25,000+ source objects per pipeline**, and building [Hevo 2.0's](https://hevodata.com/) control plane (`hermes`) from scratch on Java 17, Dropwizard, and Temporal. Along the way I've resolved 295 P0/P1 production incidents, cut critical API latency from 60+ seconds to sub-second, and reviewed 2,057 PRs across 54 repositories.
 
-Explore my portfolio to see the fruits of my labor, from web applications to mobile apps and everything in between. I'm excited to share my journey and the projects that have shaped my development career. If you have any questions or would like to collaborate, don't hesitate to get in touch!
+The problems I find most exciting now sit at the intersection of **data infrastructure and agentic AI** — autonomous agents that act on real production systems, tool-use platforms, and the plumbing that makes them reliable. I'm already building it: I created **hevo-connector-agent**, an AI agent that generates production-ready data connectors straight from API documentation, plus a Claude Code plugin and MCP servers that turn 100+ internal APIs into agent tools. The same engineering that keeps a CDC pipeline correct at 25,000 objects is what keeps an autonomous agent trustworthy in production.
 
-Let's embark on this coding adventure together!
+When I'm not coding I'm reading, writing, or [tinkering on side projects](/archive). If you're working on data infra, AI tooling, or distributed systems and want to chat — [get in touch](mailto:adrijshikhar85@gmail.com).

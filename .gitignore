@@ -19,3 +19,7 @@ package-lock.json
 
 # designlang extraction output (scratch)
 design-extract-output/
+
+.superpowers/
+.DS_Store
+**/.DS_Store

@@ -89,19 +89,22 @@ entries:
 - Built **Hermes**, Hevo 2.0's control plane from scratch — Java 17, Dropwizard, Groot auth, Caffeine/Redis caching, Temporal orchestration, RBAC. Owned full lifecycle across **5 environments** (preview, gamma, US, EU, Asia).
 - Designed the **log-router sidecar** for session log collection — fluent-bit wrapper routing structured logs to S3, integrated across **8+ data plane services**.
 - Shipped **Failure Classifier Phase 1** — error classification engine across all connectors and loaders, replacing generic errors with actionable diagnostics.
-- Implemented **SCD Type 2 (History Mode)** for Redshift and BigQuery loaders.
+- Shipped **SCD Type 2 (History Mode)** across Snowflake, BigQuery, and Redshift loaders — destination-specific strategies (Snowflake/BigQuery MERGE, Fivetran-identical Redshift DELETE+UPDATE+INSERT) unified behind a `__hevo__valid_from` catalog primitive spanning loader-base, catalog-service, and connector-framework.
+- Migrated **9+ source connectors to Connector Framework v2 (CDK)** — declarative `generateTasks`/`ObjectPollTask` model replacing imperative fetch loops, with pluggable offset codecs and null-safe task generation.
 
 ### Reliability & Incident Response
 
-- Resolved **200+ P0/P1 production incidents** across US, EU, India, AU regions — binlog failures, WAL slot issues, data mismatches, and ingestion lag.
+- Resolved **295 P0/P1 production incidents** across US, EU, India, AU regions — binlog failures, WAL slot issues, data mismatches, and ingestion lag.
 - Fixed critical data integrity issues: unsigned types, geometry columns, timestamp-with-timezone, binary PKs, and table map cache corruption in CDC pipelines.
 - Hardened API security: eliminated plaintext password exposure, missing auth checks, and OAuth credential leakage.
 
 ### Leadership & Impact
 
-- Provided **1,889 code reviews** across **47 repositories** over 4 years, averaging 40+ reviews/month.
-- Owned **4 major epics**: Debezium MySQL Connector, 25K Source Object Handling (24 child issues), Failure Classifier (9 issues), Hermes Optimizations (63 issues).
-- Built developer tooling: hevo-2-starter local dev, MCP servers, JFR profiling, InfluxDB+Telegraf metrics, connector-generator scaffolding.
+- Created and architected **hevo-connector-agent** — an AI agent that generates production-ready Hevo source connectors directly from API documentation. Built the original framework and interactive Claude Code workflow, later extended into a model-driven generation pipeline (ERD + OpenAPI parsing, LanceDB RAG over docs, multi-flow LLM enrichment, and auto-fixing Java codegen with TCK tests).
+- Authored **hevo-ai-plugin** — internal Claude Code plugin (16K+ LOC, 20+ skills) for on-call debugging, TDD workflows, and RCA automation; built the **Hermes MCP server** generating 100+ Claude tools from Postman collections to drive Hevo APIs programmatically.
+- Built local-dev platform tooling: hevo-2-starter one-command stack, **InfluxDB + Telegraf + Grafana** StatsD metrics across 11 services, and JFR profiling commands.
+- Provided **2,057 code reviews** across **54 repositories** over 4 years, averaging 40+ reviews/month.
+- Owned **4 major epics** (102 child issues): Hermes Optimizations (64), 25K Source Object Handling (24), Failure Classifier (9), Debezium MySQL Connector (5).
 
 <!-- hevo-intern -->
 

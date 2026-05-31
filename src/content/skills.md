@@ -2,32 +2,22 @@
 title: "Skills"
 ---
 
-## Development Environment
-
-- **OS:** macOS / Manjaro i3wm
-- **IDE:** Highly customized [ VS Code | IntelliJ ] with self crafted theme
-- **Shell:** fish-shell, Oh My Fish, Bash, Zsh
-
 ## Languages & Frameworks
 
-Java 8/17, Dropwizard, Spring, gRPC/Protobuf, Kotlin, Python, Django, TypeScript, React, Node.js, GraphQL, Golang, Lua, Dart
+Java 8/17, Dropwizard, Spring, gRPC/Protobuf, Kotlin, Python, Golang, React, Node.js
 
-## Data & Infrastructure
+## AI & Agentic Systems
 
-MySQL CDC (Debezium), PostgreSQL WAL, Oracle Log Mining, SQL Server CT, Snowflake, BigQuery, Redshift, MongoDB, Redis, Apache Kafka, Apache Spark
+AI agents for connector code-generation, Claude Agent SDK, RAG (LanceDB hybrid vector + BM25), Model Context Protocol (MCP) servers, Claude Code plugin & skill authoring, agentic tool-use (100+ internal APIs as agent tools), autonomous on-call & RCA agents
 
-## Cloud & DevOps
+## Data Infrastructure & CDC
 
-AWS (ECS/Fargate, S3), Docker, Kubernetes, Terraform, Ansible, CircleCI, Temporal, Fluent-bit, InfluxDB/Telegraf/Grafana, OpenTelemetry
+MySQL CDC (Debezium), PostgreSQL WAL, Oracle LogMiner, SQL Server CT, SCD Type 2 / History Mode, Connector Framework v2 (CDK), Snowflake, BigQuery, Redshift, MongoDB, Apache Kafka, Apache Spark
 
-## Testing & Observability
+## Distributed Systems & Cloud
 
-JUnit 5, Testcontainers, k6, JFR Profiling, GC Logging, Coralogix, Sentry, Playwright
+Temporal, Caffeine/Redis caching, RBAC & OAuth2, AWS (ECS/Fargate, S3), Docker, Kubernetes, Terraform, Ansible, CircleCI
 
-## And More...
+## Observability & Testing
 
-- Git, Linux, Shell Scripting
-- HTML5, CSS3, Sass, Tailwind CSS
-- Redux, Flutter
-- SQL, PostgreSQL, MySQL
-- PHP, C++
+OpenTelemetry, InfluxDB/Telegraf/Grafana, Fluent-bit, Coralogix, Sentry, JFR profiling, GC logging, JUnit 5, Testcontainers, k6, Playwright
