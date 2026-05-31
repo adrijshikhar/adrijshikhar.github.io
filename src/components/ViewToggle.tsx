@@ -56,9 +56,15 @@ export default function ViewToggle() {
 
       setMode(next);
 
-      // Flip to the terminal canvas up front; the body background-color CSS transition
-      // (0.45s, set on the body base rule) eases it to #101010 — no snap, no gsap override.
+      // Snap the WHOLE canvas (html + body) to the dark terminal in one frame with transitions
+      // suppressed, so no light html shows through a half-opaque body (the light-mode flicker).
+      // GSAP then crossfades the views over the already-dark backdrop.
+      const root = document.documentElement;
+      root.classList.add('mode-switching');
+      root.classList.add('machine-mode');
       document.body.classList.add('machine-mode');
+      void root.offsetWidth;
+      requestAnimationFrame(() => root.classList.remove('mode-switching'));
 
       const tl = gsap.timeline({ onComplete: () => setTransitioning(false) });
 
@@ -98,10 +104,14 @@ export default function ViewToggle() {
     } else {
       setMode(next);
 
-      // Restore the human canvas up front: drop .machine-mode so the body background-color
-      // CSS transition eases #101010 → transparent (revealing the current mode's html --bg)
-      // and the aurora fades back in. No inline bg / gsap override.
+      // Snap the canvas back to the current mode (html + body) in one suppressed frame, then
+      // GSAP crossfades the human view in over the already-correct backdrop.
+      const root = document.documentElement;
+      root.classList.add('mode-switching');
+      root.classList.remove('machine-mode');
       document.body.classList.remove('machine-mode');
+      void root.offsetWidth;
+      requestAnimationFrame(() => root.classList.remove('mode-switching'));
 
       const tl = gsap.timeline({ onComplete: () => setTransitioning(false) });
 
@@ -154,7 +164,8 @@ export default function ViewToggle() {
     humanView.style.minHeight = '0';
     gsap.set(humanView, { height: 0, opacity: 0 });
 
-    // Body end-state (canvas comes from the .machine-mode CSS background-color).
+    // Canvas end-state: machine-mode on html + body so the whole backdrop is dark.
+    document.documentElement.classList.add('machine-mode');
     document.body.classList.add('machine-mode');
 
     // Machine view expanded/visible end-state.

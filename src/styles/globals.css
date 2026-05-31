@@ -380,6 +380,9 @@
   /* Machine mode: terminal canvas stays pure — kill the aurora entirely.
      Machine is ALWAYS dark: force the dark foundation tokens even when the
      human view is in light mode, so the terminal canvas never goes light. */
+  /* Machine canvas on the ROOT too: in light mode html would otherwise stay light and show
+     through the half-opaque body mid-toggle (the light-mode flicker). Keep html dark in machine. */
+  html.machine-mode { background-color: #101010; }
   body.machine-mode .aurora-stage { opacity: 0; }
   body.machine-mode {
     --bg: #0e0e0e;
