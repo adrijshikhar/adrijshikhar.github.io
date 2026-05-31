@@ -36,3 +36,11 @@ Add a **6-accent theme switcher** layered on the foundation:
 
 ## Definition of done
 A cohesive, award-worthy flat Swiss-terminal portfolio where human and machine views feel like one design system, the orange accent is surgical, and the theme switcher swaps accents live with no layout shift and no FOUC.
+
+## v2 merge — ambient aurora
+Ported a subtle 3-blob drifting aurora background from the sibling Glass/Aurora design (design-d-glass-aurora), adapted to the Swiss-Terminal foundation:
+- Added `.aurora-stage` (fixed, `z-index:-1`, `pointer-events:none`) holding three large blurred circular blobs behind all content. The flat near-black `--bg` still reads; the blobs only add a faint ambient glow.
+- Blobs are tinted entirely from THIS design's single `--accent` token via `color-mix` (no foreign aurora tokens imported), so default = orange glow and they recolor live with the existing theme switcher (teal/rausch/violet/hyperlink/signal).
+- Opacities tuned far lower than the source (0.10 / 0.07 / 0.06 vs ~0.34) to stay minimal/flat — ambient, not a wash. No `mix-blend-mode` to avoid lifting bg luminance.
+- `prefers-reduced-motion: reduce` halts blob drift (static), matching the source.
+- `body.machine-mode .aurora-stage { display:none }` keeps the terminal/machine view pure, exactly like the source hid its aurora.

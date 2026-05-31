@@ -159,6 +159,74 @@
 }
 
 @layer components {
+  /* ==========================================================================
+     AMBIENT AURORA — ported from the Glass/Aurora design, tuned WAY down.
+     Three large blurred circular blobs drift slowly behind everything.
+     Tinted from THIS design's single --accent token (so default = orange
+     glow, recolors live with the theme switcher). Faint enough to keep the
+     flat near-black foundation reading + WCAG AA text contrast intact.
+     Static under reduced-motion; fully hidden in machine mode.
+     ========================================================================== */
+  .aurora-stage {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    background: var(--bg);
+    pointer-events: none;
+  }
+
+  .aurora-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    will-change: transform;
+  }
+  /* primary accent glow — top-left */
+  .aurora-blob--1 {
+    width: 50vw; height: 50vw;
+    top: -18vw; left: -12vw;
+    opacity: 0.10;
+    background: radial-gradient(circle at 30% 30%, var(--accent), transparent 68%);
+    animation: aurora-drift1 30s ease-in-out infinite alternate;
+  }
+  /* cooler accent-toward-white tail — top-right */
+  .aurora-blob--2 {
+    width: 44vw; height: 44vw;
+    top: 6vw; right: -16vw;
+    opacity: 0.07;
+    background: radial-gradient(circle at 60% 40%, color-mix(in srgb, var(--accent) 70%, #ffffff), transparent 70%);
+    animation: aurora-drift2 36s ease-in-out infinite alternate;
+  }
+  /* dim accent-toward-bg anchor — bottom */
+  .aurora-blob--3 {
+    width: 46vw; height: 46vw;
+    bottom: -22vw; left: 22vw;
+    opacity: 0.06;
+    background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--accent) 55%, #000000), transparent 70%);
+    animation: aurora-drift3 42s ease-in-out infinite alternate;
+  }
+
+  @keyframes aurora-drift1 {
+    0%   { transform: translate3d(0, 0, 0) scale(1); }
+    100% { transform: translate3d(7vw, 5vw, 0) scale(1.1); }
+  }
+  @keyframes aurora-drift2 {
+    0%   { transform: translate3d(0, 0, 0) scale(1.04); }
+    100% { transform: translate3d(-6vw, 4vw, 0) scale(0.96); }
+  }
+  @keyframes aurora-drift3 {
+    0%   { transform: translate3d(0, 0, 0) scale(0.96); }
+    100% { transform: translate3d(5vw, -5vw, 0) scale(1.08); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .aurora-blob { animation: none !important; }
+  }
+
+  /* Machine mode: terminal canvas stays pure — kill the aurora entirely. */
+  body.machine-mode .aurora-stage { display: none; }
+
   /* Mono eyebrow / section label with terminal motif */
   .eyebrow {
     font-family: var(--font-mono);
