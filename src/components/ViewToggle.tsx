@@ -87,9 +87,12 @@ export default function ViewToggle() {
     incoming.style.overflow = 'visible';
     incoming.style.display = '';
 
-    // Drive the canvas crossfade on the SAME 0.4s ease as the opacity timeline (no .mode-switching
-    // suppression here — we WANT the background to fade in lockstep, not snap).
-    root.classList.add('view-fade');
+    // SNAP canvas + foundation tokens to the target state with CSS transitions SUPPRESSED, so the
+    // outgoing view's colors don't shimmer/recolor mid-fade. (Dark→machine is already smooth because
+    // its tokens barely change; light→machine flickered because the human view recoloured light→dark
+    // on a different clock than the opacity fade. Snapping makes light behave exactly like dark.)
+    // Only OPACITY (driven by GSAP inline, unaffected by transition:none) crossfades.
+    root.classList.add('mode-switching');
     if (next === 'machine') {
       root.classList.add('machine-mode');
       document.body.classList.add('machine-mode');
@@ -114,7 +117,7 @@ export default function ViewToggle() {
         // default is opacity:0 — clearing it would re-hide the terminal). Only clear transform.
         gsap.set(incoming, { opacity: 1, clearProps: 'transform' });
 
-        root.classList.remove('view-fade');
+        root.classList.remove('mode-switching');
         setTransitioning(false);
       },
     });
