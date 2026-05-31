@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import ModeToggle from './ModeToggle';
 
 type ThemeId = 'red' | 'parallel' | 'blue' | 'teal' | 'violet' | 'signal';
 
@@ -65,6 +66,9 @@ export default function ThemeSwitcher() {
           />
         );
       })}
+      {/* divider + light/dark mode toggle, docked in the same control cluster */}
+      <span className="ml-1 h-4 w-px bg-white/30" aria-hidden="true" />
+      <ModeToggle />
     </div>
   );
 }

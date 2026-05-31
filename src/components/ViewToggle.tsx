@@ -18,10 +18,10 @@ const buildMachineHtml = () => {
 };
 
 export default function ViewToggle() {
-  // Lazily initialize from the URL so ?machine=true first paints as machine view.
-  const [mode, setMode] = useState<'human' | 'machine'>(() =>
-    startsInMachine() ? 'machine' : 'human',
-  );
+  // Init 'human' to match SSR (the static build has no URL param) — avoids a hydration
+  // mismatch on ?machine=true. The mount effect below flips to 'machine' right after
+  // hydration; the view DOM itself is set to the machine end-state instantly there.
+  const [mode, setMode] = useState<'human' | 'machine'>('human');
   const [transitioning, setTransitioning] = useState(false);
   const machineLoadedRef = useRef(false);
   const islandRef = useRef<HTMLDivElement>(null);
@@ -42,140 +42,83 @@ export default function ViewToggle() {
     const humanView = document.querySelector('.human-view') as HTMLElement | null;
     const machineView = document.querySelector('.machine-view') as HTMLElement | null;
 
-    if (!humanView || !machineView) return;
-
-    if (next === 'machine') {
-      // Load machine content on first toggle
-      if (!machineLoadedRef.current) {
-        machineView.innerHTML = buildMachineHtml();
-        machineLoadedRef.current = true;
-      }
-
-      // Update toggle indicator immediately
-      setMode(next);
-
-      const tl = gsap.timeline({
-        onComplete: () => {
-          setTransitioning(false);
-        },
-      });
-
-      // Island transitions first
-      if (islandRef.current) {
-        tl.to(islandRef.current, {
-          backgroundColor: 'rgba(24, 24, 24, 0.95)',
-          borderColor: '#555555',
-          duration: 0.15,
-          ease: 'power1.inOut',
-        }, 0);
-      }
-
-      // Collapse human view
-      tl.to(humanView, {
-        height: 0,
-        opacity: 0,
-        duration: 0.25,
-        ease: 'power2.inOut',
-        onStart: () => {
-          humanView.style.overflow = 'hidden';
-          gsap.set(humanView, { height: humanView.scrollHeight });
-        },
-        onComplete: () => {
-          humanView.style.pointerEvents = 'none';
-          humanView.style.minHeight = '0';
-        },
-      }, 0);
-
-      // Background transition
-      tl.to(document.body, {
-        backgroundColor: '#101010',
-        duration: 0.2,
-        ease: 'power1.inOut',
-        onStart: () => {
-          document.body.classList.add('machine-mode');
-        },
-      }, '-=0.1');
-
-      // Expand machine view
-      tl.fromTo(machineView, {
-        height: 0,
-        opacity: 0,
-        overflow: 'hidden',
-      }, {
-        height: 'auto',
-        opacity: 1,
-        duration: 0.25,
-        ease: 'power2.inOut',
-        onStart: () => {
-          machineView.style.pointerEvents = 'auto';
-          machineView.style.overflow = 'visible';
-          window.scrollTo({ top: 0, behavior: 'instant' });
-        },
-      }, '-=0.05');
-
-    } else {
-      // Update toggle indicator immediately
-      setMode(next);
-
-      const tl = gsap.timeline({
-        onComplete: () => {
-          setTransitioning(false);
-        },
-      });
-
-      // Island transitions first
-      if (islandRef.current) {
-        tl.to(islandRef.current, {
-          backgroundColor: 'rgba(10, 25, 47, 0.95)',
-          borderColor: 'rgba(100, 116, 139, 0.4)',
-          duration: 0.15,
-          ease: 'power1.inOut',
-        }, 0);
-      }
-
-      // Collapse machine view
-      tl.to(machineView, {
-        height: 0,
-        opacity: 0,
-        duration: 0.25,
-        ease: 'power2.inOut',
-        onStart: () => {
-          machineView.style.overflow = 'hidden';
-        },
-        onComplete: () => {
-          machineView.style.pointerEvents = 'none';
-        },
-      }, 0);
-
-      // Background transition
-      tl.to(document.body, {
-        backgroundColor: '#0f172a',
-        duration: 0.2,
-        ease: 'power1.inOut',
-        onStart: () => {
-          document.body.classList.remove('machine-mode');
-        },
-      }, '-=0.1');
-
-      // Expand human view
-      tl.to(humanView, {
-        height: 'auto',
-        opacity: 1,
-        duration: 0.25,
-        ease: 'power2.inOut',
-        onStart: () => {
-          humanView.style.overflow = '';
-          humanView.style.pointerEvents = '';
-          humanView.style.minHeight = '';
-          window.scrollTo({ top: 0, behavior: 'instant' });
-        },
-      }, '-=0.05');
+    if (!humanView || !machineView) {
+      setTransitioning(false);
+      return;
     }
+
+    // Load machine content on first switch into machine view.
+    if (next === 'machine' && !machineLoadedRef.current) {
+      machineView.innerHTML = buildMachineHtml();
+      machineLoadedRef.current = true;
+    }
+
+    // Pin scroll to top ONCE, up front — no mid-animation jump.
+    window.scrollTo({ top: 0, behavior: 'instant' });
+
+    setMode(next);
+
+    const incoming = next === 'machine' ? machineView : humanView;
+    const outgoing = next === 'machine' ? humanView : machineView;
+
+    // parallel.ai technique (ported from G) — NO geometry animation:
+    //   1. Lift the OUTGOING view OUT of flow (.view-overlay = position:absolute) so the
+    //      INCOMING view immediately occupies the space at its natural height. Zero reflow.
+    //   2. Both views render at full natural height (clear any prior height:0 / overflow).
+    //   3. Crossfade OPACITY of both on ONE 0.4s power1.inOut timeline.
+    // The machine canvas is token-driven (== the active mode), so the toggle never recolors
+    // the background — pure opacity crossfade, identical in light and dark.
+    outgoing.classList.add('view-overlay');
+    outgoing.style.height = 'auto';
+    outgoing.style.minHeight = '';
+    outgoing.style.overflow = 'visible';
+    outgoing.style.pointerEvents = 'none';
+
+    incoming.style.height = 'auto';
+    incoming.style.minHeight = '';
+    incoming.style.overflow = 'visible';
+    incoming.style.display = '';
+
+    // .machine-mode only hides the spotlight overlay now (canvas follows the mode token).
+    if (next === 'machine') {
+      document.documentElement.classList.add('machine-mode');
+      document.body.classList.add('machine-mode');
+    } else {
+      document.documentElement.classList.remove('machine-mode');
+      document.body.classList.remove('machine-mode');
+    }
+
+    // ONE clock: outgoing 1→0 and incoming 0→1, identical duration/ease — perfectly in sync.
+    const DURATION = 0.4;
+    const tl = gsap.timeline({
+      onComplete: () => {
+        outgoing.classList.remove('view-overlay');
+        outgoing.style.display = 'none';
+        outgoing.style.pointerEvents = 'none';
+        gsap.set(outgoing, { clearProps: 'transform' });
+
+        incoming.style.display = '';
+        incoming.style.pointerEvents = 'auto';
+        // Keep opacity:1 inline so the active view stays visible (the .machine-view
+        // stylesheet default is opacity:0 — clearing it would re-hide the terminal).
+        gsap.set(incoming, { opacity: 1, clearProps: 'transform' });
+
+        setTransitioning(false);
+      },
+    });
+
+    tl.to(outgoing, { opacity: 0, duration: DURATION, ease: 'power1.inOut' }, 0);
+    tl.fromTo(
+      incoming,
+      { opacity: 0 },
+      { opacity: 1, duration: DURATION, ease: 'power1.inOut' },
+      0,
+    );
   };
 
-  // On mount: when starting in machine view (?machine=true), apply the SAME
-  // final DOM/GSAP end-state INSTANTLY (gsap.set, no animation) so the very
-  // first paint is already machine view — no human-content flash/FOUC.
+  // On mount: when starting in machine view (?machine=true), apply the SAME final
+  // DOM/GSAP end-state INSTANTLY (gsap.set, no animation) so the first paint is
+  // already machine view — no human-content flash/FOUC, no height tween.
   useEffect(() => {
     if (!startsInMachine()) return;
 
@@ -183,53 +126,48 @@ export default function ViewToggle() {
     const machineView = document.querySelector('.machine-view') as HTMLElement | null;
     if (!humanView || !machineView) return;
 
-    // Same machine-content load that toggle() performs.
+    // Reflect machine in the toggle indicator (post-hydration, so no SSR mismatch).
+    setMode('machine');
+
     if (!machineLoadedRef.current) {
       machineView.innerHTML = buildMachineHtml();
       machineLoadedRef.current = true;
     }
 
-    // Island end-state (machine).
-    if (islandRef.current) {
-      gsap.set(islandRef.current, {
-        backgroundColor: 'rgba(24, 24, 24, 0.95)',
-        borderColor: '#555555',
-      });
-    }
-
-    // Human view collapsed/hidden end-state.
-    humanView.style.overflow = 'hidden';
+    // Human view: out of flow, hidden.
+    humanView.style.display = 'none';
     humanView.style.pointerEvents = 'none';
-    humanView.style.minHeight = '0';
-    gsap.set(humanView, { height: 0, opacity: 0 });
+    gsap.set(humanView, { opacity: 0 });
 
-    // Body end-state.
+    // Canvas end-state: machine-mode on html + body (hides the spotlight overlay).
+    document.documentElement.classList.add('machine-mode');
     document.body.classList.add('machine-mode');
-    gsap.set(document.body, { backgroundColor: '#101010' });
 
-    // Machine view expanded/visible end-state.
+    // Machine view: in flow at natural height, visible.
+    machineView.style.display = '';
     machineView.style.pointerEvents = 'auto';
+    machineView.style.height = 'auto';
     machineView.style.overflow = 'visible';
-    gsap.set(machineView, { height: 'auto', opacity: 1 });
+    gsap.set(machineView, { opacity: 1 });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[1100] flex items-center gap-2">
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[1100] flex items-center gap-2">
       <div
         ref={islandRef}
-        className="flex gap-4 px-4 py-2.5 rounded-md backdrop-blur-xl font-mono text-sm bg-[#0a192f]/95 border border-slate-500/40"
+        className="flex gap-4 border-[3px] border-ink bg-surface px-4 py-2.5 font-mono text-sm backdrop-blur-xl"
       >
         <Toggle
           pressed={mode === 'human'}
           onPressedChange={(pressed) => { if (pressed && mode !== 'human') toggle(); }}
           className="!bg-transparent !h-auto !min-w-0 !px-0 !py-0 !rounded-none flex items-center gap-2 transition-colors duration-300 hover:!bg-transparent data-[state=on]:!bg-transparent"
         >
-          <span className={`size-[6px] inline-block rounded-full transition-all duration-500 ${
-            mode === 'human' ? 'bg-current outline outline-1 outline-offset-1 outline-current' : 'outline outline-1 outline-offset-1 outline-[#858483]/30'
+          <span className={`size-[7px] inline-block transition-all duration-300 ${
+            mode === 'human' ? 'bg-accent outline outline-1 outline-offset-1 outline-ink' : 'outline outline-1 outline-offset-1 outline-muted'
           }`} />
           <span className={`uppercase text-xs tracking-wider transition-colors duration-300 ${
-            mode === 'human' ? 'text-white' : 'text-[#858483]/50'
+            mode === 'human' ? 'text-heading' : 'text-muted'
           }`}>Human</span>
         </Toggle>
         <Toggle
@@ -237,11 +175,11 @@ export default function ViewToggle() {
           onPressedChange={(pressed) => { if (pressed && mode !== 'machine') toggle(); }}
           className="!bg-transparent !h-auto !min-w-0 !px-0 !py-0 !rounded-none flex items-center gap-2 transition-colors duration-300 hover:!bg-transparent data-[state=on]:!bg-transparent"
         >
-          <span className={`size-[6px] inline-block rounded-full transition-all duration-500 ${
-            mode === 'machine' ? 'bg-current outline outline-1 outline-offset-1 outline-current' : 'outline outline-1 outline-offset-1 outline-[#858483]/30'
+          <span className={`size-[7px] inline-block transition-all duration-300 ${
+            mode === 'machine' ? 'bg-accent outline outline-1 outline-offset-1 outline-ink' : 'outline outline-1 outline-offset-1 outline-muted'
           }`} />
           <span className={`uppercase text-xs tracking-wider transition-colors duration-300 ${
-            mode === 'machine' ? 'text-white' : 'text-[#858483]/50'
+            mode === 'machine' ? 'text-heading' : 'text-muted'
           }`}>Machine</span>
         </Toggle>
       </div>

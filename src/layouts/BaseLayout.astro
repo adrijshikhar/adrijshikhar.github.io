@@ -23,7 +23,7 @@ const { title, canonical } = Astro.props;
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     />
-    <!-- No-FOUC accent theme: applied before first paint -->
+    <!-- No-FOUC: apply saved accent theme + light/dark mode before first paint -->
     <script is:inline>
       (function () {
         try {
@@ -33,6 +33,19 @@ const { title, canonical } = Astro.props;
           document.documentElement.dataset.theme = t;
         } catch (e) {
           document.documentElement.dataset.theme = 'red';
+        }
+        try {
+          // ?mode= URL override wins, else saved mode, else default LIGHT (E's default;
+          // dark is the added variant — the reverse of design G whose default is dark).
+          var urlMode = new URLSearchParams(location.search).get('mode');
+          var savedMode =
+            urlMode === 'light' || urlMode === 'dark'
+              ? urlMode
+              : localStorage.getItem('mode');
+          document.documentElement.dataset.mode =
+            savedMode === 'dark' ? 'dark' : 'light';
+        } catch (e) {
+          document.documentElement.dataset.mode = 'light';
         }
       })();
     </script>

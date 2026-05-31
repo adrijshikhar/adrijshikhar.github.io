@@ -43,7 +43,7 @@
     --ring: var(--accent);
   }
 
-  /* ---- 6-accent theme switcher (lead primary only) ---- */
+  /* ---- 6-accent theme switcher (lead primary only) — tuned for the LIGHT canvas ---- */
   :root[data-theme="red"]      { --accent: #c22d1a; --accent-contrast: #ffffff; }
   :root[data-theme="parallel"] { --accent: #c2410c; --accent-contrast: #ffffff; }
   :root[data-theme="blue"]     { --accent: #1d3fb5; --accent-contrast: #ffffff; }
@@ -51,9 +51,68 @@
   :root[data-theme="violet"]   { --accent: #5241d4; --accent-contrast: #ffffff; }
   :root[data-theme="signal"]   { --accent: #c41616; --accent-contrast: #ffffff; }
 
+  /* =========================================================
+     DARK MODE — Neo-Bauhaus on near-black. LIGHT (:root above) is the default;
+     dark is the added variant (the reverse of design G).
+
+     Strategy: --ink is E's single structural token (frames, hard offset
+     shadows, structural type, social/CV chips). Flip --ink LIGHT and every
+     thick black frame + offset shadow becomes a crisp LIGHT frame on the dark
+     canvas — the bold geometry still reads. --border follows --ink. The primary
+     color BLOCKS (red/blue/yellow) stay vivid and pop on the dark ground.
+     Accent-contrast flips DARK because the dark-mode accents are bright fills
+     (dark text on them clears AA; white would fail).
+     ========================================================= */
+  :root[data-mode="dark"] {
+    /* canvas + structure */
+    --bg: #121212;            /* near-black canvas */
+    --surface: #1b1b1b;       /* panels — one step up from canvas */
+    --ink: #f0f0f0;           /* FLIPPED light: frames, offset shadows, structural type */
+    --border: #f0f0f0;        /* thick frames follow the light ink */
+
+    /* supporting Bauhaus primaries — kept vivid so they pop on the dark ground */
+    --block-1: #2f54d6;       /* blue (brightened; white-on-blue = 6.25:1) */
+    --block-2: #f4c20d;       /* yellow (black-on-yellow = 11.3:1) */
+    --block-3: #f0f0f0;       /* was structural black; flip light so an "ink" block still reads */
+
+    /* type roles on the dark canvas */
+    --text: #d0d0d0;          /* body — 12.15:1 on bg, 11.17:1 on surface */
+    --heading: #f0f0f0;       /* headings — 16.44:1 on bg */
+    --muted: #9a9a9a;         /* muted labels — 6.66:1 on bg, 6.12:1 on surface */
+
+    /* live theme lead — bright accents need DARK contrast text on their fill */
+    --accent: #ff5a44;        /* default Bauhaus-red, brightened for dark AA */
+    --accent-contrast: #121212;
+
+    /* shadcn primitives — flip dark so imported UI adapts */
+    --background: 0 0% 7%;
+    --foreground: 0 0% 94%;
+  }
+
+  /* Per-accent AA retune for the dark bg (#121212). Each ≥4.5:1 as text/link on
+     BOTH --bg (#121212) and --surface (#1b1b1b); --accent-contrast stays dark
+     (#121212) since these are bright fills. */
+  :root[data-mode="dark"][data-theme="red"]      { --accent: #ff5a44; } /* 6.06 / 5.58 */
+  :root[data-mode="dark"][data-theme="parallel"] { --accent: #fb7a3c; } /* 7.09 / 6.52 */
+  :root[data-mode="dark"][data-theme="blue"]      { --accent: #6f8cff; } /* 6.13 / 5.64 */
+  :root[data-mode="dark"][data-theme="teal"]      { --accent: #3fd9c4; } /* 10.65 / 9.79 */
+  :root[data-mode="dark"][data-theme="violet"]    { --accent: #9b8cff; } /* 6.77 / 6.22 */
+  :root[data-mode="dark"][data-theme="signal"]    { --accent: #ff5247; } /* 5.84 / 5.37 */
+
   html {
     scroll-behavior: smooth;
+    /* ease the canvas across the light/dark swap */
+    transition: background-color 0.4s ease;
     @apply font-sans;
+  }
+
+  /* Atomic light/dark swap: ModeToggle adds .mode-switching for one frame so
+     every element flips in the SAME paint — no lagging background, no flicker. */
+  :root.mode-switching,
+  :root.mode-switching *,
+  :root.mode-switching *::before,
+  :root.mode-switching *::after {
+    transition: none !important;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -68,6 +127,8 @@
   body {
     background-color: var(--bg);
     color: var(--text);
+    /* ease the canvas across the light/dark swap; text colour snaps to avoid mass flicker */
+    transition: background-color 0.4s ease;
     @apply font-sans antialiased;
   }
 
@@ -140,6 +201,15 @@
     line-height: 0.8;
     letter-spacing: -0.04em;
   }
+
+  /* Shared overlay helper (ported from G): during the human↔machine crossfade the
+     OUTGOING view lifts out of flow so the INCOMING view occupies the space at its
+     natural height immediately — zero reflow, pure opacity tween, no height animation. */
+  .view-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
 }
 
 /* Hard-cut block reveal (snappy, no soft fade) */
@@ -155,6 +225,25 @@
 
 .bh-reveal {
   animation: bh-pop-in 0.42s cubic-bezier(0.2, 0.9, 0.25, 1) both;
+}
+
+/* DARK mode: the Interests panel is an "ink block" (background var(--ink), which
+   flips LIGHT in dark mode) carrying inverted prose. prose-invert's light-on-dark
+   body/heading colours would then sit light-on-light and fail AA. Re-point the
+   prose vars to the DARK foundation so the content stays dark-on-light (≥4.5:1).
+   In LIGHT mode the ink block is dark and prose-invert's own defaults are correct,
+   so this override is dark-only. */
+:root[data-mode="dark"] .prose-invert {
+  --tw-prose-invert-body: #2a2622;
+  --tw-prose-invert-headings: #121212;
+  --tw-prose-invert-bold: #1d3fb5;
+  --tw-prose-invert-links: #1d3fb5;
+  --tw-prose-invert-bullets: #2a2622;
+  --tw-prose-invert-hr: rgba(0, 0, 0, 0.2);
+  --tw-prose-invert-quotes: #2a2622;
+  --tw-prose-invert-quote-borders: #1d3fb5;
+  --tw-prose-invert-captions: #44403a;
+  --tw-prose-invert-code: #121212;
 }
 
 @media (prefers-reduced-motion: reduce) {

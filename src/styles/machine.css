@@ -23,29 +23,32 @@
   font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 13px;
   line-height: 1.23;
-  color: #858483;
+  /* Token-driven so the terminal FOLLOWS the active light/dark mode: the machine
+     canvas equals the human canvas, so the human↔machine toggle never recolors
+     the background — it's a pure opacity crossfade (always smooth, both modes). */
+  color: var(--muted);
   white-space: pre-wrap;
   word-wrap: break-word;
   letter-spacing: -0.01em;
 }
 
 .machine-pre a {
-  color: #fb631b;
+  color: var(--accent);
   text-decoration: none;
 }
 
 .machine-pre a:hover {
-  color: #f4793f;
   text-decoration: underline;
+  opacity: 0.82;
 }
 
 .machine-pre strong {
-  color: #d6d6d5;
+  color: var(--text);
   font-weight: 500;
 }
 
 .machine-pre h1,
 .machine-pre h2,
 .machine-pre h3 {
-  color: #adadac;
+  color: var(--heading);
 }
