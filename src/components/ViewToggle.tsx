@@ -2,8 +2,26 @@ import { useState, useRef, useEffect } from 'react';
 import { gsap } from '../lib/gsap';
 import { Toggle } from './ui/toggle';
 
+const startsInMachine = () =>
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get('machine') === 'true';
+
+// Build the machine-view inner HTML from the raw markdown payload.
+const buildMachineHtml = () => {
+  const raw: string = (window as any).__RAW_MARKDOWN__ || '';
+  const withLinks = raw.replace(
+    /\[([^\]]+)\]\(([^)]+)\)/g,
+    '<a href="$2" target="_blank" rel="noreferrer noopener">$1</a>',
+  );
+  const withBold = withLinks.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  return `<div class="machine-content-wrapper"><pre class="machine-pre">${withBold}</pre></div>`;
+};
+
 export default function ViewToggle() {
-  const [mode, setMode] = useState<'human' | 'machine'>('human');
+  // Lazily initialize from the URL so ?machine=true first paints as machine view.
+  const [mode, setMode] = useState<'human' | 'machine'>(() =>
+    startsInMachine() ? 'machine' : 'human',
+  );
   const [transitioning, setTransitioning] = useState(false);
   const machineLoadedRef = useRef(false);
   const islandRef = useRef<HTMLDivElement>(null);
@@ -29,13 +47,7 @@ export default function ViewToggle() {
     if (next === 'machine') {
       // Load machine content on first toggle
       if (!machineLoadedRef.current) {
-        const raw: string = (window as any).__RAW_MARKDOWN__ || '';
-        const withLinks = raw.replace(
-          /\[([^\]]+)\]\(([^)]+)\)/g,
-          '<a href="$2" target="_blank" rel="noreferrer noopener">$1</a>',
-        );
-        const withBold = withLinks.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-        machineView.innerHTML = `<div class="machine-content-wrapper"><pre class="machine-pre">${withBold}</pre></div>`;
+        machineView.innerHTML = buildMachineHtml();
         machineLoadedRef.current = true;
       }
 
@@ -161,11 +173,44 @@ export default function ViewToggle() {
     }
   };
 
-  // On mount, initialize from the URL: ?machine=true starts in machine view
+  // On mount: when starting in machine view (?machine=true), apply the SAME
+  // final DOM/GSAP end-state INSTANTLY (gsap.set, no animation) so the very
+  // first paint is already machine view — no human-content flash/FOUC.
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).get('machine') === 'true') {
-      toggle();
+    if (!startsInMachine()) return;
+
+    const humanView = document.querySelector('.human-view') as HTMLElement | null;
+    const machineView = document.querySelector('.machine-view') as HTMLElement | null;
+    if (!humanView || !machineView) return;
+
+    // Same machine-content load that toggle() performs.
+    if (!machineLoadedRef.current) {
+      machineView.innerHTML = buildMachineHtml();
+      machineLoadedRef.current = true;
     }
+
+    // Island end-state (machine).
+    if (islandRef.current) {
+      gsap.set(islandRef.current, {
+        backgroundColor: 'rgba(24, 24, 24, 0.95)',
+        borderColor: '#555555',
+      });
+    }
+
+    // Human view collapsed/hidden end-state.
+    humanView.style.overflow = 'hidden';
+    humanView.style.pointerEvents = 'none';
+    humanView.style.minHeight = '0';
+    gsap.set(humanView, { height: 0, opacity: 0 });
+
+    // Body end-state.
+    document.body.classList.add('machine-mode');
+    gsap.set(document.body, { backgroundColor: '#101010' });
+
+    // Machine view expanded/visible end-state.
+    machineView.style.pointerEvents = 'auto';
+    machineView.style.overflow = 'visible';
+    gsap.set(machineView, { height: 'auto', opacity: 1 });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
