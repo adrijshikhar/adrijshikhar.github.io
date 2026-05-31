@@ -384,6 +384,25 @@
      through the half-opaque body mid-toggle (the light-mode flicker). Keep html dark in machine. */
   html.machine-mode { background-color: #101010; }
   body.machine-mode .aurora-stage { opacity: 0; }
+
+  /* parallel.ai-style VIEW toggle: the human<->machine canvas crossfade runs on ONE 0.4s ease
+     clock, synchronized with the GSAP opacity crossfade of the two views. While the view toggle
+     is active, force BOTH html and body background-color onto the same 0.4s ease so the dark
+     terminal canvas fades in/out in lockstep with the content (no lagging bg, no light-html bleed).
+     This is independent of .mode-switching (which is for the separate light/dark ModeToggle). */
+  html.view-fade,
+  html.view-fade body {
+    transition: background-color 0.4s ease !important;
+  }
+
+  /* Shared overlay helper: the OUTGOING view lifts out of flow during the crossfade so the
+     INCOMING view occupies the space immediately at its natural height — zero reflow, zero
+     height animation. Applied/removed by ViewToggle around the GSAP timeline. */
+  .view-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
   body.machine-mode {
     --bg: #0e0e0e;
     --surface: #161616;
