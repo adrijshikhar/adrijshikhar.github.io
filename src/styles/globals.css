@@ -196,9 +196,9 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    /* machine canvas (body bg) darkens/lightens PROMPTLY so terminal content never sits on the
-       wrong-colour canvas; text colour eases slower. (Mode-toggle uses html bg, see html rule.) */
-    transition: color 0.45s ease, background-color 0.28s ease;
+    /* Only the canvas (body bg) transitions; text COLOUR changes instantly to avoid mass
+       color-transition flicker when the mode token set swaps. */
+    transition: background-color 0.28s ease;
   }
 
   @media (min-width: 1024px) {
@@ -212,7 +212,6 @@
     font-family: var(--font-heading);
     font-weight: 600;
     letter-spacing: -0.02em;
-    transition: color 0.45s ease;
   }
 
   a {
