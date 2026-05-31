@@ -60,15 +60,7 @@ export default function ViewToggle() {
         },
       });
 
-      // Island transitions first
-      if (islandRef.current) {
-        tl.to(islandRef.current, {
-          backgroundColor: 'rgba(24, 24, 24, 0.95)',
-          borderColor: '#555555',
-          duration: 0.15,
-          ease: 'power1.inOut',
-        }, 0);
-      }
+      // Island styling is CSS-driven (bg-surface adapts to light/dark/machine) — no gsap color override.
 
       // Collapse human view
       tl.to(humanView, {
@@ -123,15 +115,7 @@ export default function ViewToggle() {
         },
       });
 
-      // Island transitions first
-      if (islandRef.current) {
-        tl.to(islandRef.current, {
-          backgroundColor: 'rgba(22, 22, 22, 0.92)',
-          borderColor: 'rgba(255, 255, 255, 0.10)',
-          duration: 0.15,
-          ease: 'power1.inOut',
-        }, 0);
-      }
+      // Island styling is CSS-driven — no gsap color override.
 
       // Collapse machine view
       tl.to(machineView, {
@@ -147,13 +131,17 @@ export default function ViewToggle() {
         },
       }, 0);
 
-      // Background transition (flat Swiss foundation, not navy)
+      // Background restore: clear to transparent so the CSS foundation (html --bg)
+      // shows through in the CURRENT mode (light or dark) and the aurora returns.
       tl.to(document.body, {
-        backgroundColor: '#0e0e0e',
+        backgroundColor: 'rgba(0,0,0,0)',
         duration: 0.2,
         ease: 'power1.inOut',
         onStart: () => {
           document.body.classList.remove('machine-mode');
+        },
+        onComplete: () => {
+          document.body.style.backgroundColor = '';
         },
       }, '-=0.1');
 
@@ -189,13 +177,7 @@ export default function ViewToggle() {
       machineLoadedRef.current = true;
     }
 
-    // Island end-state (machine).
-    if (islandRef.current) {
-      gsap.set(islandRef.current, {
-        backgroundColor: 'rgba(24, 24, 24, 0.95)',
-        borderColor: '#555555',
-      });
-    }
+    // Island styling is CSS-driven (bg-surface adapts via machine-mode tokens) — no gsap override.
 
     // Human view collapsed/hidden end-state.
     humanView.style.overflow = 'hidden';
@@ -218,7 +200,7 @@ export default function ViewToggle() {
     <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[1100] flex items-center gap-2">
       <div
         ref={islandRef}
-        className="flex gap-4 px-4 py-2.5 rounded-none backdrop-blur-xl font-mono text-sm bg-surface/92 border border-[rgb(var(--border)/0.14)]"
+        className="flex gap-4 px-4 py-2.5 rounded-full backdrop-blur-xl font-mono text-sm bg-surface/92 border border-[rgb(var(--border)/0.14)] shadow-[var(--card-shadow)]"
       >
         <Toggle
           pressed={mode === 'human'}
