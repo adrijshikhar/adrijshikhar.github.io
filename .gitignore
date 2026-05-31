@@ -26,3 +26,6 @@ design-extract-output/
 
 # resume-ops raw source data (gathered locally, not versioned)
 resume-ops-output/raw/
+
+# Superpowers worktrees
+.worktrees/
