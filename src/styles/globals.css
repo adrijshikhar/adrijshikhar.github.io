@@ -377,45 +377,18 @@
      --aurora-* variables set in :root vs :root[data-mode="light"] — no per-mode
      element selectors needed here. */
 
-  /* Machine mode: terminal canvas stays pure — kill the aurora entirely.
-     Machine is ALWAYS dark: force the dark foundation tokens even when the
-     human view is in light mode, so the terminal canvas never goes light. */
-  /* Machine canvas on the ROOT too: in light mode html would otherwise stay light and show
-     through the half-opaque body mid-toggle (the light-mode flicker). Keep html dark in machine. */
-  html.machine-mode { background-color: #101010; }
+  /* Machine view FOLLOWS the active light/dark mode: it's token-driven (see machine.css), so its
+     canvas equals the human canvas in that mode. The human↔machine toggle therefore never changes
+     background colour — it's a pure opacity crossfade (always smooth, in both modes). We only hide
+     the aurora for a clean terminal. */
   body.machine-mode .aurora-stage { opacity: 0; }
 
-  /* parallel.ai-style VIEW toggle: the human<->machine canvas crossfade runs on ONE 0.4s ease
-     clock, synchronized with the GSAP opacity crossfade of the two views. While the view toggle
-     is active, force BOTH html and body background-color onto the same 0.4s ease so the dark
-     terminal canvas fades in/out in lockstep with the content (no lagging bg, no light-html bleed).
-     This is independent of .mode-switching (which is for the separate light/dark ModeToggle). */
-  html.view-fade,
-  html.view-fade body {
-    transition: background-color 0.4s ease !important;
-  }
-
   /* Shared overlay helper: the OUTGOING view lifts out of flow during the crossfade so the
-     INCOMING view occupies the space immediately at its natural height — zero reflow, zero
-     height animation. Applied/removed by ViewToggle around the GSAP timeline. */
+     INCOMING view occupies the space immediately at its natural height — zero reflow. */
   .view-overlay {
     position: absolute;
     inset: 0;
     pointer-events: none;
-  }
-  body.machine-mode {
-    --bg: #0e0e0e;
-    --surface: #161616;
-    --surface-2: #1c1c1c;
-    --text: #a8a8a8;
-    --heading: #e6e6e6;
-    --muted: #828282;
-    --border: 255 255 255;
-    --border-color: rgba(255, 255, 255, 0.10);
-    --hairline: rgba(255, 255, 255, 0.10);
-    /* No !important — let the body background-color TRANSITION (set on body base rule)
-       ease the canvas to the terminal instead of snapping. */
-    background-color: #101010;
   }
 
   /* Hero name gradient text (ported from D) — heading → accent → aurora hue. */

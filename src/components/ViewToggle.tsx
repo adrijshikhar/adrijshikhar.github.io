@@ -87,12 +87,9 @@ export default function ViewToggle() {
     incoming.style.overflow = 'visible';
     incoming.style.display = '';
 
-    // SNAP canvas + foundation tokens to the target state with CSS transitions SUPPRESSED, so the
-    // outgoing view's colors don't shimmer/recolor mid-fade. (Dark→machine is already smooth because
-    // its tokens barely change; light→machine flickered because the human view recoloured light→dark
-    // on a different clock than the opacity fade. Snapping makes light behave exactly like dark.)
-    // Only OPACITY (driven by GSAP inline, unaffected by transition:none) crossfades.
-    root.classList.add('mode-switching');
+    // Machine view follows the active mode (token-driven), so the canvas colour is IDENTICAL across
+    // the toggle — no recolor, no shimmer. The only effect of .machine-mode is hiding the aurora.
+    // Pure GSAP opacity crossfade does the rest (same in light and dark).
     if (next === 'machine') {
       root.classList.add('machine-mode');
       document.body.classList.add('machine-mode');
@@ -117,7 +114,6 @@ export default function ViewToggle() {
         // default is opacity:0 — clearing it would re-hide the terminal). Only clear transform.
         gsap.set(incoming, { opacity: 1, clearProps: 'transform' });
 
-        root.classList.remove('mode-switching');
         setTransitioning(false);
       },
     });
