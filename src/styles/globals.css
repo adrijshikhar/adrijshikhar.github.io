@@ -298,9 +298,9 @@
     mix-blend-mode: multiply;
     filter: blur(110px);
   }
-  :root[data-mode="light"] .aurora-blob--1 { opacity: 0.16; }
-  :root[data-mode="light"] .aurora-blob--2 { opacity: 0.12; }
-  :root[data-mode="light"] .aurora-blob--3 { opacity: 0.11; }
+  :root[data-mode="light"] .aurora-blob--1 { opacity: 0.55; }
+  :root[data-mode="light"] .aurora-blob--2 { opacity: 0.45; }
+  :root[data-mode="light"] .aurora-blob--3 { opacity: 0.4; }
 
   /* Machine mode: terminal canvas stays pure — kill the aurora entirely.
      Machine is ALWAYS dark: force the dark foundation tokens even when the

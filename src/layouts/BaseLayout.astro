@@ -37,7 +37,8 @@ const { title, canonical } = Astro.props;
           document.documentElement.dataset.theme = 'parallel';
         }
         try {
-          var savedMode = localStorage.getItem('mode');
+          var urlMode = new URLSearchParams(location.search).get('mode');
+          var savedMode = urlMode === 'light' || urlMode === 'dark' ? urlMode : localStorage.getItem('mode');
           document.documentElement.dataset.mode =
             savedMode === 'light' ? 'light' : 'dark';
         } catch (e) {
