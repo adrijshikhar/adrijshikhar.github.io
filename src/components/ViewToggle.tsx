@@ -218,7 +218,7 @@ export default function ViewToggle() {
     <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[1100] flex items-center gap-2">
       <div
         ref={islandRef}
-        className="flex gap-4 px-4 py-2.5 rounded-none backdrop-blur-xl font-mono text-sm bg-[#161616]/92 border border-white/10"
+        className="flex gap-4 px-4 py-2.5 rounded-none backdrop-blur-xl font-mono text-sm bg-surface/92 border border-[rgb(var(--border)/0.14)]"
       >
         <Toggle
           pressed={mode === 'human'}
@@ -226,10 +226,10 @@ export default function ViewToggle() {
           className="!bg-transparent !h-auto !min-w-0 !px-0 !py-0 !rounded-none flex items-center gap-2 transition-colors duration-300 hover:!bg-transparent data-[state=on]:!bg-transparent"
         >
           <span className={`size-[6px] inline-block rounded-full transition-all duration-500 ${
-            mode === 'human' ? 'bg-current outline outline-1 outline-offset-1 outline-current' : 'outline outline-1 outline-offset-1 outline-[#858483]/30'
+            mode === 'human' ? 'bg-current outline outline-1 outline-offset-1 outline-current' : 'outline outline-1 outline-offset-1 outline-muted/40'
           }`} />
           <span className={`uppercase text-xs tracking-wider transition-colors duration-300 ${
-            mode === 'human' ? 'text-white' : 'text-[#858483]/50'
+            mode === 'human' ? 'text-heading' : 'text-muted'
           }`}>Human</span>
         </Toggle>
         <Toggle
@@ -238,10 +238,10 @@ export default function ViewToggle() {
           className="!bg-transparent !h-auto !min-w-0 !px-0 !py-0 !rounded-none flex items-center gap-2 transition-colors duration-300 hover:!bg-transparent data-[state=on]:!bg-transparent"
         >
           <span className={`size-[6px] inline-block rounded-full transition-all duration-500 ${
-            mode === 'machine' ? 'bg-current outline outline-1 outline-offset-1 outline-current' : 'outline outline-1 outline-offset-1 outline-[#858483]/30'
+            mode === 'machine' ? 'bg-current outline outline-1 outline-offset-1 outline-current' : 'outline outline-1 outline-offset-1 outline-muted/40'
           }`} />
           <span className={`uppercase text-xs tracking-wider transition-colors duration-300 ${
-            mode === 'machine' ? 'text-white' : 'text-[#858483]/50'
+            mode === 'machine' ? 'text-heading' : 'text-muted'
           }`}>Machine</span>
         </Toggle>
       </div>

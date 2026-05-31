@@ -206,8 +206,9 @@
   }
 
   ::selection {
-    background: var(--accent);
-    color: var(--accent-contrast);
+    /* subtle accent-tint highlight; keep text at --heading so it stays high-contrast in both modes */
+    background: color-mix(in srgb, var(--accent) 30%, transparent);
+    color: var(--heading);
   }
 
   /* Visible focus rings, accent-tinted */
