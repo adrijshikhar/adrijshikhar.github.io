@@ -59,23 +59,26 @@ export default function ViewToggle() {
       const tl = gsap.timeline({ onComplete: () => setTransitioning(false) });
 
       // Crossfade: expand machine IN and collapse human OUT simultaneously (both at t=0)
-      // so something always occupies space — no empty-screen gap.
+      // so something always occupies space — no empty-screen gap. Longer, eased, with a
+      // soft upward slide on the incoming terminal so the entrance feels smooth, not abrupt.
       tl.fromTo(machineView,
-        { height: 0, opacity: 0, overflow: 'hidden' },
+        { height: 0, opacity: 0, y: 14, overflow: 'hidden' },
         {
           height: 'auto',
           opacity: 1,
-          duration: 0.4,
-          ease: 'power2.out',
+          y: 0,
+          duration: 0.6,
+          ease: 'power3.out',
           onStart: () => { machineView.style.pointerEvents = 'auto'; },
-          onComplete: () => { machineView.style.overflow = 'visible'; },
+          onComplete: () => { machineView.style.overflow = 'visible'; gsap.set(machineView, { clearProps: 'transform' }); },
         }, 0);
 
       tl.to(humanView, {
         height: 0,
         opacity: 0,
-        duration: 0.3,
-        ease: 'power2.in',
+        y: -10,
+        duration: 0.45,
+        ease: 'power2.inOut',
         onStart: () => {
           humanView.style.overflow = 'hidden';
           gsap.set(humanView, { height: humanView.scrollHeight });
@@ -86,9 +89,9 @@ export default function ViewToggle() {
         },
       }, 0);
 
-      // Flip the canvas to the dark terminal at the crossfade midpoint (not while human is still full).
-      tl.add(() => { document.body.classList.add('machine-mode'); }, 0.16);
-      tl.to(document.body, { backgroundColor: '#101010', duration: 0.25, ease: 'power1.inOut' }, 0.12);
+      // Ease the canvas to the dark terminal, crossing over mid-transition (not a hard cut).
+      tl.add(() => { document.body.classList.add('machine-mode'); }, 0.22);
+      tl.to(document.body, { backgroundColor: '#101010', duration: 0.45, ease: 'power1.inOut' }, 0.08);
 
     } else {
       setMode(next);
