@@ -18,10 +18,10 @@ const buildMachineHtml = () => {
 };
 
 export default function ViewToggle() {
-  // Lazily initialize from the URL so ?machine=true first paints as machine view.
-  const [mode, setMode] = useState<'human' | 'machine'>(() =>
-    startsInMachine() ? 'machine' : 'human',
-  );
+  // Init 'human' to match SSR (the static build has no URL param) — avoids a hydration mismatch
+  // on ?machine=true. The mount effect below flips to 'machine' right after hydration; the view
+  // DOM itself is set to the machine end-state instantly in that same effect (no human flash).
+  const [mode, setMode] = useState<'human' | 'machine'>('human');
   const [transitioning, setTransitioning] = useState(false);
   const machineLoadedRef = useRef(false);
   const islandRef = useRef<HTMLDivElement>(null);
@@ -136,6 +136,9 @@ export default function ViewToggle() {
     const humanView = document.querySelector('.human-view') as HTMLElement | null;
     const machineView = document.querySelector('.machine-view') as HTMLElement | null;
     if (!humanView || !machineView) return;
+
+    // Reflect machine in the toggle indicator (post-hydration, so no SSR mismatch).
+    setMode('machine');
 
     // Same machine-content load that toggle() performs.
     if (!machineLoadedRef.current) {
