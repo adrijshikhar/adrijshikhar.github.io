@@ -33,6 +33,12 @@
   --aurora-1: #fb631b; /* orange */
   --aurora-2: #ff9d5c; /* amber */
   --aurora-3: #ffd089; /* gold */
+  /* Aurora rendering (DARK). Light mode overrides these values only — see [data-mode="light"]. */
+  --aurora-blend: screen;
+  --aurora-blur: 100px;
+  --aurora-op-1: 0.5;
+  --aurora-op-2: 0.38;
+  --aurora-op-3: 0.34;
 
   /* Atelier card (bridge: A hairline + C soft premium) */
   --card-tint: color-mix(in srgb, var(--accent) 6%, var(--surface));
@@ -128,6 +134,13 @@
   --card-shadow: 0 8px 30px rgba(31, 27, 18, 0.07);
   --card-shadow-lg: 0 18px 50px rgba(31, 27, 18, 0.11);
   --card-edge: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+
+  /* Aurora rendering (LIGHT): multiply blend reads on a light bg; higher opacity to stay visible */
+  --aurora-blend: multiply;
+  --aurora-blur: 110px;
+  --aurora-op-1: 0.55;
+  --aurora-op-2: 0.45;
+  --aurora-op-3: 0.4;
 
   /* shadcn token bridge — flip to light so ui/* components adapt */
   --background: 60 14% 96%;
@@ -299,15 +312,15 @@
   .aurora-blob {
     position: absolute;
     border-radius: 50%;
-    filter: blur(100px);
-    mix-blend-mode: screen;
+    filter: blur(var(--aurora-blur));
+    mix-blend-mode: var(--aurora-blend);
     will-change: transform;
   }
   /* primary accent glow — top-left */
   .aurora-blob--1 {
     width: 50vw; height: 50vw;
     top: -18vw; left: -12vw;
-    opacity: 0.5;
+    opacity: var(--aurora-op-1);
     background: radial-gradient(circle at 30% 30%, var(--aurora-1), transparent 68%);
     animation: aurora-drift1 30s ease-in-out infinite alternate;
   }
@@ -315,7 +328,7 @@
   .aurora-blob--2 {
     width: 44vw; height: 44vw;
     top: 6vw; right: -16vw;
-    opacity: 0.38;
+    opacity: var(--aurora-op-2);
     background: radial-gradient(circle at 60% 40%, var(--aurora-2), transparent 70%);
     animation: aurora-drift2 36s ease-in-out infinite alternate;
   }
@@ -323,7 +336,7 @@
   .aurora-blob--3 {
     width: 46vw; height: 46vw;
     bottom: -22vw; left: 22vw;
-    opacity: 0.34;
+    opacity: var(--aurora-op-3);
     background: radial-gradient(circle at 50% 50%, var(--aurora-3), transparent 70%);
     animation: aurora-drift3 42s ease-in-out infinite alternate;
   }
@@ -345,17 +358,9 @@
     .aurora-blob { animation: none !important; }
   }
 
-  /* LIGHT MODE aurora: pure screen-blend washes out on a light bg (light+light
-     ≈ white, no visible hue). Switch to multiply (darkens toward the tint) and
-     dial opacity way down so it stays a tasteful faint edge-glow and the central
-     content zone keeps AA contrast. Veil already fades back to --bg over content. */
-  :root[data-mode="light"] .aurora-blob {
-    mix-blend-mode: multiply;
-    filter: blur(110px);
-  }
-  :root[data-mode="light"] .aurora-blob--1 { opacity: 0.55; }
-  :root[data-mode="light"] .aurora-blob--2 { opacity: 0.45; }
-  :root[data-mode="light"] .aurora-blob--3 { opacity: 0.4; }
+  /* Light-mode aurora differences (blend/blur/opacity) are driven entirely by the
+     --aurora-* variables set in :root vs :root[data-mode="light"] — no per-mode
+     element selectors needed here. */
 
   /* Machine mode: terminal canvas stays pure — kill the aurora entirely.
      Machine is ALWAYS dark: force the dark foundation tokens even when the
