@@ -162,8 +162,8 @@ export default function ViewToggle() {
     // Machine view: in flow at natural height, visible.
     machineView.style.display = '';
     machineView.style.pointerEvents = 'auto';
-    machineView.style.height = '';
-    machineView.style.overflow = '';
+    machineView.style.height = 'auto'; /* override .machine-view{height:0} so the terminal is visible on direct ?machine=true load */
+    machineView.style.overflow = 'visible';
     gsap.set(machineView, { opacity: 1 });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
