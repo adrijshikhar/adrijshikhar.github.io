@@ -12,4 +12,13 @@ export default defineConfig({
     tailwind({ applyBaseStyles: false }),
     sitemap(),
   ],
+  vite: {
+    server: {
+      fs: {
+        // Allow the dev server to serve deps that resolve to the parent repo's
+        // node_modules (git worktrees share the parent checkout). Dev-only.
+        allow: ['..', '../..', '../../..'],
+      },
+    },
+  },
 });

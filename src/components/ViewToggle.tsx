@@ -126,8 +126,8 @@ export default function ViewToggle() {
       // Island transitions first
       if (islandRef.current) {
         tl.to(islandRef.current, {
-          backgroundColor: 'rgba(10, 25, 47, 0.95)',
-          borderColor: 'rgba(100, 116, 139, 0.4)',
+          backgroundColor: 'rgba(22, 22, 22, 0.92)',
+          borderColor: 'rgba(255, 255, 255, 0.10)',
           duration: 0.15,
           ease: 'power1.inOut',
         }, 0);
@@ -147,9 +147,9 @@ export default function ViewToggle() {
         },
       }, 0);
 
-      // Background transition
+      // Background transition (flat Swiss foundation, not navy)
       tl.to(document.body, {
-        backgroundColor: '#0f172a',
+        backgroundColor: '#0e0e0e',
         duration: 0.2,
         ease: 'power1.inOut',
         onStart: () => {
@@ -218,7 +218,7 @@ export default function ViewToggle() {
     <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[1100] flex items-center gap-2">
       <div
         ref={islandRef}
-        className="flex gap-4 px-4 py-2.5 rounded-md backdrop-blur-xl font-mono text-sm bg-[#0a192f]/95 border border-slate-500/40"
+        className="flex gap-4 px-4 py-2.5 rounded-none backdrop-blur-xl font-mono text-sm bg-[#161616]/92 border border-white/10"
       >
         <Toggle
           pressed={mode === 'human'}

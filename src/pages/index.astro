@@ -69,59 +69,68 @@ const rawMarkdown = [
   <div class="machine-view" />
 
   <div class="human-view mx-auto min-h-screen max-w-screen-xl px-6 py-12 md:px-12 md:py-20 lg:px-16 lg:py-0">
-    <div class="lg:flex lg:justify-between lg:gap-4">
+    <div class="lg:flex lg:justify-between lg:gap-8">
       <SideNav />
 
       <main id="content" class="pt-24 lg:w-[55%] lg:py-24">
 
         <!-- About -->
-        <section id="about" class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24">
-          <div class="prose prose-invert prose-sm max-w-none text-slate-400" set:html={marked.parse(about.content)} />
+        <section id="about" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
+          <p class="eyebrow mb-5"><span class="tick">//</span> 01 about</p>
+          <div
+            class="prose prose-invert prose-sm max-w-none text-text prose-p:text-text prose-p:leading-relaxed prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-strong:text-heading prose-strong:font-medium"
+            set:html={marked.parse(about.content)}
+          />
         </section>
 
         <!-- Experience -->
-        <section id="experience" class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24">
-          <div class="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-slate-900/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:px-0 lg:py-0 lg:opacity-0">
-            <h2 class="text-sm font-bold uppercase tracking-widest text-slate-200 lg:sr-only">Experience</h2>
+        <section id="experience" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
+          <div class="sticky top-0 z-20 -mx-6 mb-6 w-screen border-b border-border bg-bg/80 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
+            <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Experience</h2>
           </div>
-          <ul class="group/list">
+          <p class="eyebrow mb-5 hidden lg:block"><span class="tick">//</span> 02 experience</p>
+          <ul class="group/list border-b-0">
             {experience.meta.entries.slice(0, 1).map((exp: any) => (
               <ExpCard {...exp} contentHtml={marked.parse(expSections[exp.slug] || '') as string} />
             ))}
           </ul>
-          <div class="mt-12">
-            <a class="inline-flex items-center font-medium leading-tight text-slate-200 group" href="/experience">
-              <span class="border-b border-transparent pb-px transition group-hover:border-accent">View Full Work Experience</span>
-              <span class="ml-2 text-accent transition-transform group-hover:translate-x-1">&rarr;</span>
+          <div class="mt-10">
+            <a class="group inline-flex items-center font-mono text-xs uppercase tracking-[0.14em] text-heading no-underline hover:text-heading" href="/experience">
+              <span class="mr-2 text-accent">&#9656;</span>
+              <span class="border-b border-transparent pb-px transition-colors duration-[120ms] group-hover:border-accent">View full work experience</span>
             </a>
           </div>
         </section>
 
         <!-- Projects -->
-        <section id="projects" class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24">
-          <div class="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-slate-900/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:px-0 lg:py-0 lg:opacity-0">
-            <h2 class="text-sm font-bold uppercase tracking-widest text-slate-200 lg:sr-only">Projects</h2>
+        <section id="projects" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
+          <div class="sticky top-0 z-20 -mx-6 mb-6 w-screen border-b border-border bg-bg/80 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
+            <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Projects</h2>
           </div>
+          <p class="eyebrow mb-5 hidden lg:block"><span class="tick">//</span> 03 projects</p>
           <ul class="group/list">
             {projects.meta.entries.slice(0, 2).map((proj: any) => (
               <ProjectCard {...proj} contentHtml={marked.parse(projSections[proj.slug] || '') as string} />
             ))}
           </ul>
-          <div class="mt-12">
-            <a class="inline-flex items-center font-medium leading-tight text-slate-200 group" href="/archive">
-              <span class="border-b border-transparent pb-px transition group-hover:border-accent">View Full Project Archive</span>
-              <span class="ml-2 text-accent transition-transform group-hover:translate-x-1">&rarr;</span>
+          <div class="mt-10">
+            <a class="group inline-flex items-center font-mono text-xs uppercase tracking-[0.14em] text-heading no-underline hover:text-heading" href="/archive">
+              <span class="mr-2 text-accent">&#9656;</span>
+              <span class="border-b border-transparent pb-px transition-colors duration-[120ms] group-hover:border-accent">View full project archive</span>
             </a>
           </div>
         </section>
 
         <!-- Writing -->
-        <section id="writing" class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24">
-          <div class="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-slate-900/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:px-0 lg:py-0 lg:opacity-0">
-            <h2 class="text-sm font-bold uppercase tracking-widest text-slate-200 lg:sr-only">Writing</h2>
+        <section id="writing" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
+          <div class="sticky top-0 z-20 -mx-6 mb-6 w-screen border-b border-border bg-bg/80 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
+            <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Writing</h2>
           </div>
+          <p class="eyebrow mb-5 hidden lg:block"><span class="tick">//</span> 04 writing</p>
           {latestPosts.length === 0 ? (
-            <p class="text-slate-400">No posts yet.</p>
+            <p class="border border-border px-5 py-6 font-mono text-sm text-muted">
+              <span class="text-accent">$</span> ls ./posts — <span class="text-text">no entries yet.</span>
+            </p>
           ) : (
             <ul class="group/list">
               {latestPosts.map((post) => (
@@ -129,48 +138,61 @@ const rawMarkdown = [
               ))}
             </ul>
           )}
-          <div class="mt-12">
-            <a class="inline-flex items-center font-medium leading-tight text-slate-200 group" href="/blogs">
-              <span class="border-b border-transparent pb-px transition group-hover:border-accent">View all posts</span>
-              <span class="ml-2 text-accent transition-transform group-hover:translate-x-1">&rarr;</span>
+          <div class="mt-10">
+            <a class="group inline-flex items-center font-mono text-xs uppercase tracking-[0.14em] text-heading no-underline hover:text-heading" href="/blogs">
+              <span class="mr-2 text-accent">&#9656;</span>
+              <span class="border-b border-transparent pb-px transition-colors duration-[120ms] group-hover:border-accent">View all posts</span>
             </a>
           </div>
         </section>
 
         <!-- Education -->
-        <section id="education" class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24">
-          <div class="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-slate-900/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:px-0 lg:py-0 lg:opacity-0">
-            <h2 class="text-sm font-bold uppercase tracking-widest text-slate-200 lg:sr-only">Education</h2>
+        <section id="education" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
+          <div class="sticky top-0 z-20 -mx-6 mb-6 w-screen border-b border-border bg-bg/80 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
+            <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Education</h2>
           </div>
-          {education.meta.entries.map((edu: any) => (
-            <div class="group flex flex-col md:flex-row justify-between mb-8 p-4 rounded-md hover:bg-slate-800/50 transition-all">
-              <div class="flex-1">
-                <h3 class="text-lg font-medium text-slate-200">{edu.institution}</h3>
-                <div class="text-accent text-sm">{edu.degree}</div>
-                {edu.field && <p class="text-slate-400/70 text-sm">{edu.field}</p>}
-              </div>
-              <div class="md:text-right mt-1 md:mt-0">
-                <span class="font-mono text-xs text-slate-400/60">{edu.startDate} — {edu.endDate}</span>
-              </div>
-            </div>
-          ))}
+          <p class="eyebrow mb-5 hidden lg:block"><span class="tick">//</span> 05 education</p>
+          <ul class="border-t border-border">
+            {education.meta.entries.map((edu: any) => (
+              <li class="group flex flex-col justify-between gap-1 border-b border-border py-5 transition-colors duration-[120ms] hover:bg-surface md:flex-row md:items-baseline">
+                <div class="flex-1">
+                  <h3 class="font-heading text-base font-medium tracking-tighter text-heading">{edu.institution}</h3>
+                  <div class="mt-0.5 text-sm text-text">
+                    {edu.degree}{edu.field && <span class="text-muted"> — {edu.field}</span>}
+                  </div>
+                </div>
+                <span class="shrink-0 font-mono text-[11px] uppercase tracking-[0.12em] text-muted">{edu.startDate} — {edu.endDate}</span>
+              </li>
+            ))}
+          </ul>
         </section>
 
         <!-- Achievements -->
-        <section id="achievements" class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24">
-          <div class="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-slate-900/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:px-0 lg:py-0 lg:opacity-0">
-            <h2 class="text-sm font-bold uppercase tracking-widest text-slate-200 lg:sr-only">Achievements</h2>
+        <section id="achievements" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
+          <div class="sticky top-0 z-20 -mx-6 mb-6 w-screen border-b border-border bg-bg/80 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
+            <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Achievements</h2>
           </div>
-          <div class="prose prose-invert max-w-none prose-a:text-accent" set:html={marked.parse(achievements.content)} />
+          <p class="eyebrow mb-5 hidden lg:block"><span class="tick">//</span> 06 achievements</p>
+          <div
+            class="prose prose-invert max-w-none text-text prose-p:text-text prose-li:text-text marker:text-accent prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-strong:text-heading"
+            set:html={marked.parse(achievements.content)}
+          />
         </section>
 
         <!-- Interests -->
-        <section id="interests" class="mb-16 scroll-mt-16 md:mb-24 lg:mb-36 lg:scroll-mt-24">
-          <div class="sticky top-0 z-20 -mx-6 mb-4 w-screen bg-slate-900/75 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:px-0 lg:py-0 lg:opacity-0">
-            <h2 class="text-sm font-bold uppercase tracking-widest text-slate-200 lg:sr-only">Interests</h2>
-          </div>
-          <div class="prose prose-invert max-w-none text-slate-400" set:html={marked.parse(interests.content)} />
+        <section id="interests" class="mb-12 scroll-mt-16 md:mb-16 lg:scroll-mt-24">
+          <p class="eyebrow mb-5"><span class="tick">//</span> 07 interests</p>
+          <div
+            class="prose prose-invert max-w-none text-text prose-p:text-text prose-li:text-text marker:text-accent prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-strong:text-heading"
+            set:html={marked.parse(interests.content)}
+          />
         </section>
+
+        <footer class="mt-8 border-t border-border pt-8">
+          <p class="font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
+            <span class="text-accent">&#9656;</span> Designed in the terminal. Built with Astro.
+          </p>
+        </footer>
 
 
       </main>
@@ -183,9 +205,27 @@ const rawMarkdown = [
   <script>
     const spotlight = document.getElementById('spotlight');
 
+    // Subtle accent-tinted spotlight (low alpha to stay flat).
+    // Cache the resolved RGB and refresh only when the theme attribute changes.
+    let accentRGB = '251, 99, 27';
+    function refreshAccent() {
+      const c = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+      const tmp = document.createElement('span');
+      tmp.style.color = c;
+      document.body.appendChild(tmp);
+      const m = getComputedStyle(tmp).color.match(/\d+/g);
+      tmp.remove();
+      if (m) accentRGB = `${m[0]}, ${m[1]}, ${m[2]}`;
+    }
+    refreshAccent();
+    new MutationObserver(refreshAccent).observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+
     document.addEventListener('mousemove', (e) => {
       if (spotlight && !document.body.classList.contains('machine-mode')) {
-        spotlight.style.background = `radial-gradient(600px at ${e.clientX}px ${e.clientY}px, rgba(29, 78, 216, 0.15), transparent 80%)`;
+        spotlight.style.background = `radial-gradient(560px at ${e.clientX}px ${e.clientY}px, rgba(${accentRGB}, 0.06), transparent 72%)`;
       }
     });
 
@@ -197,7 +237,8 @@ const rawMarkdown = [
     modeObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
     // Section fade-in on scroll (progressive enhancement — visible by default if observer unsupported)
-    if ('IntersectionObserver' in window) {
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if ('IntersectionObserver' in window && !prefersReduced) {
       const sections = document.querySelectorAll('section[id]');
       sections.forEach((s) => {
         (s as HTMLElement).style.opacity = '0';

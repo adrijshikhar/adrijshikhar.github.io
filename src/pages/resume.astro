@@ -1,0 +1,108 @@
+---
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import matter from 'gray-matter';
+import { marked } from 'marked';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+function readContent(filename: string) {
+  const raw = readFileSync(join(process.cwd(), 'src/content', filename), 'utf-8');
+  const { data, content } = matter(raw);
+  return { meta: data, content };
+}
+
+function splitBySlug(content: string): Record<string, string> {
+  const sections: Record<string, string> = {};
+  const parts = content.split(/<!--\s*([\w-]+)\s*-->/);
+  for (let i = 1; i < parts.length; i += 2) {
+    sections[parts[i]] = parts[i + 1]?.trim() || '';
+  }
+  return sections;
+}
+
+const about = readContent('about.md');
+const experience = readContent('experience.md');
+const education = readContent('education.md');
+const skills = readContent('skills.md');
+const achievements = readContent('achievements.md');
+const expSections = splitBySlug(experience.content);
+
+const proseClass =
+  'prose prose-invert prose-sm max-w-none text-text prose-p:text-text prose-li:text-text ' +
+  'prose-li:my-0.5 marker:text-accent prose-headings:text-heading prose-headings:text-sm ' +
+  'prose-headings:font-semibold prose-headings:tracking-tighter prose-a:text-accent ' +
+  'prose-a:no-underline hover:prose-a:underline prose-strong:text-heading prose-strong:font-medium';
+---
+
+<BaseLayout title="Resume | Adrij Shikhar">
+  <main class="mx-auto min-h-screen max-w-3xl px-6 py-16 md:px-12 md:py-24">
+    <a href="/" class="group inline-flex items-center font-mono text-xs uppercase tracking-[0.14em] text-muted no-underline hover:text-accent">
+      <span class="mr-2 transition-transform duration-[120ms] group-hover:-translate-x-1">&larr;</span>
+      <span>adrij_shikhar</span>
+    </a>
+
+    <header class="mt-10 flex flex-col gap-6 border-b border-border pb-10 md:flex-row md:items-end md:justify-between">
+      <div>
+        <p class="eyebrow mb-4"><span class="tick">//</span> resume.txt</p>
+        <h1 class="font-heading text-4xl font-semibold tracking-tightest text-heading sm:text-5xl">{about.meta.name ?? 'Adrij Shikhar'}</h1>
+        <p class="mt-2 font-heading text-base font-medium tracking-tighter text-heading">Senior Software Engineer</p>
+      </div>
+      <a
+        href="/assets/resume.pdf"
+        download="Adrij Shikhar Resume.pdf"
+        class="group inline-flex shrink-0 items-center gap-2 border border-border px-4 py-2.5 font-mono text-xs uppercase tracking-[0.14em] text-heading no-underline transition-colors duration-[120ms] hover:border-accent hover:text-accent"
+      >
+        <span class="text-accent">&#9662;</span> Download PDF
+      </a>
+    </header>
+
+    <!-- Experience -->
+    <section class="mt-12">
+      <p class="eyebrow mb-6"><span class="tick">//</span> 01 experience</p>
+      <ul class="border-t border-border">
+        {experience.meta.entries.map((exp: any) => (
+          <li class="border-b border-border py-6">
+            <div class="flex flex-col gap-1 md:flex-row md:items-baseline md:justify-between">
+              <h2 class="font-heading text-base font-medium tracking-tighter text-heading">
+                {exp.position} <span class="mx-1 text-muted">/</span> {exp.company}
+              </h2>
+              <span class="shrink-0 font-mono text-[11px] uppercase tracking-[0.12em] text-muted">{exp.startDate} — {exp.endDate}</span>
+            </div>
+            {exp.location && <p class="mt-0.5 font-mono text-[11px] uppercase tracking-[0.1em] text-muted">{exp.location}</p>}
+            {expSections[exp.slug] && (
+              <div class={`mt-3 ${proseClass}`} set:html={marked.parse(expSections[exp.slug])} />
+            )}
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- Education -->
+    <section class="mt-12">
+      <p class="eyebrow mb-6"><span class="tick">//</span> 02 education</p>
+      <ul class="border-t border-border">
+        {education.meta.entries.map((edu: any) => (
+          <li class="flex flex-col gap-1 border-b border-border py-5 md:flex-row md:items-baseline md:justify-between">
+            <div>
+              <h3 class="font-heading text-base font-medium tracking-tighter text-heading">{edu.institution}</h3>
+              <p class="mt-0.5 text-sm text-text">{edu.degree}{edu.field && <span class="text-muted"> — {edu.field}</span>}</p>
+            </div>
+            <span class="shrink-0 font-mono text-[11px] uppercase tracking-[0.12em] text-muted">{edu.startDate} — {edu.endDate}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- Skills -->
+    <section class="mt-12">
+      <p class="eyebrow mb-6"><span class="tick">//</span> 03 skills</p>
+      <div class={proseClass} set:html={marked.parse(skills.content)} />
+    </section>
+
+    <!-- Achievements -->
+    <section class="mt-12">
+      <p class="eyebrow mb-6"><span class="tick">//</span> 04 achievements</p>
+      <div class={proseClass} set:html={marked.parse(achievements.content)} />
+    </section>
+  </main>
+</BaseLayout>
