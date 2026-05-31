@@ -1,0 +1,31 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const posts = (await getCollection('blog', ({ data }) => import.meta.env.PROD ? !data.draft : true))
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const fmt = (d) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+---
+
+<BaseLayout title="Writing | Adrij Shikhar">
+  <main class="mx-auto min-h-screen max-w-screen-md px-6 py-12 md:px-12 md:py-20">
+    <a href="/" class="text-sm text-slate-400 hover:text-accent">← Back</a>
+    <h1 class="mt-6 text-3xl font-bold tracking-tight text-slate-200">Writing</h1>
+    {posts.length === 0 ? (
+      <p class="mt-8 text-slate-400">No posts yet.</p>
+    ) : (
+      <ul class="mt-8 space-y-8">
+        {posts.map((post) => (
+          <li class="group">
+            <a href={`/blogs/${post.id}`} class="block">
+              <div class="text-xs font-semibold uppercase tracking-widest text-slate-500">{fmt(post.data.date)}</div>
+              <h2 class="mt-1 text-lg font-medium text-slate-200 group-hover:text-accent">{post.data.title}</h2>
+              <p class="mt-1 text-sm leading-normal text-slate-400">{post.data.description}</p>
+            </a>
+          </li>
+        ))}
+      </ul>
+    )}
+  </main>
+</BaseLayout>
