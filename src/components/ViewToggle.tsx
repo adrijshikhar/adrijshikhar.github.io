@@ -68,38 +68,38 @@ export default function ViewToggle() {
 
       const tl = gsap.timeline({ onComplete: () => setTransitioning(false) });
 
-      // Crossfade: expand machine IN and collapse human OUT simultaneously (both at t=0)
-      // so something always occupies space — no empty-screen gap. Longer, eased, with a
-      // soft upward slide on the incoming terminal so the entrance feels smooth, not abrupt.
-      tl.fromTo(machineView,
-        { height: 0, opacity: 0, y: 14, overflow: 'hidden' },
-        {
-          height: 'auto',
-          opacity: 1,
-          y: 0,
-          duration: 0.6,
-          ease: 'power3.out',
-          onStart: () => { machineView.style.pointerEvents = 'auto'; },
-          onComplete: () => { machineView.style.overflow = 'visible'; gsap.set(machineView, { clearProps: 'transform' }); },
-        }, 0);
-
+      // SEQUENTIAL "boot-up": canvas is already dark (snapped above). First fade the human
+      // content OUT to the dark canvas, then fade the terminal text IN on the black — so the
+      // machine view appears smoothly on an already-dark stage instead of crossfading.
       tl.to(humanView, {
-        height: 0,
         opacity: 0,
-        y: -10,
-        duration: 0.45,
-        ease: 'power2.inOut',
+        y: -8,
+        duration: 0.3,
+        ease: 'power2.in',
         onStart: () => {
           humanView.style.overflow = 'hidden';
           gsap.set(humanView, { height: humanView.scrollHeight });
         },
         onComplete: () => {
+          gsap.set(humanView, { height: 0 });
           humanView.style.pointerEvents = 'none';
           humanView.style.minHeight = '0';
         },
       }, 0);
 
-      // (Canvas is handled by the CSS body background-color transition + .machine-mode class above.)
+      // Terminal fades/rises in on the dark stage, starting just after the human view clears.
+      tl.fromTo(machineView,
+        { height: 'auto', opacity: 0, y: 10, overflow: 'visible' },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.5,
+          ease: 'power2.out',
+          onStart: () => { machineView.style.pointerEvents = 'auto'; },
+          onComplete: () => { gsap.set(machineView, { clearProps: 'transform' }); },
+        }, 0.28);
+
+      // (Canvas already snapped dark via the atomic html+body .machine-mode class above.)
 
     } else {
       setMode(next);
