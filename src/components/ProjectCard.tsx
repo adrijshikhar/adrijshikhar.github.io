@@ -1,4 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
+import { CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
+import HoverCard from './HoverCard';
 
 interface ProjectCardProps {
   title: string;
@@ -11,9 +12,7 @@ interface ProjectCardProps {
 
 export default function ProjectCard({ title, company, date, link, builtWith = [], contentHtml }: ProjectCardProps) {
   return (
-    <li className="mb-12">
-      <Card className="!gap-0 !overflow-visible !rounded-none !py-0 group relative border-0 bg-transparent p-0 shadow-none !ring-0 text-inherit transition-all lg:hover:!opacity-100 lg:group-hover/list:opacity-50">
-        <div className="absolute -inset-x-4 -inset-y-4 z-0 hidden rounded-md transition motion-reduce:transition-none lg:-inset-x-6 lg:block lg:group-hover:bg-slate-800/50 lg:group-hover:shadow-[inset_0_1px_0_0_rgba(148,163,184,0.1)] lg:group-hover:drop-shadow-lg" />
+    <HoverCard>
         <CardHeader className="relative z-10 !gap-0 !p-0">
           <div className="flex items-baseline justify-between gap-4">
             <CardTitle className="!text-base !font-medium !leading-snug text-slate-200">
@@ -46,7 +45,6 @@ export default function ProjectCard({ title, company, date, link, builtWith = []
             dangerouslySetInnerHTML={{ __html: contentHtml }}
           />
         )}
-      </Card>
-    </li>
+    </HoverCard>
   );
 }

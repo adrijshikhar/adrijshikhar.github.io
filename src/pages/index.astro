@@ -9,6 +9,7 @@ import SideNav from '../components/SideNav.astro';
 import Section from '../components/Section.astro';
 import ExpCard from '../components/ExpCard.tsx';
 import ProjectCard from '../components/ProjectCard.tsx';
+import BlogCard from '../components/BlogCard.tsx';
 import ViewToggle from '../components/ViewToggle.tsx';
 
 function readContent(filename: string) {
@@ -124,15 +125,7 @@ const rawMarkdown = [
           ) : (
             <ul class="group/list">
               {latestPosts.map((post) => (
-                <li class="mb-4">
-                  <a
-                    class="group flex flex-col gap-1 rounded-md p-4 transition-all hover:bg-slate-800/50 lg:hover:!opacity-100 lg:group-hover/list:opacity-50"
-                    href={`/blogs/${post.id}`}
-                  >
-                    <span class="font-mono text-xs text-slate-400/60">{fmtPostDate(post.data.date)}</span>
-                    <h3 class="font-medium leading-snug text-slate-200 group-hover:text-accent">{post.data.title}</h3>
-                  </a>
-                </li>
+                <BlogCard title={post.data.title} date={fmtPostDate(post.data.date)} href={`/blogs/${post.id}`} />
               ))}
             </ul>
           )}
