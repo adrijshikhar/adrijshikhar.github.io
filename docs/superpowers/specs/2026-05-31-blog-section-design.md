@@ -43,6 +43,24 @@ cross-posts set `rel=canonical` back to the site URL.
 (No code is required for cross-posting; this section documents the publishing workflow so
 the post's frontmatter can carry a `canonicalUrl`/`crossposts` note if desired.)
 
+## Phasing
+
+Build + publishing are split into phases. **Each blog posting (per platform) is its own
+phase**, so they ship independently.
+
+- **Phase 1 — Blog foundation (code).** Content collection, `/blogs` list + post pages,
+  homepage Writing section + `SideNav` anchor, `?machine=true`, and the first post scaffold.
+  Ships the **canonical** post on `adrijshikhar.github.io`. Built in a worktree off
+  `content`; PR → merge → CI deploy.
+- **Phase 2 — Publish on dev.to.** Finalize the post prose, then cross-post to
+  [dev.to](https://dev.to/adrijshikhar) with `rel=canonical` → the site URL (via dev.to
+  API or the editor), tagged `#showdev`. No site code.
+- **Phase 3 — Publish on [everydev.ai](https://www.everydev.ai/).** Cross-post the same
+  finalized post with canonical → the site URL. No site code.
+
+Phases 2–3 depend on the finalized Phase-1 post content and are otherwise independent. Each
+gets its own plan/execution cycle.
+
 ## Architecture / components
 
 ### Content model — `src/content.config.ts`
