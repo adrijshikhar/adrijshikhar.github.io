@@ -18,7 +18,7 @@
   --bg: #0e0e0e;
   --surface: #161616;
   --surface-2: #1c1c1c;
-  --text: #a8a8a8;
+  --text: #c4c4c4; /* lightened from #a8a8a8 for readability on the near-black bg */
   --heading: #e6e6e6;
   --muted: #909090; /* AA (≥4.5:1) on bg, surface, AND accent-tinted cards (worst teal tint-2 = 4.60) */
   --border: 255 255 255; /* used as rgb(var(--border) / a) */
@@ -232,6 +232,22 @@
 }
 
 @layer components {
+  /* C-style soft pill button */
+  .atelier-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 9999px;
+    background: var(--card-tint-2);
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--accent);
+    transition: transform 0.3s var(--ease-spring), background-color 0.3s ease;
+  }
+  .atelier-btn:hover { transform: translateY(-2px); background: color-mix(in srgb, var(--accent) 14%, var(--surface)); }
+  @media (prefers-reduced-motion: reduce) { .atelier-btn:hover { transform: none; } }
+
   .atelier-card {
     border: 1px solid rgb(var(--border) / 0.12);
     border-radius: var(--card-radius);

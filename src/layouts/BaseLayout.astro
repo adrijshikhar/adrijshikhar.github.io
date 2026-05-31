@@ -58,7 +58,6 @@ const { title, canonical } = Astro.props;
 
     <div class="pointer-events-none fixed z-[9999] hidden lg:block" id="cursor">
       <div class="absolute -left-[10px] -top-[10px] h-5 w-5 rounded-[5px] border border-muted transition-all duration-150 ease-out" id="cursor-ring"></div>
-      <div class="absolute -left-[2px] -top-[2px] h-1 w-1 rounded-[1px] transition-all duration-150 ease-out" id="cursor-dot" style="background: var(--accent)"></div>
     </div>
     <slot />
 
@@ -74,7 +73,6 @@ const { title, canonical } = Astro.props;
     <script>
       const cursor = document.getElementById('cursor');
       const cursorRing = document.getElementById('cursor-ring');
-      const cursorDot = document.getElementById('cursor-dot');
       if (cursor) {
         cursor.style.left = `${window.innerWidth * 0.07}px`;
         cursor.style.top = `${window.innerHeight * 0.5}px`;
@@ -89,12 +87,10 @@ const { title, canonical } = Astro.props;
         el.addEventListener('mouseenter', () => {
           cursorRing?.classList.add('scale-150');
           cursorRing?.style.setProperty('border-color', 'var(--accent)');
-          cursorDot?.classList.add('scale-150');
         });
         el.addEventListener('mouseleave', () => {
           cursorRing?.classList.remove('scale-150');
           cursorRing?.style.removeProperty('border-color');
-          cursorDot?.classList.remove('scale-150');
         });
       });
     </script>

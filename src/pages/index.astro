@@ -69,14 +69,14 @@ const rawMarkdown = [
   <div class="machine-view" />
 
   <div class="human-view mx-auto min-h-screen max-w-screen-xl px-6 py-12 md:px-12 md:py-20 lg:px-16 lg:py-0">
-    <div class="lg:flex lg:justify-between lg:gap-8">
+    <div class="lg:flex lg:justify-between lg:gap-10">
       <SideNav />
 
-      <main id="content" class="pt-24 lg:w-[55%] lg:py-24">
+      <main id="content" class="pt-24 lg:w-[58%] lg:py-24">
 
         <!-- About -->
         <section id="about" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <p class="eyebrow mb-5"><span class="tick">//</span> 01 about</p>
+          <p class="mb-5 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted"><span class="h-2 w-2 rounded-full bg-accent"></span> about</p>
           <div
             class="prose prose-invert prose-sm max-w-none text-text prose-p:text-text prose-p:leading-relaxed prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-strong:text-heading prose-strong:font-medium"
             set:html={marked.parse(about.content)}
@@ -88,16 +88,15 @@ const rawMarkdown = [
           <div class="sticky top-0 z-20 -mx-6 mb-6 w-screen border-b border-border bg-bg/80 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
             <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Experience</h2>
           </div>
-          <p class="eyebrow mb-5 hidden lg:block"><span class="tick">//</span> 02 experience</p>
+          <p class="mb-5 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted hidden lg:flex"><span class="h-2 w-2 rounded-full bg-accent"></span> experience</p>
           <ul class="group/list border-b-0">
             {experience.meta.entries.slice(0, 1).map((exp: any) => (
               <ExpCard {...exp} contentHtml={marked.parse(expSections[exp.slug] || '') as string} />
             ))}
           </ul>
           <div class="mt-10">
-            <a class="group inline-flex items-center font-mono text-xs uppercase tracking-[0.14em] text-heading no-underline hover:text-heading" href="/experience">
-              <span class="mr-2 text-accent">&#9656;</span>
-              <span class="border-b border-transparent pb-px transition-colors duration-[120ms] group-hover:border-accent">View full work experience</span>
+            <a class="group atelier-btn" href="/experience">
+              <span>View full work experience</span><span class="transition-transform group-hover:translate-x-1">&rarr;</span>
             </a>
           </div>
         </section>
@@ -107,16 +106,15 @@ const rawMarkdown = [
           <div class="sticky top-0 z-20 -mx-6 mb-6 w-screen border-b border-border bg-bg/80 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
             <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Projects</h2>
           </div>
-          <p class="eyebrow mb-5 hidden lg:block"><span class="tick">//</span> 03 projects</p>
+          <p class="mb-5 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted hidden lg:flex"><span class="h-2 w-2 rounded-full bg-accent"></span> projects</p>
           <ul class="group/list">
             {projects.meta.entries.slice(0, 2).map((proj: any) => (
               <ProjectCard {...proj} contentHtml={marked.parse(projSections[proj.slug] || '') as string} />
             ))}
           </ul>
           <div class="mt-10">
-            <a class="group inline-flex items-center font-mono text-xs uppercase tracking-[0.14em] text-heading no-underline hover:text-heading" href="/archive">
-              <span class="mr-2 text-accent">&#9656;</span>
-              <span class="border-b border-transparent pb-px transition-colors duration-[120ms] group-hover:border-accent">View full project archive</span>
+            <a class="group atelier-btn" href="/archive">
+              <span>View full project archive</span><span class="transition-transform group-hover:translate-x-1">&rarr;</span>
             </a>
           </div>
         </section>
@@ -126,7 +124,7 @@ const rawMarkdown = [
           <div class="sticky top-0 z-20 -mx-6 mb-6 w-screen border-b border-border bg-bg/80 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
             <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Writing</h2>
           </div>
-          <p class="eyebrow mb-5 hidden lg:block"><span class="tick">//</span> 04 writing</p>
+          <p class="mb-5 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted hidden lg:flex"><span class="h-2 w-2 rounded-full bg-accent"></span> writing</p>
           {latestPosts.length === 0 ? (
             <p class="border border-border px-5 py-6 font-mono text-sm text-muted">
               <span class="text-accent">$</span> ls ./posts — <span class="text-text">no entries yet.</span>
@@ -139,9 +137,8 @@ const rawMarkdown = [
             </ul>
           )}
           <div class="mt-10">
-            <a class="group inline-flex items-center font-mono text-xs uppercase tracking-[0.14em] text-heading no-underline hover:text-heading" href="/blogs">
-              <span class="mr-2 text-accent">&#9656;</span>
-              <span class="border-b border-transparent pb-px transition-colors duration-[120ms] group-hover:border-accent">View all posts</span>
+            <a class="group atelier-btn" href="/blogs">
+              <span>View all posts</span><span class="transition-transform group-hover:translate-x-1">&rarr;</span>
             </a>
           </div>
         </section>
@@ -151,7 +148,7 @@ const rawMarkdown = [
           <div class="sticky top-0 z-20 -mx-6 mb-6 w-screen border-b border-border bg-bg/80 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
             <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Education</h2>
           </div>
-          <p class="eyebrow mb-5 hidden lg:block"><span class="tick">//</span> 05 education</p>
+          <p class="mb-5 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted hidden lg:flex"><span class="h-2 w-2 rounded-full bg-accent"></span> education</p>
           <ul class="border-t border-border">
             {education.meta.entries.map((edu: any) => (
               <li class="group flex flex-col justify-between gap-1 border-b border-border py-5 transition-colors duration-[120ms] hover:bg-surface md:flex-row md:items-baseline">
@@ -172,7 +169,7 @@ const rawMarkdown = [
           <div class="sticky top-0 z-20 -mx-6 mb-6 w-screen border-b border-border bg-bg/80 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
             <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Achievements</h2>
           </div>
-          <p class="eyebrow mb-5 hidden lg:block"><span class="tick">//</span> 06 achievements</p>
+          <p class="mb-5 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted hidden lg:flex"><span class="h-2 w-2 rounded-full bg-accent"></span> achievements</p>
           <div
             class="prose prose-invert max-w-none text-text prose-p:text-text prose-li:text-text marker:text-accent prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-strong:text-heading"
             set:html={marked.parse(achievements.content)}
@@ -181,7 +178,7 @@ const rawMarkdown = [
 
         <!-- Interests -->
         <section id="interests" class="mb-12 scroll-mt-16 md:mb-16 lg:scroll-mt-24">
-          <p class="eyebrow mb-5"><span class="tick">//</span> 07 interests</p>
+          <p class="mb-5 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted"><span class="h-2 w-2 rounded-full bg-accent"></span> interests</p>
           <div
             class="prose prose-invert max-w-none text-text prose-p:text-text prose-li:text-text marker:text-accent prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-strong:text-heading"
             set:html={marked.parse(interests.content)}

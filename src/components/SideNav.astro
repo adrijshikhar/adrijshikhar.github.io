@@ -9,7 +9,7 @@ const sections = [
 ];
 ---
 
-<header class="lg:sticky lg:top-0 lg:flex lg:max-h-screen lg:w-1/2 lg:flex-col lg:justify-between lg:py-24">
+<header class="lg:sticky lg:top-0 lg:flex lg:max-h-screen lg:w-[42%] lg:flex-col lg:justify-between lg:py-24">
   <div>
     <p class="eyebrow mb-4"><span class="tick">//</span> portfolio.exe</p>
     <h1 class="font-heading text-[2.6rem] font-semibold leading-[0.95] tracking-tightest text-heading sm:text-[2.9rem]">
@@ -30,11 +30,8 @@ const sections = [
               href={`#${s.id}`}
               data-section={s.id}
             >
-              <span class="nav-index mr-4 font-mono text-[10px] tabular-nums tracking-[0.1em] text-muted transition-colors group-hover:text-accent group-focus-visible:text-accent">
-                {String(i + 1).padStart(2, '0')}
-              </span>
               <span class="nav-indicator mr-4 h-px w-6 bg-muted transition-all duration-[120ms] ease-out group-hover:w-12 group-hover:bg-accent group-focus-visible:w-12 group-focus-visible:bg-accent"></span>
-              <span class="nav-text font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted transition-colors group-hover:text-heading group-focus-visible:text-heading">
+              <span class="nav-text font-mono text-xs font-medium uppercase tracking-[0.16em] text-muted transition-colors group-hover:text-heading group-focus-visible:text-heading">
                 {s.label}
               </span>
             </a>
