@@ -22,7 +22,14 @@ export default function ModeToggle() {
 
   const toggle = () => {
     const next: Mode = mode === 'dark' ? 'light' : 'dark';
-    document.documentElement.dataset.mode = next;
+    const root = document.documentElement;
+    // Atomic swap: kill transitions for this frame so the canvas, text, and the gradient
+    // name all flip in the SAME frame — no lagging background and no one-frame name flash.
+    root.classList.add('mode-switching');
+    root.dataset.mode = next;
+    // Force a style flush, then restore transitions on the next frame.
+    void root.offsetWidth;
+    requestAnimationFrame(() => root.classList.remove('mode-switching'));
     try {
       localStorage.setItem(STORAGE_KEY, next);
     } catch {

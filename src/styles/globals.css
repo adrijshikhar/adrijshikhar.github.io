@@ -177,6 +177,15 @@
     transition: background-color 0.45s ease;
   }
 
+  /* Atomic light/dark swap: ModeToggle adds .mode-switching for one frame so every element
+     flips in the same paint — no lagging background, no gradient-name flash. */
+  :root.mode-switching,
+  :root.mode-switching *,
+  :root.mode-switching *::before,
+  :root.mode-switching *::after {
+    transition: none !important;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     html {
       scroll-behavior: auto;
