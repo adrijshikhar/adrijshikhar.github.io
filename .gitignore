@@ -13,3 +13,6 @@ size-plugin.json
 
 # npm lockfile — project uses bun (bun.lock)
 package-lock.json
+
+# local agent worktrees / tooling
+.claude/
