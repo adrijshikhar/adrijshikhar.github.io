@@ -7,9 +7,10 @@ const { title } = Astro.props;
 ---
 
 <div class="mb-7 flex items-center gap-4">
-  <!-- geometric accent square marker (no number) -->
-  <span class="bh-index relative inline-block h-12 w-12 shrink-0 bg-accent md:h-14 md:w-14">
-    <span aria-hidden="true" class="absolute -right-2 -top-2 h-3 w-3 rounded-full bg-ink"></span>
+  <!-- geometric accent square marker — first letter of the heading -->
+  <span class="bh-index relative inline-flex h-12 w-12 shrink-0 items-center justify-center bg-accent font-bold leading-none text-accent-contrast md:h-14 md:w-14" aria-hidden="true">
+    <span class="text-3xl md:text-4xl">{title.charAt(0).toUpperCase()}</span>
+    <span class="absolute -right-2 -top-2 h-3 w-3 rounded-full bg-ink"></span>
   </span>
   <h2 class="text-3xl font-bold tracking-tightest text-heading md:text-4xl">
     {title}

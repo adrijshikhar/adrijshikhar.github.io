@@ -41,7 +41,7 @@ const sections = [
               href={`#${s.id}`}
               data-section={s.id}
             >
-              <span class="nav-indicator h-7 w-7 shrink-0 border-[3px] border-ink bg-bg transition-all duration-150 group-hover:bg-accent group-focus-visible:bg-accent"></span>
+              <span class="nav-indicator flex h-7 w-7 shrink-0 items-center justify-center border-[3px] border-ink bg-bg font-mono text-xs font-bold text-ink transition-all duration-150 group-hover:bg-accent group-hover:text-accent-contrast group-focus-visible:bg-accent group-focus-visible:text-accent-contrast">{s.label.charAt(0).toUpperCase()}</span>
               <span class="nav-text bh-label text-muted transition-colors group-hover:text-ink group-focus-visible:text-ink">
                 {s.label}
               </span>
