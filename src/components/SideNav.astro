@@ -91,21 +91,18 @@ const sections = [
             const isActive = link.getAttribute('data-section') === entry.target.id;
             const indicator = link.querySelector('.nav-indicator');
             const text = link.querySelector('.nav-text');
-            const index = link.querySelector('.nav-index');
             if (isActive) {
               indicator?.classList.add('w-12');
               indicator?.classList.remove('w-6', 'bg-muted');
               (indicator as HTMLElement | null)?.style.setProperty('background-color', 'var(--accent)');
               text?.classList.add('text-heading');
               text?.classList.remove('text-muted');
-              (index as HTMLElement | null)?.style.setProperty('color', 'var(--accent)');
             } else {
               indicator?.classList.remove('w-12');
               indicator?.classList.add('w-6', 'bg-muted');
               (indicator as HTMLElement | null)?.style.removeProperty('background-color');
               text?.classList.remove('text-heading');
               text?.classList.add('text-muted');
-              (index as HTMLElement | null)?.style.removeProperty('color');
             }
           });
         }

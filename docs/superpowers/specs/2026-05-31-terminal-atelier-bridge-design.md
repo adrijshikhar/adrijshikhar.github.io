@@ -54,7 +54,7 @@ Branch: `design/terminal-atelier` (forked from `design/swiss-terminal`).
 
 ## Hard constraints
 
-- **Machine view UNTOUCHED**: `src/styles/machine.css`, machine markup/logic, `ViewToggle` machine behavior, `?machine=true`, `window.__RAW_MARKDOWN__`, `rawMarkdown` assembly, human/machine parity — all unchanged. Machine stays dark `#101010` regardless of human-view mode.
+- **Machine-view contract preserved**: `?machine=true`, `window.__RAW_MARKDOWN__`, `rawMarkdown` assembly, and human/machine parity — all intact. Machine view is now token-driven (`src/styles/machine.css`) and follows the active light/dark mode, so the human↔machine toggle is a pure opacity crossfade (the canvas never recolors → no flicker).
 - Content/data unchanged: `src/content/*.md`, `content.config.ts`.
 - All routes consistent: `/`, `/experience`, `/archive`, `/blogs`, `/blogs/[slug]`.
 - **Accessibility:** every text/bg and text/card pair ≥ 4.5:1 AA in **both** modes and across all 6 accents (verify worst case: lightest text vs most-saturated card tint). Respect `prefers-reduced-motion`. Visible focus rings. No FOUC, no layout shift on mode/theme swap. Content visible without JS.

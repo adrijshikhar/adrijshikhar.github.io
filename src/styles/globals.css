@@ -118,7 +118,7 @@
    LIGHT MODE — clean light Swiss aesthetic. Dark is the default :root above.
    Activated via documentElement.dataset.mode = 'light'. Foundation tokens only;
    the 6 accents are re-tuned per theme below to hold AA (≥4.5:1) on the light bg.
-   Machine view stays dark regardless (see body.machine-mode override).
+   Machine view is token-driven (see machine.css) and follows the active mode.
    ========================================================================== */
 :root[data-mode="light"] {
   --bg: #f7f7f5;          /* near-white warm */

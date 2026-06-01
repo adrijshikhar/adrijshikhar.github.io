@@ -54,7 +54,7 @@ export default function ViewToggle() {
     }
 
     // Pin scroll to top ONCE, up front — no mid-animation jump.
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    window.scrollTo({ top: 0, behavior: 'auto' });
 
     setMode(next);
 
