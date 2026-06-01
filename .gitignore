@@ -10,3 +10,6 @@ size-plugin.json
 
 .idea
 *.iml.firecrawl/
+
+# npm lockfile — project uses bun (bun.lock)
+package-lock.json
