@@ -36,9 +36,17 @@ const { title, canonical } = Astro.props;
         }
         try {
           var urlMode = new URLSearchParams(location.search).get('mode');
-          var savedMode = urlMode === 'light' || urlMode === 'dark' ? urlMode : localStorage.getItem('mode');
-          document.documentElement.dataset.mode =
-            savedMode === 'light' ? 'light' : 'dark';
+          var stored = localStorage.getItem('mode');
+          var mode;
+          if (urlMode === 'light' || urlMode === 'dark') {
+            mode = urlMode;
+          } else if (stored === 'light' || stored === 'dark') {
+            mode = stored;
+          } else {
+            // No explicit choice yet — follow the OS/browser preference.
+            mode = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          }
+          document.documentElement.dataset.mode = mode;
         } catch (e) {
           document.documentElement.dataset.mode = 'dark';
         }
