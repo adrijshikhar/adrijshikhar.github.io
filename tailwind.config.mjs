@@ -14,6 +14,7 @@ export default {
         heading: 'var(--heading)',
         muted: 'var(--muted)',
         accent: 'var(--accent)',
+        'accent-fill': 'var(--accent-fill)',
         'accent-contrast': 'var(--accent-contrast)',
         'block-1': 'var(--block-1)',
         'block-2': 'var(--block-2)',

@@ -1,7 +1,6 @@
 ---
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import ThemeSwitcher from '../../components/ThemeSwitcher.tsx';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ data }) => import.meta.env.PROD ? !data.draft : true);
@@ -15,7 +14,6 @@ const canonical = post.data.canonicalUrl ?? new URL(`/blogs/${post.id}`, Astro.s
 ---
 
 <BaseLayout title={`${post.data.title} | Adrij Shikhar`} canonical={canonical}>
-  <ThemeSwitcher client:load />
   <main class="mx-auto min-h-screen max-w-screen-md px-5 py-12 md:px-10 md:py-20">
     <a class="group mb-8 inline-flex items-center gap-2 border-2 border-ink bg-surface px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-widest text-ink transition-transform hover:-translate-x-0.5" href="/blogs">
       <span class="transition-transform group-hover:-translate-x-1">&larr;</span>
