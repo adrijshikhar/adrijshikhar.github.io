@@ -21,12 +21,21 @@ const canonical = post.data.canonicalUrl ?? new URL(`/blogs/${post.id}`, Astro.s
       <span>all posts</span>
     </a>
 
-    <header class="mt-10 border-b border-border pb-8">
-      <p class="mb-4 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted"><span class="h-2 w-2 rounded-full bg-accent"></span> {fmt(post.data.date)}</p>
+    {post.data.cover && (
+      <img
+        src={post.data.cover}
+        alt={post.data.title}
+        class="mt-8 aspect-[2/1] w-full rounded-[10px] border border-border object-cover shadow-[var(--card-shadow)]"
+        loading="eager"
+      />
+    )}
+
+    <header class={`border-b border-border pb-8 ${post.data.cover ? 'mt-8' : 'mt-10'}`}>
       <h1 class="font-heading text-3xl font-semibold leading-[1.08] tracking-tightest text-heading sm:text-4xl">{post.data.title}</h1>
       {post.data.description && (
-        <p class="mt-4 text-base leading-relaxed text-text">{post.data.description}</p>
+        <p class="mt-4 text-lg leading-relaxed text-muted">{post.data.description}</p>
       )}
+      <p class="mt-5 flex items-center gap-3 font-mono text-xs uppercase tracking-[0.16em] text-muted"><span class="h-1.5 w-1.5 rounded-full bg-accent"></span> {fmt(post.data.date)}</p>
     </header>
 
     <article

@@ -9,6 +9,9 @@ const blog = defineCollection({
     description: z.string(),
     draft: z.boolean().default(false),
     canonicalUrl: z.string().url().optional(),
+    // Optional cover/banner image — absolute path under /public (e.g. /blog/foo.png)
+    // or a remote URL. Rendered full-width atop the post and as a list thumbnail.
+    cover: z.string().optional(),
   }),
 });
 

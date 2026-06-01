@@ -1,0 +1,106 @@
+---
+import { marked } from 'marked';
+
+// Render the ACTUAL profile README, fetched from GitHub raw at build time (no stored copy).
+// All visuals are remote images (typing-svg banner, Shields stat badges, activity graph,
+// Pac-Man SVG), so they load + animate live and stay current.
+const RAW = 'https://raw.githubusercontent.com/adrijshikhar/adrijshikhar/main/README.md';
+const REPO = 'https://github.com/adrijshikhar/adrijshikhar/blob/main/';
+
+let html: string;
+try {
+  const res = await fetch(RAW);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  let md = await res.text();
+  // Repo-relative links (./AGENTS.md, ./template/…) → absolute GitHub URLs.
+  md = md.replace(/\]\(\.\//g, `](${REPO}`).replace(/href="\.\//g, `href="${REPO}`);
+  html = marked.parse(md) as string;
+} catch {
+  html = '<p style="text-align:center;margin:0">README preview unavailable — <a href="https://github.com/adrijshikhar/adrijshikhar">view it on GitHub →</a></p>';
+}
+---
+
+<figure class="readme-embed not-prose">
+  <div class="readme-embed__chrome">
+    <span class="readme-embed__dot"></span>
+    <span class="readme-embed__dot"></span>
+    <span class="readme-embed__dot"></span>
+    <span class="readme-embed__path">adrijshikhar / README.md</span>
+  </div>
+  <div class="readme-embed__body" set:html={html}></div>
+  <figcaption class="readme-embed__cap">
+    A live render of my GitHub profile README — the banner types itself and the Pac-Man
+    graph + stat badges regenerate on their own.
+  </figcaption>
+</figure>
+
+<style is:global>
+  .readme-embed {
+    margin: 1.85rem 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    background: #0d1117;
+    box-shadow: var(--card-shadow);
+  }
+  .readme-embed__chrome {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: #161b22;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .readme-embed__dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #30363d;
+  }
+  .readme-embed__dot:first-child {
+    background: var(--accent);
+  }
+  .readme-embed__path {
+    margin-left: 6px;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: #8b949e;
+  }
+  .readme-embed__body {
+    padding: 26px 28px 6px;
+    color: #e6edf3;
+    font: 15px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  .readme-embed__body h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #e6edf3;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 0.3em;
+    margin: 1.5em 0 0.8em;
+  }
+  .readme-embed__body p { margin: 0.7em 0; }
+  .readme-embed__body a { color: #58a6ff; text-decoration: none; }
+  .readme-embed__body a:hover { text-decoration: underline; }
+  .readme-embed__body ul { margin: 0.6em 0; padding-left: 1.3em; }
+  .readme-embed__body li { margin: 0.3em 0; }
+  .readme-embed__body strong { color: #e6edf3; }
+  .readme-embed__body div[align="center"] { text-align: center; margin: 1.1em 0; }
+  .readme-embed__body img { display: inline; vertical-align: middle; margin: 2px; max-width: 100%; }
+  .readme-embed__body code {
+    background: #161b22;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    padding: 0.1em 0.35em;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.9em;
+  }
+  .readme-embed__cap {
+    padding: 6px 28px 22px;
+    color: #8b949e;
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+</style>
