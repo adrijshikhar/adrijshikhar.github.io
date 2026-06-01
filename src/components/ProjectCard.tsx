@@ -41,7 +41,7 @@ export default function ProjectCard({ title, company, date, link, builtWith = []
       )}
       {contentHtml && (
         <CardContent
-          className="prose prose-sm relative z-10 mt-3 max-w-none !p-0 text-sm leading-normal text-text prose-headings:mb-2 prose-headings:mt-4 prose-headings:text-sm prose-headings:font-bold prose-headings:text-heading prose-a:text-accent prose-strong:text-heading prose-ul:my-1 prose-li:my-0.5"
+          className="prose relative z-10 mt-3 max-w-none !p-0 text-[0.975rem] leading-relaxed text-text prose-headings:mb-2 prose-headings:mt-4 prose-headings:text-base prose-headings:font-bold prose-headings:text-heading prose-a:text-accent prose-strong:text-heading prose-ul:my-2 prose-li:my-1"
           dangerouslySetInnerHTML={{ __html: contentHtml }}
         />
       )}

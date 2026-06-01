@@ -15,7 +15,7 @@ export default function HoverCard({ children }: { children: ReactNode }) {
           aria-hidden="true"
           className="absolute -right-[3px] -top-[3px] h-3 w-3 bg-accent transition-colors duration-150 group-hover:bg-ink"
         />
-        <div className="p-5">{children}</div>
+        <div className="p-6 md:p-8">{children}</div>
       </Card>
     </li>
   );

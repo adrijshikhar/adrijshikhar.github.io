@@ -3,18 +3,16 @@ interface Props {
   index: number;
   title: string;
 }
-const { index, title } = Astro.props;
-const num = index.toString().padStart(2, '0');
+const { title } = Astro.props;
 ---
 
-<div class="mb-5 flex items-end gap-4">
-  <!-- oversized geometric index marker -->
-  <span class="bh-index relative inline-block bg-accent px-2 text-[2.75rem] text-accent-contrast md:text-[3.25rem]">
-    {num}
+<div class="mb-7 flex items-center gap-4">
+  <!-- geometric accent square marker (no number) -->
+  <span class="bh-index relative inline-block h-12 w-12 shrink-0 bg-accent md:h-14 md:w-14">
     <span aria-hidden="true" class="absolute -right-2 -top-2 h-3 w-3 rounded-full bg-ink"></span>
   </span>
-  <h2 class="pb-1 text-3xl font-bold tracking-tightest text-heading md:text-4xl">
+  <h2 class="text-3xl font-bold tracking-tightest text-heading md:text-4xl">
     {title}
   </h2>
-  <span aria-hidden="true" class="mb-2 h-[3px] flex-1 bg-ink"></span>
+  <span aria-hidden="true" class="h-[3px] flex-1 bg-ink"></span>
 </div>
