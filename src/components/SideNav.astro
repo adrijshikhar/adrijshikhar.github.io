@@ -9,7 +9,10 @@ const sections = [
 ];
 ---
 
-<header class="lg:sticky lg:top-0 lg:flex lg:max-h-screen lg:w-[36%] lg:flex-col lg:justify-between lg:py-20">
+<header class="relative lg:sticky lg:top-0 lg:flex lg:max-h-screen lg:w-[36%] lg:flex-col lg:justify-between lg:py-20">
+  <!-- solo Bauhaus shapes spread down the empty right edge of the column -->
+  <span aria-hidden="true" class="pointer-events-none absolute right-0 top-[44%] hidden h-7 w-7 border-[3px] border-ink bg-block-1 lg:block"></span>
+  <span aria-hidden="true" class="pointer-events-none absolute right-6 top-[66%] hidden h-5 w-5 rounded-full border-[3px] border-ink lg:block"></span>
   <div>
     <!-- Identity composition: name in an ink block + primary shapes -->
     <div class="relative">
