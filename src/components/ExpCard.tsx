@@ -23,7 +23,7 @@ export default function ExpCard({ position, company, companyLink, location, star
     <HoverCard index={index}>
       <div className="flex items-baseline justify-between gap-4">
         <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted">
-          {startDate} <span className="text-muted/50">—</span> {endDate}
+          {startDate} <span className="opacity-50">—</span> {endDate}
         </span>
       </div>
       <h3 className="mt-2 font-heading text-base font-medium leading-snug tracking-tighter text-heading">

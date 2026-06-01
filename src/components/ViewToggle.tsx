@@ -158,6 +158,9 @@ export default function ViewToggle() {
     // Canvas end-state: machine-mode on html + body so the whole backdrop is dark.
     document.documentElement.classList.add('machine-mode');
     document.body.classList.add('machine-mode');
+    // Drop the no-FOUC boot class now that JS controls the views via inline styles
+    // (leaving it would !block toggling back to human via its .human-view rule).
+    document.documentElement.classList.remove('machine-boot');
 
     // Machine view: in flow at natural height, visible.
     machineView.style.display = '';
@@ -172,7 +175,7 @@ export default function ViewToggle() {
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[1100] flex items-center gap-2">
       <div
         ref={islandRef}
-        className="flex gap-4 px-4 py-2.5 rounded-xl backdrop-blur-xl font-mono text-sm bg-surface/92 border border-[rgb(var(--border)/0.14)] shadow-[var(--card-shadow)]"
+        className="flex gap-4 px-4 py-2.5 rounded-xl backdrop-blur-xl font-mono text-sm bg-[color-mix(in_srgb,var(--surface)_92%,transparent)] border border-[rgb(var(--border)/0.14)] shadow-[var(--card-shadow)]"
       >
         <Toggle
           pressed={mode === 'human'}
@@ -180,7 +183,7 @@ export default function ViewToggle() {
           className="!bg-transparent !h-auto !min-w-0 !px-0 !py-0 !rounded-none flex items-center gap-2 transition-colors duration-300 hover:!bg-transparent data-[state=on]:!bg-transparent"
         >
           <span className={`size-[6px] inline-block rounded-full transition-all duration-500 ${
-            mode === 'human' ? 'bg-current outline outline-1 outline-offset-1 outline-current' : 'outline outline-1 outline-offset-1 outline-muted/40'
+            mode === 'human' ? 'bg-current outline outline-1 outline-offset-1 outline-current' : 'outline outline-1 outline-offset-1 outline-muted'
           }`} />
           <span className={`uppercase text-xs tracking-wider transition-colors duration-300 ${
             mode === 'human' ? 'text-heading' : 'text-muted'
@@ -192,7 +195,7 @@ export default function ViewToggle() {
           className="!bg-transparent !h-auto !min-w-0 !px-0 !py-0 !rounded-none flex items-center gap-2 transition-colors duration-300 hover:!bg-transparent data-[state=on]:!bg-transparent"
         >
           <span className={`size-[6px] inline-block rounded-full transition-all duration-500 ${
-            mode === 'machine' ? 'bg-current outline outline-1 outline-offset-1 outline-current' : 'outline outline-1 outline-offset-1 outline-muted/40'
+            mode === 'machine' ? 'bg-current outline outline-1 outline-offset-1 outline-current' : 'outline outline-1 outline-offset-1 outline-muted'
           }`} />
           <span className={`uppercase text-xs tracking-wider transition-colors duration-300 ${
             mode === 'machine' ? 'text-heading' : 'text-muted'

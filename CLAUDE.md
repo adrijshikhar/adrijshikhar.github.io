@@ -2,94 +2,97 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Commands
+Personal portfolio + blog. Astro 6 static site with React 19 interactive islands, Tailwind 3 (CSS-variable design tokens) + shadcn/ui, MDX. Design is **"Terminal Atelier"** — dark-default with a light mode, an accent-tinted card system, and a warm-gold ambient aurora.
+
+## Toolchain & commands
+
+- **Package manager: Bun only.** Use `bun install` / `bun run …` / `bun x …`. `bun.lock` is the lockfile; `package-lock.json` is gitignored — never commit one.
+- **Node: via fnm**, pinned by `.node-version` (Node 22). `fnm use` before working.
 
 ```bash
-bun run dev       # Start dev server at localhost:4321
-bun run build     # Production build to dist/
-bun run preview   # Preview production build locally
+bun install                 # install deps
+bun run dev                 # dev server at localhost:4321 (hot reload)
+bun run build               # production build to dist/
+bun run preview             # serve the production build
+bun x astro sync            # regenerate content-collection types after schema changes
 ```
 
-Node version managed via fnm (`.node-version` → Node 22).
+No test or lint scripts exist. Prettier is a dependency but is not wired to a script. The
+`deploy` npm script (`gh-pages`) is legacy/unused — deployment is via GitHub Actions (below).
 
-## Architecture
+If a dev-server React island fails to hydrate with `jsxDEV is not a function` after editing
+`astro.config.mjs`, clear stale caches and restart: `rm -rf node_modules/.vite .astro && bun run dev`.
 
-Astro 6 static site with React 19 for interactive islands. Tailwind CSS 3 (native slate palette) + shadcn/ui for styling. Content lives in markdown files, not components.
+## Two independent content systems (important)
 
-### Content System
+The site reads content two different ways — keep them separate:
 
-Seven markdown files in `src/content/` drive the entire site:
+1. **Resume/portfolio content** — loose markdown in `src/content/*.md` (`about`, `experience`,
+   `projects`, `education`, `achievements`, `interests`, `skills`), read at build time with
+   `fs` + `gray-matter` directly inside the pages. This is **not** an Astro collection.
+   `experience.md` and `projects.md` use **slug-splitting**: a YAML `entries[]` array in
+   frontmatter plus a body split on `<!-- slug -->` HTML-comment delimiters; `splitBySlug()`
+   maps each slug to its markdown chunk, then frontmatter + chunk render a card.
 
-- `about.md`, `skills.md`, `achievements.md`, `interests.md` — YAML frontmatter + markdown body
-- `education.md` — YAML `entries` array, no body
-- `experience.md`, `projects.md` — **slug-based splitting**: YAML `entries` array in frontmatter, body split by `<!-- slug-name -->` HTML comment delimiters
+2. **Blog** — an Astro **content collection** (`src/content.config.ts`, glob loader + Zod
+   schema) over `src/content/blog/*.mdx`. Read with `getCollection('blog')`. Drafts
+   (`draft: true`) are hidden when `import.meta.env.PROD` (visible in `dev`); `getStaticPaths`
+   in `[...slug].astro` emits a route for **every** post regardless of `draft`, so don't add
+   stray `.mdx` files to that dir. Post `id` (the filename slug) is the URL.
 
-The slug-splitting pattern in `index.astro`:
-```
----
-entries:
-  - slug: hevo-senior
-    position: "Senior Software Engineer"
-    ...
----
+Don't migrate the resume `.md` files into the collection — the isolation is intentional.
 
-<!-- hevo-senior -->
-Description content here...
+## Theming (CSS-variable tokens)
 
-<!-- hevo-intern -->
-Next entry content...
-```
+`src/styles/globals.css` defines all design tokens as CSS variables on `:root`. Mode and
+accent are token-set overrides, not per-element styles:
+- `:root[data-mode="light"]` overrides the foundation tokens for light mode.
+- `[data-theme="…"]` (parallel/teal/rausch/violet/hyperlink/signal) overrides the accent
+  (+ aurora) tokens, re-tuned per mode to hold AA contrast.
 
-`splitBySlug()` regex splits on `<!-- slug -->` comments to map each slug to its markdown content. Frontmatter metadata + slug body are combined to render cards.
+Light/dark **defaults to the system preference** (`prefers-color-scheme`) until the user makes
+an explicit choice; `ModeToggle.tsx` persists `mode` to `localStorage` (explicit choice wins)
+and follows live OS changes while unset. A **no-FOUC inline head script** in `BaseLayout.astro`
+sets `data-mode`/`data-theme` before first paint; `?mode=light|dark` is a URL override. Mode
+swaps are made atomic via a one-frame `.mode-switching { transition: none }` class to avoid
+gradient/heading flicker. Tailwind color utilities map to these vars in `tailwind.config.mjs`,
+so prefer token classes (`bg-surface`, `text-muted`, `border-border`) over raw colors.
 
-### Pages
+Gotcha: Tailwind's `/opacity` modifier does **not** compile against CSS-var colors
+(`bg-foo/70` renders invisible) — use solid token colors.
 
-- `/` — Main page. Shows Hevo senior role (1 entry), top 2 projects, education, achievements, interests.
-- `/experience` — Full work experience table (all entries).
-- `/archive` — Full project archive table with Year, Project, Description, Built with, Link columns.
+## Human / Machine view toggle (a hard contract)
 
-### Human/Machine Toggle
+`ViewToggle.tsx` (the primary `client:load` island, driven by GSAP via `src/lib/gsap.ts`)
+crossfades between `.human-view` (the styled site) and `.machine-view` (the raw markdown that
+backs the page). The raw markdown is assembled at build in `index.astro` and exposed as
+`window.__RAW_MARKDOWN__`. The machine view is **token-driven** (`src/styles/machine.css`) and
+**follows the active light/dark mode**, so the canvas never recolors across the toggle — the
+transition is a pure opacity crossfade (no flicker). `?machine=true` deep-links straight into
+the machine view (with a no-FOUC head script), and toggling keeps the URL param in sync.
 
-`ViewToggle.tsx` is the only React island (`client:load`). It toggles between:
-- **Human mode**: Styled two-column layout (sticky left sidebar + scrolling right content)
-- **Machine mode**: Raw markdown at 640px max-width, monospace, parallel.ai-inspired palette (#101010 bg, #858483 text, #fb631b links)
+**Do not break:** `?machine=true`, `window.__RAW_MARKDOWN__`, or human/machine content parity.
 
-Toggle uses parallel.ai-style height collapse animation. Raw markdown assembled at build time via `<script define:vars>`.
+## Layout & components
 
-### Layout
+`BaseLayout.astro` wraps every page: `<head>` no-FOUC scripts, the `.aurora-stage` blobs
+(warm-gold, mode-aware, behind a central readability veil), a fixed top-right `ModeToggle`, and
+the slot. Home (`index.astro`) is a two-column layout — sticky `SideNav.astro` (identity +
+scroll-spy in-page nav) on the left, scrolling `<main>` on the right. List cards (`ExpCard`,
+`ProjectCard`, `BlogCard`) share the `HoverCard.tsx` shell — the accent-tinted, soft-shadowed
+"atelier-card" with a springy hover lift (the `.atelier-card` / `.atelier-btn` classes live in
+`globals.css`).
 
-Brittany Chiang-inspired: `lg:flex` two-column, left `<header>` is `lg:sticky lg:top-0 lg:max-h-screen`, right `<main>` scrolls. Cards use absolute overlay div for glassmorphism hover (`bg-slate-800/50 + inset shadow + drop-shadow`). Sibling cards dim on hover (`group-hover/list:opacity-50`).
-
-### Color Palette
-
-Uses native Tailwind slate scale — no custom color overrides except `accent` (#64ffda) and `navy` (alias for slate-900).
-
-Human mode: `bg-slate-900` (#0f172a), `text-slate-400` (#94a3b8), headings `text-slate-200` (#e2e8f0), accent `#64ffda`
-Machine mode: `#101010` bg, `#858483` text, `#d6d6d5` headings, `#fb631b` links
-
-### Animations
-
-- Mouse spotlight: radial gradient follows cursor (`rgba(29, 78, 216, 0.15)`)
-- Section fade-in on scroll via IntersectionObserver
-- Smooth scroll (`scroll-behavior: smooth`)
-- Card hover: glassmorphism overlay with inset shadow
-- Human/machine toggle: height collapse + opacity crossfade
-
-### Key Files
-
-- `src/pages/index.astro` — main page, reads all content, assembles raw markdown, spotlight + scroll animations
-- `src/pages/archive.astro` — full project table
-- `src/pages/experience.astro` — full experience table
-- `src/components/SideNav.astro` — sticky sidebar with scroll-spy
-- `src/components/ViewToggle.tsx` — React toggle with height collapse animation
-- `src/components/ExpCard.astro` — experience card with grid layout + hover overlay
-- `src/components/ProjectCard.astro` — project card with grid layout + hover overlay
-- `src/styles/machine.css` — machine mode transitions and palette
-- `src/styles/globals.css` — Tailwind base, smooth scroll, dark theme
-- `tailwind.config.mjs` — accent color, fonts (Inter/JetBrains Mono), typography plugin
+Pages: `/` (home preview of each section), `/experience` (full), `/archive` (2-col masonry),
+`/blogs` (list), `/blogs/[...slug]` (post), `/resume`.
 
 ## Deployment
 
-GitHub Actions (`.github/workflows/deploy.yml`) triggers on push to `content` branch. Uses `actions/setup-node` + `oven-sh/setup-bun`. Deploys via `actions/deploy-pages@v4`. Pages source set to "GitHub Actions" in repo settings.
+Push to the **`content`** branch → `.github/workflows/deploy.yml` builds with Bun and publishes
+`dist/` to GitHub Pages (`actions/deploy-pages`). `build.yml` runs the build on PRs into
+`content`. PRs target `content`, not `main`/`master`.
 
-Build CI (`.github/workflows/build.yml`) runs on PRs and `feat/**` branches.
+Workflow conventions to preserve: **major-version action tags** (e.g. `@v6` — not SHA pins),
+**least-privilege `permissions:`** per workflow, and **never interpolate untrusted input into
+`run:`** (pass it as an env var). Actions are on the Node-24 majors (checkout v6, setup-node
+v6, upload-pages-artifact v5, deploy-pages v5).

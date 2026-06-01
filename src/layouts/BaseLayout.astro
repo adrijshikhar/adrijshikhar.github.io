@@ -50,6 +50,14 @@ const { title, canonical } = Astro.props;
         } catch (e) {
           document.documentElement.dataset.mode = 'dark';
         }
+        try {
+          // No-FOUC: a direct ?machine=true load must not flash the human view before the
+          // ViewToggle island hydrates. Mark the document now; machine.css hides .human-view
+          // and reveals .machine-view under .machine-boot, and the island clears it on mount.
+          if (new URLSearchParams(location.search).get('machine') === 'true') {
+            document.documentElement.classList.add('machine-boot', 'machine-mode');
+          }
+        } catch (e) {}
       })();
     </script>
   </head>
@@ -66,7 +74,7 @@ const { title, canonical } = Astro.props;
 
     <!-- Light/dark mode toggle, docked top-right -->
     <div class="fixed top-5 right-5 z-[1090] md:top-6 md:right-6">
-      <div class="flex items-center rounded-xl border border-[rgb(var(--border)/0.14)] bg-surface/92 px-3 py-2.5 shadow-[var(--card-shadow)] backdrop-blur-xl">
+      <div class="flex items-center rounded-xl border border-[rgb(var(--border)/0.14)] bg-[color-mix(in_srgb,var(--surface)_92%,transparent)] px-3 py-2.5 shadow-[var(--card-shadow)] backdrop-blur-xl">
         <ModeToggle client:load />
       </div>
     </div>

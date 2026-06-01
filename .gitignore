@@ -16,3 +16,6 @@ package-lock.json
 
 # local agent worktrees / tooling
 .claude/
+
+# designlang extraction output (scratch)
+design-extract-output/

@@ -461,6 +461,71 @@
   --tw-prose-td-borders: var(--border-color);
 }
 
+/* Fenced code: the inline-code chrome (border/bg/padding from the prose-code utilities)
+   must NOT apply to <code> inside <pre>. The <code> is display:inline, so a border on it
+   paints a fragment on every wrapped row (a line above + below each text line). Strip it;
+   the <pre> carries the block's single border + background. */
+.prose pre code {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font-size: inherit;
+}
+
+/* Shiki dual-theme code blocks (astro.config emits --shiki-light/--shiki-dark with
+   defaultColor:false). Dark is the default; light mode flips to the light token set so
+   fenced code is readable on both surfaces. */
+.astro-code,
+.astro-code span {
+  color: var(--shiki-dark);
+  font-style: var(--shiki-dark-font-style);
+  font-weight: var(--shiki-dark-font-weight);
+  text-decoration: var(--shiki-dark-text-decoration);
+}
+.astro-code {
+  background-color: var(--shiki-dark-bg);
+}
+:root[data-mode="light"] .astro-code,
+:root[data-mode="light"] .astro-code span {
+  color: var(--shiki-light);
+  font-style: var(--shiki-light-font-style);
+  font-weight: var(--shiki-light-font-weight);
+  text-decoration: var(--shiki-light-text-decoration);
+}
+:root[data-mode="light"] .astro-code {
+  background-color: var(--shiki-light-bg);
+}
+
+/* Code blocks styled as Terminal Atelier panes: atelier-card surface (card radius,
+   hairline border, soft shadow) with the signature accent top edge — matching the
+   card/button language instead of a flat default <pre>. */
+.prose pre.astro-code {
+  border-radius: var(--card-radius, 10px);
+  border: 1px solid rgb(var(--border) / 0.14);
+  border-top: 2px solid color-mix(in srgb, var(--accent) 85%, transparent);
+  box-shadow: var(--card-shadow);
+  margin: 1.75rem 0;
+  padding: 1.15rem 1.3rem;
+  overflow-x: hidden;
+  font-size: 0.86em;
+  line-height: 1.65;
+}
+/* Soft-wrap long lines instead of a horizontal scrollbar. */
+.prose pre.astro-code,
+.prose pre.astro-code code,
+.prose pre.astro-code .line {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+/* Inline code: a small accent-tinted chip, consistent with the block accent. */
+.prose :not(pre) > code {
+  border-radius: 5px;
+  border: 1px solid rgb(var(--border) / 0.14);
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+  color: var(--heading);
+}
+
 /* Reduced-motion: kill section-reveal transforms set inline by scripts */
 @media (prefers-reduced-motion: reduce) {
   section[id] {

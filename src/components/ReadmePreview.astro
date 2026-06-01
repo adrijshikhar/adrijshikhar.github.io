@@ -1,0 +1,125 @@
+---
+import { marked } from 'marked';
+
+// Render the ACTUAL profile README, fetched from GitHub raw at build time (no stored copy).
+// All visuals are remote images (typing-svg banner, Shields stat badges, activity graph,
+// Pac-Man SVG), so they load + animate live and stay current.
+const RAW = 'https://raw.githubusercontent.com/adrijshikhar/adrijshikhar/main/README.md';
+const REPO = 'https://github.com/adrijshikhar/adrijshikhar/blob/main/';
+
+let html: string;
+try {
+  const res = await fetch(RAW);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  let md = await res.text();
+
+  // Repo-relative links (./AGENTS.md, ./template/…) → absolute GitHub URLs.
+  md = md.replace(/\]\(\.\//g, `](${REPO}`).replace(/href="\.\//g, `href="${REPO}`);
+
+  html = marked.parse(md) as string;
+
+  // The README uses <picture> with prefers-color-scheme to pick light/dark variants
+  // (activity graph, Pac-Man, snake, streak). That follows the OS, not our toggle — so on
+  // the RENDERED HTML (after marked passes <picture> through verbatim) convert each into a
+  // dual <img> pair toggled by [data-mode] (CSS below) to stay in sync with the blog.
+  html = html.replace(
+    /<picture>\s*<source[^>]*media="\(prefers-color-scheme:\s*dark\)"[^>]*srcset="([^"]+)"[^>]*\/?>\s*<img([^>]*?)src="([^"]+)"([^>]*?)\/?>\s*<\/picture>/gi,
+    (_m, darkUrl, pre, lightUrl, post) =>
+      `<img class="rm-only-dark"${pre}src="${darkUrl}"${post}/>` +
+      `<img class="rm-only-light"${pre}src="${lightUrl}"${post}/>`
+  );
+} catch {
+  html = '<p style="text-align:center;margin:0">README preview unavailable — <a href="https://github.com/adrijshikhar/adrijshikhar">view it on GitHub →</a></p>';
+}
+---
+
+<figure class="readme-embed not-prose">
+  <div class="readme-embed__chrome">
+    <span class="readme-embed__dot"></span>
+    <span class="readme-embed__dot"></span>
+    <span class="readme-embed__dot"></span>
+    <span class="readme-embed__path">adrijshikhar / README.md</span>
+  </div>
+  <div class="readme-embed__body" set:html={html}></div>
+  <figcaption class="readme-embed__cap">
+    A live render of my GitHub profile README — the banner types itself and the Pac-Man
+    graph + stat badges regenerate on their own.
+  </figcaption>
+</figure>
+
+<style is:global>
+  /* Card follows the blog's light/dark via semantic tokens. */
+  .readme-embed {
+    margin: 1.85rem 0;
+    border: 1px solid rgb(var(--border) / 0.14);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--surface);
+    box-shadow: var(--card-shadow);
+  }
+  .readme-embed__chrome {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: color-mix(in srgb, var(--accent) 4%, var(--surface));
+    border-bottom: 1px solid rgb(var(--border) / 0.12);
+  }
+  .readme-embed__dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: rgb(var(--border) / 0.22);
+  }
+  .readme-embed__dot:first-child { background: var(--accent); }
+  .readme-embed__path {
+    margin-left: 6px;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+  }
+  .readme-embed__body {
+    padding: 26px 28px 6px;
+    color: var(--text);
+    font: 15px/1.65 var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  }
+  .readme-embed__body h2 {
+    font-family: var(--font-heading, inherit);
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--heading);
+    border-bottom: 1px solid rgb(var(--border) / 0.12);
+    padding-bottom: 0.3em;
+    margin: 1.5em 0 0.8em;
+  }
+  .readme-embed__body p { margin: 0.7em 0; }
+  .readme-embed__body a { color: var(--accent); text-decoration: none; }
+  .readme-embed__body a:hover { text-decoration: underline; }
+  .readme-embed__body ul { margin: 0.6em 0; padding-left: 1.3em; }
+  .readme-embed__body li { margin: 0.3em 0; }
+  .readme-embed__body strong { color: var(--heading); }
+  .readme-embed__body div[align="center"] { text-align: center; margin: 1.1em 0; }
+  .readme-embed__body img { display: inline; vertical-align: middle; margin: 2px; max-width: 100%; }
+  .readme-embed__body code {
+    background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+    border: 1px solid rgb(var(--border) / 0.14);
+    border-radius: 5px;
+    padding: 0.1em 0.35em;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.9em;
+  }
+  .readme-embed__cap {
+    padding: 6px 28px 22px;
+    color: var(--muted);
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+
+  /* Dual light/dark README images, synced to the blog toggle (default = dark). */
+  .readme-embed__body .rm-only-light { display: none; }
+  .readme-embed__body .rm-only-dark { display: inline; }
+  :root[data-mode="light"] .readme-embed__body .rm-only-dark { display: none; }
+  :root[data-mode="light"] .readme-embed__body .rm-only-light { display: inline; }
+</style>
