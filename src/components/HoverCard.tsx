@@ -9,7 +9,7 @@ import { Card } from './ui/card';
 export default function HoverCard({ children }: { children: ReactNode }) {
   return (
     <li className="mb-7">
-      <Card className="group relative !gap-0 !overflow-visible !rounded-none border-[3px] border-ink bg-surface !py-0 p-0 !ring-0 text-inherit shadow-[6px_6px_0_0_var(--ink)] transition-[transform,box-shadow] duration-150 ease-out hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[8px_8px_0_0_var(--accent)] motion-reduce:transition-none motion-reduce:hover:translate-x-0 motion-reduce:hover:translate-y-0">
+      <Card className="group relative !gap-0 !overflow-visible !rounded-none border-2 border-ink bg-surface !py-0 p-0 !ring-0 text-inherit shadow-[3px_3px_0_0_var(--ink)] transition-[transform,box-shadow] duration-150 ease-out hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-[5px_5px_0_0_var(--accent)] motion-reduce:transition-none motion-reduce:hover:translate-x-0 motion-reduce:hover:translate-y-0">
         {/* accent corner tab */}
         <span
           aria-hidden="true"

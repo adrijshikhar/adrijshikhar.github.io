@@ -39,7 +39,7 @@ const projSections = splitBySlug(projects.content);
       </h1>
     </div>
 
-    <ul class="group/list">
+    <ul class="grid grid-cols-1 gap-x-8 md:grid-cols-2">
       {projects.meta.entries.map((proj: any) => (
         <ProjectCard {...proj} contentHtml={marked.parse(projSections[proj.slug] || '') as string} />
       ))}

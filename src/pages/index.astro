@@ -90,8 +90,8 @@ const rawMarkdown = [
         <section id="experience" class="bh-section mb-12 scroll-mt-16 md:mb-16 lg:scroll-mt-24">
           <SectionHead index={2} title="Experience" />
           <ul class="group/list">
-            {experience.meta.entries.slice(0, 1).map((exp: any) => (
-              <ExpCard {...exp} contentHtml={marked.parse(expSections[exp.slug] || '') as string} />
+            {experience.meta.entries.slice(0, 2).map((exp: any) => (
+              <ExpCard {...exp} />
             ))}
           </ul>
           <div class="mt-4">
