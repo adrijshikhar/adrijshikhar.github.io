@@ -127,9 +127,10 @@ export default function ViewToggle() {
     );
   };
 
-  // On mount: when starting in machine view (?machine=true), apply the SAME
-  // final DOM/GSAP end-state INSTANTLY (gsap.set, no animation) so the very
-  // first paint is already machine view — no human-content flash/FOUC.
+  // After hydration: when starting in machine view (?machine=true), lock in the
+  // machine end-state via gsap.set (no animation) so it matches the pre-hydration
+  // paint (handled by machine.css initial states + the no-FOUC head script) and
+  // no human-content flash appears as GSAP takes over.
   useEffect(() => {
     if (!startsInMachine()) return;
 
