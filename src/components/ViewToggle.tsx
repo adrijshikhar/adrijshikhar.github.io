@@ -156,7 +156,7 @@ export default function ViewToggle() {
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[1100] flex items-center gap-2">
       <div
         ref={islandRef}
-        className="flex gap-4 border-[3px] border-ink bg-surface px-4 py-2.5 font-mono text-sm backdrop-blur-xl"
+        className="flex gap-4 border-[3px] border-ink bg-[#f6e7df] px-4 py-2.5 font-mono text-sm shadow-[5px_5px_0_0_var(--ink)] backdrop-blur-xl"
       >
         <Toggle
           pressed={mode === 'human'}
@@ -166,7 +166,7 @@ export default function ViewToggle() {
           <span className={`size-[7px] inline-block transition-all duration-300 ${
             mode === 'human' ? 'bg-accent outline outline-1 outline-offset-1 outline-ink' : 'outline outline-1 outline-offset-1 outline-muted'
           }`} />
-          <span className={`uppercase text-xs tracking-wider transition-colors duration-300 ${
+          <span className={`bh-label transition-colors duration-300 ${
             mode === 'human' ? 'text-heading' : 'text-muted'
           }`}>Human</span>
         </Toggle>
@@ -178,7 +178,7 @@ export default function ViewToggle() {
           <span className={`size-[7px] inline-block transition-all duration-300 ${
             mode === 'machine' ? 'bg-accent outline outline-1 outline-offset-1 outline-ink' : 'outline outline-1 outline-offset-1 outline-muted'
           }`} />
-          <span className={`uppercase text-xs tracking-wider transition-colors duration-300 ${
+          <span className={`bh-label transition-colors duration-300 ${
             mode === 'machine' ? 'text-heading' : 'text-muted'
           }`}>Machine</span>
         </Toggle>

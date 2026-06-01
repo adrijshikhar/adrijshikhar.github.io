@@ -10,7 +10,7 @@ const { title } = Astro.props;
   <!-- accent rectangle hugging the first letter — same height as the heading text -->
   <span class="bh-index relative inline-flex shrink-0 items-center bg-accent px-2 font-bold leading-none text-accent-contrast" aria-hidden="true">
     <span class="text-3xl md:text-4xl">{title.charAt(0).toUpperCase()}</span>
-    <span class="absolute -right-1.5 -top-1.5 h-2.5 w-2.5 rounded-full bg-ink"></span>
+    <span class="absolute -right-1.5 -top-1.5 h-2.5 w-2.5 rounded-full bg-[#111111]"></span>
   </span>
   <!-- first letter lives in the box; the heading continues with the rest of the word -->
   <h2 class="-ml-1 text-3xl font-bold leading-none tracking-tightest text-heading md:text-4xl">
