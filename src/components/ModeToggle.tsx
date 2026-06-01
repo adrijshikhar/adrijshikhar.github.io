@@ -20,6 +20,27 @@ export default function ModeToggle() {
     setMode(readMode());
   }, []);
 
+  // While the user hasn't made an explicit choice, follow OS preference changes live.
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    const onChange = (e: MediaQueryListEvent) => {
+      try {
+        if (localStorage.getItem(STORAGE_KEY)) return; // explicit choice wins
+      } catch {
+        /* ignore */
+      }
+      const next: Mode = e.matches ? 'dark' : 'light';
+      const root = document.documentElement;
+      root.classList.add('mode-switching');
+      root.dataset.mode = next;
+      void root.offsetWidth;
+      requestAnimationFrame(() => root.classList.remove('mode-switching'));
+      setMode(next);
+    };
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+
   const toggle = () => {
     const next: Mode = mode === 'dark' ? 'light' : 'dark';
     const root = document.documentElement;
