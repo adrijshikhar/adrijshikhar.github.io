@@ -64,34 +64,33 @@ const rawMarkdown = [
 ---
 
 <BaseLayout title="Adrij Shikhar">
-  <div class="pointer-events-none fixed inset-0 z-30 transition-opacity duration-300" id="spotlight"></div>
   <ViewToggle client:load />
   <div class="machine-view" />
 
-  <div class="human-view mx-auto min-h-screen max-w-screen-xl px-6 py-12 md:px-12 md:py-20 lg:px-16 lg:py-0">
-    <div class="lg:flex lg:justify-between lg:gap-10">
+  <div class="human-view mx-auto min-h-screen max-w-screen-xl px-5 py-10 md:px-8 md:py-16 lg:px-10 lg:py-0">
+    <div class="lg:flex lg:justify-between lg:gap-12">
       <SideNav />
 
-      <main id="content" class="pt-24 lg:w-[58%] lg:py-24">
+      <main id="content" class="pt-24 lg:w-[62%] lg:py-24">
 
         <!-- About -->
         <section id="about" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
           <p class="mb-5 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted"><span class="h-2 w-2 rounded-full bg-accent"></span> about</p>
           <div
-            class="prose prose-invert prose-sm max-w-none text-text prose-p:text-text prose-p:leading-relaxed prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-strong:text-heading prose-strong:font-medium"
+            class="prose prose-invert max-w-none text-[0.975rem] leading-relaxed text-text prose-p:text-text prose-p:leading-relaxed prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-strong:text-heading prose-strong:font-medium"
             set:html={marked.parse(about.content)}
           />
         </section>
 
         <!-- Experience -->
         <section id="experience" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="sticky top-0 z-20 -mx-6 mb-6 w-screen border-b border-border bg-bg/80 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
+          <div class="sticky top-0 z-20 -mx-5 mb-6 w-screen border-b border-border bg-bg/80 px-5 py-5 backdrop-blur md:-mx-8 md:px-8 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
             <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Experience</h2>
           </div>
           <p class="mb-5 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted hidden lg:flex"><span class="h-2 w-2 rounded-full bg-accent"></span> experience</p>
           <ul class="group/list border-b-0">
-            {experience.meta.entries.slice(0, 1).map((exp: any) => (
-              <ExpCard {...exp} contentHtml={marked.parse(expSections[exp.slug] || '') as string} />
+            {experience.meta.entries.slice(0, 2).map((exp: any, i: number) => (
+              <ExpCard {...exp} index={i} />
             ))}
           </ul>
           <div class="mt-10">
@@ -103,13 +102,13 @@ const rawMarkdown = [
 
         <!-- Projects -->
         <section id="projects" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="sticky top-0 z-20 -mx-6 mb-6 w-screen border-b border-border bg-bg/80 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
+          <div class="sticky top-0 z-20 -mx-5 mb-6 w-screen border-b border-border bg-bg/80 px-5 py-5 backdrop-blur md:-mx-8 md:px-8 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
             <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Projects</h2>
           </div>
           <p class="mb-5 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted hidden lg:flex"><span class="h-2 w-2 rounded-full bg-accent"></span> projects</p>
           <ul class="group/list">
-            {projects.meta.entries.slice(0, 2).map((proj: any) => (
-              <ProjectCard {...proj} contentHtml={marked.parse(projSections[proj.slug] || '') as string} />
+            {projects.meta.entries.slice(0, 2).map((proj: any, i: number) => (
+              <ProjectCard {...proj} index={i} contentHtml={marked.parse(projSections[proj.slug] || '') as string} />
             ))}
           </ul>
           <div class="mt-10">
@@ -121,7 +120,7 @@ const rawMarkdown = [
 
         <!-- Writing -->
         <section id="writing" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="sticky top-0 z-20 -mx-6 mb-6 w-screen border-b border-border bg-bg/80 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
+          <div class="sticky top-0 z-20 -mx-5 mb-6 w-screen border-b border-border bg-bg/80 px-5 py-5 backdrop-blur md:-mx-8 md:px-8 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
             <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Writing</h2>
           </div>
           <p class="mb-5 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted hidden lg:flex"><span class="h-2 w-2 rounded-full bg-accent"></span> writing</p>
@@ -145,20 +144,18 @@ const rawMarkdown = [
 
         <!-- Education -->
         <section id="education" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="sticky top-0 z-20 -mx-6 mb-6 w-screen border-b border-border bg-bg/80 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
+          <div class="sticky top-0 z-20 -mx-5 mb-6 w-screen border-b border-border bg-bg/80 px-5 py-5 backdrop-blur md:-mx-8 md:px-8 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
             <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Education</h2>
           </div>
           <p class="mb-5 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted hidden lg:flex"><span class="h-2 w-2 rounded-full bg-accent"></span> education</p>
-          <ul class="border-t border-border">
-            {education.meta.entries.map((edu: any) => (
-              <li class="group flex flex-col justify-between gap-1 border-b border-border py-5 transition-colors duration-[120ms] hover:bg-surface md:flex-row md:items-baseline">
-                <div class="flex-1">
-                  <h3 class="font-heading text-base font-medium tracking-tighter text-heading">{edu.institution}</h3>
-                  <div class="mt-0.5 text-sm text-text">
-                    {edu.degree}{edu.field && <span class="text-muted"> — {edu.field}</span>}
-                  </div>
+          <ul class="grid gap-4 sm:grid-cols-2">
+            {education.meta.entries.map((edu: any, i: number) => (
+              <li class={`atelier-card group/list-item px-5 py-6 lg:px-6 lg:py-7 ${i % 2 === 1 ? 'is-alt' : ''}`}>
+                <span class="font-mono text-[11px] uppercase tracking-[0.12em] text-muted">{edu.startDate} — {edu.endDate}</span>
+                <h3 class="mt-2 font-heading text-base font-medium leading-snug tracking-tighter text-heading">{edu.institution}</h3>
+                <div class="mt-1 text-sm text-text">
+                  {edu.degree}{edu.field && <span class="text-muted"> — {edu.field}</span>}
                 </div>
-                <span class="shrink-0 font-mono text-[11px] uppercase tracking-[0.12em] text-muted">{edu.startDate} — {edu.endDate}</span>
               </li>
             ))}
           </ul>
@@ -166,7 +163,7 @@ const rawMarkdown = [
 
         <!-- Achievements -->
         <section id="achievements" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="sticky top-0 z-20 -mx-6 mb-6 w-screen border-b border-border bg-bg/80 px-6 py-5 backdrop-blur md:-mx-12 md:px-12 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
+          <div class="sticky top-0 z-20 -mx-5 mb-6 w-screen border-b border-border bg-bg/80 px-5 py-5 backdrop-blur md:-mx-8 md:px-8 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
             <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Achievements</h2>
           </div>
           <p class="mb-5 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted hidden lg:flex"><span class="h-2 w-2 rounded-full bg-accent"></span> achievements</p>
@@ -200,39 +197,6 @@ const rawMarkdown = [
     window.__RAW_MARKDOWN__ = rawMarkdown;
   </script>
   <script>
-    const spotlight = document.getElementById('spotlight');
-
-    // Subtle accent-tinted spotlight (low alpha to stay flat).
-    // Cache the resolved RGB and refresh only when the theme attribute changes.
-    let accentRGB = '251, 99, 27';
-    function refreshAccent() {
-      const c = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
-      const tmp = document.createElement('span');
-      tmp.style.color = c;
-      document.body.appendChild(tmp);
-      const m = getComputedStyle(tmp).color.match(/\d+/g);
-      tmp.remove();
-      if (m) accentRGB = `${m[0]}, ${m[1]}, ${m[2]}`;
-    }
-    refreshAccent();
-    new MutationObserver(refreshAccent).observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['data-theme'],
-    });
-
-    document.addEventListener('mousemove', (e) => {
-      if (spotlight && !document.body.classList.contains('machine-mode')) {
-        spotlight.style.background = `radial-gradient(560px at ${e.clientX}px ${e.clientY}px, rgba(${accentRGB}, 0.06), transparent 72%)`;
-      }
-    });
-
-    // Hide spotlight in machine mode
-    const modeObserver = new MutationObserver(() => {
-      const isMachine = document.body.classList.contains('machine-mode');
-      if (spotlight) spotlight.style.opacity = isMachine ? '0' : '1';
-    });
-    modeObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
-
     // Section fade-in on scroll (progressive enhancement — visible by default if observer unsupported)
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if ('IntersectionObserver' in window && !prefersReduced) {

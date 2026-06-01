@@ -9,13 +9,13 @@ const fmt = (d) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'shor
 ---
 
 <BaseLayout title="Writing | Adrij Shikhar">
-  <main class="mx-auto min-h-screen max-w-3xl px-6 py-16 md:px-12 md:py-24">
+  <main class="mx-auto min-h-screen max-w-5xl px-6 py-16 md:px-12 md:py-24">
     <a href="/" class="group mb-10 inline-flex items-center font-mono text-xs uppercase tracking-[0.14em] text-muted no-underline hover:text-accent">
       <span class="mr-2 transition-transform duration-[120ms] group-hover:-translate-x-1">&larr;</span>
       <span>adrij_shikhar</span>
     </a>
 
-    <p class="mb-4 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted"><span class="h-2 w-2 rounded-full bg-accent"></span> writing — {String(posts.length).padStart(2, '0')} entries</p>
+    <p class="mb-4 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted"><span class="h-2 w-2 rounded-full bg-accent"></span> writing</p>
     <h1 class="mb-12 font-heading text-4xl font-semibold tracking-tightest text-heading sm:text-5xl">Writing</h1>
 
     {posts.length === 0 ? (
@@ -23,17 +23,16 @@ const fmt = (d) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'shor
         <span class="text-accent">$</span> ls ./posts — <span class="text-text">no entries yet.</span>
       </p>
     ) : (
-      <ul class="border-t border-border">
+      <ul class="group/list columns-1 gap-5 sm:columns-2">
         {posts.map((post, i) => (
-          <li class="group border-b border-border transition-colors duration-[120ms] hover:bg-surface">
-            <a href={`/blogs/${post.id}`} class="relative block py-6 pl-5 pr-2 text-inherit no-underline hover:text-inherit">
-              <span aria-hidden class="pointer-events-none absolute left-0 top-0 h-full w-px scale-y-0 bg-accent transition-transform duration-[120ms] ease-out group-hover:scale-y-100" />
-              <div class="flex items-baseline justify-between gap-4">
-                <span class="font-mono text-[11px] uppercase tracking-[0.12em] text-muted">{fmt(post.data.date)}</span>
-                <span class="font-mono text-[10px] tabular-nums text-muted">{String(i + 1).padStart(2, '0')}</span>
-              </div>
-              <h2 class="mt-2 font-heading text-lg font-medium tracking-tighter text-heading transition-colors duration-[120ms] group-hover:text-accent">{post.data.title}</h2>
-              <p class="mt-1.5 text-sm leading-relaxed text-text">{post.data.description}</p>
+          <li class={`atelier-card group/list-item mb-5 break-inside-avoid px-5 py-6 lg:px-6 lg:py-7 ${i % 2 === 1 ? 'is-alt' : ''}`}>
+            <a href={`/blogs/${post.id}`} class="block text-inherit no-underline hover:text-inherit">
+              <span class="font-mono text-[11px] uppercase tracking-[0.12em] text-muted">{fmt(post.data.date)}</span>
+              <h2 class="mt-2 font-heading text-lg font-medium leading-snug tracking-tighter text-heading">
+                <span class="transition-colors duration-[120ms] group-hover/list-item:text-accent">{post.data.title}</span>
+                <span class="ml-1 text-xs text-muted transition-colors group-hover/list-item:text-accent">&rarr;</span>
+              </h2>
+              {post.data.description && <p class="mt-1.5 text-[0.975rem] leading-relaxed text-text">{post.data.description}</p>}
             </a>
           </li>
         ))}

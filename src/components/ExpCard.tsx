@@ -9,17 +9,18 @@ interface ExpCardProps {
   endDate: string;
   tagline?: string;
   contentHtml?: string;
+  index?: number;
 }
 
 const prose =
-  'mt-3 text-sm leading-relaxed text-text prose prose-invert prose-sm max-w-none ' +
-  'prose-headings:text-heading prose-headings:text-sm prose-headings:font-semibold prose-headings:tracking-tighter prose-headings:mt-4 prose-headings:mb-2 ' +
+  'mt-3 text-[0.975rem] leading-relaxed text-text prose prose-invert max-w-none ' +
+  'prose-headings:text-heading prose-headings:text-base prose-headings:font-semibold prose-headings:tracking-tighter prose-headings:mt-4 prose-headings:mb-2 ' +
   'prose-p:text-text prose-li:text-text prose-li:my-0.5 prose-ul:my-1.5 marker:text-accent ' +
   'prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-strong:text-heading prose-strong:font-medium';
 
-export default function ExpCard({ position, company, companyLink, location, startDate, endDate, tagline, contentHtml }: ExpCardProps) {
+export default function ExpCard({ position, company, companyLink, location, startDate, endDate, tagline, contentHtml, index = 0 }: ExpCardProps) {
   return (
-    <HoverCard>
+    <HoverCard index={index}>
       <div className="flex items-baseline justify-between gap-4">
         <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted">
           {startDate} <span className="text-muted/50">—</span> {endDate}

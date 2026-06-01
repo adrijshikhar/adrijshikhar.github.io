@@ -23,18 +23,16 @@ function splitBySlug(content: string): Record<string, string> {
 
 const experience = readContent('experience.md');
 const expSections = splitBySlug(experience.content);
-const count = experience.meta.entries.length;
 ---
 
 <BaseLayout title="All Experience | Adrij Shikhar">
-  <div class="pointer-events-none fixed inset-0 z-30" id="spotlight"></div>
-  <main class="mx-auto min-h-screen max-w-3xl px-6 py-16 md:px-12 md:py-24">
+  <main class="mx-auto min-h-screen max-w-5xl px-6 py-16 md:px-12 md:py-24">
     <a class="group mb-10 inline-flex items-center font-mono text-xs uppercase tracking-[0.14em] text-muted no-underline hover:text-accent" href="/">
       <span class="mr-2 transition-transform duration-[120ms] group-hover:-translate-x-1">&larr;</span>
       <span>adrij_shikhar</span>
     </a>
 
-    <p class="mb-4 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted"><span class="h-2 w-2 rounded-full bg-accent"></span> index — {String(count).padStart(2, '0')} entries</p>
+    <p class="mb-4 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted"><span class="h-2 w-2 rounded-full bg-accent"></span> experience</p>
     <h1 class="mb-12 font-heading text-4xl font-semibold tracking-tightest text-heading sm:text-5xl">
       Work Experience
     </h1>
@@ -45,22 +43,4 @@ const count = experience.meta.entries.length;
       ))}
     </ul>
   </main>
-  <script>
-    const spotlight = document.getElementById('spotlight');
-    let accentRGB = '251, 99, 27';
-    (function () {
-      const c = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
-      const tmp = document.createElement('span');
-      tmp.style.color = c;
-      document.body.appendChild(tmp);
-      const m = getComputedStyle(tmp).color.match(/\d+/g);
-      tmp.remove();
-      if (m) accentRGB = `${m[0]}, ${m[1]}, ${m[2]}`;
-    })();
-    document.addEventListener('mousemove', (e) => {
-      if (spotlight) {
-        spotlight.style.background = `radial-gradient(560px at ${e.clientX}px ${e.clientY}px, rgba(${accentRGB}, 0.06), transparent 72%)`;
-      }
-    });
-  </script>
 </BaseLayout>

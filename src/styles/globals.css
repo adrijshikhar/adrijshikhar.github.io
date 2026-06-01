@@ -29,10 +29,12 @@
   --accent: #fb631b;
   --accent-contrast: #0e0e0e;
 
-  /* Ambient aurora trio (3 distinct hues, ported from D). Overridden per [data-theme]. */
-  --aurora-1: #fb631b; /* orange */
-  --aurora-2: #ff9d5c; /* amber */
-  --aurora-3: #ffd089; /* gold */
+  /* Ambient aurora trio (3 distinct hues, ported from D). Overridden per [data-theme].
+     Warm-gold sweep — analogous to the orange accent but lighter and more golden,
+     so it harmonizes without smearing the accent hue. Accent stays on the mouse spotlight. */
+  --aurora-1: #ff9d3d; /* amber */
+  --aurora-2: #ffc04d; /* gold */
+  --aurora-3: #ffe0a0; /* peach */
   /* Aurora rendering (DARK). Light mode overrides these values only — see [data-mode="light"]. */
   --aurora-blend: screen;
   --aurora-blur: 100px;
@@ -81,7 +83,7 @@
 [data-theme="parallel"] {
   --accent: #fb631b;
   --accent-contrast: #0e0e0e;
-  --aurora-1: #fb631b; --aurora-2: #ff9d5c; --aurora-3: #ffd089;
+  --aurora-1: #ff9d3d; --aurora-2: #ffc04d; --aurora-3: #ffe0a0;
 }
 [data-theme="teal"] {
   --accent: #64ffda;
@@ -210,12 +212,6 @@
     transition: background-color 0.28s ease;
   }
 
-  @media (min-width: 1024px) {
-    *, *::before, *::after {
-      cursor: none !important;
-    }
-  }
-
   h1, h2, h3, h4, h5, h6 {
     color: var(--heading);
     font-family: var(--font-heading);
@@ -320,7 +316,7 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: radial-gradient(125% 88% at 50% 16%, transparent 0%, transparent 26%, var(--bg) 78%);
+    background: radial-gradient(125% 92% at 50% 16%, transparent 0%, transparent 34%, var(--bg) 92%);
     pointer-events: none;
   }
 
@@ -333,18 +329,18 @@
   }
   /* primary accent glow — top-left */
   .aurora-blob--1 {
-    width: 50vw; height: 50vw;
-    top: -18vw; left: -12vw;
+    width: 68vw; height: 68vw;
+    top: -26vw; left: -30vw;
     opacity: var(--aurora-op-1);
-    background: radial-gradient(circle at 30% 30%, var(--aurora-1), transparent 68%);
+    background: radial-gradient(circle at 38% 38%, var(--aurora-1), transparent 80%);
     animation: aurora-drift1 30s ease-in-out infinite alternate;
   }
   /* cooler accent-toward-white tail — top-right */
   .aurora-blob--2 {
-    width: 44vw; height: 44vw;
-    top: 6vw; right: -16vw;
+    width: 62vw; height: 62vw;
+    top: 16vw; right: -20vw;
     opacity: var(--aurora-op-2);
-    background: radial-gradient(circle at 60% 40%, var(--aurora-2), transparent 70%);
+    background: radial-gradient(circle at 58% 42%, var(--aurora-2), transparent 82%);
     animation: aurora-drift2 36s ease-in-out infinite alternate;
   }
   /* dim accent-toward-bg anchor — bottom */

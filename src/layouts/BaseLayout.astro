@@ -1,7 +1,6 @@
 ---
 import '../styles/globals.css';
 import '../styles/machine.css';
-import ThemeSwitcher from '../components/ThemeSwitcher.tsx';
 import ModeToggle from '../components/ModeToggle.tsx';
 
 interface Props {
@@ -56,43 +55,13 @@ const { title, canonical } = Astro.props;
       <div class="aurora-blob aurora-blob--3"></div>
     </div>
 
-    <div class="pointer-events-none fixed z-[9999] hidden lg:block" id="cursor">
-      <div class="absolute -left-[10px] -top-[10px] h-5 w-5 rounded-[5px] border border-muted transition-all duration-150 ease-out" id="cursor-ring"></div>
-    </div>
     <slot />
 
-    <!-- Accent theme switcher, docked beside the human/machine toggle -->
-    <div class="fixed bottom-6 left-1/2 z-[1090] -translate-x-1/2 translate-y-[calc(100%+0.625rem)] sm:translate-y-0 sm:left-auto sm:right-6 sm:bottom-7">
-      <div class="flex items-center gap-3 border border-border bg-surface/90 px-3 py-2 backdrop-blur-xl">
-        <ThemeSwitcher client:load />
-        <span class="h-[14px] w-px bg-border" aria-hidden="true"></span>
+    <!-- Light/dark mode toggle, docked top-right -->
+    <div class="fixed top-5 right-5 z-[1090] md:top-6 md:right-6">
+      <div class="flex items-center rounded-xl border border-[rgb(var(--border)/0.14)] bg-surface/92 px-3 py-2.5 shadow-[var(--card-shadow)] backdrop-blur-xl">
         <ModeToggle client:load />
       </div>
     </div>
-
-    <script>
-      const cursor = document.getElementById('cursor');
-      const cursorRing = document.getElementById('cursor-ring');
-      if (cursor) {
-        cursor.style.left = `${window.innerWidth * 0.07}px`;
-        cursor.style.top = `${window.innerHeight * 0.5}px`;
-      }
-      document.addEventListener('mousemove', (e) => {
-        if (cursor) {
-          cursor.style.left = `${e.clientX}px`;
-          cursor.style.top = `${e.clientY}px`;
-        }
-      });
-      document.querySelectorAll('a, button').forEach((el) => {
-        el.addEventListener('mouseenter', () => {
-          cursorRing?.classList.add('scale-150');
-          cursorRing?.style.setProperty('border-color', 'var(--accent)');
-        });
-        el.addEventListener('mouseleave', () => {
-          cursorRing?.classList.remove('scale-150');
-          cursorRing?.style.removeProperty('border-color');
-        });
-      });
-    </script>
   </body>
 </html>

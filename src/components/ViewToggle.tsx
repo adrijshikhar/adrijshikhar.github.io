@@ -171,7 +171,7 @@ export default function ViewToggle() {
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[1100] flex items-center gap-2">
       <div
         ref={islandRef}
-        className="flex gap-4 px-4 py-2.5 rounded-full backdrop-blur-xl font-mono text-sm bg-surface/92 border border-[rgb(var(--border)/0.14)] shadow-[var(--card-shadow)]"
+        className="flex gap-4 px-4 py-2.5 rounded-xl backdrop-blur-xl font-mono text-sm bg-surface/92 border border-[rgb(var(--border)/0.14)] shadow-[var(--card-shadow)]"
       >
         <Toggle
           pressed={mode === 'human'}
