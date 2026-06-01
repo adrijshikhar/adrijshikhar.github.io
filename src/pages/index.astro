@@ -57,8 +57,8 @@ const rawMarkdown = [
   `\n---\n\n## Experience\n\n${experience.meta.entries.map((e: any) => formatExpEntry(e, expSections[e.slug] || '')).join('\n\n---\n\n')}`,
   `\n---\n\n## Projects\n\n${projects.meta.entries.map((p: any) => formatProjEntry(p, projSections[p.slug] || '')).join('\n\n---\n\n')}`,
   `\n---\n\n## Writing\n\n${latestPosts.map((post) => `- [${post.data.title}](/blogs/${post.id})`).join('\n') || '_No posts yet._'}`,
-  `\n---\n\n## Achievements\n\n${achievements.content}`,
   `\n---\n\n## Education\n\n${education.meta.entries.map((e: any) => `### ${e.institution}\n\n${e.degree}${e.field ? ` — ${e.field}` : ''}`).join('\n\n')}`,
+  `\n---\n\n## Achievements\n\n${achievements.content}`,
   `\n---\n\n## Interests\n\n${interests.content}`,
 ].join('\n');
 ---
@@ -84,7 +84,7 @@ const rawMarkdown = [
 
         <!-- Experience -->
         <section id="experience" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="sticky top-0 z-20 -mx-5 mb-6 w-screen border-b border-border bg-bg/80 px-5 py-5 backdrop-blur md:-mx-8 md:px-8 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
+          <div class="sticky top-0 z-20 -mx-5 mb-6 w-screen border-b border-border bg-[color-mix(in_srgb,var(--bg)_80%,transparent)] px-5 py-5 backdrop-blur md:-mx-8 md:px-8 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
             <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Experience</h2>
           </div>
           <p class="mb-5 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted hidden lg:flex"><span class="h-2 w-2 rounded-full bg-accent"></span> experience</p>
@@ -102,7 +102,7 @@ const rawMarkdown = [
 
         <!-- Projects -->
         <section id="projects" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="sticky top-0 z-20 -mx-5 mb-6 w-screen border-b border-border bg-bg/80 px-5 py-5 backdrop-blur md:-mx-8 md:px-8 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
+          <div class="sticky top-0 z-20 -mx-5 mb-6 w-screen border-b border-border bg-[color-mix(in_srgb,var(--bg)_80%,transparent)] px-5 py-5 backdrop-blur md:-mx-8 md:px-8 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
             <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Projects</h2>
           </div>
           <p class="mb-5 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted hidden lg:flex"><span class="h-2 w-2 rounded-full bg-accent"></span> projects</p>
@@ -120,7 +120,7 @@ const rawMarkdown = [
 
         <!-- Writing -->
         <section id="writing" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="sticky top-0 z-20 -mx-5 mb-6 w-screen border-b border-border bg-bg/80 px-5 py-5 backdrop-blur md:-mx-8 md:px-8 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
+          <div class="sticky top-0 z-20 -mx-5 mb-6 w-screen border-b border-border bg-[color-mix(in_srgb,var(--bg)_80%,transparent)] px-5 py-5 backdrop-blur md:-mx-8 md:px-8 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
             <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Writing</h2>
           </div>
           <p class="mb-5 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted hidden lg:flex"><span class="h-2 w-2 rounded-full bg-accent"></span> writing</p>
@@ -144,7 +144,7 @@ const rawMarkdown = [
 
         <!-- Education -->
         <section id="education" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="sticky top-0 z-20 -mx-5 mb-6 w-screen border-b border-border bg-bg/80 px-5 py-5 backdrop-blur md:-mx-8 md:px-8 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
+          <div class="sticky top-0 z-20 -mx-5 mb-6 w-screen border-b border-border bg-[color-mix(in_srgb,var(--bg)_80%,transparent)] px-5 py-5 backdrop-blur md:-mx-8 md:px-8 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
             <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Education</h2>
           </div>
           <p class="mb-5 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted hidden lg:flex"><span class="h-2 w-2 rounded-full bg-accent"></span> education</p>
@@ -163,7 +163,7 @@ const rawMarkdown = [
 
         <!-- Achievements -->
         <section id="achievements" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="sticky top-0 z-20 -mx-5 mb-6 w-screen border-b border-border bg-bg/80 px-5 py-5 backdrop-blur md:-mx-8 md:px-8 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
+          <div class="sticky top-0 z-20 -mx-5 mb-6 w-screen border-b border-border bg-[color-mix(in_srgb,var(--bg)_80%,transparent)] px-5 py-5 backdrop-blur md:-mx-8 md:px-8 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
             <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Achievements</h2>
           </div>
           <p class="mb-5 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted hidden lg:flex"><span class="h-2 w-2 rounded-full bg-accent"></span> achievements</p>

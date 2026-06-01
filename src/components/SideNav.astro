@@ -82,7 +82,11 @@ const sections = [
 <script>
   // Scroll-spy for desktop nav
   const navLinks = document.querySelectorAll('.nav-link');
-  const sectionEls = document.querySelectorAll('section[id]');
+  // Only observe sections that have a matching nav link — otherwise a section with no nav
+  // entry (e.g. #interests) intersecting would run the else-branch for every link and
+  // deactivate the whole nav.
+  const navIds = new Set([...navLinks].map((l) => l.getAttribute('data-section')));
+  const sectionEls = [...document.querySelectorAll('section[id]')].filter((s) => navIds.has(s.id));
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {

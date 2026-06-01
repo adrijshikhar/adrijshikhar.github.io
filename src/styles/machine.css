@@ -11,6 +11,22 @@
   pointer-events: none;
 }
 
+/* No-FOUC for ?machine=true: the head script adds .machine-boot before first paint so the
+   human view never flashes. The ViewToggle mount effect removes .machine-boot once it owns
+   the views via inline styles. */
+html.machine-boot .human-view {
+  display: none;
+}
+html.machine-boot .machine-view {
+  height: auto;
+  opacity: 1;
+  overflow: visible;
+  pointer-events: auto;
+}
+html.machine-boot .aurora-stage {
+  opacity: 0;
+}
+
 /* === Machine content — matches parallel.ai exactly === */
 
 .machine-content-wrapper {

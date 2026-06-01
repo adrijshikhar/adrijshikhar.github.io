@@ -92,7 +92,7 @@ Push to the **`content`** branch → `.github/workflows/deploy.yml` builds with 
 `dist/` to GitHub Pages (`actions/deploy-pages`). `build.yml` runs the build on PRs into
 `content`. PRs target `content`, not `main`/`master`.
 
-Workflow conventions to preserve: **SHA-pin actions** (not tags), **least-privilege
-`permissions:`** per workflow, and **never interpolate untrusted input into `run:`** (pass it
-as an env var). Actions are on the Node-24 majors (checkout v6, setup-node v6,
-upload-pages-artifact v5, deploy-pages v5).
+Workflow conventions to preserve: **major-version action tags** (e.g. `@v6` — not SHA pins),
+**least-privilege `permissions:`** per workflow, and **never interpolate untrusted input into
+`run:`** (pass it as an env var). Actions are on the Node-24 majors (checkout v6, setup-node
+v6, upload-pages-artifact v5, deploy-pages v5).
