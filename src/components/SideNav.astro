@@ -41,7 +41,7 @@ const sections = [
               href={`#${s.id}`}
               data-section={s.id}
             >
-              <span class="nav-indicator h-2 w-2 shrink-0 rounded-full bg-ink/70 transition-all duration-200 ease-out group-hover:scale-[1.6] group-hover:bg-accent group-focus-visible:scale-[1.6] group-focus-visible:bg-accent"></span>
+              <span class="nav-indicator h-2 w-2 shrink-0 rounded-full bg-muted transition-all duration-200 ease-out group-hover:scale-[1.6] group-hover:bg-accent group-focus-visible:scale-[1.6] group-focus-visible:bg-accent"></span>
               <span class="nav-text bh-label text-muted transition-colors group-hover:text-ink group-focus-visible:text-ink">
                 {s.label}
               </span>
@@ -105,12 +105,12 @@ const sections = [
             const text = link.querySelector('.nav-text');
             if (isActive) {
               indicator?.classList.add('scale-[1.6]', 'bg-accent');
-              indicator?.classList.remove('bg-ink/70');
+              indicator?.classList.remove('bg-muted');
               text?.classList.add('text-ink');
               text?.classList.remove('text-muted');
             } else {
               indicator?.classList.remove('scale-[1.6]', 'bg-accent');
-              indicator?.classList.add('bg-ink/70');
+              indicator?.classList.add('bg-muted');
               text?.classList.remove('text-ink');
               text?.classList.add('text-muted');
             }
