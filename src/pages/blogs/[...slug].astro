@@ -14,12 +14,34 @@ const canonical = post.data.canonicalUrl ?? new URL(`/blogs/${post.id}`, Astro.s
 ---
 
 <BaseLayout title={`${post.data.title} | Adrij Shikhar`} canonical={canonical}>
-  <main class="mx-auto min-h-screen max-w-screen-md px-6 py-12 md:px-12 md:py-20">
-    <a href="/blogs" class="text-sm text-slate-400 hover:text-accent">← All posts</a>
-    <h1 class="mt-6 text-3xl font-bold tracking-tight text-slate-200">{post.data.title}</h1>
-    <div class="mt-2 text-xs font-semibold uppercase tracking-widest text-slate-500">{fmt(post.data.date)}</div>
-    <article class="prose prose-invert mt-8 max-w-none">
+  <main class="mx-auto min-h-screen max-w-5xl px-6 py-16 md:px-12 md:py-24">
+   <div class="mx-auto max-w-3xl">
+    <a href="/blogs" class="group inline-flex items-center font-mono text-xs uppercase tracking-[0.14em] text-muted no-underline hover:text-accent">
+      <span class="mr-2 transition-transform duration-[120ms] group-hover:-translate-x-1">&larr;</span>
+      <span>all posts</span>
+    </a>
+
+    <header class="mt-10 border-b border-border pb-8">
+      <p class="mb-4 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted"><span class="h-2 w-2 rounded-full bg-accent"></span> {fmt(post.data.date)}</p>
+      <h1 class="font-heading text-3xl font-semibold leading-[1.08] tracking-tightest text-heading sm:text-4xl">{post.data.title}</h1>
+      {post.data.description && (
+        <p class="mt-4 text-base leading-relaxed text-text">{post.data.description}</p>
+      )}
+    </header>
+
+    <article
+      class="prose prose-invert mt-10 max-w-none
+        prose-headings:font-heading prose-headings:tracking-tighter prose-headings:text-heading
+        prose-p:text-text prose-p:leading-relaxed prose-li:text-text marker:text-accent
+        prose-a:text-accent prose-a:no-underline hover:prose-a:underline
+        prose-strong:text-heading prose-strong:font-medium
+        prose-code:rounded-none prose-code:border prose-code:border-border prose-code:bg-surface prose-code:px-1.5 prose-code:py-0.5 prose-code:font-mono prose-code:text-[0.85em] prose-code:text-heading prose-code:before:content-none prose-code:after:content-none
+        prose-pre:rounded-none prose-pre:border prose-pre:border-border prose-pre:bg-surface
+        prose-blockquote:border-l-2 prose-blockquote:border-accent prose-blockquote:text-muted prose-blockquote:not-italic
+        prose-hr:border-border prose-img:rounded-none prose-img:border prose-img:border-border"
+    >
       <Content />
     </article>
+   </div>
   </main>
 </BaseLayout>

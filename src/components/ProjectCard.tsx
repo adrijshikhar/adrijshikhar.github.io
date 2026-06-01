@@ -1,4 +1,3 @@
-import { CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
 import HoverCard from './HoverCard';
 
 interface ProjectCardProps {
@@ -8,43 +7,53 @@ interface ProjectCardProps {
   link?: string;
   builtWith?: string[];
   contentHtml?: string;
+  index?: number;
 }
 
-export default function ProjectCard({ title, company, date, link, builtWith = [], contentHtml }: ProjectCardProps) {
+const prose =
+  'mt-3 text-[0.975rem] leading-relaxed text-text prose prose-invert max-w-none ' +
+  'prose-headings:text-heading prose-headings:text-base prose-headings:font-semibold prose-headings:tracking-tighter prose-headings:mt-4 prose-headings:mb-2 ' +
+  'prose-p:text-text prose-li:text-text prose-li:my-0.5 prose-ul:my-1.5 marker:text-accent ' +
+  'prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-strong:text-heading prose-strong:font-medium';
+
+export default function ProjectCard({ title, company, date, link, builtWith = [], contentHtml, index = 0 }: ProjectCardProps) {
+  const Title = (
+    <span className="transition-colors duration-[120ms] group-hover/list-item:text-accent">
+      {title}
+      {link && <span className="ml-1 text-xs text-muted transition-colors group-hover/list-item:text-accent">&#8599;</span>}
+    </span>
+  );
+
   return (
-    <HoverCard>
-        <CardHeader className="relative z-10 !gap-0 !p-0">
-          <div className="flex items-baseline justify-between gap-4">
-            <CardTitle className="!text-base !font-medium !leading-snug text-slate-200">
-              {link ? (
-                <a href={link} target="_blank" rel="noreferrer noopener" className="text-inherit hover:text-inherit inline-flex items-baseline">
-                  <span className="group-hover:text-accent transition-colors">
-                    {title}<span className="ml-1 text-xs text-slate-400/60 group-hover:text-accent transition-colors">&#8599;</span>
-                  </span>
-                </a>
-              ) : (
-                <span className="group-hover:text-accent transition-colors">{title}</span>
-              )}
-            </CardTitle>
-            <span className="shrink-0 text-xs font-mono uppercase tracking-wide text-slate-400/60">{date}</span>
-          </div>
-          {company && (
-            <CardDescription className="text-slate-400/60 text-sm mt-0.5">{company}</CardDescription>
-          )}
-        </CardHeader>
-        {builtWith.length > 0 && (
-          <div className="relative z-10 flex flex-wrap gap-1.5 mt-2">
-            {builtWith.map((tech) => (
-              <span key={tech} className="rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-medium text-accent">{tech}</span>
-            ))}
-          </div>
+    <HoverCard index={index}>
+      <div className="flex items-baseline justify-between gap-4">
+        <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted">{date}</span>
+        {company && <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted">{company}</span>}
+      </div>
+      <h3 className="mt-2 font-heading text-base font-medium leading-snug tracking-tighter text-heading">
+        {link ? (
+          <a href={link} target="_blank" rel="noreferrer noopener" className="text-heading no-underline hover:text-heading">
+            {Title}
+          </a>
+        ) : (
+          Title
         )}
-        {contentHtml && (
-          <CardContent
-            className="relative z-10 !p-0 mt-2 text-sm leading-normal text-slate-400 prose prose-invert prose-sm max-w-none prose-headings:text-slate-200 prose-headings:text-sm prose-headings:font-semibold prose-headings:mt-4 prose-headings:mb-2 prose-li:my-0.5 prose-ul:my-1 prose-a:text-accent prose-strong:text-slate-200"
-            dangerouslySetInnerHTML={{ __html: contentHtml }}
-          />
-        )}
+      </h3>
+      {builtWith.length > 0 && (
+        <ul className="mt-3 flex flex-wrap gap-x-3 gap-y-1.5">
+          {builtWith.map((tech) => (
+            <li
+              key={tech}
+              className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted before:mr-1.5 before:text-accent before:content-['+']"
+            >
+              {tech}
+            </li>
+          ))}
+        </ul>
+      )}
+      {contentHtml && (
+        <div className={prose} dangerouslySetInnerHTML={{ __html: contentHtml }} />
+      )}
     </HoverCard>
   );
 }

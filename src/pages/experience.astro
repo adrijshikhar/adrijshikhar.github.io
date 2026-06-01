@@ -26,26 +26,21 @@ const expSections = splitBySlug(experience.content);
 ---
 
 <BaseLayout title="All Experience | Adrij Shikhar">
-  <div class="pointer-events-none fixed inset-0 z-30" id="spotlight"></div>
-  <main class="mx-auto min-h-screen max-w-screen-xl px-6 py-12 md:px-12 md:py-20 lg:px-24">
-    <a class="group mb-2 inline-flex items-center font-semibold leading-tight text-accent" href="/">
-      <span class="mr-1 transition-transform group-hover:-translate-x-1">&larr;</span>
-      <span>Adrij Shikhar</span>
+  <main class="mx-auto min-h-screen max-w-5xl px-6 py-16 md:px-12 md:py-24">
+    <a class="group mb-10 inline-flex items-center font-mono text-xs uppercase tracking-[0.14em] text-muted no-underline hover:text-accent" href="/">
+      <span class="mr-2 transition-transform duration-[120ms] group-hover:-translate-x-1">&larr;</span>
+      <span>adrij_shikhar</span>
     </a>
-    <h1 class="text-4xl font-bold tracking-tight text-slate-200 sm:text-5xl mb-12">All Experience</h1>
 
-    <ul class="space-y-4">
+    <p class="mb-4 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted"><span class="h-2 w-2 rounded-full bg-accent"></span> experience</p>
+    <h1 class="mb-12 font-heading text-4xl font-semibold tracking-tightest text-heading sm:text-5xl">
+      Work Experience
+    </h1>
+
+    <ul class="group/list border-b border-border">
       {experience.meta.entries.map((exp: any) => (
         <ExpCard {...exp} contentHtml={marked.parse(expSections[exp.slug] || '') as string} />
       ))}
     </ul>
   </main>
-  <script>
-    const spotlight = document.getElementById('spotlight');
-    document.addEventListener('mousemove', (e) => {
-      if (spotlight) {
-        spotlight.style.background = `radial-gradient(600px at ${e.clientX}px ${e.clientY}px, rgba(29, 78, 216, 0.15), transparent 80%)`;
-      }
-    });
-  </script>
 </BaseLayout>
