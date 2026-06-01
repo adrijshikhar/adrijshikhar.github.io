@@ -37,11 +37,11 @@ const sections = [
         {sections.map((s, i) => (
           <li>
             <a
-              class="group flex items-center gap-4 py-2.5 nav-link"
+              class="group flex items-center gap-2.5 py-2.5 nav-link"
               href={`#${s.id}`}
               data-section={s.id}
             >
-              <span class="nav-indicator h-2.5 w-2.5 shrink-0 rounded-full bg-ink/25 transition-all duration-200 ease-out group-hover:scale-150 group-hover:bg-accent group-focus-visible:scale-150 group-focus-visible:bg-accent"></span>
+              <span class="nav-indicator h-2 w-2 shrink-0 rounded-full bg-ink/40 transition-all duration-200 ease-out group-hover:scale-[1.6] group-hover:bg-accent group-focus-visible:scale-[1.6] group-focus-visible:bg-accent"></span>
               <span class="nav-text bh-label text-muted transition-colors group-hover:text-ink group-focus-visible:text-ink">
                 {s.label}
               </span>
@@ -104,13 +104,13 @@ const sections = [
             const indicator = link.querySelector('.nav-indicator');
             const text = link.querySelector('.nav-text');
             if (isActive) {
-              indicator?.classList.add('scale-150', 'bg-accent');
-              indicator?.classList.remove('bg-ink/25');
+              indicator?.classList.add('scale-[1.6]', 'bg-accent');
+              indicator?.classList.remove('bg-ink/40');
               text?.classList.add('text-ink');
               text?.classList.remove('text-muted');
             } else {
-              indicator?.classList.remove('scale-150', 'bg-accent');
-              indicator?.classList.add('bg-ink/25');
+              indicator?.classList.remove('scale-[1.6]', 'bg-accent');
+              indicator?.classList.add('bg-ink/40');
               text?.classList.remove('text-ink');
               text?.classList.add('text-muted');
             }
