@@ -191,12 +191,12 @@ const rawMarkdown = [
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     // Retuned spotlight: a hard-edged accent disc that tracks the cursor.
-    // Uses the live --accent token so it recolors with the theme switcher.
+    // References the --accent token directly inside color-mix() so it stays
+    // token-driven without a getComputedStyle read on every mousemove.
     function paint(x, y) {
       if (!spotlight || document.body.classList.contains('machine-mode')) return;
-      const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#d1331f';
       // hard radial: solid faint accent disc then a clean cut to transparent
-      spotlight.style.background = `radial-gradient(220px circle at ${x}px ${y}px, color-mix(in srgb, ${accent} 9%, transparent) 0%, color-mix(in srgb, ${accent} 9%, transparent) 60%, transparent 61%)`;
+      spotlight.style.background = `radial-gradient(220px circle at ${x}px ${y}px, color-mix(in srgb, var(--accent) 9%, transparent) 0%, color-mix(in srgb, var(--accent) 9%, transparent) 60%, transparent 61%)`;
     }
 
     if (!reduceMotion) {

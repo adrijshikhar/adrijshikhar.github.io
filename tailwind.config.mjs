@@ -21,6 +21,23 @@ export default {
         'block-3': 'var(--block-3)',
         border: 'var(--border)',
         ring: 'var(--ring)',
+        // shadcn/ui primitive keys (src/components/ui/*) mapped onto the
+        // Neo-Bauhaus tokens so their utilities resolve instead of no-op'ing.
+        background: 'var(--surface)',
+        foreground: 'var(--text)',
+        card: 'var(--surface)',
+        'card-foreground': 'var(--text)',
+        popover: 'var(--surface)',
+        'popover-foreground': 'var(--text)',
+        primary: 'var(--accent)',
+        'primary-foreground': 'var(--accent-contrast)',
+        secondary: 'var(--bg)',
+        'secondary-foreground': 'var(--ink)',
+        'muted-foreground': 'var(--muted)',
+        'accent-foreground': 'var(--accent-contrast)',
+        input: 'var(--border)',
+        destructive: '#d12222',
+        'destructive-foreground': '#ffffff',
       },
       fontFamily: {
         sans: ['Geist Variable', 'Inter', 'system-ui', 'sans-serif'],
