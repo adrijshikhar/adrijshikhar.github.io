@@ -421,6 +421,64 @@ Operational (no site code). Same finalized post.
 
 ---
 
+## Reusable blog-post template
+
+To write a new post, copy `src/content/blog/_template.mdx` (below) to
+`src/content/blog/<slug>.mdx`, fill it in, and set `draft: false` when ready to publish. The
+`<slug>` becomes the URL (`/blogs/<slug>`) — use kebab-case.
+
+```mdx
+---
+title: "<Post title — sentence case>"
+date: <YYYY-MM-DD>            # publish/authored date; drives list ordering (newest first)
+description: "<1–2 sentence summary — shown on /blogs and used for SEO/social>"
+draft: true                  # true = hidden in prod builds, visible in `bun run dev`; flip to false to ship
+canonicalUrl: "https://adrijshikhar.github.io/blogs/<slug>"   # for cross-post rel=canonical
+---
+
+<!-- Opening hook: 2–4 sentences. Lead with the problem/tension, not "In this post I…". -->
+
+## <Section — the "why" or context>
+
+<!-- Prose. Keep paragraphs tight. -->
+
+## <Section — the "what/how">
+
+<!-- Code fences get Shiki highlighting automatically. Keep snippets short + load-bearing. -->
+
+\`\`\`ts
+// minimal, illustrative — not the whole file
+\`\`\`
+
+## <Section — a decision or tradeoff worth dwelling on>
+
+<!-- The part readers remember: a removed feature, a gotcha, a security boundary, a perf cut. -->
+
+## Try it
+
+- **Link 1:** <repo / demo>
+- **Link 2:** <related resource>
+
+<!-- Closing: one forward-looking line. -->
+```
+
+**Conventions**
+- **Slug = filename** (`my-post.mdx` → `/blogs/my-post`); kebab-case, stable (it's the URL).
+- **`draft`** — keep `true` while writing (visible in `dev`, hidden in prod); flip to `false` in
+  the shipping PR. The `/blogs` list + homepage Writing section filter drafts in prod automatically.
+- **`description`** — write it for a human skimming `/blogs`; it's the only preview text.
+- **MDX** — plain Markdown works; you may also import/use components if a post needs them.
+- **Images** — put under `public/` and reference with an absolute path (`/img/...`).
+- **Cross-posting** — once live, set the same `canonicalUrl` on dev.to / everydev.ai (Phases 2–3).
+
+> **Don't commit the skeleton as a `.mdx` in `src/content/blog/`** unless you also exclude it
+> from the loader: the glob (`**/*.{md,mdx}`) + `getStaticPaths` pick up *every* file
+> regardless of `draft`, so a `_template.mdx` would emit a real `/blogs/_template` route. Keep
+> the template here in the plan (copy from above), or, if you want a committed file, change the
+> loader pattern to ignore underscore-prefixed files (e.g. `['**/!(_)*.{md,mdx}']`) first.
+
+---
+
 ## Self-Review (plan author)
 
 - **Spec coverage:** collection (T1) · /blogs list (T3) · post page (T4) · homepage Writing +
