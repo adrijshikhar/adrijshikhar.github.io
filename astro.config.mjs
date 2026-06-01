@@ -6,6 +6,14 @@ import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
   site: 'https://adrijshikhar.github.io',
+  // Dual Shiki themes emitted as CSS variables (no baked color), so fenced code
+  // blocks are readable in BOTH light and dark — switched by [data-mode] in globals.css.
+  markdown: {
+    shikiConfig: {
+      themes: { light: 'github-light', dark: 'github-dark' },
+      defaultColor: false,
+    },
+  },
   integrations: [
     mdx(),
     react(),
