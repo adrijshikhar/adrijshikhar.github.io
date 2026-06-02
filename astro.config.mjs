@@ -5,7 +5,7 @@ import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: 'https://adrijshikhar.github.io',
+  site: 'https://adrijshikhar.dev',
   // Dual Shiki themes emitted as CSS variables (no baked color), so fenced code
   // blocks are readable in BOTH light and dark — switched by [data-mode] in globals.css.
   markdown: {
