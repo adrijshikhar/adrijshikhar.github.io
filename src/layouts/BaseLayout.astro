@@ -9,6 +9,12 @@ interface Props {
 }
 
 const { title, canonical } = Astro.props;
+
+// Cloudflare Web Analytics beacon — token is public (ships in client HTML).
+// Resolved from a .env file (local dev) or a shell/CI env var (GitHub Actions).
+// Unset → no beacon emitted.
+const cfBeaconToken =
+  import.meta.env.PUBLIC_CF_BEACON_TOKEN ?? process.env.PUBLIC_CF_BEACON_TOKEN;
 ---
 
 <!doctype html>
@@ -23,6 +29,15 @@ const { title, canonical } = Astro.props;
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     />
+    {
+      cfBeaconToken && (
+        <script
+          defer
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon={JSON.stringify({ token: cfBeaconToken })}
+        />
+      )
+    }
     <!-- No-FOUC: apply saved accent theme + light/dark mode before first paint -->
     <script is:inline>
       (function () {
