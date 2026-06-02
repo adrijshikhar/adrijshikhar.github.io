@@ -21,7 +21,7 @@
 **AFTER:**
 ```
 - Shipped **Failure Classifier Phase 1** — error classification engine across all connectors and loaders, replacing generic errors with actionable diagnostics.
-- Shipped **SCD Type 2 (History Mode)** across Snowflake, BigQuery, and Redshift loaders — destination-specific strategies (Snowflake/BigQuery MERGE, Fivetran-identical Redshift DELETE+UPDATE+INSERT) unified behind a `__hevo__valid_from` catalog primitive spanning loader-base, catalog-service, and connector-framework.
+- Shipped **SCD Type 2 (History Mode)** across Snowflake, BigQuery, and Redshift loaders — destination-specific strategies (Snowflake/BigQuery MERGE, Redshift DELETE+UPDATE+INSERT) unified behind a `__hevo__valid_from` catalog primitive spanning loader-base, catalog-service, and connector-framework.
 - Migrated **9+ source connectors to Connector Framework v2 (CDK)** — declarative `generateTasks`/`ObjectPollTask` model replacing imperative fetch loops, with pluggable offset codecs and null-safe task generation.
 ```
 

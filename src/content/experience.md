@@ -76,35 +76,31 @@ entries:
 
 <!-- hevo-senior -->
 
-### Scale & Performance
+### Scale & Performance Impact
 
-- Scaled data pipeline platform to support **25,000+ source objects per pipeline** by profiling and optimizing ingestion across MySQL, Postgres, SQL Server connectors and Snowflake/BigQuery loaders.
-- Reduced object listing API latency from **60+ seconds to sub-second** by replacing N+1 mapping fetches with bulk APIs and paginated catalog queries.
-- Optimized source object generation by decoupling SO/SOTR/CT insertion from synchronous pipeline creation, cutting pipeline creation time for large integrations.
-- Built performance testing infrastructure using **k6** with Grafana dashboards for continuous pipeline lifecycle benchmarking.
+- **Unlocked enterprise-scale pipelines — 25× object capacity (1K → 25K objects/pipeline)**, clearing churn-risk blockers for customers ingesting 200M–400M events/month. Broke hard platform ceilings along the way (MongoDB's 16MB doc cap at ~800 objects, Temporal's 4MB activity-context limit, Redshift table limits) — tested to 50K objects, benchmarked to ~100K.
+- **Made job monitoring near real-time — per-event processing 1.67 min → ~1 sec (~100×)** and job-summary memory **10 GB (OOM) → 400 MB**, by replacing per-event DB calls with a MongoDB aggregation + batched fetch (steady-state CPU 100% spikes → <20%).
+- **Cut a critical API from 60+ seconds to sub-second** by replacing N+1 mapping fetches with bulk catalog APIs and cursor pagination.
+- **Cut test/build runtime −49% locally and −31% in CI** via shared per-fork integration-test containers, then propagated the model across services.
 
-### CDC Framework & System Design
+### CDC & Data-Correctness Innovation
 
-- Architected and shipped **Binlog V2** (Debezium-based MySQL CDC) from ground up — DDL parser, large transaction handling, skipped table management, new polling strategy, and GTID support. Rolled out to **100% of MySQL pipelines** over 12 months.
-- Built **Hermes**, Hevo 2.0's control plane from scratch — Java 17, Dropwizard, Groot auth, Caffeine/Redis caching, Temporal orchestration, RBAC. Owned full lifecycle across **5 environments** (preview, gamma, US, EU, Asia).
-- Designed the **log-router sidecar** for session log collection — fluent-bit wrapper routing structured logs to S3, integrated across **8+ data plane services**.
-- Shipped **Failure Classifier Phase 1** — error classification engine across all connectors and loaders, replacing generic errors with actionable diagnostics.
-- Shipped **SCD Type 2 (History Mode)** across Snowflake, BigQuery, and Redshift loaders — destination-specific strategies (Snowflake/BigQuery MERGE, Fivetran-identical Redshift DELETE+UPDATE+INSERT) unified behind a `__hevo__valid_from` catalog primitive spanning loader-base, catalog-service, and connector-framework.
-- Migrated **9+ source connectors to Connector Framework v2 (CDK)** — declarative `generateTasks`/`ObjectPollTask` model replacing imperative fetch loops, with pluggable offset codecs and null-safe task generation.
+- **Architected Binlog V2 (Debezium-based MySQL CDC) from scratch** and invented a **transaction-start-anchored polling model** — eliminating duplicate-row corruption in append-only destinations, removing per-transaction `TABLE_MAP_EVENT` persistence (and a Redis write-through table), and handling >4 GB transactions around MySQL server bugs. Rolled out to **100% of MySQL pipelines**.
+- **Diagnosed and killed "the root of all binlog latency issues"** — false multi-hour lag spikes traced to measuring from statement-execution instead of commit time; re-anchored the latency calc to COMMIT/XID timestamps.
+- **Shipped SCD Type 2 History Mode** across Snowflake/BigQuery/Redshift — kept connectors history-unaware (emit `source_modified_at`) while the platform derives `valid_from/valid_to/is_active` via `LEAD`/`ROW_NUMBER` window SQL and per-destination MERGE.
+- **Built Inferred Deletes** for full-load objects — timestamp soft-delete with a BigQuery single-pass `MERGE ... NOT MATCHED BY SOURCE` (vs Snowflake/Redshift two-step), keeping destinations consistent without explicit delete events.
 
-### Reliability & Incident Response
+### Reliability & Activation Impact
 
-- Resolved **295 P0/P1 production incidents** across US, EU, India, AU regions — binlog failures, WAL slot issues, data mismatches, and ingestion lag.
-- Fixed critical data integrity issues: unsigned types, geometry columns, timestamp-with-timezone, binary PKs, and table map cache corruption in CDC pipelines.
-- Hardened API security: eliminated plaintext password exposure, missing auth checks, and OAuth credential leakage.
+- **Attacked the biggest onboarding leak** — test-connection failures drove **40% of incidents and ~70% of signup drop-off**. My preflight + dynamic-classification redesign cut **false-negative classification >30% → 0%**, **system-error failures −25%**, invalid-credential feedback **180 s → <1 s**, p95 latency to **≤10 s**, and error-rule deploys from **3–7 days → minutes**.
+- **Replaced the failure-classification regex engine with RE2J (DFA)** after root-causing catastrophic backtracking + thread-pool starvation — regex hangs **∞ → <5 s**, and a 4,800-request load test went from stalling (killed at 7 min) to **1m19s**.
+- **Eliminated multi-day stuck loads** by setting an explicit Snowflake query timeout (**2-day JDBC default → 3 hr**); resolved 295 P0/P1 incidents across 4 regions with documented RCAs and a standardized gRPC→HTTP error-handling layer (UUID error-ID correlation across UI and logs).
 
-### Leadership & Impact
+### AI Tooling & Platform Innovation
 
-- Created and architected **hevo-connector-agent** — an AI agent that generates production-ready Hevo source connectors directly from API documentation. Built the original framework and interactive Claude Code workflow, later extended into a model-driven generation pipeline (ERD + OpenAPI parsing, LanceDB RAG over docs, multi-flow LLM enrichment, and auto-fixing Java codegen with TCK tests).
-- Authored **hevo-ai-plugin** — internal Claude Code plugin (16K+ LOC, 20+ skills) for on-call debugging, TDD workflows, and RCA automation; built the **Hermes MCP server** generating 100+ Claude tools from Postman collections to drive Hevo APIs programmatically.
-- Built local-dev platform tooling: hevo-2-starter one-command stack, **InfluxDB + Telegraf + Grafana** StatsD metrics across 11 services, and JFR profiling commands.
-- Provided **2,057 code reviews** across **54 repositories** over 4 years, averaging 40+ reviews/month.
-- Owned **4 major epics** (102 child issues): Hermes Optimizations (64), 25K Source Object Handling (24), Failure Classifier (9), Debezium MySQL Connector (5).
+- **Originated hevo-connector-agent** — an AI toolkit that builds production connectors straight from API docs (model-driven: ERD/OpenAPI parsing → LanceDB RAG → multi-flow LLM enrichment → auto-fixing Java codegen + TCK tests). Engineered its token efficiency: a command-as-orchestrator loading on-demand skill libraries cut LLM cost **30–50% per connector (~65K tokens saved on a 5-connector build)**, with pre-tool-use hooks enforcing the CDC offset data-loss invariant.
+- **Built the Hermes MCP server** turning **100+ Hevo APIs into Claude tools**, plus **hevo-ai-plugin** (20+ skills) for autonomous on-call debugging and RCA generation.
+- **Built Hermes, Hevo 2.0's control plane, from scratch** (Java 17, Dropwizard, Temporal, Groot RBAC) across 5 regions; **eliminated 3-repo coupling** per connector config knob via a connector-owned runtime-config model.
 
 <!-- hevo-intern -->
 
