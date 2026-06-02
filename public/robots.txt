@@ -1,4 +1,4 @@
-# robots.txt for https://adrijshikhar.github.io
+# robots.txt for https://adrijshikhar.dev
 # Crawl rules: RFC 9309 (https://www.rfc-editor.org/rfc/rfc9309)
 # Content Signals: https://contentsignals.org/
 #
@@ -28,4 +28,4 @@ User-agent: Bytespider
 Content-Signal: search=yes, ai-input=yes, ai-train=no
 Allow: /
 
-Sitemap: https://adrijshikhar.github.io/sitemap-index.xml
+Sitemap: https://adrijshikhar.dev/sitemap-index.xml
