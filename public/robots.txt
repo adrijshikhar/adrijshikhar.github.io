@@ -1,0 +1,31 @@
+# robots.txt for https://adrijshikhar.github.io
+# Crawl rules: RFC 9309 (https://www.rfc-editor.org/rfc/rfc9309)
+# Content Signals: https://contentsignals.org/
+#
+# Content-Signal declares usage preferences (a preference layer, not a hard block):
+#   search    = yes  -> may index for search/discovery
+#   ai-input  = yes  -> may use content to ground AI answers (cite my work)
+#   ai-train  = no   -> do NOT use content to train AI models
+# This portfolio wants maximum discoverability while opting out of model training.
+
+# Default: everything is crawlable.
+User-agent: *
+Content-Signal: search=yes, ai-input=yes, ai-train=no
+Allow: /
+
+# Explicit AI crawler rules (same policy, stated for clarity).
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-Web
+User-agent: anthropic-ai
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: PerplexityBot
+User-agent: CCBot
+User-agent: Bytespider
+Content-Signal: search=yes, ai-input=yes, ai-train=no
+Allow: /
+
+Sitemap: https://adrijshikhar.github.io/sitemap-index.xml
