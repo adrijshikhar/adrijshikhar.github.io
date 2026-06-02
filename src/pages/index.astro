@@ -11,6 +11,7 @@ import ExpCard from '../components/ExpCard.tsx';
 import ProjectCard from '../components/ProjectCard.tsx';
 import BlogCard from '../components/BlogCard.tsx';
 import ViewToggle from '../components/ViewToggle.tsx';
+import { buildRawMarkdown } from '../lib/raw-markdown';
 
 function readContent(filename: string) {
   const raw = readFileSync(join(process.cwd(), 'src/content', filename), 'utf-8');
@@ -35,7 +36,6 @@ const education = readContent('education.md');
 const achievements = readContent('achievements.md');
 const interests = readContent('interests.md');
 
-const expSections = splitBySlug(experience.content);
 const projSections = splitBySlug(projects.content);
 
 const latestPosts = (await getCollection('blog', ({ data }) => import.meta.env.PROD ? !data.draft : true))
@@ -43,24 +43,8 @@ const latestPosts = (await getCollection('blog', ({ data }) => import.meta.env.P
   .slice(0, 3);
 const fmtPostDate = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
 
-function formatExpEntry(entry: any, body: string): string {
-  return `### ${entry.position} @ ${entry.company} (${entry.startDate} — ${entry.endDate})\n\n${body}`;
-}
-
-function formatProjEntry(entry: any, body: string): string {
-  const header = entry.link ? `### [${entry.title}](${entry.link}) — ${entry.company}` : `### ${entry.title} — ${entry.company}`;
-  return `${header}\n\n${body}`;
-}
-
-const rawMarkdown = [
-  `# ${about.meta.name}\n\n${about.content}`,
-  `\n---\n\n## Experience\n\n${experience.meta.entries.map((e: any) => formatExpEntry(e, expSections[e.slug] || '')).join('\n\n---\n\n')}`,
-  `\n---\n\n## Projects\n\n${projects.meta.entries.map((p: any) => formatProjEntry(p, projSections[p.slug] || '')).join('\n\n---\n\n')}`,
-  `\n---\n\n## Writing\n\n${latestPosts.map((post) => `- [${post.data.title}](/blogs/${post.id})`).join('\n') || '_No posts yet._'}`,
-  `\n---\n\n## Education\n\n${education.meta.entries.map((e: any) => `### ${e.institution}\n\n${e.degree}${e.field ? ` — ${e.field}` : ''}`).join('\n\n')}`,
-  `\n---\n\n## Achievements\n\n${achievements.content}`,
-  `\n---\n\n## Interests\n\n${interests.content}`,
-].join('\n');
+// Machine-view payload — shared with the /llms.txt and /index.md endpoints (parity).
+const rawMarkdown = await buildRawMarkdown();
 ---
 
 <BaseLayout title="Adrij Shikhar">
