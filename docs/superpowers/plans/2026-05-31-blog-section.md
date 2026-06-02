@@ -13,6 +13,41 @@
 
 ---
 
+## STATUS / HANDOFF (updated 2026-06-02)
+
+- **Phase 1 — DONE + live.** All foundation tasks (collection, `/blogs` list + `[...slug]` post,
+  homepage Writing section + SideNav anchor, `?machine=true`, first post) shipped — partly with the
+  Terminal Atelier redesign (#768) and finalized via **#774** (content branch). First post is live:
+  `https://adrijshikhar.dev/blogs/building-an-agentic-era-profile-readme/`. Post is `draft:false`.
+  Canonical domain is now **`adrijshikhar.dev`** (custom domain; `.github.io` still resolves).
+  - Extras beyond plan: live `ReadmePreview.astro` (build-time fetch of the real README, mode-synced),
+    dual-theme Shiki code blocks, optional `cover` banner field. Code-review fixes merged in #774.
+  - Tasks 0–7 below are historical — **do not re-run**; verify against `content` before any change.
+
+- **Phase 2 — dev.to: DRAFT created, awaiting author review/publish.**
+  - dev.to article **id 3803610**, `published:false`, canonical → `adrijshikhar.dev/blogs/...`,
+    tags `showdev, github, webdev, ai`.
+  - **dev.to blocks remote SVG** → live typing-banner + Pac-Man render broken. Hero replaced with a
+    **retina PNG screenshot** of the rendered README top, hosted at
+    `https://raw.githubusercontent.com/adrijshikhar/adrijshikhar/output/readme-top.png`.
+  - Body built from the post mdx: strip frontmatter + the `import ReadmePreview` line, replace
+    `<ReadmePreview />` with the PNG (linked to GitHub) + a "see full live README" link, keep prose + code.
+  - `DEV_TO_API_KEY` is in shell env. API: `POST`/`PUT https://dev.to/api/articles[/{id}]`, header
+    `api-key: $DEV_TO_API_KEY`, JSON `{"article":{...}}`. **Remaining:** review in dev.to dashboard,
+    flip `published:true` (PUT) when happy.
+
+- **Phase 3 — everydev.ai: pending.** Same finalized post + same canonical + reuse the `readme-top.png`
+  asset. No site code.
+
+### Recipe — regenerate the README screenshot (raster, for SVG-blocking platforms)
+1. Open the live post `?mode=dark` in chrome-devtools at DPR 2 (`emulate viewport 1000x1500x2`).
+2. `evaluate`: isolate `.readme-embed` (replace `document.body.innerHTML` with its `outerHTML` on a
+   `#0d1117` wrapper) and `await` ~3.8s so the typing banner shows text.
+3. `take_screenshot fullPage` → crop the top with `ffmpeg -i in.png -vf "crop=1980:1120:0:0" out.png`.
+4. Push to the `output` branch via `gh api --method PUT repos/adrijshikhar/adrijshikhar/contents/readme-top.png` (base64 content, `branch:output`, include `sha` if updating).
+
+---
+
 ## File Structure
 
 | File | Responsibility |
