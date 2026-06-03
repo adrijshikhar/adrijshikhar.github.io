@@ -3,7 +3,50 @@
 **Date:** 2026-05-31
 **Repo:** `adrijshikhar/adrijshikhar.github.io` (Astro 6 + React 19 + Tailwind 3 + MDX, deployed to GitHub Pages)
 **Integration branch:** `content` (CI `build.yml`/`deploy.yml` trigger on `branches: [content]`; deploy publishes `dist` to Pages). Execution happens in a git worktree branched off `content`.
-**Status:** Approved — ready for implementation planning
+**Status:** Phase 1 SHIPPED + live. Phase 2 (dev.to) = DRAFT created. Phase 3 (everydev.ai) = pending.
+
+---
+
+## STATUS / HANDOFF (updated 2026-06-02)
+
+**Live:** Phase-1 blog shipped. The site has a custom domain now — canonical is
+**`https://adrijshikhar.dev`** (also reachable at `adrijshikhar.github.io`). First post live:
+`https://adrijshikhar.dev/blogs/building-an-agentic-era-profile-readme/` (200).
+
+**Scope note — this shipped on top of a full redesign.** The original "no visual redesign"
+constraint is obsolete: the site was rebuilt as the **"Terminal Atelier"** design (dark-default
++ light, CSS-var tokens, aurora, atelier cards) before/around the blog. The blog uses that design.
+
+**What was built beyond the original plan:**
+- `src/components/ReadmePreview.astro` — renders the **actual** GitHub profile README in the post
+  hero by fetching `raw.githubusercontent.com/adrijshikhar/adrijshikhar/main/README.md` at BUILD
+  time (marked), in a GitHub-styled card. Its `<picture>` blocks are rewritten to dual `<img>`
+  pairs toggled by `[data-mode]` so the embed follows the blog's light/dark (not the OS).
+- Blog schema gained optional `cover` (banner image); post page renders banner → title →
+  subheading (`description`) → date meta.
+- Code blocks: dual Shiki themes (github-light/dark) via CSS vars switched by `[data-mode]`;
+  soft-wrap (no horizontal scrollbar); atelier-card styling.
+- Code-review fixes merged (#774): human/machine **parity order** (Education before Achievements
+  in `rawMarkdown` to match DOM), Tailwind `/opacity`-on-token-color classes replaced with
+  `color-mix(...)`, scroll-spy no longer blanks on `#interests`, `?machine=true` no-FOUC head
+  script (`.machine-boot`).
+
+**Cross-post learnings (important for Phases 2–3):**
+- **dev.to blocks remote SVG images** → the live typing-banner + Pac-Man SVGs render broken. Use a
+  **raster (retina PNG) screenshot** of the rendered README instead.
+- A retina top-crop screenshot is hosted at
+  `https://raw.githubusercontent.com/adrijshikhar/adrijshikhar/output/readme-top.png` (banner +
+  For-humans + stat badges). Reuse it for everydev.ai. Regenerate via the recipe in the plan.
+- `DEV_TO_API_KEY` is in the shell env. dev.to API: `POST/PUT https://dev.to/api/articles` with
+  header `api-key: $DEV_TO_API_KEY`.
+
+**dev.to draft:** id **3803610**, `published:false`, canonical → `adrijshikhar.dev/blogs/...`,
+tags `showdev, github, webdev, ai`, hero = the retina PNG. Author reviews + publishes manually.
+
+**Next:** (Phase 2) review + publish the dev.to draft. (Phase 3) cross-post to everydev.ai with the
+same canonical + screenshot.
+
+---
 
 ## Goal
 

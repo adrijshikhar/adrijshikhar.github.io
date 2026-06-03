@@ -2,438 +2,347 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add a blog to the portfolio — `/blogs` list + per-post pages (Astro content collections + MDX), a homepage "Writing" entry, and a `?machine=true` deep-link — without changing the existing layout/design. Then cross-post the first article to dev.to and everydev.ai (each its own phase).
+**Goal:** Ship a blog on the portfolio (`/blogs` list + per-post pages, homepage "Writing" entry, `?machine=true` deep-link), then cross-post the first article to dev.to and everydev.ai with the site as canonical.
 
-**Architecture:** Astro 6 Content Layer collection (`blog`, glob loader + Zod schema) drives `/blogs/index.astro` (list) and `/blogs/[...slug].astro` (post), both wrapped in the existing `BaseLayout`. The homepage gains a Writing preview section + a `SideNav` anchor, mirroring the existing Experience/Projects "see all" pattern. `ViewToggle.tsx` learns to read/write a `machine` URL param. The existing `fs`-based resume content is untouched.
+**Architecture:** Astro 6 Content Layer collection (`blog`, glob loader + Zod schema) drives `/blogs/index.astro` (list) and `/blogs/[...slug].astro` (post), both wrapped in `BaseLayout`. The homepage gains a Writing preview + `SideNav` anchor; `ViewToggle.tsx` reads/writes a `machine` URL param. The `fs`-based resume content is untouched. Cross-posting is operational (no site code) — the site URL is canonical, cross-posts set `rel=canonical` back to it.
 
-**Tech Stack:** Astro 6, `astro:content` (Content Layer), `@astrojs/mdx`, React (ViewToggle), Tailwind, Bun.
+**Tech Stack:** Astro 6, `astro:content` (Content Layer), `@astrojs/mdx`, React (ViewToggle), Tailwind 3, Bun. dev.to API (`api-key` header), GitHub `output` branch for hosted raster assets.
 
 **Spec:** `docs/superpowers/specs/2026-05-31-blog-section-design.md`
-**Integration branch:** `content` (CI builds + deploys from it).
+**Integration branch:** `content` (CI `build.yml`/`deploy.yml` trigger on `branches: [content]`; deploy publishes `dist/` to Pages).
+
+---
+
+## STATUS / HANDOFF (updated 2026-06-02)
+
+- **Phase 1 — Blog foundation: DONE + live.** Shipped on `content` (partly with the Terminal Atelier
+  redesign #768, finalized in #774). First post live at
+  `https://adrijshikhar.dev/blogs/building-an-agentic-era-profile-readme/` (200), `draft:false`.
+  Canonical domain is now **`adrijshikhar.dev`** (custom domain; `.github.io` still resolves).
+  Tasks 1–7 below are a **historical record — do not re-run.** Verify against `content` before any change.
+  - Extras beyond the original plan: `ReadmePreview.astro` (build-time fetch of the real README,
+    mode-synced light/dark), dual-theme Shiki code blocks, optional `cover` banner field.
+
+- **Phase 2 — dev.to: DRAFT created, awaiting author review/publish.** This is the next actionable work.
+  - Article **id 3803610**, `published:false`, canonical → `adrijshikhar.dev/blogs/...`,
+    tags `showdev, github, webdev, ai`, hero = retina PNG screenshot.
+  - **dev.to blocks remote SVG** → the live typing-banner + Pac-Man render broken. Hero uses a
+    raster PNG instead, hosted at
+    `https://raw.githubusercontent.com/adrijshikhar/adrijshikhar/output/readme-top.png`.
+  - `DEV_TO_API_KEY` is in the shell env.
+
+- **Phase 3 — everydev.ai: pending.** Same finalized post, same canonical, reuse `readme-top.png`. No site code.
+- **Phase 4 — Hashnode: pending.** Same finalized post + canonical (Hashnode GraphQL API or editor). No site code.
+- **Phase 5 — HackerNoon: pending.** Editorial submission with canonical. No site code.
+- **Phase 6 — Medium: pending.** Import-story (auto-canonical) or canonical field. No site code.
+
+All cross-post phases (2–6) share one rule: **the site is canonical**, every platform sets
+`rel=canonical` → `https://adrijshikhar.dev/blogs/building-an-agentic-era-profile-readme`, and the hero
+uses the raster **`readme-top.png`** (never the live SVG banner/Pac-Man — most platforms block or
+mangle remote SVG).
+
+### Post 2 — `retry-thread-pool` (added 2026-06-03)
+
+Second post: **introduces the `retry-thread-pool` Java library** (greenfield framing — a brand-new
+library that brings retries to the thread-pool level; never frame it as fixing prior/internal code).
+Angle blends "introducing the library" with the site's **for-humans/for-agents** brand: the library's
+repo is itself **agent-first** (`llms.txt` + `AGENTS.md` + `docs/AI_USAGE.md` + docs-as-compilable-tests),
+so AI agents can read the examples and implement against it correctly.
+
+- **Site post — DONE (in this worktree).** `src/content/blog/retry-thread-pool.mdx`, `draft:false`,
+  canonical `https://adrijshikhar.dev/blogs/retry-thread-pool`. Plain MDX (no custom components, no
+  cover) — `bun run build` emits `/blogs/retry-thread-pool/`. Ships on merge of
+  `docs/blog-handoff-update` → `content`.
+- **dev.to — DRAFT prepared as a file, NOT yet pushed to the API.**
+  `docs/crossposts/retry-thread-pool.devto.md` holds the dev.to-flavored body + frontmatter
+  (`published:false`, `canonical_url` → the site post, tags `java, opensource, webdev, ai`). This post
+  is **code-only — no SVG/hero-image constraint** (the readme-top.png raster rule applies to Post 1
+  only). **Remaining:** create the dev.to article via the API (or editor) from this file, then
+  review + publish — see Phase 7.
+- everydev.ai / Hashnode / HackerNoon / Medium: same canonical-back-to-site rule if cross-posted later.
 
 ---
 
 ## File Structure
 
-| File | Responsibility |
-|------|----------------|
-| `src/content.config.ts` | Define the `blog` content collection (loader + schema) |
-| `src/content/blog/building-an-agentic-era-profile-readme.mdx` | First post (draft) |
-| `src/pages/blogs/index.astro` | Blog list page (newest first, drafts hidden in prod) |
-| `src/pages/blogs/[...slug].astro` | Single post page (renders MDX in BaseLayout) |
-| `src/pages/index.astro` | + Writing preview section (modify) |
-| `src/components/SideNav.astro` | + "Writing" anchor (modify) |
-| `src/components/ViewToggle.tsx` | + read/write `?machine=true` (modify) |
+| File | Responsibility | State |
+|------|----------------|-------|
+| `src/content.config.ts` | `blog` collection (glob loader + Zod schema) | shipped |
+| `src/content/blog/building-an-agentic-era-profile-readme.mdx` | First post | shipped (`draft:false`) |
+| `src/pages/blogs/index.astro` | Blog list (newest first, drafts hidden in prod) | shipped |
+| `src/pages/blogs/[...slug].astro` | Single post page (MDX in BaseLayout) | shipped |
+| `src/pages/index.astro` | Homepage Writing preview section | shipped |
+| `src/components/SideNav.astro` | "Writing" anchor | shipped |
+| `src/components/ViewToggle.tsx` | `?machine=true` read/write | shipped |
+| `src/components/ReadmePreview.astro` | Build-time README embed, mode-synced | shipped |
+| `src/content/blog/retry-thread-pool.mdx` | Post 2 — retry-thread-pool library | done (`draft:false`, this worktree) |
+| `docs/crossposts/retry-thread-pool.devto.md` | Post 2 dev.to draft (file; not yet on API) | done (this worktree) |
 
 ---
 
-# Phase 1 — Blog foundation (code)
-
-Ships the canonical post on `adrijshikhar.github.io`. Done in a worktree off `content`.
-
-## Task 0: Worktree + clean base
-
-**Files:** none (git)
-
-- [ ] **Step 1: Create an isolated worktree off `content`**
-
-The main checkout is on a dirty `feat/resume-ops-output`. Work off `content` in a worktree:
-```bash
-cd /Users/nemesis/Projects/my-projects/adrijshikhar.github.io
-git fetch origin content
-git worktree add ../adrijshikhar-blog -b feat/blog-section origin/content
-cd ../adrijshikhar-blog
-```
-Expected: new worktree at `../adrijshikhar-blog` on branch `feat/blog-section`. **All subsequent paths are relative to this worktree.**
-
-- [ ] **Step 2: Install deps + baseline build**
-
-Run: `bun install && bun run build`
-Expected: build succeeds (baseline, before changes).
-
-## Task 1: Blog content collection
-
-**Files:**
-- Create: `src/content.config.ts`
-
-- [ ] **Step 1: Create the collection config**
-
-Create `src/content.config.ts`:
-```ts
-import { defineCollection, z } from 'astro:content';
-import { glob } from 'astro/loaders';
-
-const blog = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/blog' }),
-  schema: z.object({
-    title: z.string(),
-    date: z.coerce.date(),
-    description: z.string(),
-    draft: z.boolean().default(false),
-    canonicalUrl: z.string().url().optional(),
-  }),
-});
-
-export const collections = { blog };
-```
-
-- [ ] **Step 2: Verify Astro picks up the collection types**
-
-Run: `bunx astro sync`
-Expected: completes without schema errors and regenerates `.astro/` types. (If `astro sync` reports the collection, the loader path is correct.)
-
-- [ ] **Step 3: Commit**
-```bash
-git add src/content.config.ts
-git commit -m "feat(blog): add blog content collection (glob loader + schema)"
-```
-
-## Task 2: First post (draft scaffold)
-
-**Files:**
-- Create: `src/content/blog/building-an-agentic-era-profile-readme.mdx`
-
-- [ ] **Step 1: Create the post**
-
-Create `src/content/blog/building-an-agentic-era-profile-readme.mdx`:
-```mdx
----
-title: "Building an agentic-era GitHub profile README"
-date: 2026-05-31
-description: "A for-humans/for-agents profile: AGENTS.md + llms.txt, live Pac-Man & snake contribution graphs, self-computed stat badges, and an issue-driven Minesweeper — plus a reusable template."
-draft: true
-canonicalUrl: "https://adrijshikhar.github.io/blogs/building-an-agentic-era-profile-readme"
----
-
-> Draft — refine the prose later.
-
-## Why
-Most profile READMEs are written only for humans. I built one that's also **agent-readable**.
-
-## What it does
-- **For humans / for agents** layout, with companion `AGENTS.md` and `llms.txt`.
-- **Live contribution art** — Pac-Man + snake, regenerated daily by GitHub Actions.
-- **Self-computed stat badges** — contributions (rolling-year), followers, repos, years —
-  via the GitHub GraphQL API → Shields endpoints (accurate, not calendar-year/public-only skew).
-- **Issue-driven Minesweeper** — hardened against command injection.
-- A **reusable template** so anyone can adopt it.
-
-## How
-<!-- TODO: flesh out with snippets + screenshots before publishing -->
-
-## Try it
-- Profile: https://github.com/adrijshikhar/adrijshikhar
-- Reuse the template: see the repo's `template/` folder.
-```
-
-- [ ] **Step 2: Commit**
-```bash
-git add src/content/blog/building-an-agentic-era-profile-readme.mdx
-git commit -m "content(blog): scaffold first post (draft)"
-```
-
-## Task 3: Blog list page
-
-**Files:**
-- Create: `src/pages/blogs/index.astro`
-
-- [ ] **Step 1: Create the list page**
-
-Create `src/pages/blogs/index.astro`:
-```astro
----
-import { getCollection } from 'astro:content';
-import BaseLayout from '../../layouts/BaseLayout.astro';
-
-const posts = (await getCollection('blog', ({ data }) => import.meta.env.PROD ? !data.draft : true))
-  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
-
-const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
----
-
-<BaseLayout title="Writing | Adrij Shikhar">
-  <main class="mx-auto min-h-screen max-w-screen-md px-6 py-12 md:px-12 md:py-20">
-    <a href="/" class="text-sm text-slate-400 hover:text-accent">← Back</a>
-    <h1 class="mt-6 text-3xl font-bold tracking-tight text-slate-200">Writing</h1>
-    {posts.length === 0 ? (
-      <p class="mt-8 text-slate-400">No posts yet.</p>
-    ) : (
-      <ul class="mt-8 space-y-8">
-        {posts.map((post) => (
-          <li class="group">
-            <a href={`/blogs/${post.id}`} class="block">
-              <div class="text-xs font-semibold uppercase tracking-widest text-slate-500">{fmt(post.data.date)}</div>
-              <h2 class="mt-1 text-lg font-medium text-slate-200 group-hover:text-accent">{post.data.title}</h2>
-              <p class="mt-1 text-sm leading-normal text-slate-400">{post.data.description}</p>
-            </a>
-          </li>
-        ))}
-      </ul>
-    )}
-  </main>
-</BaseLayout>
-```
-
-- [ ] **Step 2: Verify it builds + renders in dev**
-
-Run: `bun run dev` then open `http://localhost:4321/blogs`.
-Expected: in dev the draft post appears (date · title · description, accent on hover). Stop dev (Ctrl-C).
-Note: `text-accent` is the existing theme accent class used elsewhere (see `SideNav.astro`); if the class name differs in this repo, match the existing one.
-
-- [ ] **Step 3: Commit**
-```bash
-git add src/pages/blogs/index.astro
-git commit -m "feat(blog): add /blogs list page"
-```
-
-## Task 4: Single post page
-
-**Files:**
-- Create: `src/pages/blogs/[...slug].astro`
-
-- [ ] **Step 1: Create the post page**
-
-Create `src/pages/blogs/[...slug].astro`:
-```astro
----
-import { getCollection, render } from 'astro:content';
-import BaseLayout from '../../layouts/BaseLayout.astro';
-
-export async function getStaticPaths() {
-  const posts = await getCollection('blog');
-  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
-}
-
-const { post } = Astro.props;
-const { Content } = await render(post);
-const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
----
-
-<BaseLayout title={`${post.data.title} | Adrij Shikhar`}>
-  <main class="mx-auto min-h-screen max-w-screen-md px-6 py-12 md:px-12 md:py-20">
-    <a href="/blogs" class="text-sm text-slate-400 hover:text-accent">← All posts</a>
-    <h1 class="mt-6 text-3xl font-bold tracking-tight text-slate-200">{post.data.title}</h1>
-    <div class="mt-2 text-xs font-semibold uppercase tracking-widest text-slate-500">{fmt(post.data.date)}</div>
-    <article class="prose prose-invert mt-8 max-w-none">
-      <Content />
-    </article>
-  </main>
-</BaseLayout>
-```
-
-- [ ] **Step 2: Verify build emits the post route**
-
-Run: `bun run build`
-Expected: build succeeds and the output lists `/blogs/building-an-agentic-era-profile-readme/index.html` is NOT emitted in prod (draft excluded). Run `bun run dev` and open `http://localhost:4321/blogs/building-an-agentic-era-profile-readme` to confirm it renders in dev (drafts visible in dev). Stop dev.
-Note: `prose prose-invert` requires `@tailwindcss/typography` (already a dependency). If post body is unstyled, confirm the plugin is enabled in `tailwind.config.mjs`; add it to `plugins` if missing.
-
-- [ ] **Step 3: Commit**
-```bash
-git add src/pages/blogs/[...slug].astro
-git commit -m "feat(blog): add /blogs/[slug] post page"
-```
-
-## Task 5: Homepage Writing section + SideNav anchor
-
-**Files:**
-- Modify: `src/pages/index.astro`
-- Modify: `src/components/SideNav.astro`
-
-- [ ] **Step 1: Read the existing Experience/Projects section markup**
-
-Run: `sed -n '70,120p' src/pages/index.astro`
-Identify the markup pattern used for an existing section (e.g. the `/experience` "see all" block at ~line 85 and `/archive` at ~line 103) and the section wrapper/ids so the new Writing section matches exactly.
-
-- [ ] **Step 2: Add the Writing preview section to `index.astro`**
-
-In the frontmatter, add (near the other `readContent(...)` calls):
-```ts
-import { getCollection } from 'astro:content';
-const latestPosts = (await getCollection('blog', ({ data }) => import.meta.env.PROD ? !data.draft : true))
-  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
-  .slice(0, 3);
-```
-Then add a Writing section in the body, immediately after the existing Projects/Archive
-section, copying that section's wrapper classes and `id`/`Section` usage. Use this inner markup:
-```astro
-<section id="writing" class="mb-16 scroll-mt-16 md:mb-24 lg:scroll-mt-24" aria-label="Writing">
-  <h2 class="text-sm font-bold uppercase tracking-widest text-slate-200 lg:sr-only">Writing</h2>
-  <ul class="mt-4 space-y-4">
-    {latestPosts.map((post) => (
-      <li>
-        <a href={`/blogs/${post.id}`} class="group inline-flex flex-col">
-          <span class="text-xs uppercase tracking-widest text-slate-500">{post.data.date.toLocaleDateString('en-US',{year:'numeric',month:'short'})}</span>
-          <span class="font-medium text-slate-200 group-hover:text-accent">{post.data.title}</span>
-        </a>
-      </li>
-    ))}
-  </ul>
-  <a class="mt-6 inline-flex items-center font-medium leading-tight text-slate-200 group" href="/blogs">
-    <span class="border-b border-transparent group-hover:border-accent">View all posts</span>
-    <span class="ml-1">→</span>
-  </a>
-</section>
-```
-Match the surrounding section's exact wrapper classes if they differ from the above (keep the new section visually consistent with Experience/Projects).
-
-- [ ] **Step 3: Add the Writing anchor to `SideNav.astro`**
-
-In `src/components/SideNav.astro`, add to the `sections` array (after `projects`):
-```ts
-{ id: 'writing', label: 'Writing' },
-```
-
-- [ ] **Step 4: Verify**
-
-Run: `bun run dev`, open `http://localhost:4321/`. Confirm: a Writing section shows the
-draft post (dev), the SideNav has a "Writing" link, clicking it scrolls to the section, and
-"View all posts →" navigates to `/blogs`. Stop dev.
-
-- [ ] **Step 5: Commit**
-```bash
-git add src/pages/index.astro src/components/SideNav.astro
-git commit -m "feat(blog): homepage Writing section + SideNav anchor"
-```
-
-## Task 6: `?machine=true` deep-link in ViewToggle
-
-**Files:**
-- Modify: `src/components/ViewToggle.tsx`
-
-- [ ] **Step 1: Read the current toggle**
-
-Run: `cat src/components/ViewToggle.tsx`
-Identify the state variable that holds the mode (e.g. `view`/`isMachine`) and the handler
-that flips it.
-
-- [ ] **Step 2: Initialize from the URL on mount**
-
-Add an effect that, on mount, sets machine mode when `?machine=true` is present. Using the
-component's actual state setter name, add:
-```tsx
-import { useEffect } from 'react';
-
-// inside the component, after the existing useState:
-useEffect(() => {
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('machine') === 'true') {
-    setMachine(true); // ← use this component's real setter
-  }
-}, []);
-```
-If the mode is represented as a string (`'human' | 'machine'`) rather than a boolean, set it
-to `'machine'` instead.
-
-- [ ] **Step 3: Sync the URL when the user toggles**
-
-In the toggle handler, after updating state, reflect it in the URL without navigation:
-```tsx
-const params = new URLSearchParams(window.location.search);
-if (nextIsMachine) params.set('machine', 'true');
-else params.delete('machine');
-const qs = params.toString();
-window.history.replaceState({}, '', qs ? `?${qs}` : window.location.pathname);
-```
-`nextIsMachine` is the new mode computed in the handler.
-
-- [ ] **Step 4: Verify**
-
-Run: `bun run dev`. Open `http://localhost:4321/?machine=true` → page loads in machine view.
-Toggle to human → URL drops `machine=true`. Toggle back → URL gains `?machine=true`. Reload
-the machine-view URL → still machine view. Stop dev.
-
-- [ ] **Step 5: Commit**
-```bash
-git add src/components/ViewToggle.tsx
-git commit -m "feat: support ?machine=true deep-link in ViewToggle"
-```
-
-## Task 7: Full verification + PR
-
-**Files:** none
-
-- [ ] **Step 1: Production build (drafts hidden)**
-
-Run: `bun run build`
-Expected: succeeds. The draft post route is NOT emitted (grep the build log / `dist/blogs`),
-`/blogs/index.html` exists and shows the empty state (since the only post is a draft).
-To preview a real published post, temporarily set `draft: false` in the MDX, rebuild, confirm
-`/blogs/<slug>/index.html` is emitted, then revert to `draft: true` (it ships published once
-the prose is finalized in Phase 2).
-
-- [ ] **Step 2: Confirm existing pages unchanged**
-
-Run: `bun run preview`, spot-check `/`, `/experience`, `/archive`, `/resume` — visually
-identical to before aside from the added Writing section. Stop preview.
-
-- [ ] **Step 3: Push + open PR into `content`**
-
-```bash
-git push -u origin feat/blog-section
-gh pr create --base content --title "feat: add /blogs section + Writing entry + ?machine=true" \
-  --body "Adds a blog (Astro content collection + MDX): /blogs list + post pages, homepage Writing section + SideNav anchor, and ?machine=true deep-link. Existing layout/design unchanged. First post scaffolded as a draft. See docs/superpowers/specs/2026-05-31-blog-section-design.md."
-```
-Expected: PR opened against `content`. CI (`build.yml`) runs; merge once green → `deploy.yml`
-publishes to Pages.
-
-- [ ] **Step 4: Clean up the worktree (after merge)**
-```bash
-cd /Users/nemesis/Projects/my-projects/adrijshikhar.github.io
-git worktree remove ../adrijshikhar-blog
-git worktree prune
-```
+# Phase 1 — Blog foundation (code) — DONE
+
+> **Historical record.** All tasks shipped on `content` (#768 + #774). Do not re-execute. Listed so
+> the canonical structure is recoverable and a fresh worker understands what exists.
+
+- **Task 1 — `blog` content collection** (`src/content.config.ts`): `defineCollection` with `glob`
+  loader over `./src/content/blog`, Zod schema `{ title, date (coerce), description, draft (default
+  false), canonicalUrl? (url), cover? }`. Validated with `bunx astro sync`.
+- **Task 2 — First post** (`building-an-agentic-era-profile-readme.mdx`): frontmatter + prose,
+  `canonicalUrl` → site URL, embeds `<ReadmePreview />`. Now `draft:false`.
+- **Task 3 — `/blogs` list** (`src/pages/blogs/index.astro`): `getCollection('blog', filter)` hides
+  drafts in prod (`import.meta.env.PROD ? !data.draft : true`), sorts by `date` desc, empty-state
+  when no posts. Styled with the atelier card shell.
+- **Task 4 — `/blogs/[...slug]`** (`src/pages/blogs/[...slug].astro`): `getStaticPaths()` from the
+  collection, `render(post)` → `<Content />`, banner → title → subheading → date meta. Dual Shiki
+  themes switched by `[data-mode]`.
+- **Task 5 — Homepage Writing + SideNav** (`src/pages/index.astro`, `src/components/SideNav.astro`):
+  latest 3 non-draft posts preview + "View all posts →"; `{ id: 'writing', label: 'Writing' }` anchor.
+- **Task 6 — `?machine=true`** (`src/components/ViewToggle.tsx`): init machine view from the URL param
+  on mount; `history.replaceState` keeps the param in sync on toggle. No-FOUC head script (`.machine-boot`).
+- **Task 7 — Verify + PR:** prod build hides drafts; existing pages visually unchanged; PR → `content`
+  → CI deploy. Code-review fixes landed in #774 (human/machine parity order, `color-mix` for token
+  opacity, scroll-spy `#interests` fix, `?machine=true` no-FOUC script).
 
 ---
 
 # Phase 2 — Publish on dev.to
 
-Operational (no site code). Depends on the Phase-1 post prose being finalized and the post
-flipped to `draft: false` + deployed (so the canonical URL is live).
+Operational (no site code). The dev.to draft already exists (id **3803610**, `published:false`). This
+phase reviews and publishes it. Depends on the Phase-1 canonical being live (it is).
 
-- [ ] **Step 1: Finalize the post prose** in
-  `src/content/blog/building-an-agentic-era-profile-readme.mdx` (fill the `<!-- TODO -->`
-  sections with snippets + screenshots), set `draft: false`, ship via a PR into `content`.
-- [ ] **Step 2: Confirm canonical is live:**
-  `curl -sI https://adrijshikhar.github.io/blogs/building-an-agentic-era-profile-readme | head -1`
-  → `HTTP/2 200`.
-- [ ] **Step 3: Cross-post to dev.to.** In the dev.to editor (or via the dev.to API with a
-  `DEV_API_KEY`), paste the post markdown. In the front matter set
-  `canonical_url: https://adrijshikhar.github.io/blogs/building-an-agentic-era-profile-readme`
-  and tags `showdev, github, webdev`. Publish.
-- [ ] **Step 4: Verify** the dev.to post shows "Originally published at adrijshikhar.github.io"
-  (canonical respected). Record the dev.to URL.
+## Task 8: Confirm canonical + draft state
+
+**Files:** none
+
+- [ ] **Step 1: Confirm the canonical post is live**
+
+Run:
+```bash
+curl -sI https://adrijshikhar.dev/blogs/building-an-agentic-era-profile-readme/ | head -1
+```
+Expected: `HTTP/2 200`.
+
+- [ ] **Step 2: Fetch the current dev.to draft and confirm its fields**
+
+Run:
+```bash
+curl -s -H "api-key: $DEV_TO_API_KEY" https://dev.to/api/articles/3803610 \
+  | python3 -c 'import sys,json; a=json.load(sys.stdin); print(a["title"]); print("published:",a["published"]); print("canonical:",a.get("canonical_url")); print("tags:",a.get("tag_list"))'
+```
+Expected: `published: False`; `canonical_url` → `https://adrijshikhar.dev/blogs/building-an-agentic-era-profile-readme`; tags include `showdev, github, webdev, ai`.
+
+## Task 9: Verify the draft body renders (SVG-free)
+
+**Files:** none
+
+- [ ] **Step 1: Confirm the hero PNG is reachable**
+
+Run:
+```bash
+curl -sI https://raw.githubusercontent.com/adrijshikhar/adrijshikhar/output/readme-top.png | head -1
+```
+Expected: `HTTP/2 200`. (dev.to blocks remote SVG — the body must use this raster, not the live SVG banner/Pac-Man.)
+
+- [ ] **Step 2: Preview the draft in the dev.to dashboard**
+
+Open the dev.to draft (id 3803610) in the editor/preview. Confirm: hero PNG shows, no broken-image
+placeholders, prose + code blocks render, the "see full live README" link points to the GitHub profile.
+
+## Task 10: Publish
+
+**Files:** none
+
+- [ ] **Step 1: Flip `published` to true** (after author is happy with the preview)
+
+Run:
+```bash
+curl -s -X PUT -H "api-key: $DEV_TO_API_KEY" -H "Content-Type: application/json" \
+  -d '{"article":{"published":true}}' \
+  https://dev.to/api/articles/3803610 \
+  | python3 -c 'import sys,json; a=json.load(sys.stdin); print("published:",a["published"]); print("url:",a["url"])'
+```
+Expected: `published: True`; prints the live dev.to URL.
+
+- [ ] **Step 2: Verify canonical is respected**
+
+Open the published dev.to URL. Confirm it shows "Originally published at adrijshikhar.dev". Record the URL.
 
 ---
 
 # Phase 3 — Publish on everydev.ai
 
-Operational (no site code). Same finalized post.
+Operational (no site code). Same finalized post, same canonical, reuse the `readme-top.png` asset.
 
-- [ ] **Step 1: Create the post on [everydev.ai](https://www.everydev.ai/)** — paste the
-  finalized markdown.
-- [ ] **Step 2: Set the canonical URL** to
-  `https://adrijshikhar.github.io/blogs/building-an-agentic-era-profile-readme` (use the
-  platform's canonical/SEO field if available; if not, add a "Originally published at …"
-  line at the top linking the canonical).
-- [ ] **Step 3: Publish; record the everydev.ai URL.**
-- [ ] **Step 4 (optional distribution):** share on Reddit r/github, Hacker News (Show HN),
-  LinkedIn/X.
+## Task 11: Cross-post to everydev.ai
+
+**Files:** none
+
+- [ ] **Step 1: Create the post on [everydev.ai](https://www.everydev.ai/)**
+
+Paste the finalized post markdown (the dev.to body — SVG-free, PNG hero). Use the platform editor.
+
+- [ ] **Step 2: Set the canonical URL**
+
+Set the platform's canonical/SEO field to
+`https://adrijshikhar.dev/blogs/building-an-agentic-era-profile-readme`. If no canonical field exists,
+add an "Originally published at https://adrijshikhar.dev/blogs/building-an-agentic-era-profile-readme"
+line at the top.
+
+- [ ] **Step 3: Publish + record the URL.**
+
+---
+
+# Phase 4 — Publish on Hashnode
+
+Operational (no site code). Same finalized post, same canonical, reuse `readme-top.png`. Hashnode has a
+GraphQL API (`https://gql.hashnode.com/`, header `Authorization: <PAT>`) — or use the editor.
+
+## Task 12: Cross-post to Hashnode
+
+**Files:** none
+
+- [ ] **Step 1: Create the draft** — paste the SVG-free post markdown (PNG hero) into the Hashnode
+  editor, or `publishPost` via the GraphQL API.
+- [ ] **Step 2: Set the canonical URL** — Hashnode supports it natively: in **Post settings → SEO →
+  "Original/Canonical URL"**, set
+  `https://adrijshikhar.dev/blogs/building-an-agentic-era-profile-readme`. (API: `originalArticleURL`
+  on the `PublishPostInput`.)
+- [ ] **Step 3: Set tags** (`github`, `webdev`, `ai`), cover image = the README PNG, then publish.
+- [ ] **Step 4: Verify** the published post shows the canonical points back to `adrijshikhar.dev`.
+  Record the Hashnode URL.
+
+---
+
+# Phase 5 — Publish on HackerNoon
+
+Operational (no site code). HackerNoon is editorial — submit a draft, an editor reviews before it goes
+live. Canonical is supported.
+
+## Task 13: Cross-post to HackerNoon
+
+**Files:** none
+
+- [ ] **Step 1: Create the story** in the HackerNoon editor — paste the SVG-free markdown (PNG hero).
+- [ ] **Step 2: Set the canonical URL** — in the story settings, set the "Canonical / Original URL" to
+  `https://adrijshikhar.dev/blogs/building-an-agentic-era-profile-readme`.
+- [ ] **Step 3: Pick categories/tags** (programming, github, ai), set the feature/cover image = README
+  PNG, submit for editorial review.
+- [ ] **Step 4: After approval, verify** the canonical resolves to `adrijshikhar.dev`. Record the URL.
+
+---
+
+# Phase 6 — Publish on Medium
+
+Operational (no site code). Prefer Medium's **Import Story** — it pulls the live canonical post and sets
+`rel=canonical` automatically, so the original stays attributed.
+
+## Task 14: Cross-post to Medium
+
+**Files:** none
+
+- [ ] **Step 1: Import the story** — Medium → **Stories → Import a story** → paste
+  `https://adrijshikhar.dev/blogs/building-an-agentic-era-profile-readme`. Medium fetches the content
+  and sets the canonical automatically.
+  - Fallback (manual paste): if import mangles the layout, paste the markdown and set the canonical via
+    **⋯ → Story settings → Advanced settings → "Canonical link"** =
+    `https://adrijshikhar.dev/blogs/building-an-agentic-era-profile-readme`.
+- [ ] **Step 2: Fix the hero** — confirm the README PNG renders (Medium handles PNG fine; drop any
+  remaining SVG). Add tags (Programming, GitHub, AI).
+- [ ] **Step 3: Publish; verify** the story footer reads "Originally published at adrijshikhar.dev".
+  Record the Medium URL.
+
+---
+
+# Phase 7 — Post 2: `retry-thread-pool` + dev.to
+
+Second article (see "Post 2" in STATUS/HANDOFF). The site post is written in this worktree; this
+phase ships it and publishes the dev.to cross-post.
+
+## Task 15: Ship the site post — DONE (in this worktree)
+
+**Files:** `src/content/blog/retry-thread-pool.mdx`
+
+- [x] **Step 1:** Post written, `draft:false`, canonical `https://adrijshikhar.dev/blogs/retry-thread-pool`.
+- [x] **Step 2:** `bun run build` emits `/blogs/retry-thread-pool/index.html` (build verified — 7 pages).
+- [ ] **Step 3:** Merge `docs/blog-handoff-update` → `content`; CI deploys. Then confirm:
+  ```bash
+  curl -sI https://adrijshikhar.dev/blogs/retry-thread-pool/ | head -1
+  ```
+  Expected: `HTTP/2 200`.
+
+## Task 16: Publish on dev.to
+
+**Files:** `docs/crossposts/retry-thread-pool.devto.md` (source of truth for the body)
+
+Depends on Task 15 Step 3 (canonical post live). The draft body is code-only — **no SVG/hero
+constraint** (the `readme-top.png` rule is Post-1-specific).
+
+- [ ] **Step 1: Create the dev.to article from the draft file.** Split the file's YAML frontmatter
+  from its markdown body, then POST it (`published:false`):
+  ```bash
+  curl -s -X POST -H "api-key: $DEV_TO_API_KEY" -H "Content-Type: application/json" \
+    -d "$(python3 - <<'PY'
+import json
+raw = open("docs/crossposts/retry-thread-pool.devto.md").read()
+_, fm, body = raw.split("---", 2)
+meta = {}
+for line in fm.strip().splitlines():
+    if line.startswith("#") or ":" not in line: continue
+    k, v = line.split(":", 1); meta[k.strip()] = v.strip().strip('"')
+print(json.dumps({"article": {
+    "title": meta["title"],
+    "body_markdown": body.strip(),
+    "published": False,
+    "canonical_url": meta["canonical_url"],
+    "tags": [t.strip() for t in meta["tags"].split(",")],
+}}))
+PY
+)" \
+    https://dev.to/api/articles \
+    | python3 -c 'import sys,json; a=json.load(sys.stdin); print("id:",a["id"]); print("published:",a["published"]); print("canonical:",a.get("canonical_url"))'
+  ```
+  Expected: prints a new article `id`, `published: False`, canonical → the site post. **Record the id**
+  here in the plan.
+- [ ] **Step 2: Review** the draft in the dev.to dashboard — prose + code blocks render, canonical
+  shows "Originally published at adrijshikhar.dev".
+- [ ] **Step 3: Publish** when happy — `PUT https://dev.to/api/articles/{id}` with
+  `{"article":{"published":true}}`; record the live URL.
+
+## Task 17 (optional): Cross-post Post 2 further
+
+everydev.ai / Hashnode / HackerNoon / Medium — same canonical-back-to-site rule as Phases 3–6, reusing
+the dev.to body. Code-only post, so no raster-hero constraint. Pursue only if desired.
+
+---
+
+## Recipe — regenerate the README screenshot (raster, for SVG-blocking platforms)
+
+Reuse this if the hosted PNG needs refreshing (the live README changed).
+
+1. Open the live post `?mode=dark` in chrome-devtools at DPR 2 (`emulate viewport 1000x1500x2`).
+2. `evaluate`: isolate `.readme-embed` (replace `document.body.innerHTML` with its `outerHTML` on a
+   `#0d1117` wrapper) and `await` ~3.8s so the typing banner shows text.
+3. `take_screenshot fullPage` → crop the top: `ffmpeg -i in.png -vf "crop=1980:1120:0:0" out.png`.
+4. Push to the `output` branch:
+   `gh api --method PUT repos/adrijshikhar/adrijshikhar/contents/readme-top.png` (base64 `content`,
+   `branch:output`, include the existing blob `sha` when updating).
 
 ---
 
 ## Reusable blog-post template
 
-To write a new post, copy `src/content/blog/_template.mdx` (below) to
-`src/content/blog/<slug>.mdx`, fill it in, and set `draft: false` when ready to publish. The
-`<slug>` becomes the URL (`/blogs/<slug>`) — use kebab-case.
+To write a new post, copy this skeleton to `src/content/blog/<slug>.mdx`, fill it in, set
+`draft: false` when ready. `<slug>` becomes the URL (`/blogs/<slug>`) — kebab-case, stable.
 
 ```mdx
 ---
 title: "<Post title — sentence case>"
 date: <YYYY-MM-DD>            # publish/authored date; drives list ordering (newest first)
 description: "<1–2 sentence summary — shown on /blogs and used for SEO/social>"
-draft: true                  # true = hidden in prod builds, visible in `bun run dev`; flip to false to ship
-canonicalUrl: "https://adrijshikhar.github.io/blogs/<slug>"   # for cross-post rel=canonical
+draft: true                  # true = hidden in prod, visible in `bun run dev`; flip to false to ship
+canonicalUrl: "https://adrijshikhar.dev/blogs/<slug>"   # for cross-post rel=canonical
+# cover: "/img/<slug>-cover.png"   # optional banner image (under public/)
 ---
 
 <!-- Opening hook: 2–4 sentences. Lead with the problem/tension, not "In this post I…". -->
@@ -444,7 +353,7 @@ canonicalUrl: "https://adrijshikhar.github.io/blogs/<slug>"   # for cross-post r
 
 ## <Section — the "what/how">
 
-<!-- Code fences get Shiki highlighting automatically. Keep snippets short + load-bearing. -->
+<!-- Code fences get dual-theme Shiki highlighting automatically. Keep snippets short + load-bearing. -->
 
 \`\`\`ts
 // minimal, illustrative — not the whole file
@@ -464,31 +373,35 @@ canonicalUrl: "https://adrijshikhar.github.io/blogs/<slug>"   # for cross-post r
 
 **Conventions**
 - **Slug = filename** (`my-post.mdx` → `/blogs/my-post`); kebab-case, stable (it's the URL).
-- **`draft`** — keep `true` while writing (visible in `dev`, hidden in prod); flip to `false` in
-  the shipping PR. The `/blogs` list + homepage Writing section filter drafts in prod automatically.
+- **`draft`** — keep `true` while writing (visible in `dev`, hidden in prod); flip to `false` in the
+  shipping PR. `/blogs` + the homepage Writing section filter drafts in prod automatically.
 - **`description`** — write it for a human skimming `/blogs`; it's the only preview text.
-- **MDX** — plain Markdown works; you may also import/use components if a post needs them.
-- **Images** — put under `public/` and reference with an absolute path (`/img/...`).
+- **MDX** — plain Markdown works; import/use components when a post needs them (e.g. `ReadmePreview`).
+- **Images** — put under `public/` and reference with an absolute path (`/img/...`). Cross-post platforms
+  that block remote SVG need a **raster** hero (see the screenshot recipe).
 - **Cross-posting** — once live, set the same `canonicalUrl` on dev.to / everydev.ai (Phases 2–3).
 
-> **Don't commit the skeleton as a `.mdx` in `src/content/blog/`** unless you also exclude it
-> from the loader: the glob (`**/*.{md,mdx}`) + `getStaticPaths` pick up *every* file
-> regardless of `draft`, so a `_template.mdx` would emit a real `/blogs/_template` route. Keep
-> the template here in the plan (copy from above), or, if you want a committed file, change the
-> loader pattern to ignore underscore-prefixed files (e.g. `['**/!(_)*.{md,mdx}']`) first.
+> **Don't commit a `_template.mdx` into `src/content/blog/`** unless you also exclude it from the loader:
+> the glob (`**/*.{md,mdx}`) + `getStaticPaths` pick up *every* file regardless of `draft`, so it would
+> emit a real `/blogs/_template` route. Keep the template here, or change the loader pattern to ignore
+> underscore-prefixed files (`['**/!(_)*.{md,mdx}']`) first.
 
 ---
 
 ## Self-Review (plan author)
 
-- **Spec coverage:** collection (T1) · /blogs list (T3) · post page (T4) · homepage Writing +
-  SideNav (T5) · ?machine=true (T6) · first post scaffold (T2) · worktree off `content` (T0) ·
-  verification (T7) · dev.to phase (Phase 2) · everydev.ai phase (Phase 3) · canonical/crosspost
-  noted in post frontmatter (T2 `canonicalUrl`). All spec sections mapped.
-- **Placeholders:** the only `<!-- TODO -->` is inside the *draft blog content* (intentional —
-  author refines prose in Phase 2), not in implementation steps. No vague impl steps.
-- **Consistency:** `post.id` (glob-loader slug) used consistently in T3/T4/T5; `getCollection('blog', filter)`
-  draft filter identical across T3/T5; `text-accent`/`slate-*` classes flagged to match the
-  repo's existing tokens.
-- **Astro API caveat:** Content Layer (`glob` loader, `render()`, `post.id`) is Astro 5/6;
-  `astro sync` (T1 S2) + the build steps validate against the installed version.
+- **Spec coverage:** Phase 1 (collection, list, post, homepage Writing + SideNav, `?machine=true`,
+  first post) — all shipped, recorded as historical Tasks 1–7. Cross-post phases: Phase 2 (dev.to) →
+  Tasks 8–10, Phase 3 (everydev.ai) → Task 11, Phase 4 (Hashnode) → Task 12, Phase 5 (HackerNoon) →
+  Task 13, Phase 6 (Medium) → Task 14. Cross-post canonical, the SVG→PNG constraint, and the screenshot
+  recipe all carried from the spec's STATUS/HANDOFF. Deferred items (themes, homepage redesign,
+  RSS/tags/search) remain out of scope per the spec.
+- **Cross-post consistency:** every platform (Phases 2–6) sets the same canonical
+  (`adrijshikhar.dev/blogs/building-an-agentic-era-profile-readme`) and uses the raster `readme-top.png`
+  hero — stated once in STATUS/HANDOFF and repeated per phase. Canonical mechanism per platform: dev.to
+  `canonical_url`, Hashnode `originalArticleURL`, HackerNoon canonical field, Medium import auto-canonical.
+- **Placeholder scan:** the only `<...>` placeholders live inside the *reusable post template*
+  (intentional — author fills per post). No vague implementation steps; every actionable step has an
+  exact command + expected output.
+- **Consistency:** canonical domain is `adrijshikhar.dev` throughout (updated from the original
+  `.github.io`); dev.to article id `3803610` and the `readme-top.png` `output`-branch URL match the spec.
