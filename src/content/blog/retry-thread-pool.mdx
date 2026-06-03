@@ -1,7 +1,7 @@
 ---
-title: "retry-thread-pool: retries at the thread-pool level"
+title: "retry-thread-pool: a retrying executor for Java"
 date: 2026-06-03
-description: "A new Java library that makes retrying a property of the pool, not the call site: wrap any ExecutorService, submit named tasks, get CompletableFutures, and let backoff, predicates, per-attempt timeouts, listeners, and stats happen transparently. Zero runtime dependencies — and built agent-first."
+description: "A Java library that makes retrying a property of the thread pool, not the call site: wrap any ExecutorService, submit named tasks, get CompletableFutures, and let backoff, predicates, per-attempt timeouts, listeners, and stats happen transparently. Zero runtime dependencies — and built agent-first."
 draft: false
 canonicalUrl: "https://adrijshikhar.dev/blogs/retry-thread-pool"
 ---
@@ -42,8 +42,7 @@ retries five times at 3am you know *what* did. The policy is immutable and reusa
 
 ## What the pool gives you
 
-The interesting decisions are all in how much the pool handles for you, so you don't reinvent it per
-task:
+The point is how much the pool handles for you, so you don't rebuild it per task:
 
 - **Backoff strategies** — `none`, `fixed`, `exponential`, and `exponentialWithJitter`. Jitter
   matters at pool scale: without it, a hundred tasks that fail together retry together, and you've
