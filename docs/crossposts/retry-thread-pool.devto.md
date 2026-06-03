@@ -55,6 +55,7 @@ See what the pool is doing — without instrumenting your task code:
 - **Listeners** — `onRetry` / `onSuccess` / `onExhausted` / `onAbort` fire on every transition; bridge them to Micrometer, StatsD, or logs.
 - **`stats()`** — an immutable snapshot: submitted / succeeded / exhausted / aborted / retried / timed-out / rejected, plus active + queued counts. Scrape it for a dashboard or a health check.
 - **Logs** — via `System.Logger`, routed to your existing backend. Nothing to wire.
+- **Latency** — `TaskEvent.attemptDuration` (per attempt) and `stats().totalExecutionMillis` (aggregate) give you timing, not just counts.
 
 ```java
 RetryExecutor executor = RetryExecutor.builder()
@@ -69,6 +70,18 @@ RetryExecutorStats s = executor.stats();   // point-in-time snapshot
 log.info("succeeded={} exhausted={} retries={} timedOut={}",
         s.succeeded(), s.exhausted(), s.retriesScheduled(), s.timedOut());
 ```
+
+## Lifecycle & control
+
+- **`AutoCloseable`** — use try-with-resources; `close()` stops new submits and drains in-flight plus already-scheduled retries before returning.
+- **Owns only what it makes** — it shuts down its internal pool; a pool you pass in stays yours to close.
+- **Cancellation** — `future.cancel(true)` interrupts the running attempt and cancels the pending retry. Cancelled ≠ exhausted, so no spurious `onExhausted`.
+
+## Robustness
+
+- **Fail-fast config** — the builder validates at `build()`: `maxRetries >= 0`, positive durations, and a class listed in both `retryOn` and `abortOn` is rejected.
+- **Overflow-safe backoff** — exponential delays cap cleanly instead of overflowing; jitter is full jitter over `[0, delay]`.
+- **Correct under load** — the scheduler thread never runs your code (attempts and listeners run on the work pool), and stats are lock-free.
 
 ## One design call: wrap, don't subclass
 
