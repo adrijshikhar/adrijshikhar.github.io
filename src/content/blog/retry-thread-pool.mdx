@@ -52,6 +52,30 @@ try (RetryExecutor executor = RetryExecutor.builder().retryPolicy(policy).build(
   beside it.
 - **Resilience is a pool property** — not retry logic threaded through every call site.
 
+## Observability
+
+See what the pool is doing — without instrumenting your task code:
+
+- **Listeners** — `onRetry` / `onSuccess` / `onExhausted` / `onAbort` fire on every transition;
+  bridge them to Micrometer, StatsD, or logs.
+- **`stats()`** — an immutable snapshot: submitted / succeeded / exhausted / aborted / retried /
+  timed-out / rejected, plus active + queued counts. Scrape it for a dashboard or a health check.
+- **Logs** — via `System.Logger`, routed to your existing backend. Nothing to wire.
+
+```java
+RetryExecutor executor = RetryExecutor.builder()
+    .retryPolicy(policy)
+    .listener(new RetryListener() {
+        @Override public void onRetry(TaskEvent e)     { meter.counter("pool.retry", "task", e.taskName()).increment(); }
+        @Override public void onExhausted(TaskEvent e) { meter.counter("pool.exhausted", "task", e.taskName()).increment(); }
+    })
+    .build();
+
+RetryExecutorStats s = executor.stats();   // point-in-time snapshot
+log.info("succeeded={} exhausted={} retries={} timedOut={}",
+        s.succeeded(), s.exhausted(), s.retriesScheduled(), s.timedOut());
+```
+
 ## One design call: wrap, don't subclass
 
 `RetryExecutor` *wraps* an `ExecutorService` instead of extending `ThreadPoolExecutor`. The retry
