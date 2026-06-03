@@ -47,7 +47,7 @@ const fmtPostDate = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric'
 const rawMarkdown = await buildRawMarkdown();
 ---
 
-<BaseLayout title="Adrij Shikhar">
+<BaseLayout title="adrijshikhar.dev">
   <ViewToggle client:load />
   <div class="machine-view" />
 
@@ -115,12 +115,12 @@ const rawMarkdown = await buildRawMarkdown();
           ) : (
             <ul class="group/list">
               {latestPosts.map((post) => (
-                <BlogCard title={post.data.title} date={fmtPostDate(post.data.date)} href={`/blogs/${post.id}`} />
+                <BlogCard title={post.data.title} date={fmtPostDate(post.data.date)} href={`/blogs/${post.id}/`} />
               ))}
             </ul>
           )}
           <div class="mt-10">
-            <a class="group atelier-btn" href="/blogs">
+            <a class="group atelier-btn" href="/blogs/">
               <span>View all posts</span><span class="transition-transform group-hover:translate-x-1">&rarr;</span>
             </a>
           </div>
