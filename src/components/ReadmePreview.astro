@@ -1,5 +1,6 @@
 ---
 import { marked } from 'marked';
+import sanitizeHtml from 'sanitize-html';
 
 // Render the ACTUAL profile README, fetched from GitHub raw at build time (no stored copy).
 // All visuals are remote images (typing-svg banner, Shields stat badges, activity graph,
@@ -16,7 +17,26 @@ try {
   // Repo-relative links (./AGENTS.md, ./template/…) → absolute GitHub URLs.
   md = md.replace(/\]\(\.\//g, `](${REPO}`).replace(/href="\.\//g, `href="${REPO}`);
 
-  html = marked.parse(md) as string;
+  // marked does NOT sanitize, and this markup is fetched from a remote host at build time.
+  // Scrub it to an allowlist before baking it into the page so a compromised upstream can't
+  // inject <script>/event-handler HTML. The allowlist keeps the README's intended visuals
+  // (<picture>/<source>/<img> badges, centered <div>s, links, headings, code).
+  html = sanitizeHtml(marked.parse(md) as string, {
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat([
+      'img',
+      'picture',
+      'source',
+      'h1',
+      'h2',
+    ]),
+    allowedAttributes: {
+      ...sanitizeHtml.defaults.allowedAttributes,
+      img: ['src', 'srcset', 'alt', 'width', 'height', 'align', 'class'],
+      source: ['srcset', 'media', 'type'],
+      a: ['href', 'name', 'target', 'rel'],
+      div: ['align'],
+    },
+  });
 
   // The README uses <picture> with prefers-color-scheme to pick light/dark variants
   // (activity graph, Pac-Man, snake, streak). That follows the OS, not our toggle — so on
