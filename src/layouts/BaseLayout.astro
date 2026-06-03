@@ -22,29 +22,9 @@ const cfBeaconToken =
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title}</title>
-    {canonical && <link rel="canonical" href={canonical} />}
-    <!-- Favicon set: SVG-first (modern), .ico fallback (legacy), apple-touch, manifest -->
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <link rel="manifest" href="/site.webmanifest" />
-    <meta name="theme-color" content="#f7f7f5" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0e0e0e" media="(prefers-color-scheme: dark)" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    />
-    {
-      cfBeaconToken && (
-        <script
-          defer
-          src="https://static.cloudflareinsights.com/beacon.min.js"
-          data-cf-beacon={JSON.stringify({ token: cfBeaconToken })}
-        />
-      )
-    }
-    <!-- No-FOUC: apply saved accent theme + light/dark mode before first paint -->
+    <!-- No-FOUC: apply saved accent theme + light/dark mode before first paint.
+         MUST stay first in <head>, before any stylesheet <link> — a stylesheet placed
+         before an inline script delays the script, which lets a default-dark frame paint. -->
     <script is:inline>
       (function () {
         try {
@@ -81,6 +61,28 @@ const cfBeaconToken =
         } catch (e) {}
       })();
     </script>
+    <title>{title}</title>
+    {canonical && <link rel="canonical" href={canonical} />}
+    <!-- Favicon set: SVG-first (modern), .ico fallback (legacy), apple-touch, manifest -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#f7f7f5" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0e0e0e" media="(prefers-color-scheme: dark)" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    {
+      cfBeaconToken && (
+        <script
+          defer
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon={JSON.stringify({ token: cfBeaconToken })}
+        />
+      )
+    }
   </head>
   <body class="antialiased text-text">
     <!-- Ambient aurora: faint accent-tinted drifting blobs behind everything.
