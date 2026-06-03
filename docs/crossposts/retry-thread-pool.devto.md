@@ -6,7 +6,7 @@
 title: "retry-thread-pool: a retrying executor for Java"
 published: false
 canonical_url: "https://adrijshikhar.dev/blogs/retry-thread-pool"
-tags: java, opensource, webdev, ai
+tags: java, concurrency, opensource, ai
 description: "Retries at the thread-pool level for Java 17+ — submit named tasks, get CompletableFutures, and let backoff/predicates/timeouts run on their own. Zero runtime dependencies, built agent-first."
 ---
 
