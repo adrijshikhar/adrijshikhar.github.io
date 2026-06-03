@@ -83,17 +83,6 @@ log.info("succeeded={} exhausted={} retries={} timedOut={}",
 - **Overflow-safe backoff** — exponential delays cap cleanly instead of overflowing; jitter is full jitter over `[0, delay]`.
 - **Correct under load** — the scheduler thread never runs your code (attempts and listeners run on the work pool), and stats are lock-free.
 
-## One design call: wrap, don't subclass
-
-`RetryExecutor` *wraps* an `ExecutorService` instead of extending `ThreadPoolExecutor`. The retry engine stays independent of how work runs, and the public surface is exactly the retry API — nothing to reach around.
-
-```java
-RetryExecutor.builder()
-    .executor(Executors.newVirtualThreadPerTaskExecutor())  // you own its lifecycle
-    .retryPolicy(RetryPolicy.ofDefaults())
-    .build();
-```
-
 ## Zero dependencies
 
 Logging goes through the JDK's `System.Logger` facade (Java 9+) — routes to your SLF4J/Log4j if present, silent otherwise. You add one artifact and nothing else comes with it.
