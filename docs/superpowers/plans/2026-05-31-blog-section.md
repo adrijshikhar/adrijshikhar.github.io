@@ -53,12 +53,12 @@ so AI agents can read the examples and implement against it correctly.
   canonical `https://adrijshikhar.dev/blogs/retry-thread-pool`. Plain MDX (no custom components, no
   cover) — `bun run build` emits `/blogs/retry-thread-pool/`. Ships on merge of
   `docs/blog-handoff-update` → `content`.
-- **dev.to — DRAFT prepared as a file, NOT yet pushed to the API.**
-  `docs/crossposts/retry-thread-pool.devto.md` holds the dev.to-flavored body + frontmatter
-  (`published:false`, `canonical_url` → the site post, tags `java, opensource, webdev, ai`). This post
-  is **code-only — no SVG/hero-image constraint** (the readme-top.png raster rule applies to Post 1
-  only). **Remaining:** create the dev.to article via the API (or editor) from this file, then
-  review + publish — see Phase 7.
+- **dev.to — DRAFT created on the API, awaiting author review/publish.** Article **id 3812186**,
+  `published:false`, canonical → `https://adrijshikhar.dev/blogs/retry-thread-pool`, tags
+  `java, opensource, webdev, ai`. Source of truth for the body is
+  `docs/crossposts/retry-thread-pool.devto.md` (code-only — **no SVG/hero constraint**; the
+  readme-top.png raster rule applies to Post 1 only). **Remaining:** review in the dev.to dashboard,
+  then flip `published:true` (PUT) — see Phase 7 Task 16 Step 3.
 - everydev.ai / Hashnode / HackerNoon / Medium: same canonical-back-to-site rule if cross-posted later.
 
 ---
@@ -265,11 +265,8 @@ phase ships it and publishes the dev.to cross-post.
 
 - [x] **Step 1:** Post written, `draft:false`, canonical `https://adrijshikhar.dev/blogs/retry-thread-pool`.
 - [x] **Step 2:** `bun run build` emits `/blogs/retry-thread-pool/index.html` (build verified — 7 pages).
-- [ ] **Step 3:** Merge `docs/blog-handoff-update` → `content`; CI deploys. Then confirm:
-  ```bash
-  curl -sI https://adrijshikhar.dev/blogs/retry-thread-pool/ | head -1
-  ```
-  Expected: `HTTP/2 200`.
+- [x] **Step 3:** Merged `docs/blog-handoff-update` → `content` (PR #780, squash). CI deployed.
+  `curl -sI https://adrijshikhar.dev/blogs/retry-thread-pool/` → `HTTP/2 200` (verified, live).
 
 ## Task 16: Publish on dev.to
 
@@ -278,8 +275,8 @@ phase ships it and publishes the dev.to cross-post.
 Depends on Task 15 Step 3 (canonical post live). The draft body is code-only — **no SVG/hero
 constraint** (the `readme-top.png` rule is Post-1-specific).
 
-- [ ] **Step 1: Create the dev.to article from the draft file.** Split the file's YAML frontmatter
-  from its markdown body, then POST it (`published:false`):
+- [x] **Step 1: Created the dev.to article from the draft file** — article **id 3812186**,
+  `published:false`, canonical → the site post, tags `java, opensource, webdev, ai`. Command used:
   ```bash
   curl -s -X POST -H "api-key: $DEV_TO_API_KEY" -H "Content-Type: application/json" \
     -d "$(python3 - <<'PY'
