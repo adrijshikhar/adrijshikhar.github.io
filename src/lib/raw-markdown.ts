@@ -58,7 +58,7 @@ export async function buildRawMarkdown(): Promise<string> {
     `# ${about.meta.name}\n\n${about.content}`,
     `\n---\n\n## Experience\n\n${experience.meta.entries.map((e: any) => formatExpEntry(e, expSections[e.slug] || '')).join('\n\n---\n\n')}`,
     `\n---\n\n## Projects\n\n${projects.meta.entries.map((p: any) => formatProjEntry(p, projSections[p.slug] || '')).join('\n\n---\n\n')}`,
-    `\n---\n\n## Writing\n\n${latestPosts.map((post) => `- [${post.data.title}](/blogs/${post.id})`).join('\n') || '_No posts yet._'}`,
+    `\n---\n\n## Writing\n\n${latestPosts.map((post) => `- [${post.data.title}](/blogs/${post.id}/)`).join('\n') || '_No posts yet._'}`,
     `\n---\n\n## Education\n\n${education.meta.entries.map((e: any) => `### ${e.institution}\n\n${e.degree}${e.field ? ` — ${e.field}` : ''}`).join('\n\n')}`,
     `\n---\n\n## Achievements\n\n${achievements.content}`,
     `\n---\n\n## Interests\n\n${interests.content}`,
