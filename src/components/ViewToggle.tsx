@@ -6,12 +6,29 @@ const startsInMachine = () =>
   typeof window !== 'undefined' &&
   new URLSearchParams(window.location.search).get('machine') === 'true';
 
+// The machine view shows the raw markdown as literal text, so it MUST be HTML-escaped
+// before insertion — HTML embedded in the content must never render. Only after escaping
+// do we re-introduce the two intended affordances (links, bold), and links only for safe
+// URL schemes so an escaped `javascript:`/`data:` URL can't become a clickable sink.
+const escapeHtml = (s: string): string =>
+  s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+
+const SAFE_URL = /^(?:https?:|mailto:)/i;
+
 // Build the machine-view inner HTML from the raw markdown payload.
-const buildMachineHtml = () => {
+const buildMachineHtml = (): string => {
   const raw: string = (window as any).__RAW_MARKDOWN__ || '';
-  const withLinks = raw.replace(
+  const escaped = escapeHtml(raw);
+  const withLinks = escaped.replace(
     /\[([^\]]+)\]\(([^)]+)\)/g,
-    '<a href="$2" target="_blank" rel="noreferrer noopener">$1</a>',
+    (match: string, text: string, url: string) =>
+      SAFE_URL.test(url)
+        ? `<a href="${url}" target="_blank" rel="noreferrer noopener">${text}</a>`
+        : match,
   );
   const withBold = withLinks.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
   return `<div class="machine-content-wrapper"><pre class="machine-pre">${withBold}</pre></div>`;
