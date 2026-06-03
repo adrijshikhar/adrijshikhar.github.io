@@ -7,18 +7,16 @@ title: "retry-thread-pool: a retrying executor for Java"
 published: false
 canonical_url: "https://adrijshikhar.dev/blogs/retry-thread-pool"
 tags: java, opensource, webdev, ai
-description: "A Java library that makes retrying a property of the thread pool, not the call site — and is built agent-first so AI agents can use it correctly from the examples alone."
+description: "Retries at the thread-pool level for Java 17+ — submit named tasks, get CompletableFutures, and let backoff/predicates/timeouts run on their own. Zero runtime dependencies, built agent-first."
 ---
 
 > Originally published at [adrijshikhar.dev](https://adrijshikhar.dev/blogs/retry-thread-pool).
 
-Most retry libraries decorate a single call. You wrap a supplier, the wrapper catches a failure, sleeps, and calls it again. That's the right shape when you have one flaky operation. But when you run a *pool* of tasks — a hundred independent fetches, a batch of jobs, a fan-out across workers — retry stops being a property of the call and becomes a property of the pool. You want to hand work to an executor, get a future back, and have the pool quietly re-run whatever failed, with its own backoff and budget, without you threading that logic through every call site.
+Most retry libraries wrap **one call**. Fine for a single flaky operation — but when you run a *pool* of tasks, retry should be the pool's job, not yours.
 
-That's [`retry-thread-pool`](https://github.com/adrijshikhar/retry-thread-pool): a small Java 17+ library that moves retries down to the thread-pool level. It's on Maven Central, has zero runtime dependencies, and — the part I want to dwell on — it's built so an AI agent can pick it up and use it correctly from the examples alone.
+[`retry-thread-pool`](https://github.com/adrijshikhar/retry-thread-pool) puts retries at the thread-pool level: wrap any `ExecutorService`, submit a named task, get a `CompletableFuture` — retries happen on their own. Java 17+, on Maven Central, **zero runtime dependencies**.
 
-## The shape
-
-You wrap any `ExecutorService`, submit a *named* task, and get a `CompletableFuture` back. Retries are transparent — the future only completes when the task finally succeeds or exhausts its budget.
+## Quickstart
 
 ```java
 RetryPolicy policy = RetryPolicy.builder()
@@ -33,33 +31,26 @@ try (RetryExecutor executor = RetryExecutor.builder().retryPolicy(policy).build(
 }
 ```
 
-The name (`"fetch-user"`) is a label that flows through events, logs, and stats, so when something retries five times at 3am you know *what* did. The policy is immutable and reusable; the executor is `AutoCloseable`.
+## What you get
 
-## What the pool gives you
+- **Backoff** — `none`, `fixed`, `exponential`, `exponentialWithJitter`. Jitter kills synchronized retry storms.
+- **Predicates** — `retryOn(...)` / `abortOn(...)`; `abortOn` wins. `Error` and `InterruptedException` never retry.
+- **Per-attempt timeout** — a hung attempt is interrupted and retried, not left to wedge a worker.
+- **Listeners** — `onRetry` / `onSuccess` / `onExhausted` / `onAbort`, for metrics/logs without touching task code.
+- **Stats** — immutable snapshot: submitted / succeeded / exhausted / retried / timed-out counts.
+- **Bring your own pool** — any `ExecutorService`, including virtual threads on 21+.
+- **Loud exhaustion** — out of retries → `RetryExhaustedException` (cause = last failure); a non-retryable error surfaces as itself.
 
-The point is how much the pool handles for you, so you don't rebuild it per task:
+## Why it matters
 
-- **Backoff strategies** — `none`, `fixed`, `exponential`, and `exponentialWithJitter`. Jitter matters at pool scale: without it, a hundred tasks that fail together retry together, and you've built a self-inflicted thundering herd.
-- **Retry predicates** — `retryOn(...)` / `abortOn(...)` decide which exceptions are worth retrying. `abortOn` wins, so a validation error fails fast while a network blip retries. `Error` and `InterruptedException` are never retried.
-- **Per-attempt timeout** — a hung attempt is interrupted and retried instead of wedging a worker forever.
-- **Listeners** — `onRetry` / `onSuccess` / `onExhausted` / `onAbort`, for wiring metrics or logs without coupling them into your task code.
-- **Stats** — an immutable snapshot of submitted / succeeded / exhausted / retried / timed-out counts.
+- **Fire and forget** — submit → future. No catch, no `sleep`, no attempt counters, no rescheduling in your code.
+- **Async stays async** — backoff is a scheduler timer, not a `Thread.sleep`. Workers keep working; throughput holds when a dependency flaps.
+- **Independent healing** — each task has its own budget; one flaky task doesn't stall the ninety-nine beside it.
+- **Resilience is a pool property** — not retry logic threaded through every call site.
 
-When retries run out, the future fails with `RetryExhaustedException` whose cause is the last failure. A non-retryable exception surfaces as itself.
+## One design call: wrap, don't subclass
 
-## Fire and forget: why this matters
-
-The point of pushing retries into the pool is what it takes *off* your orchestrating code. The thread that hands out work — the manager, the coordinator, whatever fans the batch out — submits a task and gets a future back. That's the whole interaction. It doesn't catch the failure, doesn't sleep between attempts, doesn't track an attempt count, doesn't reschedule anything. The retry logic lives in the pool, so the call site stays a one-liner and your business logic stops carrying retry bookkeeping it never wanted.
-
-That's also what keeps asynchronous code actually asynchronous. A hand-rolled retry is usually a loop with a `Thread.sleep` in it — and that blocks *something*, either the caller or a worker, for the entire backoff. Here the backoff is a timer on a scheduler, not a sleeping thread: a failed attempt is parked until its delay elapses and then re-submitted, while the workers stay free to do real work in the meantime. You get retries without paying for them in blocked threads, so throughput holds up even when a dependency is flapping.
-
-And because every task carries its own policy and its own budget, they heal independently. One task that fails four times doesn't stall the ninety-nine beside it — it works through its own backoff while the rest finish. Jitter spreads those retries out so a shared dependency's hiccup doesn't turn into a synchronized stampede back at it. The manager fires the batch, walks away, and collects the results (and any `RetryExhaustedException`s) at the end. Resilience became a property of the pool, not a responsibility you thread through every call site — fewer moving parts in your code, and a pipeline that absorbs transient failure on its own.
-
-## A design choice: wrap, don't subclass
-
-The obvious way to build this in Java is to extend `ThreadPoolExecutor` and override its hooks. I chose composition instead — `RetryExecutor` *wraps* an `ExecutorService` rather than being one.
-
-That keeps the retry engine independent of how work actually runs. You bring the executor: a fixed pool, a cached pool, or a virtual-thread executor on Java 21+. The retry logic lives in one place and never has to fight the executor's lifecycle, and the public surface is exactly the retry API and nothing else.
+`RetryExecutor` *wraps* an `ExecutorService` instead of extending `ThreadPoolExecutor`. The retry engine stays independent of how work runs, and the public surface is exactly the retry API — nothing to reach around.
 
 ```java
 RetryExecutor.builder()
@@ -68,22 +59,21 @@ RetryExecutor.builder()
     .build();
 ```
 
-## Zero runtime dependencies
+## Zero dependencies
 
-A small utility library shouldn't drag transitive baggage into your dependency tree. `retry-thread-pool` has **no runtime dependencies**. Logging goes through the JDK's built-in `System.Logger` facade (Java 9+), so if your app has SLF4J or Log4j on the classpath the library's logs route there automatically; if it doesn't, they're silently discarded.
+Logging goes through the JDK's `System.Logger` facade (Java 9+) — routes to your SLF4J/Log4j if present, silent otherwise. You add one artifact and nothing else comes with it.
 
-## Agent-first: the examples *are* the contract
+## Agent-first
 
-Increasingly the first thing to "read" a library isn't a human — it's an AI agent writing code against it. So the repo is built agent-first.
+Built so an AI agent can use it from the examples alone:
 
-- **`llms.txt`** at the repo root — a curated index pointing an agent at the usage guide, API reference, and examples instead of making it crawl the whole tree.
-- **`docs/AI_USAGE.md`** — one dense file with the complete public surface, failure semantics, and a recipe per feature. An agent retrieves it, grounds on it, and generates correct calls.
-- **`AGENTS.md`** — for agents *editing* the library: build/test commands and conventions.
-
-But docs rot. The fix is to make the examples executable: **every recipe in the docs is a real, passing test**. If the public API changes, the examples stop compiling and the build fails — so the snippets an agent copies are guaranteed to match the published API. The documentation can't drift from the code, because the documentation *is* code that CI runs.
+- **`llms.txt`** — discovery index pointing agents at the docs.
+- **`docs/AI_USAGE.md`** — full public surface + a recipe per feature.
+- **`AGENTS.md`** — build/test/conventions for agents editing the library.
+- **Docs = compiling tests** — every recipe is a real test in `ExamplesTest`. Change the API and the examples stop compiling, so the build fails. The docs can't drift from the code.
 
 ```java
-// from ExamplesTest — this compiles and passes on every build
+// from ExamplesTest — compiles and passes on every build
 @Test
 void exhaustionSurfacesLastFailure() {
   RetryPolicy policy = RetryPolicy.builder()
@@ -99,8 +89,6 @@ void exhaustionSurfacesLastFailure() {
   }
 }
 ```
-
-A human reads `AI_USAGE.md`; an agent retrieves it; the build proves it. Same source, three readers.
 
 ## Try it
 
