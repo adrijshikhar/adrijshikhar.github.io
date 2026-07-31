@@ -1,0 +1,198 @@
+---
+title: "A MySQL binlog file can exceed 4 GiB — and then every position in it lies"
+date: 2026-08-01
+description: "max_binlog_size caps at 1 GiB, so a 5.7 GB binlog shouldn't exist. One big transaction produces one anyway — and because end_log_pos is a uint32, every event past the 4 GiB mark reports a wrapped position. Decode stays clean. The positions are garbage."
+draft: true
+canonicalUrl: "https://adrijshikhar.dev/blogs/mysql-binlog-4gib-position-wrap"
+---
+
+I spent an afternoon convinced I had a bug in my binlog decoder. Positions kept jumping
+backwards near the end of one file, the indexer re-scanned the same file forever, and
+every event decoded perfectly while doing it.
+
+The decoder was fine. The file was lying.
+
+Here is the claim, and it contradicts what most people — me included, until I went
+looking — believe about binlogs:
+
+**A MySQL binlog file can be larger than 4 GiB. When it is, `end_log_pos` wraps — and
+every event past the 4 GiB mark reports a position that is simply wrong.**
+
+## Why that shouldn't be possible
+
+`max_binlog_size` maxes out at 1 GiB. You cannot set it higher:
+
+```sql
+mysql> SET GLOBAL max_binlog_size = 5368709120;
+mysql> SELECT @@max_binlog_size;
++-------------------+
+| @@max_binlog_size |
++-------------------+
+|        1073741824 |   -- 1 GiB. It clamped.
++-------------------+
+```
+
+So the server rotates to a new binlog every gigabyte, and a 4 GiB file never happens.
+That's the reasoning, and it's wrong — because of one rule that overrides the size cap.
+
+## The loophole
+
+**A transaction is never split across binlog files.** The server checks whether it should
+rotate *between* transactions, not inside one. If a transaction is still open when the
+file crosses `max_binlog_size`, rotation waits for the COMMIT.
+
+So the size cap isn't a cap. It's a suggestion that the server honours at transaction
+boundaries. One transaction bigger than 4 GiB forces one binlog file bigger than 4 GiB,
+and there's nothing to stop it.
+
+## Making one in 15 seconds
+
+You don't need a 5 GB table or a slow afternoon. `BLACKHOLE` discards the rows but
+**still writes them to the binlog**, so you get the binlog volume with none of the InnoDB
+cost:
+
+```sql
+SET GLOBAL binlog_format = 'ROW';
+
+CREATE TABLE big (
+  id      INT PRIMARY KEY AUTO_INCREMENT,
+  payload LONGBLOB
+) ENGINE=BLACKHOLE;
+
+START TRANSACTION;
+-- repeat 340 times, no intermediate COMMIT:
+INSERT INTO big(payload) VALUES (REPEAT('x', 16*1024*1024));
+COMMIT;
+```
+
+340 rows × 16 MB in a single transaction. On MySQL 8.0.39 that produced a binlog of
+**5,704,288,226 bytes in under 15 seconds**.
+
+## The math
+
+The binlog event header is 19 bytes, and two of its fields are 4-byte unsigned ints:
+`event_size` and `end_log_pos`. `event_size` is the length of one event, which stays
+comfortably under 16 MB, so it never overflows.
+
+`end_log_pos` is different. It's **cumulative** — the byte offset of the end of this event
+within the file. Cumulative counters in a uint32 have exactly one behaviour past
+4,294,967,296:
+
+```
+file size        5,704,288,226
+2^32             4,294,967,296
+size mod 2^32    1,409,320,930   ← what the last event actually reports
+```
+
+`mysqlbinlog` shows it happening. Positions climb normally to about 4,278,216,212, then
+reset to roughly 26,176, then climb again — ending the file at 1,409,320,930, which is
+1.4 GB for a file that is 5.7 GB on disk. Elided down to the field that matters:
+
+```
+... end_log_pos 4278216212   Write_rows
+... end_log_pos      26176   Write_rows   ← wrapped
+...
+... end_log_pos 1409320930   Xid          ← last event, file is 5.7 GB
+```
+
+This isn't a `mysqlbinlog` quirk or a decoder bug. It's the on-disk format. Every reader
+sees the same wrapped value, because that's the number in the file.
+
+## The part that makes it dangerous
+
+Here's the part that took me longest to accept: **decoding is completely clean.**
+
+On that 5.7 GB file my decoder reported 686 events, zero errors, correct event sizes,
+correct row data. (686 sounds low for 5.7 GB, and that's the point — 340 rows of 16 MB
+each, roughly two events per row, is a handful of enormous events rather than millions of
+small ones.) Summed event lengths came to the true 5.7 GB. Every byte was parsed correctly.
+
+Only the *position* field was wrong. And position is what everything downstream is built
+on:
+
+- **Resume logic breaks.** My indexer tracks a committed boundary — the highest offset
+  where everything below is fully indexed. It took that from `end_log_pos`, so it recorded
+  1,409,320,930 for a 5,704,288,226-byte file. The boundary never equals the file size, so
+  every scan decided there was new data, re-indexed from a wrapped offset, seeked into the
+  middle of an event, failed with "tail truncated", and started over. Forever. With live
+  tail on, that's an event-stream storm.
+- **Positions collide.** Offset 26,176 now refers to two different events in one file.
+  Any "jump to position" lookup is a coin flip.
+- **Size heuristics under-report.** A detector measuring transaction size as
+  `end_pos − start_pos` reported ~1.4 GB for a transaction that actually wrote 5.7 GB —
+  off by exactly 2³².
+
+That last one is worth dwelling on, because it's the trap inside the trap. I had a
+"huge transaction" detector. On the largest transaction I have ever seen, it under-reported
+by 4 GiB and stayed quiet.
+
+## The fix
+
+Stop trusting `end_log_pos`.
+
+The event header already tells you each event's length, and `event_size` doesn't overflow.
+So accumulate offsets yourself instead of reading the cumulative field:
+
+```go
+var runPos uint64 = 4 // the first event (FORMAT_DESCRIPTION) sits at offset 4
+
+err := p.ParseFile(path, 4, func(be *replication.BinlogEvent) error {
+    size := uint64(be.Header.EventSize)
+
+    pos := runPos          // true byte offset of this event
+    endPos := pos + size   // ...and of its end
+    runPos = endPos
+
+    // use pos/endPos everywhere; never be.Header.LogPos
+    return nil
+})
+```
+
+Four lines. It's wrap-immune because it never reads the field that wraps, and below 4 GiB
+it produces exactly the same numbers as before, so nothing else changes.
+
+On the 5.7 GB repro: positions monotonic all the way to 5,704,288,226, committed boundary
+equal to the file size, zero backward jumps, no re-index churn.
+
+A useful side effect — this also fixes MariaDB. Inline `ANNOTATE_ROWS` events carry
+`LogPos = 0`, so the old `LogPos - size` arithmetic underflowed. An accumulator doesn't
+care.
+
+## Detecting it instead of being surprised by it
+
+Fixing your own positions is half of it. You also want to know a file is in this territory
+at all, because everything else that reads it — your ETL, your CDC pipeline, your own
+scripts — is probably still trusting `end_log_pos`.
+
+So [binsight](https://github.com/adrijshikhar/binsight) ships a `pos_wrap` detector that
+flags files ≥ 4 GiB and transactions whose true byte size is ≥ 4 GiB, and the events table
+highlights the single event straddling each 2³² boundary.
+
+One warning if you go looking for these yourself: **`end_pos <= start_pos` is not a
+reliable signature.** A big transaction that starts early in the file wraps to a value
+still greater than its small start position — I saw start 377, wrapped end 1.4 GB, which
+looks perfectly ordinary. The signals that actually work are file size ≥ 2³², and summed
+event bytes diverging from the position span by a multiple of 2³².
+
+## Should you care?
+
+Honestly: most people never hit this. It needs a single transaction over 4 GiB, which
+means a bulk load, a giant `DELETE`, or a schema migration that rewrites a huge table in
+one shot.
+
+But "rare" and "harmless" are different things. When it does happen, nothing errors. Your
+decoder reports success, your row data is correct, and your positions are quietly wrong by
+4 GiB. That's the failure mode I'd rather know about in advance than discover during an
+incident.
+
+If you want to see it: the repro above takes 15 seconds, and
+[binsight](https://github.com/adrijshikhar/binsight) will show you the wrap.
+
+```sh
+brew install adrijshikhar/tap/binsight
+binsight serve /path/to/binlogs
+```
+
+It's a local, read-only binlog viewer for MySQL and MariaDB — event stream, transaction
+grouping, row-image diffs, hex view, anomaly detection. Written because I got tired of
+reading `mysqlbinlog` output in a pager, and it now knows about this particular lie.

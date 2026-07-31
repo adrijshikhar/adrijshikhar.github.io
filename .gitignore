@@ -15,7 +15,11 @@ size-plugin.json
 package-lock.json
 
 # local agent worktrees / tooling
-.claude/
+.claude/*
+!.claude/skills/
 
 # designlang extraction output (scratch)
 design-extract-output/
+
+# blog-editor review output
+scratch/
