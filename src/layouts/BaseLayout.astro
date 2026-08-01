@@ -2,13 +2,15 @@
 import '../styles/globals.css';
 import '../styles/machine.css';
 import ModeToggle from '../components/ModeToggle.tsx';
+import SkyField from '../components/SkyField.tsx';
 
 interface Props {
   title: string;
   canonical?: string;
+  skyMode?: 'full' | 'quiet';
 }
 
-const { title, canonical } = Astro.props;
+const { title, canonical, skyMode = 'quiet' } = Astro.props;
 
 // Cloudflare Web Analytics beacon — token is public (ships in client HTML).
 // Resolved from a .env file (local dev) or a shell/CI env var (GitHub Actions).
@@ -85,6 +87,7 @@ const cfBeaconToken =
     }
   </head>
   <body class="antialiased text-text">
+    <SkyField client:visible mode={skyMode} />
     <slot />
 
     <!-- Light/dark mode toggle, docked top-right -->
