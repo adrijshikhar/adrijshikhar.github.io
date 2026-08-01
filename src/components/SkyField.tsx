@@ -1,10 +1,21 @@
 import { useEffect, useRef } from 'react';
-import { computeSky, drawQuiet, type Observer } from '../lib/sky/render';
+import {
+  computeSky,
+  computeFullSky,
+  drawQuiet,
+  drawFull,
+  nearestBody,
+  figureAt,
+  type Observer,
+} from '../lib/sky/render';
+import { animate, onScroll } from '../lib/motion';
 
 interface SkyFieldProps {
   /** 'quiet' (every page): faint field + named stars, no interaction. 'full'
-   *  (home page instrument view — graticule, planets, Moon, labels, the game)
-   *  is a later task; for now it renders identically to 'quiet'. */
+   *  (home page only): adds the alt/az graticule, planets, the Moon with a
+   *  real phase, persistent labels, hover naming, and a scroll-driven
+   *  constellation reveal. The orbital-mechanics game is a separate, later
+   *  feature — this mode is look-only. */
   mode: 'full' | 'quiet';
 }
 
@@ -23,6 +34,16 @@ export default function SkyField({ mode }: SkyFieldProps) {
     let W = 0;
     let H = 0;
 
+    // Full mode only: hover is read at render time from the last known pointer
+    // position rather than recomputed on every pointermove — bodies are
+    // already recomputed every frame, so this avoids doing the hit-test twice.
+    const mouse = { x: -1000, y: -1000 };
+    let hoverIndex = -1;
+    let hoverFig: string | null = null;
+    // Reduced motion: constellations render fully formed (no scroll-driven reveal).
+    const scrollP = { t: reduced ? 1 : 0 };
+    let scrollAnim: ReturnType<typeof animate> | null = null;
+
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       W = window.innerWidth;
@@ -40,8 +61,16 @@ export default function SkyField({ mode }: SkyFieldProps) {
         accent: cs.getPropertyValue('--accent').trim(),
         muted: cs.getPropertyValue('--muted').trim(),
       };
-      const { pts, faint } = computeSky(obs, new Date(), W, H);
-      drawQuiet(ctx, W, H, pts, faint, colors);
+      if (mode === 'full') {
+        const { bodies, faint, moonPhase } = computeFullSky(obs, new Date(), W, H);
+        hoverIndex = nearestBody(bodies, mouse.x, mouse.y);
+        // star hover wins over a constellation hover when both are under the cursor
+        hoverFig = hoverIndex >= 0 ? null : figureAt(bodies, scrollP.t, mouse.x, mouse.y);
+        drawFull(ctx, W, H, bodies, faint, moonPhase, scrollP.t, hoverIndex, hoverFig, mouse, colors);
+      } else {
+        const { pts, faint } = computeSky(obs, new Date(), W, H);
+        drawQuiet(ctx, W, H, pts, faint, colors);
+      }
     };
 
     resize();
@@ -63,6 +92,30 @@ export default function SkyField({ mode }: SkyFieldProps) {
     };
     window.addEventListener('resize', onResize);
 
+    // Hover tracking — full mode only. Look-only: hover names a body or a
+    // drawn constellation segment, nothing is draggable.
+    const onPointerMove = (e: PointerEvent) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+      if (reduced) renderFrame(); // no rAF loop running to pick this up otherwise
+    };
+    if (mode === 'full') {
+      window.addEventListener('pointermove', onPointerMove, { passive: true });
+    }
+
+    // Scroll-driven constellation reveal — every one of the 47 segments draws
+    // over the WHOLE scroll range simultaneously (see drawFull/figureAt),
+    // eased toward the scroll position (sync: 0.14) rather than tracking the
+    // scrollbar 1:1, which is what makes the reveal feel fluid rather than
+    // jerky. Skipped entirely under reduced motion.
+    if (mode === 'full' && !reduced) {
+      scrollAnim = animate(scrollP, {
+        t: [0, 1],
+        ease: 'linear',
+        autoplay: onScroll({ target: document.body, enter: 'top top', leave: 'bottom bottom', sync: 0.14 }),
+      });
+    }
+
     // Real location, best-effort — never block first paint on the network.
     const controller = new AbortController();
     const timeoutId = window.setTimeout(() => controller.abort(), 1200);
@@ -83,6 +136,8 @@ export default function SkyField({ mode }: SkyFieldProps) {
     return () => {
       if (rafId) cancelAnimationFrame(rafId);
       window.removeEventListener('resize', onResize);
+      if (mode === 'full') window.removeEventListener('pointermove', onPointerMove);
+      scrollAnim?.revert(); // tears down the linked anime.js ScrollObserver too
       window.clearTimeout(timeoutId);
       controller.abort();
     };
