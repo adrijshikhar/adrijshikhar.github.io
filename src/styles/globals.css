@@ -92,6 +92,11 @@
   --hairline:     oklch(28% .02 60 / .14);
   --rule:         oklch(28% .02 60 / .14);
   --rule-hi:      oklch(28% .02 60 / .32);
+  /* Engraved star-chart ink (SkyField, light mode) — dark marks on paper,
+     not an inverted photograph. Same hue/lightness family as --heading/--rule,
+     kept as its own token since it's opaque (star fills) where those carry
+     their own baked-in alpha. */
+  --sky-ink:      oklch(28% .02 60);
 
   --card-shell: color-mix(in oklab, var(--surface-2) 60%, transparent);
   --card-core:  var(--surface);
