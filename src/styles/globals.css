@@ -1,62 +1,62 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+/* Fonts are local. The old Google Fonts @import was render-blocking AND loaded
+   Inter, which never painted — 'Geist Variable' always won the stack ahead of it. */
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
+@import "@fontsource/ibm-plex-mono/400.css";
+@import "@fontsource/ibm-plex-mono/500.css";
+@import "@fontsource/ibm-plex-mono/600.css";
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* ============================================================================
-   SWISS TERMINAL — semantic design tokens
-   Flat near-black warm-gray foundation. Borders do the work, not shadows.
-   Only --accent / --accent-contrast change between themes.
+   OBSERVATORY — semantic design tokens
+
+   Lightness ramp in oklch. The ground sits at 14.5% rather than near-black, so
+   it reads as a surface instead of a hole, and surfaces LIFT in two steps.
+   Muted text is deliberately bright (72.5%): dim grey on near-black is the
+   single biggest cause of eye strain in a dark UI.
+   Chroma stays low — a loud accent is what makes a dark theme look cheap.
    ========================================================================== */
 
 :root {
-  /* Foundation (constant across themes) — warm gray, NOT blue-gray */
-  --bg: #0e0e0e;
-  --surface: #161616;
-  --surface-2: #1c1c1c;
-  --text: #c4c4c4; /* lightened from #a8a8a8 for readability on the near-black bg */
-  --heading: #e6e6e6;
-  --muted: #909090; /* AA (≥4.5:1) on bg, surface, AND accent-tinted cards (worst teal tint-2 = 4.60) */
-  --border: 255 255 255; /* used as rgb(var(--border) / a) */
-  --border-color: rgba(255, 255, 255, 0.10);
-  --hairline: rgba(255, 255, 255, 0.10);
+  --bg:        oklch(14.5%  .004 62);
+  --surface:   oklch(19.2%  .005 62);   /* lifted card */
+  --surface-2: oklch(24.8%  .005 62);   /* lifted again */
+  --heading:   oklch(94%    .012 70);
+  --text:      oklch(85%    .012 66);
+  --muted:     oklch(72.5%  .010 68);
+  --border: 255 255 255;                /* used as rgb(var(--border) / a) */
+  --border-color: oklch(100% 0 0 / .11);
+  --hairline:     oklch(100% 0 0 / .11);
+  --rule:         oklch(100% 0 0 / .11);
+  --rule-hi:      oklch(100% 0 0 / .26);
 
-  /* Accent — default Parallel orange. Overridden per [data-theme]. */
-  --accent: #fb631b;
-  --accent-contrast: #0e0e0e;
+  --accent: oklch(72% .085 64);         /* warm bronze, low chroma on purpose */
+  --accent-contrast: oklch(14.5% .004 62);
 
-  /* Ambient aurora trio (3 distinct hues, ported from D). Overridden per [data-theme].
-     Warm-gold sweep — analogous to the orange accent but lighter and more golden,
-     so it harmonizes without smearing the accent hue. Accent stays on the mouse spotlight. */
-  --aurora-1: #ff9d3d; /* amber */
-  --aurora-2: #ffc04d; /* gold */
-  --aurora-3: #ffe0a0; /* peach */
-  /* Aurora rendering (DARK). Light mode overrides these values only — see [data-mode="light"]. */
-  --aurora-blend: screen;
-  --aurora-blur: 100px;
-  --aurora-op-1: 0.5;
-  --aurora-op-2: 0.38;
-  --aurora-op-3: 0.34;
-
-  /* Atelier card (bridge: A hairline + C soft premium) */
-  --card-tint: color-mix(in srgb, var(--accent) 6%, var(--surface));
-  --card-tint-2: color-mix(in srgb, var(--accent) 9%, var(--surface));
-  --card-radius: 10px;
-  /* C's airy shadow geometry (0 8px 30px base / 0 18px 50px hover), dark alpha for the near-black bg */
-  --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.40);
-  --card-shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.50);
-  --card-edge: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  /* Springy easing (from C) */
+  /* Card — double bezel: an outer shell holding an inner core, concentric radii.
+     Shadows are warm-tinted; pure black shadow is a tell. */
+  --card-shell: color-mix(in oklab, var(--surface-2) 55%, transparent);
+  --card-core:  var(--surface);
+  --card-radius: 18px;
+  --card-inset: 6px;
+  --card-core-radius: 12px;             /* card-radius − card-inset */
+  --card-shadow:    0 1px 2px oklch(0% 0 0 / .28), 0 10px 26px oklch(0% 0 0 / .22);
+  --card-shadow-lg: 0 2px 4px oklch(0% 0 0 / .32), 0 18px 44px oklch(0% 0 0 / .30);
+  --card-edge: inset 0 1px 0 oklch(100% 0 0 / .055);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out: cubic-bezier(.32, .72, 0, 1);
 
-  /* Typography */
-  --font-heading: 'Geist Variable', 'Inter', system-ui, sans-serif;
-  --font-sans: 'Geist Variable', 'Inter', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+  /* Typography — three voices, no fourth.
+     Geist owns headings and prose; IBM Plex Mono owns every piece of DATA
+     (dates, coordinates, metrics, labels). Plex was drawn for technical
+     readouts: true tabular figures, slashed zero, unambiguous 1/l/I. */
+  --font-heading: 'Geist Variable', system-ui, sans-serif;
+  --font-sans:    'Geist Variable', system-ui, sans-serif;
+  --font-mono:    'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
   /* shadcn token bridge (kept for ui/* components) */
   --radius: 2px;
@@ -76,73 +76,32 @@
   --ring: var(--accent);
 }
 
-/* ============================================================================
-   THEME ACCENT OVERRIDES — foundation stays constant
-   ========================================================================== */
 
-[data-theme="parallel"] {
-  --accent: #fb631b;
-  --accent-contrast: #0e0e0e;
-  --aurora-1: #ff9d3d; --aurora-2: #ffc04d; --aurora-3: #ffe0a0;
-}
-[data-theme="teal"] {
-  --accent: #64ffda;
-  --accent-contrast: #0e0e0e;
-  --aurora-1: #3dd7c9; --aurora-2: #6b8cff; --aurora-3: #b06bff;
-}
-[data-theme="rausch"] {
-  --accent: #ff385c;
-  --accent-contrast: #0e0e0e;
-  --aurora-1: #ff385c; --aurora-2: #ff7aa8; --aurora-3: #ffba6b;
-}
-[data-theme="violet"] {
-  /* lightened from #5241d4 so AA text-on-bg holds (≥4.5:1) */
-  --accent: #8b7dff;
-  --accent-contrast: #0e0e0e;
-  --aurora-1: #5241d4; --aurora-2: #8a6bff; --aurora-3: #d06bff;
-}
-[data-theme="hyperlink"] {
-  /* lightened from #0000ee — pure blue on near-black fails AA badly */
-  --accent: #6f8cff;
-  --accent-contrast: #0e0e0e;
-  --aurora-1: #2f4dff; --aurora-2: #6f8bff; --aurora-3: #4bd6ff;
-}
-[data-theme="signal"] {
-  /* lightened from #d12222 to clear AA on near-black */
-  --accent: #ff5247;
-  --accent-contrast: #0e0e0e;
-  --aurora-1: #d12222; --aurora-2: #ff6b4a; --aurora-3: #ffb04a;
-}
-
-/* ============================================================================
-   LIGHT MODE — clean light Swiss aesthetic. Dark is the default :root above.
-   Activated via documentElement.dataset.mode = 'light'. Foundation tokens only;
-   the 6 accents are re-tuned per theme below to hold AA (≥4.5:1) on the light bg.
-   Machine view is token-driven (see machine.css) and follows the active mode.
-   ========================================================================== */
+/* LIGHT — an engraved star chart rather than a night sky. Warm paper ground,
+   ink marks. The sky canvas inverts to match: dark stars on cream, the way a
+   printed celestial atlas reads. */
 :root[data-mode="light"] {
-  --bg: #f7f7f5;          /* near-white warm */
-  --surface: #ffffff;
-  --surface-2: #f0f0ee;
-  --text: #3a3a3a;        /* 10.6:1 on bg */
-  --heading: #141414;     /* 17.2:1 on bg */
-  --muted: #6a6a6a;       /* 5.0:1 on bg, 4.7:1 on surface-2 */
-  --border: 0 0 0;        /* black-based borders, used as rgb(var(--border) / a) */
-  --border-color: rgba(0, 0, 0, 0.12);
-  --hairline: rgba(0, 0, 0, 0.12);
+  --bg:        oklch(97.8% .004 56);   /* warm paper */
+  --surface:   oklch(100%  0    0);
+  --surface-2: oklch(94.6% .003 60);
+  --heading:   oklch(28%   .022 60);   /* ink, not black */
+  --text:      oklch(38%   .028 61);
+  --muted:     oklch(50%   .008 55);
+  --border: 0 0 0;                     /* used as rgb(var(--border) / a) */
+  --border-color: oklch(28% .02 60 / .14);
+  --hairline:     oklch(28% .02 60 / .14);
+  --rule:         oklch(28% .02 60 / .14);
+  --rule-hi:      oklch(28% .02 60 / .32);
 
-  --card-tint: color-mix(in srgb, var(--accent) 5%, var(--surface));
-  --card-tint-2: color-mix(in srgb, var(--accent) 8%, var(--surface));
-  --card-shadow: 0 8px 30px rgba(31, 27, 18, 0.07);
-  --card-shadow-lg: 0 18px 50px rgba(31, 27, 18, 0.11);
-  --card-edge: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  --card-shell: color-mix(in oklab, var(--surface-2) 60%, transparent);
+  --card-core:  var(--surface);
+  --card-shadow:    0 1px 2px oklch(30% .03 60 / .07), 0 10px 26px oklch(30% .03 60 / .07);
+  --card-shadow-lg: 0 2px 4px oklch(30% .03 60 / .09), 0 18px 44px oklch(30% .03 60 / .11);
+  --card-edge: inset 0 1px 0 oklch(100% 0 0 / .7);
 
-  /* Aurora rendering (LIGHT): multiply blend reads on a light bg; higher opacity to stay visible */
-  --aurora-blend: multiply;
-  --aurora-blur: 110px;
-  --aurora-op-1: 0.55;
-  --aurora-op-2: 0.45;
-  --aurora-op-3: 0.4;
+  /* Bronze darkened for AA on paper — the dark-mode value fails contrast here. */
+  --accent: oklch(52% .105 58);
+  --accent-contrast: oklch(97.8% .004 56);
 
   /* shadcn token bridge — flip to light so ui/* components adapt */
   --background: 60 14% 96%;
@@ -159,14 +118,6 @@
   --input: 0 0% 0% / 14%;
 }
 
-/* Accent re-tune for light bg — bright dark-bg accents fail AA on #f7f7f5.
-   Each value verified ≥4.5:1 against both --bg (#f7f7f5) and --surface (#fff). */
-:root[data-mode="light"][data-theme="parallel"] { --accent: #b8480f; } /* 4.93 / 5.29 */
-:root[data-mode="light"][data-theme="teal"]     { --accent: #0f766e; } /* 5.10 / 5.47 — was #64ffda (fails) */
-:root[data-mode="light"][data-theme="rausch"]   { --accent: #c81d4a; } /* 5.25 / 5.63 */
-:root[data-mode="light"][data-theme="violet"]   { --accent: #6b21d4; } /* 7.01 / 7.52 — was #8b7dff (fails) */
-:root[data-mode="light"][data-theme="hyperlink"]{ --accent: #2348d8; } /* 6.55 / 7.02 — was #6f8cff (fails) */
-:root[data-mode="light"][data-theme="signal"]   { --accent: #d11f1f; } /* 4.99 / 5.35 */
 /* --accent-contrast stays #0e0e0e (dark) — accent swatches are saturated mid-tones,
    so dark text/selection-fill on an accent fill still reads well in light mode. */
 
