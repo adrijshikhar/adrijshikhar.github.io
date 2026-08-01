@@ -173,6 +173,40 @@ const MOON_MAG = -8;
 // produces an absurd disc — it's fixed at a plausible instrument radius instead.
 const MOON_VR = 13;
 
+/** Ceiling on how opaque any single body (star, planet, or Moon) may draw in
+ *  the full instrument view. `starAlpha`'s own clamp tops out at 1.0 — fully
+ *  opaque — which every body brighter than mag -0.8 hits (the Moon at -8,
+ *  Venus at -4.1, Jupiter at -2.2, but also ordinary catalogue stars like
+ *  Sirius). The Moon's alt/az is real and time-varying, so it lands on
+ *  different page content for different visitors; the field is background
+ *  and must never fully occlude prose. Applied uniformly to every body here
+ *  — not a Moon-only special case — so whichever body happens to be bright
+ *  and well-placed today can't repeat this.
+ *
+ *  Picked by measurement (see task-7-report.md's fix addendum), driving the
+ *  clock across a day and several dates and sampling `getImageData` over
+ *  every `main p`/`main li`/`.atelier-card` on the home page: 0.5 keeps the
+ *  Moon/Venus/Jupiter worst case (disc + earthshine + bloom, the most
+ *  layered case) at alpha ~137–153/255 in the worst positions found, under
+ *  the ≤169 every other sampled element sits under. Left out of `starAlpha`
+ *  itself (used by `drawQuiet` too) — quiet mode has no planets or Moon, and
+ *  its ordinary stars were not part of what was flagged.
+ *
+ *  Note: the same sweep also turned up ordinary catalogue stars (Sirius,
+ *  Alnitak, Sadr…) occasionally reaching 170–196 at multi-segment
+ *  constellation vertices — that's independent of this cap (it reproduces
+ *  even at BODY_ALPHA_CAP = 0, i.e. bodies invisible) and comes from
+ *  multiple SEGMENTS strokes compositing at a shared vertex, a different
+ *  mechanism this task wasn't asked to touch. Moon/Venus/Jupiter can never
+ *  hit it — they aren't named in any FIGURES segment. */
+const BODY_ALPHA_CAP = 0.5;
+
+/** Build once per frame and thread through — every SEGMENTS lookup by name
+ *  otherwise rebuilds the same map. */
+export function bodyIndex(bodies: BodyPos[]): Map<string, BodyPos> {
+  return new Map(bodies.map((b) => [b.name, b]));
+}
+
 /** Recompute stars, faint field, planets and the Moon for `when`. Planets and
  *  the Moon are cheap enough (one Kepler solve or a handful of trig terms
  *  each) to recompute every frame right alongside the stars — no separate
@@ -234,16 +268,16 @@ function distToSeg(px: number, py: number, x1: number, y1: number, x2: number, y
 
 /** Which constellation, if any, is under the cursor — hit-tests only the
  *  portion of each segment that has actually drawn in at `scrollT`. Returns
- *  null before anything meaningful has drawn yet. */
+ *  null before anything meaningful has drawn yet. `byName` is a `bodyIndex()`
+ *  built once per frame by the caller, not rebuilt here. */
 export function figureAt(
-  bodies: BodyPos[],
+  byName: Map<string, BodyPos>,
   scrollT: number,
   mx: number,
   my: number,
   tol = 9,
 ): string | null {
   if (scrollT < 0.04) return null;
-  const byName = new Map(bodies.map((b) => [b.name, b]));
   let best: string | null = null;
   let bd = tol;
   for (const seg of SEGMENTS) {
@@ -325,6 +359,7 @@ export function drawFull(
   W: number,
   H: number,
   bodies: BodyPos[],
+  byName: Map<string, BodyPos>,
   faint: FaintStarPos[],
   moonPhase: MoonPhase,
   scrollT: number,
@@ -335,7 +370,6 @@ export function drawFull(
 ): void {
   ctx.clearRect(0, 0, W, H);
   const { accent, muted } = colors;
-  const byName = new Map(bodies.map((b) => [b.name, b]));
 
   // Constellations join progressively with scroll — every segment starts at
   // the same moment and finishes at the same moment, across the whole page.
@@ -373,7 +407,7 @@ export function drawFull(
     const s = bodies[i];
     if (s.alt < FLOOR) continue;
     const below = s.alt < 0 ? 0.3 : 1;
-    const a = starAlpha(s.mag) * below;
+    const a = Math.min(BODY_ALPHA_CAP, starAlpha(s.mag)) * below;
     const r = s.vr; // single source of truth for the painted radius
 
     if (s.isMoon) {
@@ -418,9 +452,11 @@ export function drawFull(
       }
     }
 
-    // persistent label for planets and the Moon — they earn a name without hover
+    // persistent label for planets and the Moon — they earn a name without hover.
+    // Same cap as the disc: near the zenith this formula alone reaches 0.67,
+    // which is exactly the kind of "bright body over prose" the cap exists for.
     if ((s.isPlanet || s.isMoon) && s.alt > 0 && i !== hoverIndex) {
-      ctx.globalAlpha = 0.42 + 0.25 * (s.alt / 90);
+      ctx.globalAlpha = Math.min(BODY_ALPHA_CAP, 0.42 + 0.25 * (s.alt / 90));
       ctx.fillStyle = '#ffe9c4';
       ctx.font = '500 9px ui-monospace,Menlo,monospace';
       ctx.textAlign = 'center';
