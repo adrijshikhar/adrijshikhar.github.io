@@ -87,6 +87,37 @@ export function computeSky(
 
 const starAlpha = (mag: number): number => Math.max(0.12, Math.min(1, (2.6 - mag) / 3.4));
 
+/** Every colour the renderer paints with, resolved once per frame by the
+ *  caller (SkyField.tsx) from CSS custom properties + the active `data-mode`.
+ *  This module stays DOM-blind — it never reads `document` or `matchMedia`
+ *  itself, it just paints whatever it's handed, so the same draw code
+ *  produces the dark-mode "photographic sky" or the light-mode "engraved
+ *  chart" purely from which strings it's given. */
+export interface SkyColors {
+  accent: string;
+  muted: string;
+  /** Full-brightness star/bloom colour — white in dark mode, full ink in light mode. */
+  bright: string;
+  /** Moon's lit-limb fill + terminator-ring stroke. */
+  moonLit: string;
+  /** Moon's earthshine disc — a low-alpha wash behind the lit limb. */
+  moonGlow: string;
+  /** Planet disc/ring/persistent-label colour. */
+  planet: string;
+  /** Faint background field colour — already faded, since the faint field's
+   *  per-star magnitude alpha still multiplies on top of it. */
+  faint: string;
+}
+
+/** Blend `base` toward transparent at `alpha` (0–1) via CSS `color-mix` —
+ *  works for any valid CSS colour string (hex, oklch, …), so one helper
+ *  builds gradient/wash stops for both the dark and light palettes without
+ *  the caller having to hand-format rgba() vs oklch() alpha strings. */
+export function fade(base: string, alpha: number): string {
+  if (alpha <= 0) return 'transparent';
+  return `color-mix(in srgb, ${base} ${(alpha * 100).toFixed(2)}%, transparent)`;
+}
+
 /** Quiet-mode draw: faint field + named stars only — no graticule, planets,
  *  Moon, labels, hover or interaction. Stars below the horizon (down to FLOOR)
  *  are drawn dimmer rather than hidden, matching the wider-than-horizon disc. */
@@ -96,7 +127,7 @@ export function drawQuiet(
   H: number,
   pts: NamedStarPos[],
   faint: FaintStarPos[],
-  colors: { accent: string; muted: string },
+  colors: SkyColors,
 ): void {
   ctx.clearRect(0, 0, W, H);
 
@@ -104,7 +135,7 @@ export function drawQuiet(
     if (f.alt < FLOOR) continue;
     const below = f.alt < 0 ? 0.22 : 1;
     ctx.globalAlpha = (0.3 - (f.mag - 3.6) * 0.055) * below;
-    ctx.fillStyle = colors.muted;
+    ctx.fillStyle = colors.faint;
     ctx.beginPath();
     ctx.arc(f.x, f.y, f.mag < 4.6 ? 1.15 : 0.8, 0, Math.PI * 2);
     ctx.fill();
@@ -116,7 +147,7 @@ export function drawQuiet(
     const a = starAlpha(s.mag) * below;
 
     ctx.globalAlpha = a * 0.92;
-    ctx.fillStyle = s.mag < 1.0 ? '#fff' : colors.muted;
+    ctx.fillStyle = s.mag < 1.0 ? colors.bright : colors.muted;
     ctx.beginPath();
     ctx.arc(s.x, s.y, s.vr, 0, Math.PI * 2);
     ctx.fill();
@@ -126,9 +157,9 @@ export function drawQuiet(
     if (s.mag < 0.6 && s.alt > 0) {
       const R = s.vr * 4.2;
       const g = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, R);
-      g.addColorStop(0, `rgba(255,255,255,${(a * 0.3).toFixed(3)})`);
-      g.addColorStop(0.35, `rgba(255,255,255,${(a * 0.1).toFixed(3)})`);
-      g.addColorStop(1, 'rgba(255,255,255,0)');
+      g.addColorStop(0, fade(colors.bright, a * 0.3));
+      g.addColorStop(0.35, fade(colors.bright, a * 0.1));
+      g.addColorStop(1, 'transparent');
       ctx.globalAlpha = 1;
       ctx.fillStyle = g;
       ctx.beginPath();
@@ -366,10 +397,10 @@ export function drawFull(
   hoverIndex: number,
   hoverFig: string | null,
   mouse: { x: number; y: number },
-  colors: { accent: string; muted: string },
+  colors: SkyColors,
 ): void {
   ctx.clearRect(0, 0, W, H);
-  const { accent, muted } = colors;
+  const { accent, muted, bright, moonLit, moonGlow, planet } = colors;
 
   // Constellations join progressively with scroll — every segment starts at
   // the same moment and finishes at the same moment, across the whole page.
@@ -396,7 +427,7 @@ export function drawFull(
     if (f.alt < FLOOR) continue;
     const below = f.alt < 0 ? 0.22 : 1;
     ctx.globalAlpha = (0.3 - (f.mag - 3.6) * 0.055) * below;
-    ctx.fillStyle = muted;
+    ctx.fillStyle = colors.faint;
     ctx.beginPath();
     ctx.arc(f.x, f.y, f.mag < 4.6 ? 1.15 : 0.8, 0, Math.PI * 2);
     ctx.fill();
@@ -416,12 +447,12 @@ export function drawFull(
       // which side waxing/waning tells us.
       const k = moonPhase.illum;
       ctx.globalAlpha = a;
-      ctx.fillStyle = 'rgba(255,246,232,0.10)'; // faint earthshine disc behind the lit portion
+      ctx.fillStyle = moonGlow; // faint earthshine disc behind the lit portion
       ctx.beginPath();
       ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
       ctx.fill();
       const side = moonPhase.waxing ? 1 : -1; // lit limb on the right if waxing
-      ctx.fillStyle = i === hoverIndex ? accent : '#fff8ec';
+      ctx.fillStyle = i === hoverIndex ? accent : moonLit;
       ctx.beginPath();
       ctx.arc(s.x, s.y, r, -Math.PI / 2, Math.PI / 2, side < 0); // the lit half
       ctx.ellipse(
@@ -430,7 +461,7 @@ export function drawFull(
       );
       ctx.fill();
       ctx.globalAlpha = a * 0.22;
-      ctx.strokeStyle = '#fff8ec';
+      ctx.strokeStyle = moonLit;
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
@@ -438,13 +469,13 @@ export function drawFull(
     } else {
       ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.92);
       // planets read as small discs with a faint ring — steady, not point-like
-      ctx.fillStyle = i === hoverIndex ? accent : s.isPlanet ? '#ffe9c4' : s.mag < 1.0 ? '#fff' : muted;
+      ctx.fillStyle = i === hoverIndex ? accent : s.isPlanet ? planet : s.mag < 1.0 ? bright : muted;
       ctx.beginPath();
       ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
       ctx.fill();
       if (s.isPlanet) {
         ctx.globalAlpha = a * 0.3;
-        ctx.strokeStyle = '#ffe9c4';
+        ctx.strokeStyle = planet;
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.arc(s.x, s.y, r + 3.5, 0, Math.PI * 2);
@@ -457,7 +488,7 @@ export function drawFull(
     // which is exactly the kind of "bright body over prose" the cap exists for.
     if ((s.isPlanet || s.isMoon) && s.alt > 0 && i !== hoverIndex) {
       ctx.globalAlpha = Math.min(BODY_ALPHA_CAP, 0.42 + 0.25 * (s.alt / 90));
-      ctx.fillStyle = '#ffe9c4';
+      ctx.fillStyle = planet;
       ctx.font = '500 9px ui-monospace,Menlo,monospace';
       ctx.textAlign = 'center';
       ctx.fillText(s.name.toUpperCase(), s.x, s.y + r + 11);
@@ -469,9 +500,9 @@ export function drawFull(
     if (s.mag < 0.6 && s.alt > 0) {
       const R = r * 4.2;
       const g = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, R);
-      g.addColorStop(0, `rgba(255,255,255,${(a * 0.3).toFixed(3)})`);
-      g.addColorStop(0.35, `rgba(255,255,255,${(a * 0.1).toFixed(3)})`);
-      g.addColorStop(1, 'rgba(255,255,255,0)');
+      g.addColorStop(0, fade(bright, a * 0.3));
+      g.addColorStop(0.35, fade(bright, a * 0.1));
+      g.addColorStop(1, 'transparent');
       ctx.globalAlpha = 1;
       ctx.fillStyle = g;
       ctx.beginPath();

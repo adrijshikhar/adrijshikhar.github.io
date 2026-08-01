@@ -7,7 +7,9 @@ import {
   nearestBody,
   figureAt,
   bodyIndex,
+  fade,
   type Observer,
+  type SkyColors,
 } from '../lib/sky/render';
 import { animate, onScroll } from '../lib/motion';
 
@@ -58,9 +60,24 @@ export default function SkyField({ mode }: SkyFieldProps) {
 
     const renderFrame = () => {
       const cs = getComputedStyle(document.documentElement);
-      const colors = {
+      // Read mode fresh every frame (and on the MutationObserver's forced
+      // repaint below) rather than caching it — this is the one thing that
+      // must be re-derived on every draw, not memoised across the effect's
+      // lifetime, so toggling never leaves the canvas painting a stale mode.
+      const light = document.documentElement.dataset.mode === 'light';
+      const ink = cs.getPropertyValue('--sky-ink').trim(); // only defined under [data-mode="light"]
+      const colors: SkyColors = {
         accent: cs.getPropertyValue('--accent').trim(),
         muted: cs.getPropertyValue('--muted').trim(),
+        bright: light ? ink : '#fff',
+        moonLit: light ? ink : '#fff8ec',
+        moonGlow: light ? fade(ink, 0.1) : 'rgba(255,246,232,0.10)',
+        planet: light ? ink : '#ffe9c4',
+        // Faint field is dimmer still in light mode: dark marks compete with
+        // dark text far more than light marks compete with a dark page, so
+        // the base colour itself carries a low alpha on top of the per-star
+        // magnitude alpha already applied where this is used.
+        faint: light ? fade(ink, 0.3) : cs.getPropertyValue('--muted').trim(),
       };
       if (mode === 'full') {
         const { bodies, faint, moonPhase } = computeFullSky(obs, new Date(), W, H);
@@ -93,6 +110,14 @@ export default function SkyField({ mode }: SkyFieldProps) {
       renderFrame();
     };
     window.addEventListener('resize', onResize);
+
+    // ModeToggle flips data-mode live (no reload). renderFrame already
+    // re-reads dataset.mode + getComputedStyle on every call, so the rAF loop
+    // picks the swap up on its own next frame — but under reduced motion
+    // there's no loop, so the toggle would otherwise sit stale until some
+    // other listener (resize, pointermove) happened to fire one.
+    const modeObserver = new MutationObserver(() => renderFrame());
+    modeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-mode'] });
 
     // Hover tracking — full mode only. Look-only: hover names a body or a
     // drawn constellation segment, nothing is draggable.
@@ -138,6 +163,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
     return () => {
       if (rafId) cancelAnimationFrame(rafId);
       window.removeEventListener('resize', onResize);
+      modeObserver.disconnect();
       if (mode === 'full') window.removeEventListener('pointermove', onPointerMove);
       scrollAnim?.revert(); // tears down the linked anime.js ScrollObserver too
       window.clearTimeout(timeoutId);
