@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { createTimeline, utils, D } from '../lib/motion';
+import { createTimeline, utils } from '../lib/motion';
 import { Toggle } from './ui/toggle';
 
 const startsInMachine = () =>
@@ -118,7 +118,6 @@ export default function ViewToggle() {
     // ONE clock: outgoing 1→0 and incoming 0→1, identical duration/ease — perfectly in sync.
     const DURATION = 400;
     const tl = createTimeline({
-      defaults: { duration: D.fast, ease: 'out(3)' },
       onComplete: () => {
         // Finalize cleanly: inactive view out of flow + hidden; active view sits normally in flow.
         outgoing.classList.remove('view-overlay');
