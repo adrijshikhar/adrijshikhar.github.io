@@ -6,6 +6,7 @@ import {
   drawFull,
   nearestBody,
   figureAt,
+  bodyIndex,
   type Observer,
 } from '../lib/sky/render';
 import { animate, onScroll } from '../lib/motion';
@@ -63,10 +64,11 @@ export default function SkyField({ mode }: SkyFieldProps) {
       };
       if (mode === 'full') {
         const { bodies, faint, moonPhase } = computeFullSky(obs, new Date(), W, H);
+        const byName = bodyIndex(bodies); // built once, shared by figureAt and drawFull
         hoverIndex = nearestBody(bodies, mouse.x, mouse.y);
         // star hover wins over a constellation hover when both are under the cursor
-        hoverFig = hoverIndex >= 0 ? null : figureAt(bodies, scrollP.t, mouse.x, mouse.y);
-        drawFull(ctx, W, H, bodies, faint, moonPhase, scrollP.t, hoverIndex, hoverFig, mouse, colors);
+        hoverFig = hoverIndex >= 0 ? null : figureAt(byName, scrollP.t, mouse.x, mouse.y);
+        drawFull(ctx, W, H, bodies, byName, faint, moonPhase, scrollP.t, hoverIndex, hoverFig, mouse, colors);
       } else {
         const { pts, faint } = computeSky(obs, new Date(), W, H);
         drawQuiet(ctx, W, H, pts, faint, colors);
