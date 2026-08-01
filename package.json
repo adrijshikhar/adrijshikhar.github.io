@@ -7,6 +7,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "verify:sky": "bun scripts/verify-sky.mjs",
     "deploy": "gh-pages -d dist -b master"
   },
   "devDependencies": {
