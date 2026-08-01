@@ -134,7 +134,7 @@ const rawMarkdown = await buildRawMarkdown();
           <p class="mb-5 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted hidden lg:flex"><span class="h-2 w-2 rounded-full bg-accent"></span> education</p>
           <ul class="grid gap-4 sm:grid-cols-2">
             {education.meta.entries.map((edu: any, i: number) => (
-              <li class={`atelier-card group/list-item px-5 py-6 lg:px-6 lg:py-7 ${i % 2 === 1 ? 'is-alt' : ''}`}>
+              <li class={`atelier-card group/list-item px-5 py-6 lg:px-6 lg:py-7`}>
                 <span class="font-mono text-[11px] uppercase tracking-[0.12em] text-muted">{edu.startDate} — {edu.endDate}</span>
                 <h3 class="mt-2 font-heading text-base font-medium leading-snug tracking-tighter text-heading">{edu.institution}</h3>
                 <div class="mt-1 text-sm text-text">
