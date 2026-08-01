@@ -25,7 +25,7 @@ export default function ProjectCard({ title, company, date, link, builtWith = []
   );
 
   return (
-    <HoverCard index={index}>
+    <HoverCard>
       <div className="flex items-baseline justify-between gap-4">
         <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted">{date}</span>
         {company && <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted">{company}</span>}

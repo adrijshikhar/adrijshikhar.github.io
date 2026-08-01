@@ -20,7 +20,7 @@ const prose =
 
 export default function ExpCard({ position, company, companyLink, location, startDate, endDate, tagline, contentHtml, index = 0 }: ExpCardProps) {
   return (
-    <HoverCard index={index}>
+    <HoverCard>
       <div className="flex items-baseline justify-between gap-4">
         <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted">
           {startDate} <span className="opacity-50">—</span> {endDate}

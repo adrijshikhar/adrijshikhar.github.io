@@ -244,7 +244,7 @@
     align-items: center;
     gap: 0.5rem;
     border-radius: 9999px;
-    background: var(--card-tint-2);
+    background: var(--surface-2);
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
     font-weight: 600;
@@ -254,29 +254,47 @@
   .atelier-btn:hover { transform: translateY(-2px); background: color-mix(in srgb, var(--accent) 14%, var(--surface)); }
   @media (prefers-reduced-motion: reduce) { .atelier-btn:hover { transform: none; } }
 
+  /* Double bezel — an outer shell holding an inner core at concentric radii
+     (18px outer, 12px inner at a 6px inset), like a glass plate seated in a
+     machined tray. Replaces four simultaneous depth signals (accent tint, 30px
+     shadow, inset edge, hairline border) with one nested structure.
+     The core is a pseudo-element, so no consumer markup changes. */
   .atelier-card {
-    border: 1px solid rgb(var(--border) / 0.12);
+    position: relative;
+    isolation: isolate;
     border-radius: var(--card-radius);
-    background: var(--card-tint);
-    box-shadow: var(--card-shadow), var(--card-edge);
-    transition: transform 0.45s var(--ease-spring), background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    background: var(--card-shell);
+    box-shadow: 0 0 0 1px var(--rule);
+    transition: transform 0.5s var(--ease-out),
+                background-color 0.35s var(--ease-out),
+                box-shadow 0.35s var(--ease-out);
   }
-  .atelier-card.is-alt { background: var(--card-tint-2); }
+  .atelier-card::before {
+    content: "";
+    position: absolute;
+    inset: var(--card-inset);
+    z-index: -1;
+    border-radius: var(--card-core-radius);
+    background: var(--card-core);
+    box-shadow: var(--card-edge), var(--card-shadow);
+    transition: background-color 0.35s var(--ease-out), box-shadow 0.35s var(--ease-out);
+  }
   @media (min-width: 1024px) {
     .group\/list-item:hover .atelier-card,
     .atelier-card:hover {
-      transform: translateY(-4px);
-      border-color: rgb(var(--border) / 0.22);
-      box-shadow: var(--card-shadow-lg), var(--card-edge);
+      transform: translateY(-2px);
+      background: color-mix(in oklab, var(--surface-2) 92%, transparent);
+      box-shadow: 0 0 0 1px var(--rule-hi);
+    }
+    .group\/list-item:hover .atelier-card::before,
+    .atelier-card:hover::before {
+      background: var(--surface-2);
+      box-shadow: inset 0 1px 0 oklch(100% 0 0 / .085), var(--card-shadow-lg);
     }
   }
   @media (prefers-reduced-motion: reduce) {
     .atelier-card { transition: background-color 0.3s ease; }
     .atelier-card:hover { transform: none; }
-  }
-
-
-  @media (prefers-reduced-motion: reduce) {
   }
 
 
