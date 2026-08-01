@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { gsap } from '../lib/gsap';
+import { createTimeline, utils, D } from '../lib/motion';
 import { Toggle } from './ui/toggle';
 
 const startsInMachine = () =>
@@ -106,7 +106,7 @@ export default function ViewToggle() {
 
     // Machine view follows the active mode (token-driven), so the canvas colour is IDENTICAL across
     // the toggle — no recolor, no shimmer.
-    // Pure GSAP opacity crossfade does the rest (same in light and dark).
+    // Pure opacity crossfade does the rest (same in light and dark).
     if (next === 'machine') {
       root.classList.add('machine-mode');
       document.body.classList.add('machine-mode');
@@ -116,38 +116,35 @@ export default function ViewToggle() {
     }
 
     // ONE clock: outgoing 1→0 and incoming 0→1, identical duration/ease — perfectly in sync.
-    const DURATION = 0.4;
-    const tl = gsap.timeline({
+    const DURATION = 400;
+    const tl = createTimeline({
+      defaults: { duration: D.fast, ease: 'out(3)' },
       onComplete: () => {
         // Finalize cleanly: inactive view out of flow + hidden; active view sits normally in flow.
         outgoing.classList.remove('view-overlay');
         outgoing.style.display = 'none';
         outgoing.style.pointerEvents = 'none';
-        gsap.set(outgoing, { clearProps: 'transform' });
+        outgoing.style.transform = '';
 
         incoming.style.display = '';
         incoming.style.pointerEvents = 'auto';
         // Keep opacity:1 inline so the active view stays visible (the .machine-view stylesheet
         // default is opacity:0 — clearing it would re-hide the terminal). Only clear transform.
-        gsap.set(incoming, { opacity: 1, clearProps: 'transform' });
+        utils.set(incoming, { opacity: 1 });
+        incoming.style.transform = '';
 
         setTransitioning(false);
       },
     });
 
-    tl.to(outgoing, { opacity: 0, duration: DURATION, ease: 'power1.inOut' }, 0);
-    tl.fromTo(
-      incoming,
-      { opacity: 0 },
-      { opacity: 1, duration: DURATION, ease: 'power1.inOut' },
-      0,
-    );
+    tl.add(outgoing, { opacity: 0, duration: DURATION, ease: 'inOutQuad' }, 0);
+    tl.add(incoming, { opacity: [0, 1], duration: DURATION, ease: 'inOutQuad' }, 0);
   };
 
   // After hydration: when starting in machine view (?machine=true), lock in the
-  // machine end-state via gsap.set (no animation) so it matches the pre-hydration
+  // machine end-state via utils.set (no animation) so it matches the pre-hydration
   // paint (handled by machine.css initial states + the no-FOUC head script) and
-  // no human-content flash appears as GSAP takes over.
+  // no human-content flash appears as motion takes over.
   useEffect(() => {
     if (!startsInMachine()) return;
 
@@ -170,7 +167,7 @@ export default function ViewToggle() {
     // Human view: out of flow, hidden.
     humanView.style.display = 'none';
     humanView.style.pointerEvents = 'none';
-    gsap.set(humanView, { opacity: 0 });
+    utils.set(humanView, { opacity: 0 });
 
     // Canvas end-state: machine-mode on html + body so the whole backdrop is dark.
     document.documentElement.classList.add('machine-mode');
@@ -184,7 +181,7 @@ export default function ViewToggle() {
     machineView.style.pointerEvents = 'auto';
     machineView.style.height = 'auto'; /* override .machine-view{height:0} so the terminal is visible on direct ?machine=true load */
     machineView.style.overflow = 'visible';
-    gsap.set(machineView, { opacity: 1 });
+    utils.set(machineView, { opacity: 1 });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
