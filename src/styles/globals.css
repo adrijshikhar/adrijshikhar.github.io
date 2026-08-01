@@ -192,6 +192,16 @@
     /* Only the canvas (body bg) transitions; text COLOUR changes instantly to avoid mass
        color-transition flicker when the mode token set swaps. */
     transition: background-color 0.28s ease;
+    /* Pre-existing latent bug, surfaced by adding #sky: body's own background is an
+       ordinary in-flow box, which CSS paints ABOVE any negative-z-index fixed
+       children (body::before's aurora, #sky) per the stacking spec — in-flow
+       non-positioned descendants (step 3) paint over negative-stack-level children
+       (step 2), regardless of DOM/z-index order. `isolation` gives body its OWN
+       stacking context, so body's background becomes that context's step-1 floor
+       and z:-2/-1 children finally paint above it, as their z-index values always
+       implied they should. Fixed positioning is unaffected (isolation alone does not
+       change the containing block for position:fixed). */
+    isolation: isolate;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -410,6 +420,17 @@
   border: 1px solid rgb(var(--border) / 0.14);
   background: color-mix(in srgb, var(--accent) 8%, var(--surface));
   color: var(--heading);
+}
+
+/* Ambient sky field (SkyField.tsx) — hidden in machine view, crossfades with
+   the rest of the canvas so the human<->machine toggle stays a pure opacity
+   swap (ViewToggle adds/removes .machine-mode on <body> in lockstep with
+   <html>). Light-mode inversion is a later task. */
+body.machine-mode #sky {
+  opacity: 0;
+}
+#sky {
+  transition: opacity 0.5s var(--ease-out);
 }
 
 /* Reduced-motion: kill section-reveal transforms set inline by scripts */
