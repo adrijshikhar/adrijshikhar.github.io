@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { altAz, planetRaDec, moonRaDec } from '../src/lib/sky/astronomy.ts';
+import { altAz, planetRaDec, moonRaDec, gmstDeg } from '../src/lib/sky/astronomy.ts';
 
 const now = new Date();
 let passed = 0;
@@ -19,12 +19,55 @@ check('Polaris is below the horizon from the southern hemisphere', () => {
   assert.ok(alt < 0, `expected below horizon, got ${alt}`);
 });
 
-check('planets stay inside their true orbital ranges', () => {
-  const range = { Mercury:[0.30,0.48], Venus:[0.71,0.74], Mars:[1.36,1.68],
-                  Jupiter:[4.94,5.47], Saturn:[8.99,10.13] };
+// `planetRaDec().au` is GEOCENTRIC (Earth-to-planet, see astronomy.ts's own
+// comment: "live geocentric range"). The brief's original per-planet numbers
+// (Mercury 0.30-0.48 etc.) are each planet's HELIOCENTRIC perihelion/aphelion —
+// distance from the SUN, not Earth — so asserting au against them fails for a
+// correct port (e.g. Mercury's real geocentric distance ranges ~0.51-1.48 AU,
+// well outside its 0.30-0.48 solar range). Bounds below are each planet's real,
+// well-known geocentric distance envelope (NASA planetary fact sheets), with
+// margin. They still catch an elements swap: Mars's range [0.36,2.7] and
+// Jupiter's [3.9,6.5] don't overlap, so putting Mars's elements under the
+// Jupiter key fails the Jupiter assertion.
+check('planets stay inside their true geocentric distance ranges', () => {
+  const range = { Mercury:[0.5,1.5], Venus:[0.25,1.75], Mars:[0.36,2.7],
+                  Jupiter:[3.9,6.5], Saturn:[7.9,11.2] };
   for (const [name, [lo, hi]] of Object.entries(range)) {
     const { au } = planetRaDec(name, now);
-    assert.ok(au > 0.1 && au < 12, `${name} geocentric ${au} implausible`);
+    assert.ok(au > lo && au < hi, `${name} geocentric ${au} outside [${lo}, ${hi}]`);
+  }
+});
+
+// Azimuth is the brief's risk #1: South-then-rotate is easy to get backwards
+// and every other check here only reads `alt`. Pin it from first principles by
+// forcing the hour angle (H) to specific values and checking where az must land.
+// H is solved from H = lst - raH*15, so raH = (lst - H)/15 puts the body exactly there.
+check('azimuth pins the South-then-rotate convention', () => {
+  const lonDeg = 0;
+  const lst = (gmstDeg(now) + lonDeg + 360) % 360;
+  const raHForHA = (haDeg) => (((lst - haDeg) % 360 + 360) % 360) / 15;
+
+  // H=0 (upper culmination) with dec(0) below the observer's zenith (lat 45):
+  // the body crosses the meridian SOUTH of straight up -> az must be 180.
+  {
+    const { az } = altAz(raHForHA(0), 0, 45, lonDeg, now);
+    assert.ok(Math.abs(az - 180) < 0.05, `south transit gave az ${az}, expected 180`);
+  }
+  // H=0 with dec(89.264) above the observer's zenith (lat 12.97, i.e. Polaris-like):
+  // crosses the meridian NORTH of straight up -> az must be 0 (== 360).
+  {
+    const { az } = altAz(raHForHA(0), 89.264, 12.97, lonDeg, now);
+    assert.ok(az < 0.05 || az > 359.95, `north transit gave az ${az}, expected 0`);
+  }
+  // H=-90 (east of the meridian, i.e. rising) at the equator with dec=0: due east, az=90.
+  {
+    const { az } = altAz(raHForHA(-90), 0, 0, lonDeg, now);
+    assert.ok(Math.abs(az - 90) < 0.05, `rising body gave az ${az}, expected east (90)`);
+  }
+  // H=+90 (west of the meridian, i.e. setting) at the equator with dec=0: due west, az=270.
+  {
+    const { az } = altAz(raHForHA(90), 0, 0, lonDeg, now);
+    assert.ok(Math.abs(az - 270) < 0.05, `setting body gave az ${az}, expected west (270)`);
   }
 });
 
@@ -40,6 +83,19 @@ check('Moon illumination sweeps a full synodic cycle', () => {
     lo = Math.min(lo, illum); hi = Math.max(hi, illum);
   }
   assert.ok(lo < 0.05 && hi > 0.95, `cycle ${lo}..${hi} is not a full sweep`);
+});
+
+// km is the brief's risk #2. Check it stays inside the real perigee/apogee
+// envelope AND that it actually moves over a month — a constant would pass a
+// bare range check, so also require a real spread across the anomalistic cycle.
+check('Moon distance stays within the perigee/apogee envelope and actually varies', () => {
+  let lo = Infinity, hi = -Infinity;
+  for (let i = 0; i < 30; i++) {
+    const { km } = moonRaDec(new Date(now.getTime() + i * 86400000));
+    assert.ok(km > 356500 && km < 406700, `km ${km} outside perigee/apogee envelope`);
+    lo = Math.min(lo, km); hi = Math.max(hi, km);
+  }
+  assert.ok(hi - lo > 20000, `range ${lo}..${hi} barely varies — km may be constant`);
 });
 
 console.log(`\n${passed} checks passed`);
