@@ -150,10 +150,41 @@
     }
   }
 
+  /* Warm ambient wash behind the top of the page — bounded to 85vh and fading
+     out, so it lifts the ground without needing a readability veil painted back
+     over it. The old aurora was three animated blobs PLUS a radial scrim that
+     restored --bg over their centre: two systems cancelling each other out. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0 0 auto 0;
+    height: 85vh;
+    z-index: -2;
+    pointer-events: none;
+    background:
+      radial-gradient(90% 62% at 22% 0%, oklch(72% .085 64 / .13), transparent 62%),
+      radial-gradient(70% 50% at 88% 6%, oklch(72% .050 40 / .07), transparent 66%);
+  }
+  :root[data-mode="light"] body::before {
+    background:
+      radial-gradient(90% 62% at 22% 0%, oklch(62% .09 60 / .09), transparent 62%),
+      radial-gradient(70% 50% at 88% 6%, oklch(62% .06 35 / .05), transparent 66%);
+  }
+
+  /* Film grain — fixed and pointer-events:none, never on a scrolling container.
+     ~400 bytes inline, no request. Breaks the flatness of a large dark field. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    pointer-events: none;
+    opacity: .028;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
   body {
-    /* transparent so the fixed .aurora-stage (z-index:-1, carries --bg + glow) shows through;
-       html paints --bg as the base + machine-mode fallback. */
-    background-color: transparent;
+    background-color: var(--bg);
     color: var(--text);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
@@ -244,91 +275,14 @@
     .atelier-card:hover { transform: none; }
   }
 
-  /* ==========================================================================
-     AMBIENT AURORA — ported from the Glass/Aurora design, tuned WAY down.
-     Three large blurred circular blobs drift slowly behind everything.
-     Tinted from THIS design's single --accent token (so default = orange
-     glow, recolors live with the theme switcher). Faint enough to keep the
-     flat near-black foundation reading + WCAG AA text contrast intact.
-     Static under reduced-motion; fully hidden in machine mode.
-     ========================================================================== */
-  .aurora-stage {
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    overflow: hidden;
-    background: var(--bg);
-    transition: opacity 0.28s ease, background-color 0.45s ease;
-    pointer-events: none;
-  }
-  /* Readability veil: fade the glow back to the dark --bg over the central
-     content zone (keeps the aurora at the edges, content stays legible — D's approach). */
-  .aurora-stage::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(125% 92% at 50% 16%, transparent 0%, transparent 34%, var(--bg) 92%);
-    pointer-events: none;
-  }
-
-  .aurora-blob {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(var(--aurora-blur));
-    mix-blend-mode: var(--aurora-blend);
-    will-change: transform;
-  }
-  /* primary accent glow — top-left */
-  .aurora-blob--1 {
-    width: 68vw; height: 68vw;
-    top: -26vw; left: -30vw;
-    opacity: var(--aurora-op-1);
-    background: radial-gradient(circle at 38% 38%, var(--aurora-1), transparent 80%);
-    animation: aurora-drift1 30s ease-in-out infinite alternate;
-  }
-  /* cooler accent-toward-white tail — top-right */
-  .aurora-blob--2 {
-    width: 62vw; height: 62vw;
-    top: 16vw; right: -20vw;
-    opacity: var(--aurora-op-2);
-    background: radial-gradient(circle at 58% 42%, var(--aurora-2), transparent 82%);
-    animation: aurora-drift2 36s ease-in-out infinite alternate;
-  }
-  /* dim accent-toward-bg anchor — bottom */
-  .aurora-blob--3 {
-    width: 46vw; height: 46vw;
-    bottom: -22vw; left: 22vw;
-    opacity: var(--aurora-op-3);
-    background: radial-gradient(circle at 50% 50%, var(--aurora-3), transparent 70%);
-    animation: aurora-drift3 42s ease-in-out infinite alternate;
-  }
-
-  @keyframes aurora-drift1 {
-    0%   { transform: translate3d(0, 0, 0) scale(1); }
-    100% { transform: translate3d(7vw, 5vw, 0) scale(1.1); }
-  }
-  @keyframes aurora-drift2 {
-    0%   { transform: translate3d(0, 0, 0) scale(1.04); }
-    100% { transform: translate3d(-6vw, 4vw, 0) scale(0.96); }
-  }
-  @keyframes aurora-drift3 {
-    0%   { transform: translate3d(0, 0, 0) scale(0.96); }
-    100% { transform: translate3d(5vw, -5vw, 0) scale(1.08); }
-  }
 
   @media (prefers-reduced-motion: reduce) {
-    .aurora-blob { animation: none !important; }
   }
 
-  /* Light-mode aurora differences (blend/blur/opacity) are driven entirely by the
-     --aurora-* variables set in :root vs :root[data-mode="light"] — no per-mode
-     element selectors needed here. */
 
   /* Machine view FOLLOWS the active light/dark mode: it's token-driven (see machine.css), so its
      canvas equals the human canvas in that mode. The human↔machine toggle therefore never changes
-     background colour — it's a pure opacity crossfade (always smooth, in both modes). We only hide
-     the aurora for a clean terminal. */
-  body.machine-mode .aurora-stage { opacity: 0; }
+     background colour — it's a pure opacity crossfade (always smooth, in both modes). */
 
   /* Shared overlay helper: the OUTGOING view lifts out of flow during the crossfade so the
      INCOMING view occupies the space immediately at its natural height — zero reflow. */
@@ -338,34 +292,7 @@
     pointer-events: none;
   }
 
-  /* Hero name gradient text (ported from D) — heading → accent → aurora hue. */
-  .aurora-text {
-    background: linear-gradient(110deg, var(--heading) 8%, var(--accent) 52%, var(--aurora-2) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-    /* No transition: interpolating between two multi-stop gradients overshoots and FLASHES
-       the name bright mid mode-swap. Snap the gradient instead. */
-  }
-  /* Light mode: the bright --aurora-2 tail (tuned for dark bg) is too light on a
-     light bg. End on the AA-safe --accent instead so the whole name stays legible. */
-  :root[data-mode="light"] .aurora-text {
-    background: linear-gradient(110deg, var(--heading) 8%, var(--accent) 70%, var(--accent) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-  }
 
-  /* Mono eyebrow / section label with terminal motif */
-  .eyebrow {
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    font-weight: 500;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-  .eyebrow .tick { color: var(--accent); }
 
   /* Mono section index e.g. 01 / about */
   .sec-index {
@@ -376,16 +303,6 @@
     color: var(--accent);
   }
 
-  /* Flat bordered block — replaces soft glow cards */
-  .flat-block {
-    border: 1px solid var(--border-color);
-    background: transparent;
-    transition: border-color 120ms ease-out, background-color 120ms ease-out;
-  }
-  .flat-block:hover {
-    border-color: rgb(var(--border) / 0.22);
-    background: var(--surface);
-  }
 }
 
 /* Light mode: the `prose prose-invert` content uses prose-* utility overrides
