@@ -12,8 +12,8 @@ every event decoded perfectly while doing it.
 
 The decoder was fine. The file was lying.
 
-Here is the claim, and it contradicts what most people — me included, until I went
-looking — believe about binlogs:
+What follows contradicts what I believed about binlogs until that afternoon, and what
+most people I've asked since believe too:
 
 **A MySQL binlog file can be larger than 4 GiB. When it is, `end_log_pos` wraps — and
 every event past the 4 GiB mark reports a position that is simply wrong.**
@@ -32,8 +32,8 @@ mysql> SELECT @@max_binlog_size;
 +-------------------+
 ```
 
-So the server rotates to a new binlog every gigabyte, and a 4 GiB file never happens.
-That's the reasoning, and it's wrong — because of one rule that overrides the size cap.
+So the server rotates every gigabyte and a 4 GiB file never happens. That's the reasoning.
+One rule breaks it.
 
 ## The loophole
 
@@ -98,7 +98,40 @@ reset to roughly 26,176, then climb again — ending the file at 1,409,320,930, 
 This isn't a `mysqlbinlog` quirk or a decoder bug. It's the on-disk format. Every reader
 sees the same wrapped value, because that's the number in the file.
 
-## The part that makes it dangerous
+## I was not the first to find this
+
+I spent that afternoon thinking I'd found something. I'd found something MySQL has known
+about since 2010.
+
+[Bug #55231 — "COM_BINLOG_DUMP needs to accept 64-bit positions else slaves can
+break"](https://bugs.mysql.com/bug.php?id=55231) was filed on **13 July 2010**, severity
+**S2 (Serious)**. Status today: *In progress*. There is a comment in MySQL's own source
+that has outlived most of my career:
+
+```c
+/* TODO: The following has to be changed to an 8 byte integer */
+```
+
+Since then:
+
+- [**#95074**](https://bugs.mysql.com/bug.php?id=95074) (2019, 5.7.18) — "binlog:
+  end_log_pos is less than pos". Reporter works out that "the end_log_pos is save in a
+  uint32 type, and the value is overflow". Closed as a **duplicate** of #55231. Their last
+  comment on the thread asks which version fixes it. Nobody answered.
+- [**#112189**](https://bugs.mysql.com/bug.php?id=112189) — "Binlog::EventHeader position
+  overflow", **Verified** against 8.0, with the same diagnosis I'd reached the long way
+  round: "binlogs can have more than 4GB in case of a big transaction since they are not
+  rotated in the middle of a transaction, which causes the position to overflow." Proposed
+  fix: "binlog should report 8 bytes position instead of 4."
+
+Widening the field to 8 bytes changes the on-disk format and the replication protocol, so
+I understand why sixteen years have passed. But the practical consequence is that the
+field lies, the fix isn't coming soon, and every tool that reads a binlog has to cope on
+its own.
+
+Most don't.
+
+## Why this is worse than an error
 
 Here's the part that took me longest to accept: **decoding is completely clean.**
 
@@ -122,9 +155,19 @@ on:
   `end_pos − start_pos` reported ~1.4 GB for a transaction that actually wrote 5.7 GB —
   off by exactly 2³².
 
-That last one is worth dwelling on, because it's the trap inside the trap. I had a
-"huge transaction" detector. On the largest transaction I have ever seen, it under-reported
-by 4 GiB and stayed quiet.
+That last one is the trap inside the trap. I had a "huge transaction" detector. On the
+largest transaction I have ever seen, it under-reported by 4 GiB and stayed quiet.
+
+And this is not a problem confined to hobby projects. gh-ost — GitHub's online schema
+migration tool, used on production databases everywhere — skips any event whose
+`end_log_pos` is less than or equal to the last one it processed, as a
+duplicate guard. Perfectly reasonable, until positions stop increasing.
+[Issue #1366](https://github.com/github/gh-ost/issues/1366) records what happens next: the
+positions go `4294954865`, `4294962881`, then `3601`, `11617` — and from the wrap onward
+**every event is silently discarded.** The title of the issue is "When the binlog file is
+larger than 4G, data loss occurs".
+
+No error. No warning. A migration that reports success and quietly loses writes.
 
 ## The fix
 
@@ -189,9 +232,13 @@ If you want to see it: the repro above takes 15 seconds, and
 [binsight](https://github.com/adrijshikhar/binsight) will show you the wrap.
 
 ```sh
-brew install adrijshikhar/tap/binsight
-binsight serve /path/to/binlogs
+curl -fsSL https://raw.githubusercontent.com/adrijshikhar/binsight/main/install.sh | sh
+binsight serve /path/to/binlog-files
 ```
+
+macOS and Linux, amd64 and arm64. Also on Homebrew
+(`brew install adrijshikhar/tap/binsight`), as a Docker image, and via
+`go install`.
 
 It's a local, read-only binlog viewer for MySQL and MariaDB — event stream, transaction
 grouping, row-image diffs, hex view, anomaly detection. Written because I got tired of
