@@ -105,7 +105,7 @@ export default function ViewToggle() {
     incoming.style.display = '';
 
     // Machine view follows the active mode (token-driven), so the canvas colour is IDENTICAL across
-    // the toggle — no recolor, no shimmer. The only effect of .machine-mode is hiding the aurora.
+    // the toggle — no recolor, no shimmer.
     // Pure GSAP opacity crossfade does the rest (same in light and dark).
     if (next === 'machine') {
       root.classList.add('machine-mode');

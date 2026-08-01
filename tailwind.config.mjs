@@ -18,10 +18,13 @@ export default {
         border: 'var(--border-color)',
         ring: 'var(--accent)',
       },
+      /* Point at the CSS tokens rather than repeating the stacks. These were
+         hardcoded and drifted: font-mono still resolved to JetBrains Mono after
+         the token moved to IBM Plex Mono, so the utility silently ignored it. */
       fontFamily: {
-        sans: ['Geist Variable', 'Inter', 'system-ui', 'sans-serif'],
-        heading: ['Geist Variable', 'Inter', 'system-ui', 'sans-serif'],
-        mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+        sans: ['var(--font-sans)'],
+        heading: ['var(--font-heading)'],
+        mono: ['var(--font-mono)'],
       },
       borderRadius: {
         none: '0',
