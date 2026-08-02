@@ -34,3 +34,6 @@ test-results/
 
 # agent scaffolding, not product code
 .superpowers/
+
+# planning docs live in ~/Projects/my-projects/projects/adrijshikhar.github.io
+docs/superpowers/
