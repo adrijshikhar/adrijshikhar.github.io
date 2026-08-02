@@ -11,6 +11,7 @@ import {
   type Observer,
   type SkyColors,
 } from '../lib/sky/render';
+import { gmstDeg } from '../lib/sky/astronomy';
 import { SkyGame, drawGame, type Tool } from '../lib/sky/game';
 import { animate, onScroll } from '../lib/motion';
 
@@ -63,9 +64,34 @@ export default function SkyField({ mode }: SkyFieldProps) {
   // in React state (not read off `obs`) so the corner updates when the geo
   // lookup lands, without the canvas loop having to drive a DOM write.
   const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(null);
+  // Local sidereal time — the angle of sky currently overhead. This is the
+  // number an observatory actually reads, and unlike a wall clock it is
+  // genuinely tied to what the canvas is drawing: LST is what decides which
+  // right ascension sits on the meridian. Ticked once a second, not per frame.
+  const [lst, setLst] = useState<string>('--:--:--');
   if (mode === 'full' && !gameRef.current) {
     gameRef.current = new SkyGame(() => setStruck((n) => n + 1));
   }
+
+  // Sidereal clock. Separate from the render effect so it survives mode
+  // changes and never couples a 1Hz timer to the animation loop.
+  useEffect(() => {
+    if (mode !== 'full') return;
+    let id = 0;
+    const tick = () => {
+      const lon = coords?.lon ?? DEFAULT_OBS.lon;
+      // gmstDeg + longitude = local sidereal angle; /15 turns degrees into hours.
+      const h = (((gmstDeg(new Date()) + lon) % 360) + 360) % 360 / 15;
+      const hh = Math.floor(h);
+      const mm = Math.floor((h - hh) * 60);
+      const ss = Math.floor((((h - hh) * 60) - mm) * 60);
+      const p = (n: number) => String(n).padStart(2, '0');
+      setLst(`${p(hh)}:${p(mm)}:${p(ss)}`);
+      id = window.setTimeout(tick, 1000);
+    };
+    tick();
+    return () => window.clearTimeout(id);
+  }, [mode, coords]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -434,9 +460,25 @@ export default function SkyField({ mode }: SkyFieldProps) {
             </b>
           </div>
           <div>
+            <span className="k">Sidereal</span>
+            <b>{lst}</b>
+          </div>
+          <div>
             <span className="k">Source</span>
             <b>{coords ? 'geo' : 'default'}</b>
           </div>
+        </div>
+      )}
+
+      {/* Bottom-right hint — the prototype's `.hint`. Tells you the instrument
+          responds before you have touched it, which is the whole reason the
+          sky is interactive at all. Sits above the easter-egg hook rather than
+          replacing it: two instruments, one corner, stacked. */}
+      {mode === 'full' && !machine && !playing && (
+        <div className="instrument instrument-r instrument-hint">
+          move &middot; stars bend
+          <br />
+          hover &middot; name it
         </div>
       )}
 

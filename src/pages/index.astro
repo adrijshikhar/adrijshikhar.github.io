@@ -5,7 +5,7 @@ import { getCollection } from 'astro:content';
 import matter from 'gray-matter';
 import { marked } from 'marked';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import TopNav from '../components/TopNav.astro';
+import SideRail from '../components/SideRail.astro';
 import Section from '../components/Section.astro';
 import ExpCard from '../components/ExpCard.tsx';
 import ProjectCard from '../components/ProjectCard.tsx';
@@ -52,7 +52,7 @@ const rawMarkdown = await buildRawMarkdown();
   <div class="machine-view" />
 
   <div class="human-view min-h-screen px-5 md:px-8">
-    <TopNav />
+    <SideRail />
 
     <!-- Single centred column at the prototype's 46rem. Every other page on the
          site is already single-column (posts max-w-3xl, lists max-w-5xl), so
