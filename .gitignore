@@ -28,3 +28,6 @@ scratch/
 
 # locally-installed skills, not product code
 .claude/skills/
+
+# playwright run artifacts
+test-results/
