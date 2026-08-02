@@ -11,6 +11,9 @@ import ProjectCard from '../components/ProjectCard.tsx';
 import BlogCard from '../components/BlogCard.tsx';
 import ViewToggle from '../components/ViewToggle.tsx';
 import { buildRawMarkdown } from '../lib/raw-markdown';
+import { STARS } from '../lib/sky/catalogue';
+
+const STAR_COUNT = STARS.length;
 
 function readContent(filename: string) {
   const raw = readFileSync(join(process.cwd(), 'src/content', filename), 'utf-8');
@@ -241,8 +244,10 @@ const SOCIAL_ICON_PATHS = {
 
         <footer class="mt-32 border-t border-border pt-12 pb-20 md:mt-40 md:pb-28">
           <p class="meta-data">
-            <span class="text-accent">&#9656;</span> Designed in the terminal. Built with Astro.
+            <span class="text-accent">&#9656;</span> {STAR_COUNT} named stars at true J2000 positions
+            for your location · faint field is representative
           </p>
+          <p class="meta-data mt-2 opacity-70">Built with Astro.</p>
         </footer>
 
 
