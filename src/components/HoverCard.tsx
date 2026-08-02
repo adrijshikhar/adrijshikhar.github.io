@@ -18,7 +18,7 @@ interface HoverCardProps {
  */
 export default function HoverCard({ children }: HoverCardProps) {
   return (
-    <li className="group/list-item mb-4 break-inside-avoid last:mb-0 sm:mb-5">
+    <li className="group/list-item mb-6 break-inside-avoid last:mb-0 sm:mb-8">
       <div className="atelier-card relative px-6 py-6 lg:px-7 lg:py-7">
         {children}
       </div>
