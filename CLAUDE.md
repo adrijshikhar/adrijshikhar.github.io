@@ -61,12 +61,22 @@ Gotcha: Tailwind's `/opacity` modifier does **not** compile against CSS-var colo
 
 ## Typography (component classes, not utility strings)
 
-Three faces: **Space Grotesk** display (`--font-heading`), **Geist** prose (`--font-sans`),
-**IBM Plex Mono** for all data (`--font-mono`) — dates, coordinates, metrics, labels. Space
-Grotesk is Space Mono's proportional sibling, so display rhymes with the all-mono instrument
-chrome; it stays out of body copy, where its quirks read as noise. It is already tightly set,
-so display tracking is `-0.03em` (`tracking-tightest`) — the `-0.045em` that suited Geist
-collides at 92px.
+Three faces: **Space Grotesk** display (`--font-heading`), **Familjen Grotesk** prose
+(`--font-sans`), **IBM Plex Mono** for all data (`--font-mono`) — dates, coordinates, metrics,
+labels. Space Grotesk is Space Mono's proportional sibling, so display rhymes with the all-mono
+instrument chrome; it stays out of body copy, where its straight-tailed single-storey `y` reads
+as noise at paragraph length. It is already tightly set, so display tracking is `-0.03em`
+(`tracking-tightest`) — the `-0.045em` that suited Geist collides at 92px.
+
+**Familjen Grotesk ships `wght 400–700` — there are no weights below 400.** Do not reach for
+`font-light`/`font-thin`; they will silently render at 400. It also sets ~6% smaller than Geist
+at the same `font-size` (x-height 0.500 vs 0.530), which is the baseline the current sizes were
+re-checked against.
+
+**Never size a measure in `ch`.** A `ch` is the width of the font's `0`, so a `ch`-based
+max-width silently resizes when the body face changes — that is how the hero lead picked up a
+one-word last line during the Geist→Familjen swap. Use `rem`. `text-wrap: pretty` on `p`/`li`
+and `balance` on `h1`–`h3` in `globals.css` are the safety net, not the fix.
 
 Every heading and label uses a **component class** from the `@layer components` block in
 `globals.css`, never a hand-assembled utility string: `.display-hero`, `.display-page`,

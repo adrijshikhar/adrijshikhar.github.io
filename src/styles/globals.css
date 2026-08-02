@@ -2,7 +2,7 @@
    Inter, which never painted — 'Geist Variable' always won the stack ahead of it. */
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/geist";
+@import "@fontsource-variable/familjen-grotesk";
 @import "@fontsource-variable/space-grotesk";
 @import "@fontsource/ibm-plex-mono/400.css";
 @import "@fontsource/ibm-plex-mono/500.css";
@@ -53,7 +53,7 @@
 
   /* Typography — three voices, no fourth. */
   --font-heading: 'Space Grotesk Variable', system-ui, sans-serif;
-  --font-sans:    'Geist Variable', system-ui, sans-serif;
+  --font-sans:    'Familjen Grotesk Variable', system-ui, sans-serif;
   --font-mono:    'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
   /* shadcn token bridge (kept for ui/* components) */
@@ -214,6 +214,13 @@
     font-family: var(--font-heading);
     font-weight: 600;
     letter-spacing: -0.02em;
+  }
+
+  p, li {
+    text-wrap: pretty;
+  }
+  h1, h2, h3 {
+    text-wrap: balance;
   }
 
   a {
