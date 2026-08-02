@@ -98,6 +98,12 @@ actual input to every position on screen.
 the renderer also draws a procedural faint field below that, so any `MAG n` label would be
 false. Don't "improve" it into one.
 
+The graticule (`drawGraticule` in `render.ts`) is structural, not texture: altitude rings are
+continuous, the horizon is a heavier solid rule carrying 10°/30° ticks. Only the **azimuth
+spokes stay dashed and faint** — they are the one element with no honest label, because a fixed
+frame cannot claim a bearing once travel has turned the sky. That is also why there is no
+N/E/S/W.
+
 ## Human / Machine view toggle (a hard contract)
 
 `ViewToggle.tsx` (the primary `client:load` island, driven by GSAP via `src/lib/gsap.ts`)
