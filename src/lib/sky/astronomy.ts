@@ -5,7 +5,8 @@
  */
 import { PLANETS, EARTH, type OrbitalElements } from './catalogue';
 
-const D2R = Math.PI / 180, R2D = 180 / Math.PI;
+export const D2R = Math.PI / 180;
+const R2D = 180 / Math.PI;
 
 /* --- astronomy: RA/Dec -> altitude/azimuth for an observer --------------- */
 export function julianDay(d: Date): number {

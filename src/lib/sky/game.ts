@@ -9,7 +9,7 @@
  * imports React or touches the DOM itself (SkyField.tsx does that).
  */
 import type { BodyPos, SkyColors, Observer } from './render';
-import { fade } from './render';
+import { fade, rnd, nearestPoint } from './render';
 import { FLOOR } from './projection';
 import {
   gravityWell,
@@ -91,10 +91,21 @@ export class SkyGame {
     for (let i = 0; i < bodies.length; i++) {
       const b = bodies[i];
       const s = this.stars[i];
-      const inFlight = this.playing && this.tool === 'sling' && (s.vx !== 0 || s.vy !== 0);
+      const wasInFlight = this.playing && this.tool === 'sling' && (s.vx !== 0 || s.vy !== 0);
+      s.playable = b.alt >= FLOOR;
+      // A star coasting in flight is not integrated once its home body sets
+      // below FLOOR (physics.ts skips non-playable stars). Left alone, its
+      // velocity would never decay, `inFlight` would read true forever, and
+      // it would freeze on screen until Reset — even once its home rose back
+      // above FLOOR a sidereal day later. Zero it here so it re-anchors like
+      // any star at rest instead.
+      if (!s.playable && wasInFlight) {
+        s.vx = 0;
+        s.vy = 0;
+      }
+      const inFlight = wasInFlight && s.playable;
       const dx = inFlight ? 0 : s.x - s.hx;
       const dy = inFlight ? 0 : s.y - s.hy;
-      s.playable = b.alt >= FLOOR;
       s.hx = b.x;
       s.hy = b.y;
       s.vr = b.vr;
@@ -186,18 +197,7 @@ export class SkyGame {
    *  prototype: off-field stars project far outside the viewport in
    *  practice, so this never actually reaches one. */
   nearest(mx: number, my: number, max = 28): number {
-    let best = -1;
-    let bd = max * max;
-    this.stars.forEach((s, i) => {
-      const dx = s.x - mx;
-      const dy = s.y - my;
-      const d = dx * dx + dy * dy;
-      if (d < bd) {
-        bd = d;
-        best = i;
-      }
-    });
-    return best;
+    return nearestPoint(this.stars, mx, my, max);
   }
 
   /** A press that HIT a star: sling mode grabs it (a star in flight is not
@@ -577,11 +577,7 @@ function drawBursts(
     // widening as the hit gets more glancing. Deterministic per collision.
     if (p < 0.7) {
       const rf = 1 - p / 0.7;
-      let h = b.seed;
-      const rnd = (): number => {
-        h = Math.imul(h ^ (h >>> 15), 2246822507) >>> 0;
-        return (h >>> 8) / 16777216;
-      };
+      const next = rnd(b.seed);
       const cone = 0.55; // fixed spray, no geometry bias
       for (const [vx, vy] of [
         [b.ax, b.ay],
@@ -592,8 +588,8 @@ function drawBursts(
         const base = Math.atan2(vy, vx);
         const n = 3 + Math.round(6 * b.e);
         for (let k = 0; k < n; k++) {
-          const a2 = base + (rnd() - 0.5) * cone;
-          const speed = 0.5 + rnd();
+          const a2 = base + (next() - 0.5) * cone;
+          const speed = 0.5 + next();
           const r0 = 4 + p * (30 + 90 * b.e) * speed; // ray head travels out
           const seg = (5 + 22 * b.e) * speed * rf; // and trails behind it
           ctx.globalAlpha = capA(rf * rf * (0.1 + 0.3 * b.e) * (0.4 + 0.6 * speed));

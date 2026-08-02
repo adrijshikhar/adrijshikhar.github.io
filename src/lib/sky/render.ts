@@ -12,11 +12,9 @@
 import { STARS, PLANETS, FIGURES } from './catalogue';
 import {
   altAz, planetRaDec, moonRaDec, sunRaDec,
-  BODY_KM, SATURN_RING_KM, apparentArcsec, planetIllum,
+  BODY_KM, SATURN_RING_KM, apparentArcsec, planetIllum, D2R,
 } from './astronomy';
 import { project, FLOOR } from './projection';
-
-const D2R = Math.PI / 180;
 
 export interface Observer {
   lat: number;
@@ -42,8 +40,9 @@ export interface FaintStarPos {
 }
 
 /** Tiny seeded PRNG (same one the prototype used) so the faint field is
- *  reproducible across reloads instead of reshuffling on every visit. */
-function rnd(seed: number): () => number {
+ *  reproducible across reloads instead of reshuffling on every visit. Shared
+ *  with game.ts's collision-flare radiation jets — same generator, different seed. */
+export function rnd(seed: number): () => number {
   let h = (seed * 2654435761) >>> 0;
   return () => {
     h = Math.imul(h ^ (h >>> 15), 2246822507) >>> 0;
@@ -380,16 +379,28 @@ export function computeFullSky(
   };
 }
 
-/** Nearest body under the cursor, within `max` px — the same 22px hit radius
- *  the prototype used for star hover. Returns -1 when nothing is close enough. */
-export function nearestBody(bodies: BodyPos[], mx: number, my: number, max = 22): number {
+/** Nearest indexed point within `max` px of (mx, my) — shared by star hover
+ *  (`nearestBody`, 22px) and the game's grab/link hit-test (`SkyGame.nearest`,
+ *  28px), which otherwise duplicated this exact scan. */
+export function nearestPoint<T extends { x: number; y: number }>(
+  points: readonly T[],
+  mx: number,
+  my: number,
+  max: number,
+): number {
   let best = -1;
   let bd = max * max;
-  bodies.forEach((s, i) => {
-    const dx = s.x - mx, dy = s.y - my, d = dx * dx + dy * dy;
+  points.forEach((p, i) => {
+    const dx = p.x - mx, dy = p.y - my, d = dx * dx + dy * dy;
     if (d < bd) { bd = d; best = i; }
   });
   return best;
+}
+
+/** Nearest body under the cursor, within `max` px — the same 22px hit radius
+ *  the prototype used for star hover. Returns -1 when nothing is close enough. */
+export function nearestBody(bodies: BodyPos[], mx: number, my: number, max = 22): number {
+  return nearestPoint(bodies, mx, my, max);
 }
 
 /** Distance from a point to a line SEGMENT (not an infinite line) — used to
