@@ -491,7 +491,10 @@ body.spinning * {
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 46;
+    /* Above every fixed control (ViewToggle 1100, ModeToggle 1090): while the
+       game hides the native cursor page-wide, a lower stack order made the
+       pointer vanish completely whenever it crossed one of those toggles. */
+    z-index: 1200;
     pointer-events: none;
     border-radius: 50%;
     will-change: transform;

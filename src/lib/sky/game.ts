@@ -54,12 +54,13 @@ const capA = (v: number): number => Math.min(CAP, v);
 /** Everything the easter egg needs to persist across animation frames,
  *  independent of React's render cycle — physics runs at 60fps and can't
  *  wait on a state setter. SkyField holds one instance in a ref and calls
- *  its methods directly; the handful of fields the UI needs (playing/tool/
- *  struck) are mirrored into React state by the caller when they change. */
+ *  its methods directly; the handful of fields the UI needs (playing/tool) are
+ *  mirrored into React state by the caller when they change. The strike count
+ *  lives only in React — it reaches the UI through the `onStrike` callback, so
+ *  there is no second copy here to fall out of sync. */
 export class SkyGame {
   playing = false;
   tool: Tool = 'sling';
-  struck = 0;
   aim: AimState | null = null;
   dragFrom: number | null = null;
   spin: SpinState | null = null;
@@ -133,10 +134,9 @@ export class SkyGame {
   tick(mouseX: number, mouseY: number): void {
     if (!this.playing) return;
     if (this.tool === 'sling') {
-      gamePhysics(this.stars, this.bursts, () => {
-        this.struck++;
-        this.onStrike();
-      });
+      // The strike count itself lives in React state — the callback is the
+      // only channel, so there is no second copy here to drift out of sync.
+      gamePhysics(this.stars, this.bursts, this.onStrike);
     } else {
       gravityWell(this.stars, mouseX, mouseY);
     }
@@ -148,7 +148,6 @@ export class SkyGame {
 
   enter(): void {
     this.playing = true;
-    this.struck = 0;
     for (const s of this.stars) {
       s.vx = 0;
       s.vy = 0;
@@ -158,7 +157,6 @@ export class SkyGame {
   /** Clears motion AND every drawing — a user-hit requirement, twice over,
    *  in the prototype's session ("reset must clear the drawing too"). */
   reset(): void {
-    this.struck = 0;
     this.aim = null;
     this.dragFrom = null;
     this.links = [];
