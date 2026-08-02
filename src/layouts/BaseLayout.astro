@@ -24,19 +24,11 @@ const cfBeaconToken =
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- No-FOUC: apply saved accent theme + light/dark mode before first paint.
+    <!-- No-FOUC: apply light/dark mode before first paint.
          MUST stay first in <head>, before any stylesheet <link> — a stylesheet placed
          before an inline script delays the script, which lets a default-dark frame paint. -->
     <script is:inline>
       (function () {
-        try {
-          var valid = ['parallel', 'teal', 'rausch', 'violet', 'hyperlink', 'signal'];
-          var saved = localStorage.getItem('theme');
-          document.documentElement.dataset.theme =
-            saved && valid.indexOf(saved) !== -1 ? saved : 'parallel';
-        } catch (e) {
-          document.documentElement.dataset.theme = 'parallel';
-        }
         try {
           var urlMode = new URLSearchParams(location.search).get('mode');
           var stored = localStorage.getItem('mode');

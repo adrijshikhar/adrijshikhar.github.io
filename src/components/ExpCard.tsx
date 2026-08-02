@@ -9,7 +9,6 @@ interface ExpCardProps {
   endDate: string;
   tagline?: string;
   contentHtml?: string;
-  index?: number;
 }
 
 const prose =
@@ -18,7 +17,7 @@ const prose =
   'prose-p:text-text prose-li:text-text prose-li:my-0.5 prose-ul:my-1.5 marker:text-accent ' +
   'prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-strong:text-heading prose-strong:font-medium';
 
-export default function ExpCard({ position, company, companyLink, location, startDate, endDate, tagline, contentHtml, index = 0 }: ExpCardProps) {
+export default function ExpCard({ position, company, companyLink, location, startDate, endDate, tagline, contentHtml }: ExpCardProps) {
   return (
     <HoverCard>
       <div className="flex items-baseline justify-between gap-4">

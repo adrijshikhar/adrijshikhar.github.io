@@ -44,16 +44,14 @@ Don't migrate the resume `.md` files into the collection — the isolation is in
 
 ## Theming (CSS-variable tokens)
 
-`src/styles/globals.css` defines all design tokens as CSS variables on `:root`. Mode and
-accent are token-set overrides, not per-element styles:
-- `:root[data-mode="light"]` overrides the foundation tokens for light mode.
-- `[data-theme="…"]` (parallel/teal/rausch/violet/hyperlink/signal) overrides the accent
-  (+ aurora) tokens, re-tuned per mode to hold AA contrast.
+`src/styles/globals.css` defines all design tokens as CSS variables on `:root`.
+`:root[data-mode="light"]` overrides the foundation (+ accent, + aurora) tokens for light
+mode, re-tuned to hold AA contrast. There is a single accent — no per-theme token sets.
 
 Light/dark **defaults to the system preference** (`prefers-color-scheme`) until the user makes
 an explicit choice; `ModeToggle.tsx` persists `mode` to `localStorage` (explicit choice wins)
 and follows live OS changes while unset. A **no-FOUC inline head script** in `BaseLayout.astro`
-sets `data-mode`/`data-theme` before first paint; `?mode=light|dark` is a URL override. Mode
+sets `data-mode` before first paint; `?mode=light|dark` is a URL override. Mode
 swaps are made atomic via a one-frame `.mode-switching { transition: none }` class to avoid
 gradient/heading flicker. Tailwind color utilities map to these vars in `tailwind.config.mjs`,
 so prefer token classes (`bg-surface`, `text-muted`, `border-border`) over raw colors.
