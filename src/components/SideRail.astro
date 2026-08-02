@@ -180,6 +180,7 @@ const sections = [
   .nav-link.is-at .nav-text { color: var(--heading); }
 
   /* The rail belongs to the instrument, so it leaves with the instrument. */
+  :global(html.machine-mode) .side-rail,
   :global(body.machine-mode) .side-rail { opacity: 0; pointer-events: none; }
   .side-rail { transition: opacity 0.5s var(--ease-out); }
 

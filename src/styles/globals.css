@@ -433,6 +433,12 @@
    the rest of the canvas so the human<->machine toggle stays a pure opacity
    swap (ViewToggle adds/removes .machine-mode on <body> in lockstep with
    <html>). Light-mode inversion is a later task. */
+/* Matches BOTH ancestors on purpose. The no-FOUC head script can only mark
+   <html> - <body> does not exist yet when it runs - while ViewToggle marks
+   <body> once hydrated. Keying on body alone left the chrome visible through
+   a ?machine=true deep-link until hydration, then dissolving it over 500ms:
+   a conspicuous fade-out of something that should never have been seen. */
+html.machine-mode #sky,
 body.machine-mode #sky {
   opacity: 0;
 }
@@ -621,6 +627,8 @@ body.spinning * {
   .instrument .k { display: inline-block; width: 6.5rem; opacity: 0.75; }
 
   /* The instrument frame belongs to the sky, so it leaves with the sky. */
+  html.machine-mode .viewfinder,
+  html.machine-mode .instrument,
   body.machine-mode .viewfinder,
   body.machine-mode .instrument {
     opacity: 0;
@@ -672,5 +680,17 @@ body.spinning * {
     min-height: 44px;
     width: 100%;
     height: 100%;
+  }
+}
+
+/* Boot is not a transition. `.machine-boot` is on <html> only while a
+   ?machine=true load is settling, so suppress the crossfade there - otherwise
+   the deep-link animates chrome away instead of never showing it. */
+@layer components {
+  html.machine-boot #sky,
+  html.machine-boot .viewfinder,
+  html.machine-boot .instrument,
+  html.machine-boot .side-rail {
+    transition: none !important;
   }
 }
