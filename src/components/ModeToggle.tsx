@@ -68,7 +68,7 @@ export default function ModeToggle() {
       aria-pressed={isLight}
       aria-label={isLight ? 'Switch to dark mode' : 'Switch to light mode'}
       title={isLight ? 'Dark mode' : 'Light mode'}
-      className="grid size-[18px] place-items-center text-muted transition-colors duration-[120ms] ease-out hover:text-heading"
+      className="tap-44 grid size-[18px] place-items-center text-muted transition-colors duration-[120ms] ease-out hover:text-heading"
     >
       {isLight ? (
         // Sun — currently light, click for dark
