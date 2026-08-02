@@ -1,0 +1,186 @@
+---
+/**
+ * The focus scale — in-page navigation rendered as the instrument's left-hand
+ * graduated rail rather than a navbar.
+ *
+ * A bar glued across the top reads as website chrome and cuts the viewfinder
+ * in half; a vertical scale reads as part of the barrel. Each section is a
+ * graduation: a hairline tick that extends and warms as you reach it, the way
+ * a focus index travels. It lives inside the viewfinder's left bracket, is
+ * vertically centred so it never fights the corner brackets, and never sits
+ * over the content column (which is centred and 46rem wide).
+ *
+ * Keeps the scroll-spy contract intact: `data-section`, `.nav-link`,
+ * `.nav-indicator`, `.nav-text`, same rootMargin. Only the geometry changed.
+ */
+const sections = [
+  { id: 'about', label: 'About' },
+  { id: 'experience', label: 'Experience' },
+  { id: 'projects', label: 'Projects' },
+  { id: 'writing', label: 'Writing' },
+  { id: 'education', label: 'Education' },
+  { id: 'achievements', label: 'Achievements' },
+];
+---
+
+<nav class="side-rail" aria-label="In-page jump links">
+  <ul>
+    {sections.map((s, i) => (
+      <li>
+        <a class="group nav-link" href={`#${s.id}`} data-section={s.id}>
+          <!-- Graduation number: the scale reads as measured, not decorative.
+               Kept at 0.5rem so it registers as an engraved index, not a label. -->
+          <span class="rail-no">{String(i + 1).padStart(2, '0')}</span>
+          <span class="nav-indicator"></span>
+          <span class="nav-text">{s.label}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<style>
+  .side-rail {
+    position: fixed;
+    left: 2.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 30;
+    display: none;
+  }
+  /* Only where there is real margin to live in. Below this the content column
+     fills the frame and a fixed rail would sit on top of it. */
+  @media (min-width: 1180px) {
+    .side-rail { display: block; }
+  }
+
+  .side-rail ul {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    margin: 0;
+    padding: 0 0 0 0.85rem;
+    list-style: none;
+  }
+
+  /* The scale spine: a dashed vertical rule the graduations hang off, using the
+     same 26px tick rhythm as the viewfinder's top edge so the two read as one
+     instrument. Mask-faded at both ends for the same reason the top scale is —
+     a hard-terminated rule reads as a border, a faded one reads as etched. */
+  .side-rail ul::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: -1.2rem;
+    bottom: -1.2rem;
+    width: 1px;
+    background: repeating-linear-gradient(
+        180deg,
+        var(--rule-hi) 0 1px,
+        transparent 1px 100%
+      )
+      0 0 / 100% 8px;
+    opacity: 0.5;
+    -webkit-mask-image: linear-gradient(180deg, transparent, #000 14%, #000 86%, transparent);
+    mask-image: linear-gradient(180deg, transparent, #000 14%, #000 86%, transparent);
+  }
+
+  /* Minor graduations between the named ones — the intermediate marks a real
+     zoom scale carries. Purely a density cue, so they never take pointer or
+     screen-reader attention. */
+  .side-rail li + li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    width: 0.34rem;
+    height: 1px;
+    margin-top: -0.22rem;
+    background: var(--rule-hi);
+    opacity: 0.32;
+  }
+  .side-rail li { position: relative; }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.42rem 0;
+    text-decoration: none;
+    /* Heavy, mass-like curve rather than a UI ease — the index should feel
+       geared, not snapped. */
+    transition: opacity 0.6s cubic-bezier(0.32, 0.72, 0, 1);
+    opacity: 0.62;
+  }
+  .nav-link:hover,
+  .nav-link:focus-visible { opacity: 1; }
+
+  .rail-no {
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    opacity: 0.5;
+    width: 1.1rem;
+    transition: color 0.6s cubic-bezier(0.32, 0.72, 0, 1),
+                opacity 0.6s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  /* The graduation itself. Width is the whole language of the component:
+     short and cool at rest, long and warm at the index. */
+  .nav-indicator {
+    display: block;
+    height: 1px;
+    width: 0.85rem;
+    background: var(--rule-hi);
+    transition: width 0.6s cubic-bezier(0.32, 0.72, 0, 1),
+                background-color 0.6s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .nav-link:hover .nav-indicator,
+  .nav-link:focus-visible .nav-indicator { width: 1.9rem; background: var(--accent); }
+
+  .nav-text {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    transition: color 0.6s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .nav-link:hover .nav-text,
+  .nav-link:focus-visible .nav-text { color: var(--heading); }
+
+  /* Active graduation, set by the observer below. */
+  .nav-link.is-at .nav-indicator { width: 2.4rem; background: var(--accent); }
+  .nav-link.is-at .nav-text { color: var(--heading); }
+  .nav-link.is-at .rail-no { color: var(--accent); opacity: 1; }
+  .nav-link.is-at { opacity: 1; }
+
+  /* The rail belongs to the instrument, so it leaves with the instrument. */
+  :global(body.machine-mode) .side-rail { opacity: 0; pointer-events: none; }
+  .side-rail { transition: opacity 0.5s var(--ease-out); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-link, .nav-indicator, .nav-text, .rail-no { transition: none; }
+  }
+</style>
+
+<script>
+  const navLinks = document.querySelectorAll('.side-rail .nav-link');
+  const navIds = new Set([...navLinks].map((l) => l.getAttribute('data-section')));
+  const sectionEls = [...document.querySelectorAll('section[id]')].filter((s) => navIds.has(s.id));
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        navLinks.forEach((link) =>
+          link.classList.toggle('is-at', link.getAttribute('data-section') === entry.target.id),
+        );
+      });
+    },
+    { rootMargin: '-40% 0px -60% 0px' },
+  );
+  sectionEls.forEach((s) => observer.observe(s));
+</script>

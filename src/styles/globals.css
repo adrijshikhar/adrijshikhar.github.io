@@ -613,6 +613,10 @@ body.spinning * {
   }
   .instrument-l { left: 1.6rem; }
   .instrument-r { right: 1.6rem; text-align: right; opacity: 0.8; }
+  /* Two instruments share the right corner: the usage hint and the easter-egg
+     hook. The hook keeps the prototype's 5.6rem slot; the hint sits below it
+     at the baseline, so neither moves when the other appears. */
+  .instrument-hint { bottom: 1.4rem; }
   .instrument b { color: var(--heading); font-weight: 500; }
   .instrument .k { display: inline-block; width: 6.5rem; opacity: 0.75; }
 
