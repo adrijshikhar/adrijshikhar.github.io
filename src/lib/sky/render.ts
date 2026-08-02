@@ -253,6 +253,15 @@ export interface BodyPos extends NamedStarPos {
   au?: number;
 }
 
+/** The planet glyph sheet, loaded by SkyField (see planet-sprite.ts) and passed
+ *  in as data so this module stays DOM-blind and importable under Node. */
+export interface PlanetSpriteRef {
+  image: CanvasImageSource;
+  row: number;
+  column: (name: string) => number | undefined;
+}
+export const SPRITE_CELL = 64;
+
 export interface MoonPhase {
   illum: number;
   waxing: boolean;
@@ -542,6 +551,7 @@ export function drawFull(
   hoverFig: string | null,
   mouse: { x: number; y: number },
   colors: SkyColors,
+  sprite?: PlanetSpriteRef | null,
 ): void {
   ctx.clearRect(0, 0, W, H);
   const { accent, muted, bright, moonLit, moonGlow, planet } = colors;
@@ -614,6 +624,23 @@ export function drawFull(
       ctx.stroke();
     } else {
       const colour = i === hoverIndex ? accent : s.isPlanet || s.isSun ? planet : s.mag < 1.0 ? bright : muted;
+      let drawn = false;
+
+      // Glyph sheet first. Six bodies draw from it; the Moon never does, its
+      // identity being a live terminator a raster cannot carry. Falls through
+      // to the computed silhouettes below while the sheet is still loading, or
+      // if the fetch failed -- so the sky is never blank waiting on an image.
+      const spriteCol = sprite && !s.isMoon ? sprite.column(s.name) : undefined;
+      if (sprite && spriteCol !== undefined) {
+        const d = r * 2;
+        ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.92);
+        ctx.drawImage(
+          sprite.image,
+          spriteCol * SPRITE_CELL, sprite.row * SPRITE_CELL, SPRITE_CELL, SPRITE_CELL,
+          s.x - r, s.y - r, d, d,
+        );
+        drawn = true;
+      }
 
       // Silhouette glyphs. Only three bodies get one, and only because each has
       // a real feature that survives ~10px: the Sun's rays and Saturn's ring
@@ -622,7 +649,9 @@ export function drawFull(
       // crisp instead of blurring to grey). Mercury, Venus and Mars have no
       // such feature, so they stay plain discs -- inventing surface texture for
       // them would be decoration dressed as data.
-      if (s.isSun) {
+      if (drawn) {
+        // already painted from the sheet
+      } else if (s.isSun) {
         ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.92);
         ctx.strokeStyle = colour;
         ctx.lineWidth = Math.max(0.75, r * 0.085);
