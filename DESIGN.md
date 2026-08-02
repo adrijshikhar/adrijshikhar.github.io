@@ -70,6 +70,15 @@ alphas for the same hairline is how the floating controls drifted apart.
 | Accent | `var(--accent)` | any literal bronze |
 | Ground | `var(--bg)` | `#0e0e0e` and other stale neutrals |
 
+**Light mode is one warm family — hue 66–78.** Ground, both surfaces, heading,
+text and muted all sit there, alongside the bronze accent and the hairlines
+(which were always warm). It drifted once: the foundation tokens were authored
+at hue 250–255 while the hairlines and accent stayed at 60, so cool blue-grey
+paper carried warm bronze marks and the page read as a palette at war with
+itself. Cards at `97%` made it worse by adding a cold near-white on top. If a
+light-mode neutral needs a hue, it is warm. Dark mode stays cool (250) — a
+night sky should be.
+
 Colour is authored in **oklch**. Tailwind's `/opacity` modifier does not
 compile against CSS-var colours — `bg-foo/70` renders invisible. Use solid
 token colours.
