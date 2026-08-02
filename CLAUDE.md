@@ -59,6 +59,21 @@ so prefer token classes (`bg-surface`, `text-muted`, `border-border`) over raw c
 Gotcha: Tailwind's `/opacity` modifier does **not** compile against CSS-var colors
 (`bg-foo/70` renders invisible) — use solid token colors.
 
+## Typography (component classes, not utility strings)
+
+Three faces: **Space Grotesk** display (`--font-heading`), **Geist** prose (`--font-sans`),
+**IBM Plex Mono** for all data (`--font-mono`) — dates, coordinates, metrics, labels. Space
+Grotesk is Space Mono's proportional sibling, so display rhymes with the all-mono instrument
+chrome; it stays out of body copy, where its quirks read as noise. It is already tightly set,
+so display tracking is `-0.03em` (`tracking-tightest`) — the `-0.045em` that suited Geist
+collides at 92px.
+
+Every heading and label uses a **component class** from the `@layer components` block in
+`globals.css`, never a hand-assembled utility string: `.display-hero`, `.display-page`,
+`.title-entry`, `.label-data`, `.meta-data`, `.link-back`, `.channel` (+ `.channel-no`).
+Repeating the utilities inline is what let six different tracking values drift into the same
+label; add a class instead. Hand-written styles only where a thing is genuinely one-off.
+
 ## Human / Machine view toggle (a hard contract)
 
 `ViewToggle.tsx` (the primary `client:load` island, driven by GSAP via `src/lib/gsap.ts`)

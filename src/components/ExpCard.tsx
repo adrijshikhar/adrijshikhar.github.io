@@ -21,11 +21,11 @@ export default function ExpCard({ position, company, companyLink, location, star
   return (
     <HoverCard>
       <div className="flex items-baseline justify-between gap-4">
-        <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted">
+        <span className="meta-data">
           {startDate} <span className="opacity-50">—</span> {endDate}
         </span>
       </div>
-      <h3 className="mt-2 font-heading text-base font-medium leading-snug tracking-tighter text-heading">
+      <h3 className="mt-2 title-entry">
         <span className="transition-colors duration-[120ms] group-hover/list-item:text-accent">{position}</span>
         <span className="mx-1.5 text-muted">/</span>
         {companyLink ? (

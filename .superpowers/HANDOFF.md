@@ -11,7 +11,9 @@ into `content`. Build clean, `verify:sky` 11/11 (now gated in CI), legibility
 | Decision | Rationale |
 |---|---|
 | **Cards stay** for experience / projects / writing | Bare prose reads at 108 alpha and carded at 137, both under the 169 bar — but a card is a *guarantee* where the sky tuning is only a *measurement*, and these are the entries people read. Bare prose reserved for the short About section. |
-| **Space Grotesk for display only** | Owner picked it. Keep Geist for `--font-sans`. It carries monospace DNA (Space Mono's proportional sibling), which rhymes with the all-mono chrome. Quirks are an asset at 76px, a liability at 16px. NOT YET APPLIED. |
+| **Space Grotesk for display only** | Owner picked it. Geist keeps `--font-sans`. It carries monospace DNA (Space Mono's proportional sibling), which rhymes with the all-mono chrome. Quirks are an asset at 76px, a liability at 16px. **APPLIED.** |
+| **No rationale comments in markup/CSS** | Owner's call. Design reasoning lives in `CLAUDE.md` or here, not inline. |
+| **Headings and labels are component classes** | Owner's call: "common classes not hand written styles". The utility strings had been copy-pasted enough that six different tracking values (0.1/0.12/0.14/0.16/0.2/0.22em) had drifted into what was meant to be one label. |
 | **No Flaticon attribution** | Owner's call, stated explicitly. For the record: account showed the `0/100` free-tier counter and "Go Premium", and the free licence requires credit. Raised once, not to be raised again. |
 | **Wide/extended faces rejected** | Archivo Expanded, Saira, Michroma all read sci-fi/automotive rather than scientific instrument. Packages removed. |
 | **Planets stay computed canvas paths** | No icon set works: they need live phase and apparent size, and every pack tested needs ~3x the render size before its detail resolves. |
@@ -22,13 +24,12 @@ into `content`. Build clean, `verify:sky` 11/11 (now gated in CI), legibility
 
 ## Next up, in priority order
 
-### 1. Apply Space Grotesk (small, but needs care)
-Three token values in `globals.css` plus the import. Package already installed.
-- Hero is `clamp(3rem, 8.5vw, 5.75rem)` at `-0.045em`, tuned for Geist. Space
-  Grotesk is wider per character and looser — tracking likely wants `-0.02em`,
-  and "Shikhar" may overflow the column at the top of the clamp.
-- **Must be checked in light mode.** Thin strokes behave differently on cream,
-  and the engraved theme is the more fragile of the two.
+### 1. ~~Apply Space Grotesk~~ — DONE
+Measured, both modes, six routes, 1180–1920px: zero overflow anywhere. The
+overflow worry was unfounded — the clamp maxes at 92px against a 736px column,
+and Space Grotesk sets marginally *narrower* than Geist ("Shikhar" 305px vs
+309px), not wider. Hero tracking moved `-0.045em → -0.03em` on legibility, not
+width. Type is now on component classes; four unused font packages removed.
 
 ### 2. Five deltas from the Gemini reference (image in conversation)
 Highest value first. 1 and 2 are contained.
@@ -58,9 +59,9 @@ mobile), entry animation, icon integration.
 - **`animation-timeline: scroll(root)`** on the rail progress track is
   Chromium-verified only. Degrades to hidden via `@supports not`, so not a
   blocker.
-- **Uncommitted**: font packages in `package.json` (`space-grotesk`, `archivo`,
-  `geist-mono`, `jetbrains-mono`, `martian-mono`) — all unused by the site.
-  Promote one, remove the rest.
+- The `/resume` **download-PDF button** still carries its type inline. It is a
+  genuine one-off (border, padding, hover), but its mono/xs/0.14em spec
+  duplicates `.link-back`. Fold it in if a second such button ever appears.
 
 ---
 

@@ -36,7 +36,7 @@ const proseClass =
 
 <BaseLayout title="Resume | adrijshikhar.dev">
   <main class="mx-auto min-h-screen max-w-3xl px-6 py-16 md:px-12 md:py-24">
-    <a href="/" class="group inline-flex items-center font-mono text-xs uppercase tracking-[0.14em] text-muted no-underline hover:text-accent">
+    <a href="/" class="group link-back">
       <span class="mr-2 transition-transform duration-[120ms] group-hover:-translate-x-1">&larr;</span>
       <span>adrij_shikhar</span>
     </a>
@@ -44,7 +44,7 @@ const proseClass =
     <header class="mt-10 flex flex-col gap-6 border-b border-border pb-10 md:flex-row md:items-end md:justify-between">
       <div>
         <p class="mb-4 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted"><span class="h-2 w-2 rounded-full bg-accent"></span> resume.txt</p>
-        <h1 class="font-heading text-4xl font-semibold tracking-tightest text-heading sm:text-5xl">{about.meta.name ?? 'Adrij Shikhar'}</h1>
+        <h1 class="display-page">{about.meta.name ?? 'Adrij Shikhar'}</h1>
         <p class="mt-2 font-heading text-base font-medium tracking-tighter text-heading">Senior Software Engineer</p>
       </div>
       <a
@@ -66,9 +66,9 @@ const proseClass =
               <h2 class="font-heading text-base font-medium tracking-tighter text-heading">
                 {exp.position} <span class="mx-1 text-muted">/</span> {exp.company}
               </h2>
-              <span class="shrink-0 font-mono text-[11px] uppercase tracking-[0.12em] text-muted">{exp.startDate} — {exp.endDate}</span>
+              <span class="shrink-0 meta-data">{exp.startDate} — {exp.endDate}</span>
             </div>
-            {exp.location && <p class="mt-0.5 font-mono text-[11px] uppercase tracking-[0.1em] text-muted">{exp.location}</p>}
+            {exp.location && <p class="meta-data mt-0.5">{exp.location}</p>}
             {expSections[exp.slug] && (
               <div class={`mt-3 ${proseClass}`} set:html={marked.parse(expSections[exp.slug])} />
             )}
@@ -87,7 +87,7 @@ const proseClass =
               <h3 class="font-heading text-base font-medium tracking-tighter text-heading">{edu.institution}</h3>
               <p class="mt-0.5 text-sm text-text">{edu.degree}{edu.field && <span class="text-muted"> — {edu.field}</span>}</p>
             </div>
-            <span class="shrink-0 font-mono text-[11px] uppercase tracking-[0.12em] text-muted">{edu.startDate} — {edu.endDate}</span>
+            <span class="shrink-0 meta-data">{edu.startDate} — {edu.endDate}</span>
           </li>
         ))}
       </ul>
