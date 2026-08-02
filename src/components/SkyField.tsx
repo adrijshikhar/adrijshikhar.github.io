@@ -15,7 +15,7 @@ import { FLOOR } from '../lib/sky/projection';
 import { STARS } from '../lib/sky/catalogue';
 import { SkyGame, drawGame, type Tool } from '../lib/sky/game';
 import { loadPlanetSprite, planetSprite } from '../lib/sky/planet-sprite';
-import { animate, onScroll } from '../lib/motion';
+import { animate, createTimer, eases, onScroll } from '../lib/motion';
 
 const ALT_RANGE = `+90…−${Math.abs(FLOOR)}°`;
 const STAR_COUNT = STARS.length;
@@ -94,6 +94,11 @@ export default function SkyField({ mode }: SkyFieldProps) {
   // opened a game whose canvas was invisible, while `.playing` set
   // `user-select: none` and made the markdown uncopyable.
   const [machine, setMachine] = useState(false);
+  // `TIME_OFFSET_MS` is read from location.search, which is 0 during SSR — so
+  // anything rendered directly from it disagrees with the server the moment
+  // `?t=` is present, and React throws away the tree. Resolved after mount
+  // instead, so the first paint always matches what was serialised.
+  const [replay, setReplay] = useState(false);
   // Observer coordinates, surfaced as the bottom-left instrument readout. Held
   // in React state (not read off `obs`) so the corner updates when the geo
   // lookup lands, without the canvas loop having to drive a DOM write.
@@ -113,7 +118,12 @@ export default function SkyField({ mode }: SkyFieldProps) {
   // What is actually over your head right now. The prototype carried both rows
   // and they are the two that make the corner read as a live instrument rather
   // than a static caption — they change as the sky turns and as you travel.
-  const [sky, setSky] = useState<{ up: number; total: number; brightest: string[] } | null>(null);
+  const [sky, setSky] = useState<{
+    up: number; total: number; brightest: string[];
+    sunAlt: number | null; twilight: string;
+    moonIllum: number; moonWaxing: boolean;
+    planetsUp: number; planetsTotal: number;
+  } | null>(null);
   // Shown once, on the first strike. The physics really does this — mass comes
   // from magnitude and launch speed divides by its square root — so the note is
   // a label on something the player has just felt, not a decorative caption.
@@ -132,6 +142,10 @@ export default function SkyField({ mode }: SkyFieldProps) {
       (name, drawn, total) => setFigure({ name, drawn, total }),
     );
   }
+
+  useEffect(() => {
+    setReplay(TIME_OFFSET_MS !== 0);
+  }, []);
 
   useEffect(() => {
     if (struck !== 1) return;
@@ -279,16 +293,35 @@ export default function SkyField({ mode }: SkyFieldProps) {
       setObsSource(source);
     };
     let skyPublishedAt = 0;
-    const publishSky = (bodies: Array<{ name: string; alt: number; mag: number }>) => {
+    const publishSky = (
+      bodies: Array<{ name: string; alt: number; mag: number; isPlanet?: boolean; isSun?: boolean }>,
+      moonPhase: { illum: number; waxing: boolean },
+    ) => {
       const t = performance.now();
       if (t - skyPublishedAt < 1000) return;
       skyPublishedAt = t;
       const named = bodies.filter((b) => b.name);
       const above = named.filter((b) => b.alt > 0);
+      const sun = bodies.find((b) => b.isSun);
+      const planets = bodies.filter((b) => b.isPlanet);
       setSky({
         up: above.length,
         total: named.length,
         brightest: [...above].sort((a, b) => a.mag - b.mag).slice(0, 3).map((b) => b.name),
+        sunAlt: sun ? sun.alt : null,
+        // The standard bands, so the label is a definition rather than a mood.
+        // This is also the number driving the twilight glow, which makes the
+        // readout an explanation of what is on screen rather than a decoration.
+        twilight: !sun ? '—'
+          : sun.alt > 0 ? 'day'
+          : sun.alt > -6 ? 'civil'
+          : sun.alt > -12 ? 'nautical'
+          : sun.alt > -18 ? 'astro'
+          : 'night',
+        moonIllum: moonPhase.illum,
+        moonWaxing: moonPhase.waxing,
+        planetsUp: planets.filter((b) => b.alt > 0).length,
+        planetsTotal: planets.length,
       });
     };
     let hoverIndex = -1;
@@ -296,6 +329,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
     // Reduced motion: constellations render fully formed (no scroll-driven reveal).
     const scrollP = { t: reduced ? 1 : 0 };
     let scrollAnim: ReturnType<typeof animate> | null = null;
+    let rippleTimer: ReturnType<typeof createTimer> | null = null;
 
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -315,6 +349,15 @@ export default function SkyField({ mode }: SkyFieldProps) {
       }
     };
 
+    // Drives the engraved Sun's ripple. anime.js owns the clock rather than a
+    // hand-rolled `performance.now() % period`: its timer is already the site's
+    // motion engine (the scroll reveal runs on it), it pauses with the document
+    // instead of burning cycles in a background tab, and it gives the loop a
+    // real duration to ease against. Reduced motion simply never starts it, and
+    // `ripple.p` stays 0 — one frame of static rings, which is the same chart
+    // convention standing still.
+    const SUN_PULSE_MS = 4200;
+    const ripple = { p: 0 };
     const renderFrame = () => {
       const cs = getComputedStyle(document.documentElement);
       // Read mode fresh every frame (and on the MutationObserver's forced
@@ -363,14 +406,15 @@ export default function SkyField({ mode }: SkyFieldProps) {
         // Constellation figures step aside during play: their vertices are the
         // very bodies physics is flinging around, so at scroll-bottom (t≈1) all
         // 47 segments would whip across the page chasing them.
-        publishSky(bodies);
+        publishSky(bodies, moonPhase);
         const figureT = game?.playing ? 0 : scrollP.t;
         const byName = bodyIndex(bodies); // built once, shared by figureAt and drawFull
         hoverIndex = nearestBody(bodies, mouse.x, mouse.y);
         // star hover wins over a constellation hover when both are under the cursor
         hoverFig = hoverIndex >= 0 ? null : figureAt(byName, figureT, mouse.x, mouse.y);
         drawFull(ctx, W, H, bodies, byName, faint, moonPhase, figureT, hoverIndex, hoverFig, mouse, colors,
-                 planetSprite(colors.engraved, colors.planet));
+                 planetSprite(colors.engraved, colors.planet),
+                 ripple.p);
         if (game && game.playing && gameCanvas && gameCtx) {
           // Ambient sky stays a direct draw (above); only the game overlay
           // goes through the offscreen buffer + single capped-alpha blit.
@@ -394,7 +438,8 @@ export default function SkyField({ mode }: SkyFieldProps) {
           }
         }
         drawQuiet(ctx, W, H, bodies, faint, moonPhase, colors,
-                  planetSprite(colors.engraved, colors.planet));
+                  planetSprite(colors.engraved, colors.planet),
+                  ripple.p);
       }
     };
 
@@ -587,6 +632,16 @@ export default function SkyField({ mode }: SkyFieldProps) {
     // eased toward the scroll position (sync: 0.14) rather than tracking the
     // scrollbar 1:1, which is what makes the reveal feel fluid rather than
     // jerky. Skipped entirely under reduced motion.
+    if (!reduced) {
+      // outCubic, so a ring leaves the limb quickly and settles as it spreads —
+      // the shape a real ripple has, and a plain linear sawtooth does not.
+      rippleTimer = createTimer({
+        duration: SUN_PULSE_MS,
+        loop: true,
+        onUpdate: (t) => { ripple.p = eases.outCubic(t.iterationProgress); },
+      });
+    }
+
     if (mode === 'full' && !reduced) {
       scrollAnim = animate(scrollP, {
         t: [0, 1],
@@ -630,6 +685,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
         window.removeEventListener('pointerenter', onWindowPointerEnter);
         controlsRef.current = null;
       }
+      rippleTimer?.revert();
       scrollAnim?.revert(); // tears down the linked anime.js ScrollObserver too
       window.clearTimeout(timeoutId);
       controller.abort();
@@ -658,6 +714,35 @@ export default function SkyField({ mode }: SkyFieldProps) {
         </div>
       )}
 
+      {/* Top-left: the three numbers that explain what is on screen. SUN is the
+          altitude driving the twilight glow, with the standard band it falls in
+          — so the warmth on the page has a stated cause. MOON is the phase the
+          terminator is drawn from. PLANETS is a count of what is actually up.
+          All three are read off the same frame the canvas just painted, so none
+          of them can drift from it. */}
+      {mode === 'full' && !machine && sky && (
+        <div className="instrument instrument-tl readout-row">
+          <div className="readout-cell">
+            <span className="k">Sun</span>
+            <b>
+              {sky.sunAlt === null ? '—' : `${sky.sunAlt > 0 ? '+' : '−'}${Math.abs(sky.sunAlt).toFixed(1)}°`}
+              <span className="opacity-60">{' · '}{sky.twilight}</span>
+            </b>
+          </div>
+          <div className="readout-cell">
+            <span className="k">Moon</span>
+            <b>
+              {Math.round(sky.moonIllum * 100)}%
+              <span className="opacity-60">{' · '}{sky.moonWaxing ? 'waxing' : 'waning'}</span>
+            </b>
+          </div>
+          <div className="readout-cell">
+            <span className="k">Planets</span>
+            <b>{sky.planetsUp} of {sky.planetsTotal} up</b>
+          </div>
+        </div>
+      )}
+
       {mode === 'full' && !machine && (
         <div className="instrument instrument-l readout-row">
           <div className="readout-cell">
@@ -677,7 +762,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
             <span className="k">Source</span>
             <b>{obsSource}</b>
           </div>
-          {TIME_OFFSET_MS !== 0 && (
+          {replay && (
             <div className="readout-cell">
               <span className="k">Epoch</span>
               <b className="text-accent">

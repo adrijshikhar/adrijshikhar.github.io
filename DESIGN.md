@@ -116,6 +116,37 @@ etched into it.
 
 ---
 
+## The Sun is the only ambient light
+
+There is no decorative glow anywhere. The page's warmth comes from
+`drawSunGlow`, anchored to the Sun's real computed position and faded by its
+real altitude on the standard twilight bands — full with the Sun up, out
+entirely at **−18°**, where astronomical night begins. Below that the page is
+black because it should be. What this replaced was a fixed warm blob pinned to
+the top-left corner (the last survivor of the old three-blob aurora): a light
+source the sky could not account for.
+
+The two modes state it with the mark each one already uses, exactly as stars
+are discs on black and open rings on paper:
+
+- **Dark emits** — a steady halo plus a tight core. No pulse. Sunlight does not
+  breathe, and animating it turns the whole page into a slow throb.
+- **Light engraves** — dashed rings spreading from the disc and fading, on
+  anime.js's clock with `outCubic` so they decelerate as a real ripple does.
+
+Ring geometry is **measured off the sprite, never guessed**. The sheet blits
+into a `2r` box, so in painted-radius units the glyph is: disc to 0.53, dashed
+rings at 0.58 / 0.77 / 0.96, outermost ink at 1.01, ink about ¾ of each step.
+The ripple continues that spacing. Getting these in viewport units instead of
+`vr` is what once left a dead band around the Sun.
+
+**Do not add travelling rings to dark mode.** Tried twice, ugly twice: rings
+over a continuous glow read as a bullseye, because the glow already fills the
+space they cross, so each band lands as a hard edge inside it rather than a
+wave over empty ground. That is the shape failing, not the timing — easing it
+or moving it to anime.js changes nothing. Light mode gets away with it
+precisely because it has no glow: there the rings cross bare paper.
+
 ## Motion
 
 - `transform` and `opacity` only. Never width, height, top or left.

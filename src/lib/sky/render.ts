@@ -168,6 +168,138 @@ export function fade(base: string, alpha: number): string {
   return `color-mix(in srgb, ${base} ${(alpha * 100).toFixed(2)}%, transparent)`;
 }
 
+/** Twilight. The one ambient light in the scene, anchored to the Sun's real
+ *  computed position and driven by its real altitude — so the page is warm
+ *  where the light actually comes from, and dark when the Sun is genuinely
+ *  down. It replaced a fixed warm blob in the top-left corner, which was a
+ *  glow from nowhere on a sky that claims to be true.
+ *
+ *  The ramp is the standard definition, not a taste curve: full strength with
+ *  the Sun up, fading through civil/nautical/astronomical twilight, and out
+ *  entirely at -18 degrees, which is where astronomical night begins and no
+ *  sunlight reaches the sky. Below that the page is black because it should be.
+ *
+ *  The two modes state it differently, for the same reason the stars do. Dark
+ *  mode EMITS: a soft bloom, because that is what light on black looks like.
+ *  Light mode ENGRAVES: concentric rings spreading from the disc and fading as
+ *  they go, which is how a printed chart draws radiance it cannot glow. A warm
+ *  bloom on paper is a stain; a ring is a mark.
+ *
+ *  Geometry measured off the sprite, not guessed. The sheet blits into a 2r box,
+ *  so in units of the painted radius the glyph is: orange disc to 0.53, then
+ *  three dashed rings at 0.58 / 0.77 / 0.96, outermost ink at 1.01, ink about
+ *  three quarters of each step. The ripple starts just past that and keeps the
+ *  same 0.19 spacing, so it continues the glyph rather than orbiting it —
+ *  getting these in the wrong units is what left a dead band around the Sun. */
+const TWILIGHT_FLOOR = -18;
+const GLOW_MAX_ALPHA = 0.16;
+/** Engraved radiance: concentric dashed circles leaving the disc and fading as
+ *  they spread — the Sun glyph's own language, continued outward. Measured off
+ *  the icon rather than guessed: its dashes are arc segments with a SMALL gap
+ *  (dash roughly 3x the gap), in two staggered rings sitting at 1.4-1.7x the
+ *  disc radius. So the ripple starts outside that and reaches only ~4 radii,
+ *  in Sun radii rather than viewport diagonal — at diagonal scale this was
+ *  just the old corner wash wearing a different shape. */
+const RING_COUNT = 3;
+const RING_START = 1.12;
+const RING_REACH = 1.55;
+/** Arc segments per ring, and how much of each step is ink rather than gap. */
+const RING_DASHES = 16;
+const RING_INK = 0.74;
+
+export function drawSunGlow(
+  ctx: CanvasRenderingContext2D,
+  W: number,
+  H: number,
+  bodies: BodyPos[],
+  colors: SkyColors,
+  /** 0–1, advanced by the caller's frame clock. Rings expand with it; at a
+   *  fixed value (reduced motion draws one frame) they read as static rings,
+   *  which is the same chart convention standing still. */
+  phase = 0,
+): void {
+  const sun = bodies.find((b) => b.isSun);
+  if (!sun || sun.alt <= TWILIGHT_FLOOR) return;
+
+  // 0 at astronomical night, 1 once the Sun is on the horizon or above.
+  const t = Math.min(1, (sun.alt - TWILIGHT_FLOOR) / -TWILIGHT_FLOOR);
+  const a = GLOW_MAX_ALPHA * t * t; // eased: twilight ramps, it does not switch
+
+  if (colors.engraved) {
+    const r0 = sun.vr * RING_START;   // starts outside the glyph's own dashes
+    const reach = sun.vr * RING_REACH;
+    ctx.strokeStyle = colors.planet;
+    ctx.lineWidth = 1;
+    ctx.lineCap = 'butt';             // square ends, like the glyph's segments
+    for (let k = 0; k < RING_COUNT; k++) {
+      const p = (phase + k / RING_COUNT) % 1; // evenly spaced along one cycle
+      // A ripple, not a decay: sin() takes each ring from nothing at the limb,
+      // up to full mid-travel, back to nothing at the edge. Fading only outward
+      // makes rings appear from thin air at the disc, which reads as a glitch.
+      const alpha = a * 1.5 * Math.sin(p * Math.PI);
+      if (alpha <= 0.004) continue;
+      const rad = r0 + p * reach;
+      // Dash length is derived from the circumference so every ring carries the
+      // same segment COUNT — a fixed pixel dash would multiply the segments as
+      // the ring grows and the pattern would visibly churn.
+      const step = (2 * Math.PI * rad) / RING_DASHES;
+      ctx.globalAlpha = alpha;
+      ctx.setLineDash([step * RING_INK, step * (1 - RING_INK)]);
+      ctx.lineDashOffset = k % 2 ? step * 0.5 : 0; // stagger, as the glyph does
+      ctx.beginPath();
+      ctx.arc(sun.x, sun.y, rad, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+    ctx.lineDashOffset = 0;
+    ctx.globalAlpha = 1;
+    return;
+  }
+
+  // Kept tight on purpose: a wide wash is indistinguishable from the corner
+  // blob this replaced. A contained bloom reads as light coming off a body.
+  //
+  // Three layers: a wide halo for the sky glow, a tight core for the light off
+  // the body, and the same outward ripple the engraved mode runs — stated as
+  // soft bands here rather than dashed rings, for the same reason the stars are
+  // discs on black and open rings on paper.
+  //
+  // Halo and core stay STEADY. Only the ripple moves. Breathing the whole glow
+  // turned the page into a slow throb, and unlike the ripple — which is a chart
+  // convention — a pulsing halo would be a claim about the Sun's output.
+  const R = Math.hypot(W, H) * 0.24;
+  const halo = ctx.createRadialGradient(sun.x, sun.y, 0, sun.x, sun.y, R);
+  halo.addColorStop(0, fade(colors.moonLit, a));
+  halo.addColorStop(0.22, fade(colors.planet, a * 0.5));
+  halo.addColorStop(0.55, fade(colors.planet, a * 0.16));
+  halo.addColorStop(1, 'transparent');
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = halo;
+  ctx.beginPath();
+  ctx.arc(sun.x, sun.y, R, 0, Math.PI * 2);
+  ctx.fill();
+
+  const CR = sun.vr * 6;
+  const core = ctx.createRadialGradient(sun.x, sun.y, 0, sun.x, sun.y, CR);
+  core.addColorStop(0, fade(colors.moonLit, a * 1.6));
+  core.addColorStop(0.45, fade(colors.planet, a * 0.5));
+  core.addColorStop(1, 'transparent');
+  ctx.fillStyle = core;
+  ctx.beginPath();
+  ctx.arc(sun.x, sun.y, CR, 0, Math.PI * 2);
+  ctx.fill();
+
+  // No travelling rings here, deliberately. Tried twice: concentric bands over
+  // a continuous glow read as a bullseye rather than a ripple, because the glow
+  // already fills the space the rings move through, so each band lands as a
+  // hard edge inside it instead of a wave crossing empty ground. That is a
+  // structural problem with the shape, not with the timing — easing it or
+  // driving it from anime.js changes nothing.
+  //
+  // The engraved mode gets away with it precisely because it has NO glow: there
+  // the rings cross bare paper, which is exactly what a printed chart does.
+}
+
 /** Quiet-mode draw: the faint field, the named stars, and the planets, Moon
  *  and Sun — the bodies that make it a sky on a given night rather than a
  *  generic starfield. What quiet still withholds is the *instrument*: no
@@ -184,8 +316,10 @@ export function drawQuiet(
   moonPhase: MoonPhase,
   colors: SkyColors,
   sprite?: PlanetSpriteRef | null,
+  sunPhase = 0,
 ): void {
   ctx.clearRect(0, 0, W, H);
+  drawSunGlow(ctx, W, H, bodies, colors, sunPhase); // behind everything, like real sky glow
 
   for (const f of faint) {
     if (f.alt < FLOOR) continue;
@@ -746,9 +880,11 @@ export function drawFull(
   mouse: { x: number; y: number },
   colors: SkyColors,
   sprite?: PlanetSpriteRef | null,
+  sunPhase = 0,
 ): void {
   ctx.clearRect(0, 0, W, H);
-  const { accent, muted, bright, moonLit, moonGlow, planet } = colors;
+  drawSunGlow(ctx, W, H, bodies, colors, sunPhase); // behind everything, like real sky glow
+  const { accent } = colors;
 
   // Constellations join progressively with scroll — every segment starts at
   // the same moment and finishes at the same moment, across the whole page.

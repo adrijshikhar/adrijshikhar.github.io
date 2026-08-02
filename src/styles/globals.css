@@ -155,10 +155,12 @@
     }
   }
 
-  /* Warm ambient wash behind the top of the page — bounded to 85vh and fading
-     out, so it lifts the ground without needing a readability veil painted back
-     over it. The old aurora was three animated blobs PLUS a radial scrim that
-     restored --bg over their centre: two systems cancelling each other out. */
+  /* Dark mode's ambient light is the Sun, drawn on the canvas at its real
+     computed position and faded by its real altitude (`drawSunGlow`). What
+     used to be here was a fixed warm blob pinned to the top-left corner — the
+     last survivor of the old three-blob aurora, and a light source the sky
+     could not account for. Only the faint cool counter remains, which reads as
+     atmosphere rather than as a lamp. */
   body::before {
     content: "";
     position: fixed;
@@ -166,11 +168,7 @@
     height: 85vh;
     z-index: -2;
     pointer-events: none;
-    background:
-      radial-gradient(90% 62% at 22% 0%, oklch(76% .130 70 / .12), transparent 62%),
-      /* cool counter-glow: gives the cold ground somewhere to read against the
-         warm signal, instead of one warm wash over a warm page. */
-      radial-gradient(70% 50% at 88% 6%, oklch(70% .050 250 / .07), transparent 66%);
+    background: radial-gradient(70% 50% at 88% 6%, oklch(70% .050 250 / .07), transparent 66%);
   }
   /* Light mode's tonal range lives here, not in the sky — see DESIGN.md. */
   :root[data-mode="light"] body::before {
@@ -704,6 +702,13 @@ body.spinning * {
   }
   .instrument-l { left: 1.6rem; }
   .instrument-r { right: 1.6rem; text-align: right; opacity: 0.8; }
+  /* Top-left ephemeris block — the one corner the instrument left empty.
+     Tucked under the viewfinder bracket, with a narrower label column than the
+     bottom readout: those labels are two words, these are one, and carrying the
+     wide column up here left the values stranded mid-corner. */
+  .instrument-tl { left: 1.25rem; top: 2.6rem; bottom: auto; }
+  .instrument-tl .k { width: 4.2rem; }
+  .instrument-tl .readout-cell { padding-left: 4.2rem; text-indent: -4.2rem; }
   /* Two instruments share the right corner: this usage hint sits at the base
      .instrument bottom (1.4rem); the easter-egg hook (SkyField.tsx) is
      positioned independently via its own `bottom-24` (6rem) Tailwind class —
@@ -875,6 +880,7 @@ body.spinning * {
   }
   html.machine-mode .expo,
   body.machine-mode .expo { opacity: 0; }
+
 
   /* The instrument frame belongs to the sky, so it leaves with the sky. */
   html.machine-mode .viewfinder,

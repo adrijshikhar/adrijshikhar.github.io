@@ -1,3 +1,3 @@
-import { animate, createTimeline, onScroll, utils } from 'animejs';
+import { animate, createTimeline, createTimer, eases, onScroll, utils } from 'animejs';
 
-export { animate, createTimeline, onScroll, utils };
+export { animate, createTimeline, createTimer, eases, onScroll, utils };
