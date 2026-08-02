@@ -702,7 +702,7 @@ body.spinning * {
     display: flex;
     flex-direction: column;
     line-height: 1.7;
-    max-width: calc((100vw - 46rem) / 2 - 2.1rem);
+    max-width: calc((100vw - 1rem - 46rem) / 2 - 2.1rem);
   }
   .readout-cell {
     display: block;
