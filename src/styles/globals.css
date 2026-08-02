@@ -22,20 +22,20 @@
    ========================================================================== */
 
 :root {
-  --bg:        oklch(14.5%  .004 62);
-  --surface:   oklch(19.2%  .005 62);   /* lifted card */
-  --surface-2: oklch(24.8%  .005 62);   /* lifted again */
-  --heading:   oklch(94%    .012 70);
-  --text:      oklch(85%    .012 66);
-  --muted:     oklch(72.5%  .010 68);
+  --bg:        oklch(14.5%  .010 250);
+  --surface:   oklch(19.2%  .012 250);   /* lifted card */
+  --surface-2: oklch(24.8%  .014 250);   /* lifted again */
+  --heading:   oklch(95%    .006 250);
+  --text:      oklch(85%    .008 250);
+  --muted:     oklch(70%    .012 250);
   --border: 255 255 255;                /* used as rgb(var(--border) / a) */
   --border-color: oklch(100% 0 0 / .11);
   --hairline:     oklch(100% 0 0 / .11);
   --rule:         oklch(100% 0 0 / .11);
   --rule-hi:      oklch(100% 0 0 / .26);
 
-  --accent: oklch(72% .085 64);         /* warm bronze, low chroma on purpose */
-  --accent-contrast: oklch(14.5% .004 62);
+  --accent: oklch(76% .130 70);         /* warm bronze, low chroma on purpose */
+  --accent-contrast: oklch(14.5% .010 250);
 
   /* Card — double bezel: an outer shell holding an inner core, concentric radii.
      Shadows are warm-tinted; pure black shadow is a tell. */
@@ -81,12 +81,12 @@
    ink marks. The sky canvas inverts to match: dark stars on cream, the way a
    printed celestial atlas reads. */
 :root[data-mode="light"] {
-  --bg:        oklch(97.8% .004 56);   /* warm paper */
+  --bg:        oklch(97.6% .005 250);   /* warm paper */
   --surface:   oklch(100%  0    0);
-  --surface-2: oklch(94.6% .003 60);
-  --heading:   oklch(28%   .022 60);   /* ink, not black */
-  --text:      oklch(38%   .028 61);
-  --muted:     oklch(50%   .008 55);
+  --surface-2: oklch(94.4% .006 250);
+  --heading:   oklch(26%   .018 255);   /* ink, not black */
+  --text:      oklch(37%   .020 255);
+  --muted:     oklch(49%   .012 252);
   --border: 0 0 0;                     /* used as rgb(var(--border) / a) */
   --border-color: oklch(28% .02 60 / .14);
   --hairline:     oklch(28% .02 60 / .14);
@@ -105,8 +105,8 @@
   --card-edge: inset 0 1px 0 oklch(100% 0 0 / .7);
 
   /* Bronze darkened for AA on paper — the dark-mode value fails contrast here. */
-  --accent: oklch(52% .105 58);
-  --accent-contrast: oklch(97.8% .004 56);
+  --accent: oklch(50% .145 62);
+  --accent-contrast: oklch(97.6% .005 250);
 
   /* shadcn token bridge — flip to light so ui/* components adapt */
   --background: 60 14% 96%;
@@ -167,13 +167,15 @@
     z-index: -2;
     pointer-events: none;
     background:
-      radial-gradient(90% 62% at 22% 0%, oklch(72% .085 64 / .13), transparent 62%),
-      radial-gradient(70% 50% at 88% 6%, oklch(72% .050 40 / .07), transparent 66%);
+      radial-gradient(90% 62% at 22% 0%, oklch(76% .130 70 / .12), transparent 62%),
+      /* cool counter-glow: gives the cold ground somewhere to read against the
+         warm signal, instead of one warm wash over a warm page. */
+      radial-gradient(70% 50% at 88% 6%, oklch(70% .050 250 / .07), transparent 66%);
   }
   :root[data-mode="light"] body::before {
     background:
-      radial-gradient(90% 62% at 22% 0%, oklch(62% .09 60 / .09), transparent 62%),
-      radial-gradient(70% 50% at 88% 6%, oklch(62% .06 35 / .05), transparent 66%);
+      radial-gradient(90% 62% at 22% 0%, oklch(50% .145 62 / .08), transparent 62%),
+      radial-gradient(70% 50% at 88% 6%, oklch(55% .05 250 / .05), transparent 66%);
   }
 
   /* Film grain — fixed and pointer-events:none, never on a scrolling container.
