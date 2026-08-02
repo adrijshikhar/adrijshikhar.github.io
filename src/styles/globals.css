@@ -652,3 +652,25 @@ body.spinning * {
     .live { animation: none; }
   }
 }
+
+/* Touch targets. The view toggle and mode controls are deliberately small
+   visually - they are chrome, not calls to action - but a 16px tap target
+   fails the 44px minimum badly on a phone. Extend the HIT AREA past the
+   visual bounds with a pseudo-element rather than padding the control, so
+   the instrument stays visually restrained while remaining thumb-usable. */
+@layer components {
+  .tap-44 { position: relative; }
+  .tap-44::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    /* grows to 44px in BOTH axes without ever shrinking a control that is
+       already larger, so it is safe to apply broadly */
+    min-width: 44px;
+    min-height: 44px;
+    width: 100%;
+    height: 100%;
+  }
+}

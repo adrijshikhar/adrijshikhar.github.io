@@ -91,7 +91,7 @@ const rawMarkdown = await buildRawMarkdown();
                 { href: 'https://www.reddit.com/user/adrijshikhar', icon: 'fa-brands fa-reddit-alien', label: 'Reddit' },
               ].map((sLink) => (
                 <li class="shrink-0 text-xs">
-                  <a class="block text-muted no-underline transition-colors duration-[120ms] hover:text-accent"
+                  <a class="tap-44 block text-muted no-underline transition-colors duration-[120ms] hover:text-accent"
                      href={sLink.href} target="_blank" rel="noreferrer noopener"
                      aria-label={`${sLink.label} (opens in a new tab)`}>
                     <i class={`${sLink.icon} text-xl`} aria-hidden="true"></i>
@@ -99,7 +99,7 @@ const rawMarkdown = await buildRawMarkdown();
                 </li>
               ))}
             </ul>
-            <a class="flex items-center gap-2 text-muted no-underline transition-colors duration-[120ms] hover:text-accent"
+            <a class="tap-44 flex items-center gap-2 text-muted no-underline transition-colors duration-[120ms] hover:text-accent"
                href="/resume">
               <i class="fa-solid fa-download" aria-hidden="true"></i>
               <span class="font-mono text-xs font-medium uppercase tracking-[0.16em]">CV</span>

@@ -193,7 +193,7 @@ export default function ViewToggle() {
         <Toggle
           pressed={mode === 'human'}
           onPressedChange={(pressed) => { if (pressed && mode !== 'human') toggle(); }}
-          className="!bg-transparent !h-auto !min-w-0 !px-0 !py-0 !rounded-none flex items-center gap-2 transition-colors duration-300 hover:!bg-transparent data-[state=on]:!bg-transparent"
+          className="tap-44 !bg-transparent !h-auto !min-w-0 !px-0 !py-0 !rounded-none flex items-center gap-2 transition-colors duration-300 hover:!bg-transparent data-[state=on]:!bg-transparent"
         >
           <span className={`size-[6px] inline-block rounded-full transition-all duration-500 ${
             mode === 'human' ? 'bg-current outline outline-1 outline-offset-1 outline-current' : 'outline outline-1 outline-offset-1 outline-muted'
@@ -205,7 +205,7 @@ export default function ViewToggle() {
         <Toggle
           pressed={mode === 'machine'}
           onPressedChange={(pressed) => { if (pressed && mode !== 'machine') toggle(); }}
-          className="!bg-transparent !h-auto !min-w-0 !px-0 !py-0 !rounded-none flex items-center gap-2 transition-colors duration-300 hover:!bg-transparent data-[state=on]:!bg-transparent"
+          className="tap-44 !bg-transparent !h-auto !min-w-0 !px-0 !py-0 !rounded-none flex items-center gap-2 transition-colors duration-300 hover:!bg-transparent data-[state=on]:!bg-transparent"
         >
           <span className={`size-[6px] inline-block rounded-full transition-all duration-500 ${
             mode === 'machine' ? 'bg-current outline outline-1 outline-offset-1 outline-current' : 'outline outline-1 outline-offset-1 outline-muted'
