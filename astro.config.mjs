@@ -3,6 +3,7 @@ import mdx from '@astrojs/mdx';
 import react from '@astrojs/react';
 import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
+import { codeThemeLight, codeThemeDark } from './src/lib/code-theme.mjs';
 
 export default defineConfig({
   site: 'https://adrijshikhar.dev',
@@ -12,9 +13,10 @@ export default defineConfig({
   trailingSlash: 'always',
   // Dual Shiki themes emitted as CSS variables (no baked color), so fenced code
   // blocks are readable in BOTH light and dark — switched by [data-mode] in globals.css.
+  // Themes are ours, not bundled: see src/lib/code-theme.mjs for why.
   markdown: {
     shikiConfig: {
-      themes: { light: 'github-light', dark: 'github-dark' },
+      themes: { light: codeThemeLight, dark: codeThemeDark },
       defaultColor: false,
     },
   },

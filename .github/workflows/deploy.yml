@@ -34,6 +34,8 @@ jobs:
 
       - name: Verify sky invariants
         run: bun run verify:sky
+      - name: Verify code theme contrast
+        run: bun run verify:code
 
 
       - name: Build
