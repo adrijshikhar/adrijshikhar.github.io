@@ -696,6 +696,53 @@ body.spinning * {
   .instrument b { color: var(--heading); font-weight: 500; }
   .instrument .k { display: inline-block; width: 6.5rem; opacity: 0.75; }
 
+  .readout-row {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    line-height: 1.5;
+  }
+  .readout-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0 1.15rem;
+    border-left: 1px solid var(--rule);
+  }
+  .readout-cell:first-child { padding-left: 0; border-left: 0; }
+  .readout-row .k {
+    width: auto;
+    font-size: 0.5625rem;
+    letter-spacing: 0.2em;
+    opacity: 0.6;
+  }
+  .readout-row b { font-variant-numeric: tabular-nums; }
+
+  .expo {
+    position: fixed;
+    top: 1.9rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 30;
+    display: flex;
+    gap: 0.5rem;
+    pointer-events: none;
+    transition: opacity 0.5s var(--ease-out);
+  }
+  .expo-cell {
+    border: 1px solid var(--rule);
+    padding: 0.2rem 0.55rem;
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  html.machine-mode .expo,
+  body.machine-mode .expo { opacity: 0; }
+
   /* The instrument frame belongs to the sky, so it leaves with the sky. */
   html.machine-mode .viewfinder,
   html.machine-mode .instrument,
@@ -712,6 +759,7 @@ body.spinning * {
      an enhancement, not load-bearing, so it simply steps aside. */
   @media (max-width: 767px) {
     .viewfinder u,
+    .expo,
     .instrument { display: none; }
   }
 }
