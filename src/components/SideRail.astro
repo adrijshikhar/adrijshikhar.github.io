@@ -1,17 +1,20 @@
 ---
 /**
- * The focus scale — in-page navigation rendered as the instrument's left-hand
- * graduated rail rather than a navbar.
+ * The EVF readout — in-page navigation rendered as a mirrorless viewfinder's
+ * live info cluster, not a lens-barrel focus scale. A fixed reticle bracket
+ * marks a constant vertical position; section labels step past it as you
+ * scroll, the way a focal-length readout advances past its index mark — the
+ * active one held bright, neighbours dimmed. Beside it, a hairline track
+ * fills continuously with real position through the whole document: two
+ * separate readouts, exactly like a real EVF's discrete-value cluster next
+ * to its always-live zoom/battery meter.
  *
- * A bar glued across the top reads as website chrome and cuts the viewfinder
- * in half; a vertical scale reads as part of the barrel. Each section is a
- * graduation: a hairline tick that extends and warms as you reach it, the way
- * a focus index travels. It lives inside the viewfinder's left bracket, is
- * vertically centred so it never fights the corner brackets, and never sits
- * over the content column (which is centred and 46rem wide).
- *
- * Keeps the scroll-spy contract intact: `data-section`, `.nav-link`,
- * `.nav-indicator`, `.nav-text`, same rootMargin. Only the geometry changed.
+ * Keeps the scroll-spy contract intact: `data-section`, `.nav-link`, same
+ * rootMargin. Motion is transform/opacity only — the stepping is driven by
+ * IntersectionObserver (no scroll listener); the continuous track by a
+ * scroll-driven CSS animation (`animation-timeline: scroll(root)`), which
+ * degrades to hidden where unsupported rather than showing a static — and
+ * therefore meaningless — bar.
  */
 const sections = [
   { id: 'about', label: 'About' },
@@ -24,19 +27,22 @@ const sections = [
 ---
 
 <nav class="side-rail" aria-label="In-page jump links">
-  <ul>
-    {sections.map((s, i) => (
-      <li>
-        <a class="group nav-link" href={`#${s.id}`} data-section={s.id}>
-          <!-- Graduation number: the scale reads as measured, not decorative.
-               Kept at 0.5rem so it registers as an engraved index, not a label. -->
-          <span class="rail-no">{String(i + 1).padStart(2, '0')}</span>
-          <span class="nav-indicator"></span>
-          <span class="nav-text">{s.label}</span>
-        </a>
-      </li>
-    ))}
-  </ul>
+  <div class="rail-progress" aria-hidden="true"><span class="rail-progress-fill"></span></div>
+
+  <div class="rail-window">
+    <!-- The fixed index mark. Constant position — it never moves; the labels move past it. -->
+    <div class="rail-reticle" aria-hidden="true"></div>
+    <ul class="rail-stack">
+      {sections.map((s, i) => (
+        <li>
+          <a class="nav-link" href={`#${s.id}`} data-section={s.id}>
+            <span class="rail-no">{String(i + 1).padStart(2, '0')}</span>
+            <span class="nav-text">{s.label}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
 </nav>
 
 <style>
@@ -47,73 +53,107 @@ const sections = [
     transform: translateY(-50%);
     z-index: 30;
     display: none;
+    align-items: center;
+    gap: 0.9rem;
   }
   /* Only where there is real margin to live in. Below this the content column
      fills the frame and a fixed rail would sit on top of it. */
   @media (min-width: 1180px) {
-    .side-rail { display: block; }
+    .side-rail { display: flex; }
   }
 
-  .side-rail ul {
+  /* ── Continuous track: real position through the whole document, not just
+     which section. A scroll-driven animation scales the fill from 0 to 1
+     across the full page scroll range — no scroll listener, no JS. Where
+     unsupported, hidden rather than shown static: a frozen bar would be a
+     mark that carries no information, which is worse than no mark. */
+  .rail-progress {
     position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-    margin: 0;
-    padding: 0 0 0 0.85rem;
-    list-style: none;
-  }
-
-  /* The scale spine: a dashed vertical rule the graduations hang off, using the
-     same 26px tick rhythm as the viewfinder's top edge so the two read as one
-     instrument. Mask-faded at both ends for the same reason the top scale is —
-     a hard-terminated rule reads as a border, a faded one reads as etched. */
-  .side-rail ul::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: -1.2rem;
-    bottom: -1.2rem;
     width: 1px;
-    background: repeating-linear-gradient(
-        180deg,
-        var(--rule-hi) 0 1px,
-        transparent 1px 100%
-      )
-      0 0 / 100% 8px;
-    opacity: 0.5;
-    -webkit-mask-image: linear-gradient(180deg, transparent, #000 14%, #000 86%, transparent);
-    mask-image: linear-gradient(180deg, transparent, #000 14%, #000 86%, transparent);
+    height: 9rem;
+    background: var(--rule);
+    flex: none;
+  }
+  .rail-progress-fill {
+    position: absolute;
+    inset: 0 0 auto 0;
+    width: 100%;
+    height: 100%;
+    background: var(--accent);
+    opacity: 0.9;
+    transform-origin: top;
+    transform: scaleY(0);
+    animation: rail-progress-fill linear;
+    animation-timeline: scroll(root);
+  }
+  @keyframes rail-progress-fill {
+    to { transform: scaleY(1); }
+  }
+  @supports not (animation-timeline: scroll(root)) {
+    .rail-progress { display: none; }
   }
 
-  /* Minor graduations between the named ones — the intermediate marks a real
-     zoom scale carries. Purely a density cue, so they never take pointer or
-     screen-reader attention. */
-  .side-rail li + li::before {
+  /* ── Windowed readout: three graduations tall, so the active label centres
+     on the reticle with one dimmed neighbour above and below — the same
+     silhouette as a focal-length dial's visible run. */
+  .rail-window {
+    position: relative;
+    overflow: hidden;
+    --item-h: 2.3rem;
+    height: calc(var(--item-h) * 3);
+  }
+
+  /* The reticle: a left bracket at a constant vertical position, the way an
+     EVF's focus point is a bracket rather than an underline. */
+  .rail-reticle {
+    position: absolute;
+    left: -0.7rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0.5rem;
+    height: var(--item-h);
+    border-left: 1px solid var(--accent);
+    opacity: 0.9;
+  }
+  .rail-reticle::before,
+  .rail-reticle::after {
     content: '';
     position: absolute;
     left: 0;
-    width: 0.34rem;
+    width: 0.5rem;
     height: 1px;
-    margin-top: -0.22rem;
-    background: var(--rule-hi);
-    opacity: 0.32;
+    background: var(--accent);
   }
-  .side-rail li { position: relative; }
+  .rail-reticle::before { top: 0; }
+  .rail-reticle::after { bottom: 0; }
+
+  .rail-stack {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    --i: 0;
+    /* Centres the active (index --i) item on the reticle: shift the whole
+       stack up by one item-height per step, then re-add one item-height so
+       index 0 sits centred rather than flush with the window's top edge. */
+    transform: translateY(calc(var(--item-h) * (1 - var(--i))));
+    transition: transform 0.6s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .rail-stack li {
+    height: var(--item-h);
+  }
 
   .nav-link {
     display: flex;
+    height: 100%;
     align-items: center;
     gap: 0.6rem;
-    padding: 0.42rem 0;
     text-decoration: none;
-    /* Heavy, mass-like curve rather than a UI ease — the index should feel
-       geared, not snapped. */
+    opacity: 0.4;
     transition: opacity 0.6s cubic-bezier(0.32, 0.72, 0, 1);
-    opacity: 0.62;
   }
   .nav-link:hover,
-  .nav-link:focus-visible { opacity: 1; }
+  .nav-link:focus-visible { opacity: 0.75; }
+  .nav-link.is-at { opacity: 1; }
 
   .rail-no {
     font-family: var(--font-mono);
@@ -122,22 +162,9 @@ const sections = [
     color: var(--muted);
     opacity: 0.5;
     width: 1.1rem;
-    transition: color 0.6s cubic-bezier(0.32, 0.72, 0, 1),
-                opacity 0.6s cubic-bezier(0.32, 0.72, 0, 1);
+    transition: color 0.6s cubic-bezier(0.32, 0.72, 0, 1);
   }
-
-  /* The graduation itself. Width is the whole language of the component:
-     short and cool at rest, long and warm at the index. */
-  .nav-indicator {
-    display: block;
-    height: 1px;
-    width: 0.85rem;
-    background: var(--rule-hi);
-    transition: width 0.6s cubic-bezier(0.32, 0.72, 0, 1),
-                background-color 0.6s cubic-bezier(0.32, 0.72, 0, 1);
-  }
-  .nav-link:hover .nav-indicator,
-  .nav-link:focus-visible .nav-indicator { width: 1.9rem; background: var(--accent); }
+  .nav-link.is-at .rail-no { color: var(--accent); opacity: 1; }
 
   .nav-text {
     font-family: var(--font-mono);
@@ -149,25 +176,30 @@ const sections = [
     transition: color 0.6s cubic-bezier(0.32, 0.72, 0, 1);
   }
   .nav-link:hover .nav-text,
-  .nav-link:focus-visible .nav-text { color: var(--heading); }
-
-  /* Active graduation, set by the observer below. */
-  .nav-link.is-at .nav-indicator { width: 2.4rem; background: var(--accent); }
+  .nav-link:focus-visible .nav-text,
   .nav-link.is-at .nav-text { color: var(--heading); }
-  .nav-link.is-at .rail-no { color: var(--accent); opacity: 1; }
-  .nav-link.is-at { opacity: 1; }
 
   /* The rail belongs to the instrument, so it leaves with the instrument. */
   :global(body.machine-mode) .side-rail { opacity: 0; pointer-events: none; }
   .side-rail { transition: opacity 0.5s var(--ease-out); }
 
+  /* Reduced motion: fall back to the static list this replaces — no
+     travelling reticle, no windowing, just the active label highlighted in
+     place among all six, all visible at once. */
   @media (prefers-reduced-motion: reduce) {
-    .nav-link, .nav-indicator, .nav-text, .rail-no { transition: none; }
+    .rail-progress,
+    .rail-reticle { display: none; }
+    .rail-window { overflow: visible; height: auto; }
+    .rail-stack { transform: none; transition: none; }
+    .nav-link,
+    .rail-no,
+    .nav-text { transition: none; }
   }
 </style>
 
 <script>
   const navLinks = document.querySelectorAll('.side-rail .nav-link');
+  const stack = document.querySelector('.rail-stack');
   const navIds = new Set([...navLinks].map((l) => l.getAttribute('data-section')));
   const sectionEls = [...document.querySelectorAll('section[id]')].filter((s) => navIds.has(s.id));
 
@@ -175,9 +207,12 @@ const sections = [
     (entries) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
-        navLinks.forEach((link) =>
-          link.classList.toggle('is-at', link.getAttribute('data-section') === entry.target.id),
-        );
+        const idx = [...navLinks].findIndex((l) => l.getAttribute('data-section') === entry.target.id);
+        navLinks.forEach((link, i) => link.classList.toggle('is-at', i === idx));
+        // Drives the reticle-centred stepping via CSS calc() — see .rail-stack.
+        // A no-op under reduced motion, where .rail-stack transform is forced
+        // to none regardless of --i.
+        if (idx !== -1) stack?.style.setProperty('--i', String(idx));
       });
     },
     { rootMargin: '-40% 0px -60% 0px' },
