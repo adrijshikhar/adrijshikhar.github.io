@@ -578,7 +578,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
             onClick={() => controlsRef.current?.enter()}
             aria-hidden={playing}
             tabIndex={playing ? -1 : 0}
-            className={`fixed right-6 bottom-24 z-[45] font-mono text-[0.625rem] tracking-[0.18em] uppercase text-muted transition-opacity duration-500 hover:text-accent ${
+            className={`tap-44 fixed right-6 bottom-24 z-[45] hidden font-mono text-[0.625rem] tracking-[0.18em] uppercase text-muted transition-opacity duration-500 hover:text-accent md:block ${
               playing ? 'pointer-events-none opacity-0' : 'opacity-30 hover:opacity-100'
             }`}
           >
