@@ -181,9 +181,20 @@ export default function SkyField({ mode }: SkyFieldProps) {
 
     let x = -100, y = -100, rx = -100, ry = -100, id = 0;
     const INTERACTIVE = 'a,button,[role="button"],input,select,textarea,label,summary';
+    // Hide the native cursor only once we know where to draw the custom one.
+    // Hiding it on mount left the ring parked off-screen at -100,-100 until the
+    // first pointermove, so a visitor who loaded the page and did not move the
+    // mouse had no pointer at all.
+    let armed = false;
     const onMove = (e: PointerEvent) => {
       x = e.clientX;
       y = e.clientY;
+      if (!armed) {
+        armed = true;
+        rx = x;
+        ry = y;
+        document.documentElement.classList.add('cursor-custom');
+      }
       dot.style.transform = `translate3d(${x}px, ${y}px, 0)`;
       const t = e.target as Element | null;
       document.body.classList.toggle('cur-ui', !!t?.closest?.(INTERACTIVE));
@@ -200,7 +211,6 @@ export default function SkyField({ mode }: SkyFieldProps) {
       id = requestAnimationFrame(follow);
     };
     id = requestAnimationFrame(follow);
-    document.documentElement.classList.add('cursor-custom');
 
     window.addEventListener('pointermove', onMove, { passive: true });
     window.addEventListener('pointerdown', onDown, { passive: true });
