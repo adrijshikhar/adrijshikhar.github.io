@@ -151,24 +151,3 @@ export function moonRaDec(when: Date): { ra: number; dec: number; km: number; il
   const waxing = elong < 180;
   return { ra, dec, km, illum, waxing };
 }
-
-/** A body's sky position plus its true distance from Earth (light years), as
- *  used for the 3-D separation readout. `distLy` is `null` when unknown. */
-export interface BodyPos {
-  ra: number;
-  dec: number;
-  distLy: number | null;
-}
-
-/* True 3-D separation between two bodies. Each sits at distance d along its
-   own RA/Dec direction, so the separation is |v₁ − v₂| — NOT the angle between
-   them. Two stars that look adjacent can be a thousand light years apart. */
-export function separationLy(a: BodyPos, b: BodyPos): number | null {
-  if (a.distLy == null || b.distLy == null) return null;
-  const vec = (o: BodyPos): [number, number, number] => {
-    const ra = o.ra * 15 * D2R, dec = o.dec * D2R, d = o.distLy as number;
-    return [d * Math.cos(dec) * Math.cos(ra), d * Math.cos(dec) * Math.sin(ra), d * Math.sin(dec)];
-  };
-  const [x1, y1, z1] = vec(a), [x2, y2, z2] = vec(b);
-  return Math.hypot(x1 - x2, y1 - y2, z1 - z2);          // light years
-}

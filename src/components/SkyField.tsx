@@ -503,7 +503,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
           sky is interactive at all. Sits above the easter-egg hook rather than
           replacing it: two instruments, one corner, stacked. */}
       {mode === 'full' && !machine && !playing && (
-        <div className="instrument instrument-r instrument-hint">
+        <div className="instrument instrument-r">
           move &middot; stars bend
           <br />
           hover &middot; name it

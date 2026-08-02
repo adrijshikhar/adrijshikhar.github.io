@@ -328,16 +328,6 @@
   }
 
 
-
-  /* Mono section index e.g. 01 / about */
-  .sec-index {
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    color: var(--accent);
-  }
-
 }
 
 /* Light mode: the `prose prose-invert` content uses prose-* utility overrides
@@ -432,7 +422,7 @@
 /* Ambient sky field (SkyField.tsx) — hidden in machine view, crossfades with
    the rest of the canvas so the human<->machine toggle stays a pure opacity
    swap (ViewToggle adds/removes .machine-mode on <body> in lockstep with
-   <html>). Light-mode inversion is a later task. */
+   <html>). */
 /* Matches BOTH ancestors on purpose. The no-FOUC head script can only mark
    <html> - <body> does not exist yet when it runs - while ViewToggle marks
    <body> once hydrated. Keying on body alone left the chrome visible through
@@ -619,10 +609,10 @@ body.spinning * {
   }
   .instrument-l { left: 1.6rem; }
   .instrument-r { right: 1.6rem; text-align: right; opacity: 0.8; }
-  /* Two instruments share the right corner: the usage hint and the easter-egg
-     hook. The hook keeps the prototype's 5.6rem slot; the hint sits below it
-     at the baseline, so neither moves when the other appears. */
-  .instrument-hint { bottom: 1.4rem; }
+  /* Two instruments share the right corner: this usage hint sits at the base
+     .instrument bottom (1.4rem); the easter-egg hook (SkyField.tsx) is
+     positioned independently via its own `bottom-24` (6rem) Tailwind class —
+     fixed apart so neither moves when the other appears. */
   .instrument b { color: var(--heading); font-weight: 500; }
   .instrument .k { display: inline-block; width: 6.5rem; opacity: 0.75; }
 

@@ -7,7 +7,6 @@ interface ProjectCardProps {
   link?: string;
   builtWith?: string[];
   contentHtml?: string;
-  index?: number;
 }
 
 const prose =
@@ -16,7 +15,7 @@ const prose =
   'prose-p:text-text prose-li:text-text prose-li:my-0.5 prose-ul:my-1.5 marker:text-accent ' +
   'prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-strong:text-heading prose-strong:font-medium';
 
-export default function ProjectCard({ title, company, date, link, builtWith = [], contentHtml, index = 0 }: ProjectCardProps) {
+export default function ProjectCard({ title, company, date, link, builtWith = [], contentHtml }: ProjectCardProps) {
   const Title = (
     <span className="transition-colors duration-[120ms] group-hover/list-item:text-accent">
       {title}

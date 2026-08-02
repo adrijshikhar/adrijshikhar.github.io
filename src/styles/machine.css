@@ -1,4 +1,4 @@
-/* === Initial states for GSAP-driven toggle === */
+/* === Initial states for the human/machine view toggle (ViewToggle.tsx) === */
 
 .human-view {
   opacity: 1;
