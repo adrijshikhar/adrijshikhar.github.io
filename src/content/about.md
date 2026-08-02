@@ -25,10 +25,7 @@ socials:
     icon: "fab fa-facebook-f"
 ---
 
-Welcome to my portfolio! I'm a graduate from IIT Roorkee. While my academic journey began in the world of chemistry, I quickly discovered my true passion for software development during my freshman year.
+Graduated from IIT Roorkee in chemistry, then spent my freshman year discovering
+I would rather build software. I have been doing that since.
 
-Over the past years, I've been honing my skills and working on exciting projects. My time is now dedicated to reading, writing, and crafting software solutions that not only solve problems but also push the boundaries of innovation.
-
-Explore my portfolio to see the fruits of my labor, from web applications to mobile apps and everything in between. I'm excited to share my journey and the projects that have shaped my development career. If you have any questions or would like to collaborate, don't hesitate to get in touch!
-
-Let's embark on this coding adventure together!
+These days that mostly means data infrastructure, and writing down what breaks.
