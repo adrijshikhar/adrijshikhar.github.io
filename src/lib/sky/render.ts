@@ -10,7 +10,10 @@
  * sky by adding more draw passes here, alongside `drawQuiet`.
  */
 import { STARS, PLANETS, FIGURES } from './catalogue';
-import { altAz, planetRaDec, moonRaDec, sunRaDec } from './astronomy';
+import {
+  altAz, planetRaDec, moonRaDec, sunRaDec,
+  BODY_KM, SATURN_RING_KM, apparentArcsec, planetIllum,
+} from './astronomy';
 import { project, FLOOR } from './projection';
 
 const D2R = Math.PI / 180;
@@ -232,6 +235,9 @@ export interface BodyPos extends NamedStarPos {
   /** The Sun. Drawn as a rayed disc: the rays break the silhouette, which is
    *  the only reason a body this small stays identifiable at 11px. */
   isSun: boolean;
+  /** Illuminated fraction, 0..1. Inner planets show real crescents; outer ones
+   *  sit at ~1 and draw full without needing a special case. */
+  illum?: number;
 }
 
 export interface MoonPhase {
@@ -252,6 +258,25 @@ const MOON_VR = 13;
 /** Sun and Moon subtend almost the same angle from Earth (~0.5 deg), so they
  *  share a size. Rays then extend to ~1.05x beyond this. */
 const SUN_VR = 11;
+/** Planets are sized by APPARENT ANGULAR EXTENT, not brightness. Magnitude sizing
+ *  made Saturn near-smallest because it is dim, when in fact its rings are the
+ *  widest planetary feature in the sky. sqrt compresses the ~9x spread between
+ *  Mars and Saturn into something drawable; 1.85 puts Saturn at ~12px, just under
+ *  the Moon, which preserves the true ordering (Sun and Moon really are ~45x
+ *  larger than any planet). */
+const APPARENT_SCALE = 1.85;
+/** Saturn's globe as a fraction of its ring radius. True ratio is 17.9/42 = 0.43,
+ *  but a 5px disc inside a 24px hoop reads as an empty ring rather than a planet,
+ *  so the body is fattened. The astronomy stays exact where it is load-bearing
+ *  (position, distance, the extent that decides Saturn is the biggest planet);
+ *  only the split of that extent into ink is a legibility choice. */
+const SATURN_BODY_FRAC = 0.62;
+
+function planetVr(name: string, au: number): number {
+  const km = name === 'Saturn' ? SATURN_RING_KM : BODY_KM[name];
+  if (!km) return vrFor(0);
+  return Math.sqrt(apparentArcsec(km, au)) * APPARENT_SCALE;
+}
 const SUN_MAG = -26.7;
 
 /** Ceiling on how opaque any single body (star, planet, or Moon) may draw in
@@ -303,11 +328,15 @@ export function computeFullSky(
   const stars: BodyPos[] = pts.map((s) => ({ ...s, isPlanet: false, isMoon: false, isSun: false }));
 
   const planets: BodyPos[] = Object.keys(PLANETS).map((name) => {
-    const { ra, dec } = planetRaDec(name, when);
+    const { ra, dec, au } = planetRaDec(name, when);
     const { alt, az } = altAz(ra, dec, obs.lat, obs.lon, when);
     const p = project(alt, az, W, H);
     const mag = PLANETS[name][2] ?? 0;
-    return { name, mag, alt, az, x: p.x, y: p.y, vr: vrFor(mag), isPlanet: true, isMoon: false, isSun: false };
+    return {
+      name, mag, alt, az, x: p.x, y: p.y,
+      vr: planetVr(name, au), isPlanet: true, isMoon: false, isSun: false,
+      illum: planetIllum(name, au),
+    };
   });
 
   const moon = moonRaDec(when);
@@ -558,16 +587,46 @@ export function drawFull(
         ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.92);
         ctx.strokeStyle = colour;
         ctx.lineWidth = Math.max(0.7, r * 0.085);
+        // Back half of the ring, then the globe, then the front half. Drawing it
+        // in three passes is what makes the ring read as passing BEHIND Saturn
+        // rather than as a flat ellipse laid over it.
+        const ringX = r;
+        const ringY = r * 0.3;
+        ctx.save();
+        ctx.translate(s.x, s.y);
+        ctx.rotate(-0.38);
         ctx.beginPath();
-        ctx.arc(s.x, s.y, r * 0.68, 0, Math.PI * 2);
+        ctx.ellipse(0, 0, ringX, ringY, 0, Math.PI, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, r * SATURN_BODY_FRAC, 0, Math.PI * 2);
         ctx.stroke();
         ctx.save();
         ctx.translate(s.x, s.y);
-        ctx.rotate(-0.38); // ring tilt, eyeballed to read as a ring not an ellipse
+        ctx.rotate(-0.38);
         ctx.beginPath();
-        ctx.ellipse(0, 0, r * 1.25, r * 0.34, 0, 0, Math.PI * 2);
+        ctx.ellipse(0, 0, ringX, ringY, 0, 0, Math.PI);
         ctx.stroke();
         ctx.restore();
+      } else if (s.isPlanet && s.illum !== undefined && s.illum < 0.92) {
+        // A real terminator, same construction as the Moon's. Only the inner
+        // planets ever get here: Mars sits at ~0.94 and the outer ones at 1.0,
+        // so they fall through to a full disc without being special-cased.
+        // This is Galileo's observation of Venus, drawn from live geometry.
+        const k = s.illum;
+        const br = r * 0.9;
+        ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.92);
+        ctx.strokeStyle = colour;
+        ctx.lineWidth = Math.max(0.7, r * 0.085);
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, br, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.fillStyle = colour;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, br, -Math.PI / 2, Math.PI / 2);
+        ctx.ellipse(s.x, s.y, br * Math.abs(1 - 2 * k), br, 0, Math.PI / 2, -Math.PI / 2, k > 0.5);
+        ctx.fill();
       } else if (s.name === 'Jupiter') {
         ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.92);
         ctx.strokeStyle = colour;

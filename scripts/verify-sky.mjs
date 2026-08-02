@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { altAz, planetRaDec, moonRaDec, gmstDeg, sunRaDec } from '../src/lib/sky/astronomy.ts';
+import { altAz, planetRaDec, moonRaDec, gmstDeg, sunRaDec, planetIllum } from '../src/lib/sky/astronomy.ts';
 
 const now = new Date();
 let passed = 0;
@@ -118,6 +118,26 @@ check('Sun is above the horizon at local noon, below at local midnight', () => {
   };
   assert.ok(at(6.5) > 60, `noon IST alt ${at(6.5)}, expected well above the horizon`);
   assert.ok(at(18.5) < -30, `midnight IST alt ${at(18.5)}, expected well below`);
+});
+
+// Phase is what decides whether a planet draws a terminator, so the inner/outer
+// split has to hold: only Mercury and Venus ever go crescent. If an outer planet
+// starts reporting a partial phase, the distance triangle is wrong.
+check('only the inner planets show phases', () => {
+  const now2 = new Date();
+  for (const p of ['Jupiter', 'Saturn']) {
+    const k = planetIllum(p, planetRaDec(p, now2).au);
+    assert.ok(k > 0.99, `${p} illum ${k}, outer planets are always ~full from Earth`);
+  }
+  const mars = planetIllum('Mars', planetRaDec('Mars', now2).au);
+  assert.ok(mars > 0.83 && mars <= 1, `Mars illum ${mars}, never crescent, never under ~0.84`);
+  // Venus must swing through a real crescent somewhere in its cycle.
+  let lo = 1;
+  for (let d = 0; d < 600; d += 10) {
+    const t = new Date(now2.getTime() + d * 86400000);
+    lo = Math.min(lo, planetIllum('Venus', planetRaDec('Venus', t).au));
+  }
+  assert.ok(lo < 0.2, `Venus min illum ${lo} over 600d, expected a real crescent`);
 });
 
 console.log(`\n${passed} checks passed`);
