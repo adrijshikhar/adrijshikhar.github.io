@@ -13,7 +13,13 @@ const fmt = (d) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'long
 const canonical = post.data.canonicalUrl ?? new URL(`/blogs/${post.id}/`, Astro.site).href;
 ---
 
-<BaseLayout title={`${post.data.title} | adrijshikhar.dev`} canonical={canonical}>
+<BaseLayout
+  title={`${post.data.title} | adrijshikhar.dev`}
+  canonical={canonical}
+  description={post.data.description}
+  ogType="article"
+  publishedAt={post.data.date}
+>
   <main class="mx-auto min-h-screen max-w-5xl px-6 py-16 md:px-12 md:py-24">
    <div class="mx-auto max-w-3xl">
     <a href="/blogs/" class="group link-back">
