@@ -22,10 +22,23 @@ paths and stays the right answer.
 
 ## What they ARE good for
 
-Favicon, apple-touch-icon and OG images, where the render size is 180-1024px
-and a fixed raster is fine. `observatory` and `telescope` are the strongest
-candidates for a site mark. Feed one to the `web-asset-generator` skill to
-produce the full size set.
+Large fixed rasters — apple-touch, android/maskable, OG. Not the favicon.
+
+**Correction, 2026-08-02.** This file previously named `observatory` and
+`telescope` as the site-mark candidates. Both were rendered at real favicon
+sizes and both fail: at 16px they are an indistinct smudge, for the same reason
+the packs fail on the canvas. A favicon renders *smaller* than the canvas
+planets do, so it is the harshest test here, not the easiest.
+
+Of the pack, only the simple radial forms survive 16px — `orbit`, `eclipse`,
+`planet`. `orbit` is the closest to the site's own language (concentric rings,
+bodies on them, a disc at centre — the graticule).
+
+**What actually shipped** is a hand-drawn SVG of that idea rather than the
+raster: `public/favicon.svg`, two rings plus two orbiting bodies on the ground
+colour, with the accent baked to `#e5a14b`. Vector means it is exact at 16px
+and at 512, and the whole size set rasterises from the one source. The pack
+icon informed the concept; no pack pixels are in the shipped mark.
 
 ## Attribution (required)
 
