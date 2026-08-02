@@ -116,6 +116,10 @@ export default function SkyField({ mode }: SkyFieldProps) {
         // the base colour itself carries a low alpha on top of the per-star
         // magnitude alpha already applied where this is used.
         faint: light ? fade(ink, 0.3) : cs.getPropertyValue('--muted').trim(),
+        // Light mode isn't dark mode with the colours swapped — a filled disc
+        // that reads as a glowing star on black reads as a dirt speck on cream.
+        // This tells the renderer to switch glyph shape, not just palette.
+        engraved: light,
       };
       if (mode === 'full') {
         const { bodies, faint, moonPhase } = computeFullSky(obs, new Date(), W, H);

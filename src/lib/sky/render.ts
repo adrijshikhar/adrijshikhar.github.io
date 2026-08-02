@@ -107,6 +107,46 @@ export interface SkyColors {
   /** Faint background field colour — already faded, since the faint field's
    *  per-star magnitude alpha still multiplies on top of it. */
   faint: string;
+  /** Light mode draws an engraved chart, not a photographed sky. Colour alone
+   *  can't carry that: a filled disc reads as a glowing star on black but as a
+   *  dirt speck on cream, because a luminous point inverts to a hole, not to a
+   *  drawn mark. So the glyph SHAPE changes too — bright stars become open
+   *  rings (the star-chart convention) and the faint field thins out. */
+  engraved: boolean;
+}
+
+/** Above this painted radius a star is drawn as an open ring in engraved mode.
+ *  Below it a ring would collapse into a blob, so it stays a small solid dot. */
+const ENGRAVED_RING_MIN_VR = 1.9;
+
+/** Draw one catalogue star: a filled disc normally, an open ring when engraved
+ *  and big enough to hold one. Shared by the quiet and full views so the two
+ *  can't drift apart. */
+function markStar(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  vr: number,
+  colour: string,
+  alpha: number,
+  engraved: boolean,
+): void {
+  if (engraved && vr >= ENGRAVED_RING_MIN_VR) {
+    // Open ring: ink on the circumference only. Keeps the star's size legible
+    // without laying down a solid dark blob over cream.
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = colour;
+    ctx.lineWidth = Math.min(1.1, 0.45 + vr * 0.12);
+    ctx.beginPath();
+    ctx.arc(x, y, vr * 0.92, 0, Math.PI * 2);
+    ctx.stroke();
+    return;
+  }
+  ctx.globalAlpha = engraved ? alpha * 0.72 : alpha;
+  ctx.fillStyle = colour;
+  ctx.beginPath();
+  ctx.arc(x, y, vr, 0, Math.PI * 2);
+  ctx.fill();
 }
 
 /** Blend `base` toward transparent at `alpha` (0–1) via CSS `color-mix` —
@@ -133,8 +173,13 @@ export function drawQuiet(
 
   for (const f of faint) {
     if (f.alt < FLOOR) continue;
+    // Engraved mode drops the faintest half of the field. On black these are
+    // atmospheric dust; on cream the same marks are just grubby stipple, and
+    // they were the bulk of the ink on the page.
+    if (colors.engraved && f.mag > 4.6) continue;
     const below = f.alt < 0 ? 0.22 : 1;
-    ctx.globalAlpha = (0.3 - (f.mag - 3.6) * 0.055) * below;
+    const dust = colors.engraved ? 0.45 : 1;
+    ctx.globalAlpha = (0.3 - (f.mag - 3.6) * 0.055) * below * dust;
     ctx.fillStyle = colors.faint;
     ctx.beginPath();
     ctx.arc(f.x, f.y, f.mag < 4.6 ? 1.15 : 0.8, 0, Math.PI * 2);
@@ -146,15 +191,13 @@ export function drawQuiet(
     const below = s.alt < 0 ? 0.3 : 1;      // under the earth -> dim, not hidden
     const a = starAlpha(s.mag) * below;
 
-    ctx.globalAlpha = a * 0.92;
-    ctx.fillStyle = s.mag < 1.0 ? colors.bright : colors.muted;
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, s.vr, 0, Math.PI * 2);
-    ctx.fill();
+    markStar(ctx, s.x, s.y, s.vr, s.mag < 1.0 ? colors.bright : colors.muted, a * 0.92, colors.engraved);
 
     // Bloom on the brightest stars — MUST be a radial gradient; a flat-alpha
-    // disc has a hard edge and reads as a grey ring, not a glow.
-    if (s.mag < 0.6 && s.alt > 0) {
+    // disc has a hard edge and reads as a grey ring, not a glow. Skipped when
+    // engraved: dark ink fading outward on cream is a smudge, not a glow, and
+    // print star charts express brightness through mark size, not halo.
+    if (s.mag < 0.6 && s.alt > 0 && !colors.engraved) {
       const R = s.vr * 4.2;
       const g = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, R);
       g.addColorStop(0, fade(colors.bright, a * 0.3));
@@ -425,8 +468,10 @@ export function drawFull(
 
   for (const f of faint) {
     if (f.alt < FLOOR) continue;
+    if (colors.engraved && f.mag > 4.6) continue; // see drawQuiet: stipple on cream
     const below = f.alt < 0 ? 0.22 : 1;
-    ctx.globalAlpha = (0.3 - (f.mag - 3.6) * 0.055) * below;
+    const dust = colors.engraved ? 0.45 : 1;
+    ctx.globalAlpha = (0.3 - (f.mag - 3.6) * 0.055) * below * dust;
     ctx.fillStyle = colors.faint;
     ctx.beginPath();
     ctx.arc(f.x, f.y, f.mag < 4.6 ? 1.15 : 0.8, 0, Math.PI * 2);
@@ -467,12 +512,19 @@ export function drawFull(
       ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
       ctx.stroke();
     } else {
-      ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.92);
-      // planets read as small discs with a faint ring — steady, not point-like
-      ctx.fillStyle = i === hoverIndex ? accent : s.isPlanet ? planet : s.mag < 1.0 ? bright : muted;
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
-      ctx.fill();
+      const colour = i === hoverIndex ? accent : s.isPlanet ? planet : s.mag < 1.0 ? bright : muted;
+      // Planets keep their solid disc even when engraved — a filled disc against
+      // ringed stars is exactly how a print chart distinguishes a planet from a
+      // star, so here the shape difference is signal rather than noise.
+      if (colors.engraved && !s.isPlanet) {
+        markStar(ctx, s.x, s.y, r, colour, a * (i === hoverIndex ? 1 : 0.92), true);
+      } else {
+        ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.92);
+        ctx.fillStyle = colour;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
       if (s.isPlanet) {
         ctx.globalAlpha = a * 0.3;
         ctx.strokeStyle = planet;
@@ -497,7 +549,7 @@ export function drawFull(
 
     // Bloom on the brightest stars. MUST be a radial gradient — a flat-alpha
     // disc has a hard edge and reads as a grey ring around the star, not a glow.
-    if (s.mag < 0.6 && s.alt > 0) {
+    if (s.mag < 0.6 && s.alt > 0 && !colors.engraved) {
       const R = r * 4.2;
       const g = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, R);
       g.addColorStop(0, fade(bright, a * 0.3));
