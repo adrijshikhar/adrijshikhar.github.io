@@ -66,7 +66,12 @@ const RADIUS = 150; // gravity well influence radius
 const MAX_PULL = 6; // max px a star is ever displaced from home
 const K = 0.14; // spring stiffness toward target
 const DAMP = 0.78; // velocity retained per frame
-const DRAG = 0.994; // near-frictionless space, sling mode
+/** Near-frictionless space, sling mode. Coast distance is v0 * DRAG/(1-DRAG),
+ *  so this — not LAUNCH_SPEED — is the travel knob: 0.994 gave ~165x the launch
+ *  speed (~1490px), 0.997 gives ~332x (~2990px). Raised here rather than
+ *  raising LAUNCH_SPEED, which would buy the same distance by making stars
+ *  faster, and 100%-power shots already read as too fast. */
+const DRAG = 0.997;
 export const MAX_PULL_PX = 110; // drag distance that reaches 100% power
 /** Launch speed at 100% power for a mass-1 star, in px/frame. At 60fps:
  *  9px/frame ~= 540px/s ~= 2.2s to cross a 1200px viewport. */
