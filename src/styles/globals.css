@@ -637,3 +637,18 @@ body.spinning * {
     .instrument { display: none; }
   }
 }
+
+/* Live indicator on the hero eyebrow. Ported from the prototype: it marks the
+   readout as live rather than printed, which is the same claim the sidereal
+   clock and observer coordinates make. Motion is the whole point, so it stops
+   entirely under reduced-motion rather than degrading. */
+@layer components {
+  @keyframes live-pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.28; }
+  }
+  .live { animation: live-pulse 2.4s var(--ease-out) infinite; }
+  @media (prefers-reduced-motion: reduce) {
+    .live { animation: none; }
+  }
+}
