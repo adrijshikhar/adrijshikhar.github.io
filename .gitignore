@@ -31,3 +31,6 @@ scratch/
 
 # playwright run artifacts
 test-results/
+
+# agent scaffolding, not product code
+.superpowers/
