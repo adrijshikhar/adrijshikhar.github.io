@@ -129,11 +129,9 @@ source the sky could not account for.
 The two modes state it with the mark each one already uses, exactly as stars
 are discs on black and open rings on paper:
 
-- **Dark emits** — a steady halo and core, plus **one** slow soft swell that
-  leaves the body and fades as it spreads. One, and close in: several waves in
-  flight stack into concentric grey rings across the whole viewport, because
-  every wavefront is an edge. The steady halo covers the trough, so a single
-  wave never leaves a gap.
+- **Dark emits** — a steady halo and core, plus one slow **swell**: a disc whose
+  reach and intensity ease up and back down on a smoothstep, shallow enough
+  that the halo underneath still carries most of the brightness.
 - **Light engraves** — dashed rings spreading from the disc and fading, which
   is how a printed chart draws radiance it cannot glow.
 
@@ -149,14 +147,25 @@ rings at 0.58 / 0.77 / 0.96, outermost ink at 1.01, ink about ¾ of each step.
 The ripple continues that spacing. Getting these in viewport units instead of
 `vr` is what once left a dead band around the Sun.
 
-**Dark mode's wave must be a disc, never a ring.** Rings there were tried
-twice and were ugly twice — first as soft filled bands, then as dashed
-hairlines. Both read as a bullseye, and for the same reason: the glow already
-fills the space a ring crosses, so every ring lands as an *edge inside* it
-rather than a wave over open ground. That is the shape failing, not the timing
-— easing it or moving it to anime.js changed nothing either time. A
-centre-bright disc has no edge to read, so the identical outward motion
-registers as light spreading.
+**Dark mode's glow profile must be monotonic — brightest at the centre,
+falling to nothing.** This is geometry, not tuning, and it took five attempts
+to admit:
+
+> For a radially symmetric glow, *travelling outward* means the bright zone
+> leaves the centre — a maximum at some non-zero radius — and the eye reads
+> **any** off-centre maximum as a ring. So "spreads outward" and "has no ring"
+> cannot both hold. Pick one.
+
+A `transparent → colour → transparent` gradient is an annulus by construction
+however long its inner ramp: the ramp still has a crest at the top. Measured,
+that crest appeared at every phase of the cycle. Soft filled bands, dashed
+hairlines, one wave, four waves — all the same failure, and neither easing nor
+moving the clock to anime.js touched it, because none of them changed the
+shape.
+
+Taking "no ring" as binding, the dark glow **swells** instead of travelling.
+Verify any change with a radial alpha profile sampled across a full cycle: it
+must fall monotonically from the disc at every phase.
 
 Light mode gets rings precisely because it has no glow: there they cross bare
 paper, which is what a printed chart does.
