@@ -525,8 +525,8 @@ body.playing .human-view {
   animation: mass-note-in 0.5s var(--ease-out) both;
 }
 @keyframes mass-note-in {
-  from { opacity: 0; transform: translate(-50%, 6px); }
-  to   { opacity: 1; transform: translate(-50%, 0); }
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 @media (prefers-reduced-motion: reduce) {
   .mass-note { animation: none; }
@@ -720,6 +720,72 @@ body.spinning * {
   }
   .readout-row b { font-variant-numeric: tabular-nums; }
 
+
+  /* Every floating control shares this. Square, hairline, unshadowed — the
+     chrome register from DESIGN.md. Backdrop blur only, no card shadow: these
+     sit ON the glass, not above it. */
+  .chrome-panel {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--rule);
+    background: color-mix(in srgb, var(--surface) 88%, transparent);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* Segmented control inside a chrome panel — the human/machine and
+     sling/draw pairs. Selection is the accent plus a brighter edge, never a
+     filled pill. */
+  .chrome-seg {
+    border: 1px solid transparent;
+    padding: 0.25rem 0.6rem;
+    /* Explicit, not inherited: shadcn's Toggle ships text-sm font-medium and a
+       text-transform reset, which put HUMAN/MACHINE at 14px sentence case
+       inside a 10px uppercase panel. */
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    font-weight: 400;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: none;
+    transition:
+      color 0.22s var(--ease-out),
+      border-color 0.22s var(--ease-out);
+  }
+  .chrome-seg:hover { color: var(--heading); }
+  .chrome-seg[aria-pressed='true'],
+  .chrome-seg[data-state='on'] {
+    color: var(--accent);
+    border-color: var(--rule-hi);
+  }
+
+  /* Banded rows inside a vertical chrome panel: tools, then live status, then
+     actions. Hairlines between bands do the grouping, so the panel reads as an
+     instrument face rather than a list of links. */
+  .chrome-group {
+    display: flex;
+    align-items: stretch;
+    border-bottom: 1px solid var(--rule);
+  }
+  .chrome-group:last-child { border-bottom: 0; }
+  .chrome-group .chrome-seg + .chrome-seg { border-left: 1px solid var(--rule); }
+
+  .chrome-status {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.45rem 0.6rem;
+    border-bottom: 1px solid var(--rule);
+    line-height: 1.5;
+    text-align: left;
+  }
+  .chrome-status-val b { color: var(--accent); font-weight: 500; }
 
   .expo {
     position: fixed;

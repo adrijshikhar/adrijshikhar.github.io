@@ -716,7 +716,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
               owns fixed bottom-6 left-1/2, z-[1100] — sharing that spot would
               have it permanently paint over half the tool bar. */}
           {playing && figure && (
-            <p className="mass-note fixed left-1/2 bottom-32 z-[45] -translate-x-1/2 whitespace-nowrap font-mono text-[0.625rem] tracking-[0.14em] uppercase text-muted">
+            <p className="mass-note fixed right-6 bottom-6 z-[45] max-w-[15rem] text-right font-mono text-[0.625rem] leading-relaxed tracking-[0.14em] uppercase text-muted">
               {figure.drawn === figure.total ? (
                 <>
                   <b className="font-medium text-accent">{figure.name}</b> complete &mdash; all {figure.total} segments
@@ -731,68 +731,75 @@ export default function SkyField({ mode }: SkyFieldProps) {
           )}
 
           {playing && !figure && massNote && (
-            <p className="mass-note fixed left-1/2 bottom-32 z-[45] -translate-x-1/2 whitespace-nowrap font-mono text-[0.625rem] tracking-[0.14em] uppercase text-muted">
+            <p className="mass-note fixed right-6 bottom-6 z-[45] max-w-[15rem] text-right font-mono text-[0.625rem] leading-relaxed tracking-[0.14em] uppercase text-muted">
               same pull, less mass &mdash; <b className="font-medium text-accent">faint stars fly faster</b>
               <span className="opacity-60"> · v &prop; 1/&radic;m</span>
             </p>
           )}
 
           {playing && (
-            <div className="fixed left-1/2 bottom-20 z-[45] flex -translate-x-1/2 items-center gap-4 rounded-full border border-[color:var(--rule)] bg-[color-mix(in_srgb,var(--surface)_88%,transparent)] px-4 py-2 font-mono text-[0.625rem] tracking-[0.14em] uppercase text-muted backdrop-blur-xl">
-              <button
-                type="button"
-                aria-pressed={tool === 'sling'}
-                onClick={() => controlsRef.current?.setTool('sling')}
-                className={`rounded-full border px-3 py-1 transition-colors ${
-                  tool === 'sling' ? 'text-accent border-accent' : 'text-muted border-[color:var(--rule)]'
-                }`}
-              >
-                sling
-              </button>
-              <button
-                type="button"
-                aria-pressed={tool === 'draw'}
-                onClick={() => controlsRef.current?.setTool('draw')}
-                className={`rounded-full border px-3 py-1 transition-colors ${
-                  tool === 'draw' ? 'text-accent border-accent' : 'text-muted border-[color:var(--rule)]'
-                }`}
-              >
-                draw
-              </button>
-              {tool === 'draw' && (
+            <div className="chrome-panel fixed right-6 bottom-24 z-[45] w-[11.5rem] flex-col items-stretch gap-0 p-0">
+              <div className="chrome-group">
                 <button
                   type="button"
-                  title="return to your own sky"
-                  onClick={() => controlsRef.current?.home()}
-                  className="rounded-full border border-[color:var(--rule)] px-3 py-1 text-muted transition-colors hover:text-accent"
+                  aria-pressed={tool === 'sling'}
+                  onClick={() => controlsRef.current?.setTool('sling')}
+                  className="chrome-seg flex-1"
                 >
-                  home
+                  sling
                 </button>
-              )}
-              {tool === 'sling' ? (
-                <>
-                  <span>pull back &amp; release</span>
-                  <span>
-                    <b className="text-heading font-medium">{struck}</b> struck
-                  </span>
-                </>
-              ) : (
-                <span>drag star&rarr;star — link · drag sky — travel</span>
-              )}
-              <button
-                type="button"
-                onClick={() => controlsRef.current?.reset()}
-                className="rounded-full border border-[color:var(--rule)] px-3 py-1 text-muted transition-colors hover:text-accent"
-              >
-                reset
-              </button>
-              <button
-                type="button"
-                onClick={() => controlsRef.current?.exit()}
-                className="rounded-full border border-[color:var(--rule)] px-3 py-1 text-muted transition-colors hover:text-accent"
-              >
-                exit
-              </button>
+                <button
+                  type="button"
+                  aria-pressed={tool === 'draw'}
+                  onClick={() => controlsRef.current?.setTool('draw')}
+                  className="chrome-seg flex-1"
+                >
+                  draw
+                </button>
+              </div>
+
+              <div className="chrome-status">
+                {tool === 'sling' ? (
+                  <>
+                    <span>pull back &amp; release</span>
+                    <span className="chrome-status-val">
+                      <b>{struck}</b> struck
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span>drag star&rarr;star &mdash; link</span>
+                    <span>drag sky &mdash; travel</span>
+                  </>
+                )}
+              </div>
+
+              <div className="chrome-group">
+                {tool === 'draw' && (
+                  <button
+                    type="button"
+                    title="return to your own sky"
+                    onClick={() => controlsRef.current?.home()}
+                    className="chrome-seg flex-1"
+                  >
+                    home
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => controlsRef.current?.reset()}
+                  className="chrome-seg flex-1"
+                >
+                  reset
+                </button>
+                <button
+                  type="button"
+                  onClick={() => controlsRef.current?.exit()}
+                  className="chrome-seg flex-1"
+                >
+                  exit
+                </button>
+              </div>
             </div>
           )}
 

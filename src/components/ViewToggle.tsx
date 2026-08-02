@@ -188,31 +188,27 @@ export default function ViewToggle() {
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[1100] flex items-center gap-2">
       <div
         ref={islandRef}
-        className="flex gap-4 px-4 py-2.5 rounded-xl backdrop-blur-xl font-mono text-sm bg-[color-mix(in_srgb,var(--surface)_92%,transparent)] border border-[rgb(var(--border)/0.14)] shadow-[var(--card-shadow)]"
+        className="chrome-panel gap-1 px-1.5 py-1.5"
       >
         <Toggle
           pressed={mode === 'human'}
           onPressedChange={(pressed) => { if (pressed && mode !== 'human') toggle(); }}
-          className="tap-44 !bg-transparent !h-auto !min-w-0 !px-0 !py-0 !rounded-none flex items-center gap-2 transition-colors duration-300 hover:!bg-transparent data-[state=on]:!bg-transparent"
+          className="chrome-seg tap-44 !h-auto !min-w-0 !rounded-none flex items-center gap-1.5 !bg-transparent hover:!bg-transparent data-[state=on]:!bg-transparent"
         >
-          <span className={`size-[6px] inline-block rounded-full transition-all duration-500 ${
-            mode === 'human' ? 'bg-current outline outline-1 outline-offset-1 outline-current' : 'outline outline-1 outline-offset-1 outline-muted'
+          <span className={`size-[5px] inline-block rounded-full transition-all duration-500 ${
+            mode === 'human' ? 'bg-current' : 'outline outline-1 outline-offset-1 outline-current opacity-50'
           }`} />
-          <span className={`uppercase text-xs tracking-wider transition-colors duration-300 ${
-            mode === 'human' ? 'text-heading' : 'text-muted'
-          }`}>Human</span>
+          <span>Human</span>
         </Toggle>
         <Toggle
           pressed={mode === 'machine'}
           onPressedChange={(pressed) => { if (pressed && mode !== 'machine') toggle(); }}
-          className="tap-44 !bg-transparent !h-auto !min-w-0 !px-0 !py-0 !rounded-none flex items-center gap-2 transition-colors duration-300 hover:!bg-transparent data-[state=on]:!bg-transparent"
+          className="chrome-seg tap-44 !h-auto !min-w-0 !rounded-none flex items-center gap-1.5 !bg-transparent hover:!bg-transparent data-[state=on]:!bg-transparent"
         >
-          <span className={`size-[6px] inline-block rounded-full transition-all duration-500 ${
-            mode === 'machine' ? 'bg-current outline outline-1 outline-offset-1 outline-current' : 'outline outline-1 outline-offset-1 outline-muted'
+          <span className={`size-[5px] inline-block rounded-full transition-all duration-500 ${
+            mode === 'machine' ? 'bg-current' : 'outline outline-1 outline-offset-1 outline-current opacity-50'
           }`} />
-          <span className={`uppercase text-xs tracking-wider transition-colors duration-300 ${
-            mode === 'machine' ? 'text-heading' : 'text-muted'
-          }`}>Machine</span>
+          <span>Machine</span>
         </Toggle>
       </div>
     </div>
