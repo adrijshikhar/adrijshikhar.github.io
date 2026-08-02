@@ -93,6 +93,41 @@ export const EARTH: OrbitalElements = [[ 1.00000261, 0.01671123, -0.00001531, 10
                [ 0.00000562,-0.00004392, -0.01294668,  35999.37244981, 0.32327364, 0.0]];
 
 /* real constellation figures — hovering any segment names the figure */
+/** Distance from the Sun in light years, for the named catalogue stars.
+ *
+ *  Static on purpose, and safe to be: a star's distance is a property of the
+ *  STAR, not of the observer. Changing location (or drag-travelling the sky)
+ *  changes which stars are up and where they sit — alt/az, recomputed every
+ *  frame — but not how far away they are. Earth's entire orbit is 2 AU across,
+ *  which is 0.00003 ly; against the nearest entry here (4.4 ly) that is four
+ *  decimal places below anything renderable.
+ *
+ *  Planets are deliberately absent. Their distance genuinely does change, so it
+ *  comes live from `planetRaDec().au` instead of any table.
+ *
+ *  Values are rounded published parallax distances — good to the significant
+ *  figures shown, which is all a separation readout claims. */
+export const DIST_LY: Record<string, number> = {
+ 'Sirius': 8.6, 'Canopus': 310, 'Rigil Kent.': 4.4, 'Arcturus': 36.7, 'Vega': 25,
+ 'Capella': 42.9, 'Rigel': 860, 'Procyon': 11.5, 'Achernar': 139, 'Betelgeuse': 548,
+ 'Hadar': 390, 'Altair': 16.7, 'Acrux': 320, 'Aldebaran': 65, 'Spica': 250, 'Antares': 550,
+ 'Pollux': 33.8, 'Fomalhaut': 25.1, 'Deneb': 2615, 'Mimosa': 280, 'Regulus': 79,
+ 'Adhara': 430, 'Castor': 51, 'Shaula': 570, 'Gacrux': 88, 'Bellatrix': 250, 'Elnath': 134,
+ 'Miaplacidus': 113, 'Alnilam': 2000, 'Alnair': 101, 'Alnitak': 1260, 'Alioth': 81,
+ 'Dubhe': 123, 'Mirfak': 510, 'Wezen': 1600, 'Kaus Aus.': 143, 'Alkaid': 104,
+ 'Sargas': 270, 'Avior': 610, 'Menkalinan': 81, 'Atria': 391, 'Alhena': 109,
+ 'Peacock': 179, 'Polaris': 433, 'Mirzam': 500, 'Alphard': 177, 'Hamal': 66, 'Diphda': 96,
+ 'Nunki': 228, 'Saiph': 650, 'Menkent': 61, 'Algieba': 130, 'Mintaka': 1200, 'Mizar': 83,
+ 'Schedar': 228, 'Caph': 55, 'Merak': 79, 'Phecda': 84, 'Ruchbah': 99, 'Megrez': 58,
+ 'Gamma Cas': 550, 'Segin': 410, 'Delta Cru': 345, 'Sadr': 1800, 'Gienah Cyg': 72,
+ 'Albireo': 430, 'Delta Cyg': 165, 'Dschubba': 400, 'Acrab': 400, 'Epsilon Sco': 65,
+ 'Denebola': 36, 'Zosma': 58, 'Alphecca': 75, 'Rasalhague': 48, 'Alpheratz': 97,
+ 'Mirach': 197, 'Almach': 350, 'Markab': 133, 'Scheat': 196, 'Algenib': 470, 'Kochab': 131,
+ 'Eltanin': 154, 'Alderamin': 49, 'Sabik': 88, 'Izar': 202, 'Muphrid': 37, 'Unukalhai': 74,
+ 'Zubeneschamali': 185, 'Zubenelgenubi': 76, 'Yed Prior': 171, 'Cebalrai': 82, 'Enif': 690,
+ 'Tarazed': 395, 'Sadalsuud': 540, 'Deneb Algedi': 39, 'Rasalgethi': 360,
+};
+
 export const FIGURES: Array<[string, Array<[string, string]>]> = [
   ['Orion',[['Betelgeuse','Bellatrix'],['Bellatrix','Mintaka'],['Mintaka','Alnilam'],
             ['Alnilam','Alnitak'],['Alnitak','Betelgeuse'],['Mintaka','Rigel'],['Alnitak','Saiph']]],

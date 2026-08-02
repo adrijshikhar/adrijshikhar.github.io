@@ -152,3 +152,48 @@ export function moonRaDec(when: Date): { ra: number; dec: number; km: number; il
   const waxing = elong < 180;
   return { ra, dec, km, illum, waxing };
 }
+
+export const AU_KM = 149597870.7;
+const LY_KM = 9.4607e12;
+export const AU_LY = AU_KM / LY_KM;
+
+/** True 3-D separation between two bodies, in light years.
+ *
+ *  NOT the angle between them. Each body sits at its own distance along its own
+ *  RA/Dec direction, so the answer is |v1 - v2| — which is the whole point: two
+ *  stars a finger's width apart on screen can be a thousand light years apart
+ *  in fact. Returns null when either distance is unknown. */
+export function separation(
+  a: { ra: number; dec: number; distLy?: number },
+  b: { ra: number; dec: number; distLy?: number },
+): number | null {
+  if (a.distLy == null || b.distLy == null) return null;
+  const vec = (o: { ra: number; dec: number; distLy?: number }) => {
+    const ra = o.ra * 15 * D2R;
+    const dec = o.dec * D2R;
+    const d = o.distLy as number;
+    return [d * Math.cos(dec) * Math.cos(ra), d * Math.cos(dec) * Math.sin(ra), d * Math.sin(dec)];
+  };
+  const [x1, y1, z1] = vec(a);
+  const [x2, y2, z2] = vec(b);
+  return Math.hypot(x1 - x2, y1 - y2, z1 - z2);
+}
+
+/** Separation formatted for the unit the reader can actually picture: km when
+ *  both bodies are in the solar system, light years otherwise. */
+export function separationLabel(
+  a: { ra: number; dec: number; distLy?: number; au?: number },
+  b: { ra: number; dec: number; distLy?: number; au?: number },
+): string | null {
+  const ly = separation(a, b);
+  if (ly == null) return null;
+  if (a.au != null && b.au != null) {
+    const km = ly * LY_KM;
+    if (km >= 1e9) return `${(km / 1e9).toFixed(2)} bn km`;
+    if (km >= 1e6) return `${(km / 1e6).toFixed(1)} M km`;
+    return `${Math.round(km).toLocaleString()} km`;
+  }
+  if (ly >= 100) return `${Math.round(ly).toLocaleString()} ly`;
+  if (ly >= 10) return `${ly.toFixed(1)} ly`;
+  return `${ly.toFixed(2)} ly`;
+}

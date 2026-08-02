@@ -11,6 +11,7 @@
 import type { BodyPos, SkyColors, Observer } from './render';
 import { fade, rnd, nearestPoint } from './render';
 import { FLOOR } from './projection';
+import { separationLabel } from './astronomy';
 import {
   gravityWell,
   gamePhysics,
@@ -110,6 +111,11 @@ export class SkyGame {
       s.hy = b.y;
       s.vr = b.vr;
       s.r = b.vr + 3;
+      // Planets genuinely move; refresh rather than trusting the first frame.
+      s.ra = b.ra;
+      s.dec = b.dec;
+      s.distLy = b.distLy;
+      s.au = b.au;
       if (!inFlight) {
         s.x = b.x + dx;
         s.y = b.y + dy;
@@ -123,6 +129,10 @@ export class SkyGame {
   private toGameStar(b: BodyPos): GameStar {
     return {
       name: b.name,
+      ra: b.ra,
+      dec: b.dec,
+      distLy: b.distLy,
+      au: b.au,
       x: b.x,
       y: b.y,
       hx: b.x,
@@ -311,6 +321,28 @@ function drawLinks(
     ctx.moveTo(a.x, a.y);
     ctx.lineTo(b.x, b.y);
     ctx.stroke();
+
+    // The payoff of draw mode: the real 3-D distance between the two bodies,
+    // which is nothing like how far apart they look. Set along the link and
+    // flipped to stay upright.
+    const txt = separationLabel(a, b);
+    if (txt) {
+      const mx = (a.x + b.x) / 2;
+      const my = (a.y + b.y) / 2;
+      const ang = Math.atan2(b.y - a.y, b.x - a.x);
+      const flip = Math.abs(ang) > Math.PI / 2;
+      ctx.save();
+      ctx.translate(mx, my);
+      ctx.rotate(flip ? ang + Math.PI : ang);
+      ctx.globalAlpha = capA(0.9);
+      ctx.fillStyle = accent;
+      ctx.font = '500 9px ui-monospace,Menlo,monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(txt, 0, -5);
+      ctx.restore();
+      ctx.textAlign = 'start';
+      ctx.globalAlpha = capA(0.85);
+    }
   }
   if (game.dragFrom != null) {
     const from = game.stars[game.dragFrom];

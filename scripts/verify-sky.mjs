@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
-import { altAz, planetRaDec, moonRaDec, gmstDeg, sunRaDec, planetIllum } from '../src/lib/sky/astronomy.ts';
+import { altAz, planetRaDec, moonRaDec, gmstDeg, sunRaDec, planetIllum, separation } from '../src/lib/sky/astronomy.ts';
+import { STARS, DIST_LY } from '../src/lib/sky/catalogue.ts';
 import { computeFullSky } from '../src/lib/sky/render.ts';
 
 const now = new Date();
@@ -166,6 +167,49 @@ check('only bodies large enough to show a crescent ever draw one', () => {
   // Venus must still get its crescent, or the gate has been tightened too far
   // and Galileo's observation is gone.
   assert.ok(drew.has('Venus'), `Venus never drew a crescent over 800 days: ${[...drew].join(', ') || 'none'}`);
+});
+
+// A distance table is exactly the kind of data eyes cannot audit — a wrong
+// entry produces a plausible-looking number on a link label and nothing else.
+check('every catalogue star carries a distance', () => {
+  const missing = STARS.map(([n]) => n).filter((n) => DIST_LY[n] == null);
+  assert.equal(missing.length, 0, `stars with no distance: ${missing.join(', ')}`);
+  const orphan = Object.keys(DIST_LY).filter((n) => !STARS.some(([s]) => s === n));
+  assert.equal(orphan.length, 0, `distances with no star: ${orphan.join(', ')}`);
+  const bad = Object.entries(DIST_LY).filter(([, v]) => !(v > 0) || v > 5000);
+  assert.equal(bad.length, 0, `implausible distances: ${bad.map(([n, v]) => `${n}=${v}`).join(', ')}`);
+});
+
+check('separation is symmetric, zero to self, and never below the radial gap', () => {
+  const by = Object.fromEntries(STARS.map(([n, ra, dec]) => [n, { ra, dec, distLy: DIST_LY[n] }]));
+  const names = Object.keys(by);
+  for (let i = 0; i < names.length; i += 7) {
+    for (let j = i + 1; j < names.length; j += 11) {
+      const a = by[names[i]], b = by[names[j]];
+      const ab = separation(a, b), ba = separation(b, a);
+      assert.ok(Math.abs(ab - ba) < 1e-9, `asymmetric: ${names[i]}/${names[j]}`);
+      // two bodies can never be closer than the difference in their distances
+      const radial = Math.abs(a.distLy - b.distLy);
+      assert.ok(ab >= radial - 1e-6,
+        `${names[i]}-${names[j]} separation ${ab.toFixed(2)} < radial gap ${radial.toFixed(2)}`);
+      // ...nor further apart than the two distances summed
+      assert.ok(ab <= a.distLy + b.distLy + 1e-6, `${names[i]}-${names[j]} exceeds the sum of distances`);
+    }
+  }
+  assert.equal(separation(by.Sirius, by.Sirius), 0, 'a star is not zero light years from itself');
+});
+
+check('separation reproduces published star-to-star distances', () => {
+  const by = Object.fromEntries(STARS.map(([n, ra, dec]) => [n, { ra, dec, distLy: DIST_LY[n] }]));
+  // published values, tolerance covers the rounding in the distance table
+  for (const [a, b, expect, tol] of [
+    ['Sirius', 'Procyon', 5.24, 0.4],
+    ['Rigil Kent.', 'Sirius', 9.5, 0.5],
+  ]) {
+    const got = separation(by[a], by[b]);
+    assert.ok(Math.abs(got - expect) <= tol,
+      `${a}-${b}: got ${got.toFixed(2)} ly, expected ~${expect} ly`);
+  }
 });
 
 console.log(`\n${passed} checks passed`);

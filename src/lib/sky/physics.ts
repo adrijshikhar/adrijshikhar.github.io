@@ -34,6 +34,13 @@ export interface GameStar {
   /** False for stars below the field floor: invisible, and must not act as
    *  phantom colliders. */
   playable: boolean;
+  /** Carried through from the sky body so a drawn link can be labelled with
+   *  the true 3-D separation, which needs the direction vector and distance —
+   *  not the on-screen endpoints. */
+  ra: number;
+  dec: number;
+  distLy?: number;
+  au?: number;
 }
 
 export interface Burst {
