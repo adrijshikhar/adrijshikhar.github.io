@@ -192,7 +192,10 @@ export function drawQuiet(
   for (const s of pts) {
     if (s.alt < FLOOR) continue;
     const below = s.alt < 0 ? 0.3 : 1;      // under the earth -> dim, not hidden
-    const a = starAlpha(s.mag) * below;
+    // Same ceiling drawFull applies. It was originally added for the home page
+    // only, which left every other route uncapped at ~200 alpha over prose
+    // against home's 155 - and those are the routes that exist to be read.
+    const a = Math.min(BODY_ALPHA_CAP, starAlpha(s.mag)) * below;
 
     markStar(ctx, s.x, s.y, s.vr, s.mag < 1.0 ? colors.bright : colors.muted, a * 0.92, colors.engraved);
 
