@@ -690,8 +690,14 @@ body.spinning * {
     display: flex;
     flex-direction: column;
     line-height: 1.7;
+    max-width: calc((100vw - 46rem) / 2 - 2.1rem);
   }
-  .readout-cell { display: block; }
+  .readout-cell {
+    display: block;
+    padding-left: 4.5rem;
+    text-indent: -4.5rem;
+  }
+  .readout-row b { overflow-wrap: anywhere; }
   .readout-row .k {
     display: inline-block;
     width: 4.5rem;

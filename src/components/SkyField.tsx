@@ -92,6 +92,10 @@ export default function SkyField({ mode }: SkyFieldProps) {
   // right ascension sits on the meridian. Ticked once a second, not per frame.
   const [lst, setLst] = useState<string>('--:--:--');
   const [jd, setJd] = useState<string>('—');
+  // What is actually over your head right now. The prototype carried both rows
+  // and they are the two that make the corner read as a live instrument rather
+  // than a static caption — they change as the sky turns and as you travel.
+  const [sky, setSky] = useState<{ up: number; total: number; brightest: string[] } | null>(null);
   if (mode === 'full' && !gameRef.current) {
     gameRef.current = new SkyGame(() => setStruck((n) => n + 1));
   }
@@ -218,6 +222,19 @@ export default function SkyField({ mode }: SkyFieldProps) {
       setCoords({ lat, lon });
       setObsSource(source);
     };
+    let skyPublishedAt = 0;
+    const publishSky = (bodies: Array<{ name: string; alt: number; mag: number }>) => {
+      const t = performance.now();
+      if (t - skyPublishedAt < 1000) return;
+      skyPublishedAt = t;
+      const named = bodies.filter((b) => b.name);
+      const above = named.filter((b) => b.alt > 0);
+      setSky({
+        up: above.length,
+        total: named.length,
+        brightest: [...above].sort((a, b) => a.mag - b.mag).slice(0, 3).map((b) => b.name),
+      });
+    };
     let hoverIndex = -1;
     let hoverFig: string | null = null;
     // Reduced motion: constellations render fully formed (no scroll-driven reveal).
@@ -290,6 +307,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
         // Constellation figures step aside during play: their vertices are the
         // very bodies physics is flinging around, so at scroll-bottom (t≈1) all
         // 47 segments would whip across the page chasing them.
+        publishSky(bodies);
         const figureT = game?.playing ? 0 : scrollP.t;
         const byName = bodyIndex(bodies); // built once, shared by figureAt and drawFull
         hoverIndex = nearestBody(bodies, mouse.x, mouse.y);
@@ -584,6 +602,18 @@ export default function SkyField({ mode }: SkyFieldProps) {
             <span className="k">Source</span>
             <b>{obsSource}</b>
           </div>
+          {sky && (
+            <>
+              <div className="readout-cell">
+                <span className="k">Above you</span>
+                <b>{sky.up} of {sky.total}</b>
+              </div>
+              <div className="readout-cell">
+                <span className="k">Brightest</span>
+                <b>{sky.brightest.join(' · ') || '—'}</b>
+              </div>
+            </>
+          )}
         </div>
       )}
 
@@ -652,11 +682,14 @@ export default function SkyField({ mode }: SkyFieldProps) {
                 </button>
               )}
               {tool === 'sling' ? (
-                <span>
-                  <b className="text-heading font-medium">{struck}</b> struck
-                </span>
+                <>
+                  <span>pull back &amp; release</span>
+                  <span>
+                    <b className="text-heading font-medium">{struck}</b> struck
+                  </span>
+                </>
               ) : (
-                <span>drag star→star — link · drag sky — travel</span>
+                <span>drag star&rarr;star — link · drag sky — travel</span>
               )}
               <button
                 type="button"
