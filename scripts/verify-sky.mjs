@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { altAz, planetRaDec, moonRaDec, gmstDeg, sunRaDec, planetIllum } from '../src/lib/sky/astronomy.ts';
+import { computeFullSky } from '../src/lib/sky/render.ts';
 
 const now = new Date();
 let passed = 0;
@@ -138,6 +139,33 @@ check('only the inner planets show phases', () => {
     lo = Math.min(lo, planetIllum('Venus', planetRaDec('Venus', t).au));
   }
   assert.ok(lo < 0.2, `Venus min illum ${lo} over 600d, expected a real crescent`);
+});
+
+// The one the previous phase check missed. That assertion tested the ASTRONOMY
+// (Mars stays above 0.83 illuminated - true, and useless) while the bug lived
+// in the RENDER DECISION derived from it. The gate is now phase AND size, so
+// this asserts the OUTCOME of that gate over a full synodic sweep: which
+// bodies actually end up drawing a crescent.
+check('only bodies large enough to show a crescent ever draw one', () => {
+  const MIN_VR = 7;                       // mirrors TERMINATOR_MIN_VR in render.ts
+  const draws = (b) => b.isPlanet && b.illum !== undefined && b.illum < 0.92 && b.vr >= MIN_VR;
+  const drew = new Set();
+  let marsMinVr = Infinity;
+  for (let d = 0; d < 800; d += 10) {
+    const when = new Date(now.getTime() + d * 86400000);
+    for (const b of computeFullSky({ lat: 12.97, lon: 77.59 }, when, 1440, 900).bodies) {
+      if (!b.isPlanet) continue;
+      if (b.name === 'Mars') marsMinVr = Math.min(marsMinVr, b.vr);
+      if (draws(b)) drew.add(b.name);
+    }
+  }
+  // Mars is the regression: it dips under the phase gate ~42% of the time but
+  // never exceeds ~6.6px, so it must never draw a terminator on its 4px disc.
+  assert.ok(!drew.has('Mars'),
+    `Mars drew a terminator (min vr over the sweep ${marsMinVr.toFixed(1)}px) - the size gate is not holding`);
+  // Venus must still get its crescent, or the gate has been tightened too far
+  // and Galileo's observation is gone.
+  assert.ok(drew.has('Venus'), `Venus never drew a crescent over 800 days: ${[...drew].join(', ') || 'none'}`);
 });
 
 console.log(`\n${passed} checks passed`);

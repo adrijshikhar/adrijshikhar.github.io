@@ -271,6 +271,19 @@ const APPARENT_SCALE = 1.85;
  *  (position, distance, the extent that decides Saturn is the biggest planet);
  *  only the split of that extent into ink is a legibility choice. */
 const SATURN_BODY_FRAC = 0.62;
+/** A terminator only means something if the crescent is wide enough to see.
+ *  Below this radius the lit-fraction ellipse is a sub-pixel sliver off a dot,
+ *  which reads as a rendering fault rather than a phase.
+ *
+ *  This gates on SIZE as well as phase because phase alone was not enough:
+ *  Mars swings 0.877-0.986 illuminated and spends ~42% of its time under the
+ *  0.92 phase gate, so for roughly five months in every two years it drew a
+ *  bite out of a 4px disc. Mars peaks at 6.6px near opposition, so the
+ *  threshold sits at 7 rather than 6 - the invariant caught that 6 still let
+ *  it through. Venus reaches 14px and keeps its crescent; Mercury peaks at
+ *  6.5px and now always draws a plain disc, which is right for the same
+ *  reason: its crescent was equally invisible. */
+const TERMINATOR_MIN_VR = 7;
 
 function planetVr(name: string, au: number): number {
   const km = name === 'Saturn' ? SATURN_RING_KM : BODY_KM[name];
@@ -609,7 +622,7 @@ export function drawFull(
         ctx.ellipse(0, 0, ringX, ringY, 0, 0, Math.PI);
         ctx.stroke();
         ctx.restore();
-      } else if (s.isPlanet && s.illum !== undefined && s.illum < 0.92) {
+      } else if (s.isPlanet && s.illum !== undefined && s.illum < 0.92 && r >= TERMINATOR_MIN_VR) {
         // A real terminator, same construction as the Moon's. Only the inner
         // planets ever get here: Mars sits at ~0.94 and the outer ones at 1.0,
         // so they fall through to a full disc without being special-cased.
