@@ -356,7 +356,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
     // real duration to ease against. Reduced motion simply never starts it, and
     // `ripple.p` stays 0 — one frame of static rings, which is the same chart
     // convention standing still.
-    const SUN_PULSE_MS = 7500;
+    const SUN_PULSE_MS = 6000;
     const ripple = { p: 0 };
     const renderFrame = () => {
       const cs = getComputedStyle(document.documentElement);

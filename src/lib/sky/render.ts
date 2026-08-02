@@ -192,7 +192,7 @@ export function fade(base: string, alpha: number): string {
  *  same 0.19 spacing, so it continues the glyph rather than orbiting it —
  *  getting these in the wrong units is what left a dead band around the Sun. */
 const TWILIGHT_FLOOR = -18;
-const GLOW_MAX_ALPHA = 0.13;
+const GLOW_MAX_ALPHA = 0.115;
 /** Engraved radiance: concentric dashed circles leaving the disc and fading as
  *  they spread — the Sun glyph's own language, continued outward. Measured off
  *  the icon rather than guessed: its dashes are arc segments with a SMALL gap
@@ -237,7 +237,10 @@ export function drawSunGlow(
   if (!colors.engraved) {
     // Kept tight on purpose: a wide wash is indistinguishable from the corner
     // blob this replaced. A contained bloom reads as light coming off a body.
-    const R = Math.hypot(W, H) * 0.24;
+    // Deliberately tighter than the expanding glow below. When the halo was
+    // the wider of the two it simply covered the expansion — measured, the
+    // lit extent sat at a fixed 212px through every phase of the cycle.
+    const R = Math.hypot(W, H) * 0.105;
     const halo = ctx.createRadialGradient(sun.x, sun.y, 0, sun.x, sun.y, R);
     halo.addColorStop(0, fade(colors.moonLit, a));
     halo.addColorStop(0.22, fade(colors.planet, a * 0.5));
@@ -249,58 +252,57 @@ export function drawSunGlow(
     ctx.arc(sun.x, sun.y, R, 0, Math.PI * 2);
     ctx.fill();
 
-    const CR = sun.vr * 6;
+    const CR = sun.vr * 40;
     const core = ctx.createRadialGradient(sun.x, sun.y, 0, sun.x, sun.y, CR);
     // 1.15, not 1.6: with the Sun high it lands squarely on the hero prose,
     // and the core — not the travelling wave — was the pixel breaching the
     // 169 ceiling. Measured worst case sits 6px from the disc.
-    core.addColorStop(0, fade(colors.moonLit, a * 1.15));
-    core.addColorStop(0.45, fade(colors.planet, a * 0.5));
+    // Radius is 5x what it was, so the alpha comes down to match: a wide
+    // core sits over far more prose, and at noon the Sun lands squarely on
+    // the hero paragraph. Measured 177/169 before this.
+    core.addColorStop(0, fade(colors.moonLit, a * 0.42));
+    core.addColorStop(0.45, fade(colors.planet, a * 0.2));
     core.addColorStop(1, 'transparent');
     ctx.fillStyle = core;
     ctx.beginPath();
     ctx.arc(sun.x, sun.y, CR, 0, Math.PI * 2);
     ctx.fill();
 
-    // ONE slow swell over the steady halo. Light leaves the Sun: the core above
-    // stays put and only this travels.
+    // Expanding glow. Starts at the centre, grows, and its border fades out —
+    // and it must never appear to contract on the way.
     //
-    // One, not several. Multiple waves in flight is what produced concentric
-    // grey rings across the whole viewport — each wavefront is an edge, and
-    // stacking four of them at any real reach turns the page into a target.
-    // A single wave has nothing to stack against, and the steady halo covers
-    // the trough so there is never a gap.
+    // Two constraints that look contradictory but are not:
     //
-    // Reach stays close to the body for the same reason: a wave that travels
-    // far is a wash over the page, not light coming off a star.
+    // 1. NO RING. Every gradient here is monotonic — brightest at the centre,
+    //    falling to nothing. A `transparent -> colour -> transparent` profile is
+    //    an annulus by construction, however long its inner ramp, and the eye
+    //    reads any off-centre maximum as a ring. That is what kept coming back.
     //
-    // The profile is the other half. The peak sits at the wavefront, but the
-    // ramp UP to it spans the entire inner radius and the fall beyond it is
-    // just as long, so there is no edge anywhere sharp enough to read as a
-    // ring — only a soft swell with a direction.
-    // MONOTONIC: brightest at the centre, falling to nothing. This is the whole
-    // constraint, and it is geometric rather than a matter of tuning.
+    // 2. NO CONTRACTION. The visible edge sits where the falling alpha crosses
+    //    the eye's threshold, so a single fading disc ALWAYS collapses inward at
+    //    the end of its life, no matter how fast its radius grows.
     //
-    // For a radially symmetric glow, "light travelling outward" means the bright
-    // zone leaves the centre — a maximum at some non-zero radius — and the eye
-    // reads any off-centre maximum as a RING. A transparent -> colour ->
-    // transparent gradient is an annulus by construction, however long its inner
-    // ramp: the ramp still has a crest at the top. Measured, that crest showed
-    // up at every phase of the cycle, which is the ring that kept appearing.
-    //
-    // So there is no shape that both travels and has no ring. Taking "no ring"
-    // as binding, the glow instead SWELLS: a disc whose reach and intensity ease
-    // up and back down. Slow and shallow enough to read as light breathing
-    // rather than a throb — the halo underneath carries most of the brightness,
-    // and this only modulates the top of it.
-    const swell = Math.sin(phase * Math.PI * 2) * 0.5 + 0.5; // 0..1, smooth, no wrap seam
-    const eased = swell * swell * (3 - 2 * swell);           // smoothstep: eases both ends
-    const alpha = a * 0.42 * eased;
-    if (alpha > 0.002) {
-      const outer = CR * (1.5 + 0.7 * eased);
+    // Both hold because the sum of monotonic-decreasing functions is itself
+    // monotonic-decreasing: overlapping discs cannot make a ring. So several
+    // are in flight at once, staggered, and a new one is already expanding
+    // before the previous has faded — the composite edge only ever travels
+    // outward. (The earlier "one wave only" rule came from stacking annuli,
+    // where it was correct, and does not apply to discs.)
+    const PUFFS = 3;
+    for (let k = 0; k < PUFFS; k++) {
+      const p = (phase + k / PUFFS) % 1;
+      // sin SQUARED, and this exponent is load-bearing. Summed over N evenly
+      // spaced offsets, sin^2 is exactly constant (N/2) — an identity, not a
+      // tuning. So the combined brightness never dips no matter where in the
+      // cycle you look, while each puff still fades in from nothing and out to
+      // nothing. With sin^0.5 the same three puffs summed 1.86 -> 2.41, a 30%
+      // swing arriving every ~2s: the glow visibly fading and coming back.
+      const alpha = a * 0.7 * Math.sin(p * Math.PI) ** 2;
+      if (alpha <= 0.002) continue;
+      const outer = CR * (0.3 + 2.4 * Math.pow(p, 1.2));
       const wave = ctx.createRadialGradient(sun.x, sun.y, 0, sun.x, sun.y, outer);
       wave.addColorStop(0, fade(colors.moonLit, alpha));
-      wave.addColorStop(0.45, fade(colors.planet, alpha * 0.38));
+      wave.addColorStop(0.42, fade(colors.planet, alpha * 0.4));
       wave.addColorStop(1, 'transparent');
       ctx.fillStyle = wave;
       ctx.beginPath();

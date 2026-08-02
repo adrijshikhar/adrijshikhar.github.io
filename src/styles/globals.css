@@ -706,7 +706,11 @@ body.spinning * {
      Tucked under the viewfinder bracket, with a narrower label column than the
      bottom readout: those labels are two words, these are one, and carrying the
      wide column up here left the values stranded mid-corner. */
-  .instrument-tl { left: 1.25rem; top: 2.6rem; bottom: auto; }
+  /* Flush with the viewfinder bracket, which sits at 14px/14px and is 18px
+     square. Left edges aligned and only a few px below it — offset by 6px and
+     9.6px it read as the block having drifted away from the corner rather than
+     belonging to it. */
+  .instrument-tl { left: 0.875rem; top: 2.25rem; bottom: auto; }
   .instrument-tl .k { width: 4.2rem; }
   .instrument-tl .readout-cell { padding-left: 4.2rem; text-indent: -4.2rem; }
   /* Two instruments share the right corner: this usage hint sits at the base

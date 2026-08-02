@@ -123,7 +123,7 @@ const SOCIAL_ICON_PATHS = {
               ))}
             </ul>
             <a class="tap-44 flex items-center gap-2 text-muted no-underline transition-colors duration-[120ms] hover:text-accent"
-               href="/resume">
+               href="/resume/">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5" aria-hidden="true">
                 <path d="M12 3v12m0 0l-4-4m4 4l4-4" />
                 <path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" />
@@ -159,7 +159,7 @@ const SOCIAL_ICON_PATHS = {
             ))}
           </ul>
           <div class="mt-10">
-            <a class="group atelier-btn" href="/experience">
+            <a class="group atelier-btn" href="/experience/">
               <span>View full work experience</span><span class="transition-transform group-hover:translate-x-1">&rarr;</span>
             </a>
           </div>
@@ -177,7 +177,7 @@ const SOCIAL_ICON_PATHS = {
             ))}
           </ul>
           <div class="mt-10">
-            <a class="group atelier-btn" href="/archive">
+            <a class="group atelier-btn" href="/archive/">
               <span>View full project archive</span><span class="transition-transform group-hover:translate-x-1">&rarr;</span>
             </a>
           </div>
@@ -247,7 +247,13 @@ const SOCIAL_ICON_PATHS = {
           />
         </section>
 
-        <footer class="mt-32 border-t border-border pt-12 pb-20 md:mt-40 md:pb-28">
+        {/* The gap above the rule is open sky, not slack. The orbital-mechanics
+            game plays over the whole viewport, so the page needs a stretch with
+            no prose under it — otherwise every sling is thrown across text.
+            Viewport-relative so the room is real on any screen. It sits BEFORE
+            the footer: past the last line there is nothing left to look at, so
+            the same space there just reads as the page failing to end. */}
+        <footer class="mt-[29vh] border-t border-border pt-12 pb-20 md:mt-[33vh] md:pb-24">
           <p class="meta-data">
             <span class="text-accent">&#9656;</span> {STAR_COUNT} named stars at true J2000 positions
             for your location · faint field is representative
