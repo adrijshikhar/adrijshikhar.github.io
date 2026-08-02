@@ -208,7 +208,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
     const follow = () => {
       rx += (x - rx) * 0.22;
       ry += (y - ry) * 0.22;
-      ring.style.transform = `translate3d(${rx.toFixed(2)}px, ${ry.toFixed(2)}px, 0)`;
+      ring.style.transform = `translate3d(${rx.toFixed(2)}px, ${ry.toFixed(2)}px, 0) scale(var(--ring-s))`;
       id = requestAnimationFrame(follow);
     };
     id = requestAnimationFrame(follow);

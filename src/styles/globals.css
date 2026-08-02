@@ -8,6 +8,12 @@
 @import "@fontsource/ibm-plex-mono/500.css";
 @import "@fontsource/ibm-plex-mono/600.css";
 
+@property --ring-s {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 1;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -74,9 +80,13 @@
    ink marks. The sky canvas inverts to match: dark stars on cream, the way a
    printed celestial atlas reads. */
 :root[data-mode="light"] {
-  --bg:        oklch(97.6% .005 250);   /* warm paper */
-  --surface:   oklch(100%  0    0);
-  --surface-2: oklch(94.4% .006 250);
+  /* Paper, not white. At the old 97.6% the ground sat at 0.93 luminance and
+     the pure-white cards on top of it reached a 1.055 contrast ratio -- no
+     separation at all, and a viewport-filling glare. Dropping the ground is
+     one change that fixes both: 12% dimmer, and cards now lift 3.4x harder. */
+  --bg:        oklch(93.5% .006 250);
+  --surface:   oklch(99.5% .002 250);
+  --surface-2: oklch(96.5% .004 250);
   --heading:   oklch(26%   .018 255);   /* ink, not black */
   --text:      oklch(37%   .020 255);
   --muted:     oklch(49%   .012 252);
@@ -579,15 +589,18 @@ body.spinning * {
     border-radius: 50%;
     will-change: transform;
   }
+  /* Size changes are a SCALE, never width/height/margin. The rAF repositions
+     this element every frame, so animating layout properties on it meant a
+     reflow per hover state on the hottest node on the page. --ring-s is
+     registered below so it interpolates; JS composes it into the transform. */
   #sky-cursor-ring {
+    --ring-s: 1;
     width: 26px;
     height: 26px;
     margin: -13px 0 0 -13px;
     border: 1px solid color-mix(in oklab, var(--muted) 70%, transparent);
     transition:
-      width 0.22s var(--ease-out),
-      height 0.22s var(--ease-out),
-      margin 0.22s var(--ease-out),
+      --ring-s 0.22s var(--ease-out),
       border-color 0.22s var(--ease-out);
   }
   #sky-cursor-dot {
@@ -599,9 +612,7 @@ body.spinning * {
   }
   /* over a grabbable star */
   body.cur-star #sky-cursor-ring {
-    width: 38px;
-    height: 38px;
-    margin: -19px 0 0 -19px;
+    --ring-s: 1.462;
     border-color: var(--accent);
   }
   body.cur-star #sky-cursor-dot {
@@ -609,9 +620,7 @@ body.spinning * {
   }
   /* over real UI (the tool bar) */
   body.cur-ui #sky-cursor-ring {
-    width: 16px;
-    height: 16px;
-    margin: -8px 0 0 -8px;
+    --ring-s: 0.615;
     border-color: var(--accent);
   }
   body.cur-ui #sky-cursor-dot {
@@ -622,9 +631,7 @@ body.spinning * {
   }
   /* dragging */
   body.grabbing #sky-cursor-ring {
-    width: 18px;
-    height: 18px;
-    margin: -9px 0 0 -9px;
+    --ring-s: 0.692;
     border-color: var(--accent);
   }
 }
