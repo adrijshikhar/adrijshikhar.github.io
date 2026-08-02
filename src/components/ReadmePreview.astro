@@ -39,15 +39,38 @@ try {
   });
 
   // The README uses <picture> with prefers-color-scheme to pick light/dark variants
-  // (activity graph, Pac-Man, snake, streak). That follows the OS, not our toggle — so on
-  // the RENDERED HTML (after marked passes <picture> through verbatim) convert each into a
-  // dual <img> pair toggled by [data-mode] (CSS below) to stay in sync with the blog.
-  html = html.replace(
-    /<picture>\s*<source[^>]*media="\(prefers-color-scheme:\s*dark\)"[^>]*srcset="([^"]+)"[^>]*\/?>\s*<img([^>]*?)src="([^"]+)"([^>]*?)\/?>\s*<\/picture>/gi,
-    (_m, darkUrl, pre, lightUrl, post) =>
-      `<img class="rm-only-dark"${pre}src="${darkUrl}"${post}/>` +
-      `<img class="rm-only-light"${pre}src="${lightUrl}"${post}/>`
-  );
+  // (activity graph, Pac-Man, snake, streak). That follows the OS, not our toggle — so
+  // convert each into a dual <img> pair switched by [data-mode] (CSS below).
+  //
+  // Match the <picture> block first and pick it apart, rather than one regex over the
+  // whole shape: sanitize-html re-serialises <source ... /> as <source ...></source>,
+  // which silently defeated the previous single-pass pattern and left every graphic
+  // following the OS instead of the toggle.
+  //
+  // Attributes are rebuilt from a small allowlist rather than passed through, so a
+  // srcset on the original <img> cannot override the variant we just chose.
+  html = html.replace(/<picture\b[^>]*>([\s\S]*?)<\/picture>/gi, (whole, inner) => {
+    const darkSrc = inner.match(
+      /<source\b(?=[^>]*prefers-color-scheme:\s*dark)[^>]*\bsrcset="([^"]+)"/i
+    )?.[1];
+    const imgAttrs = inner.match(/<img\b([^>]*)>/i)?.[1];
+    if (!darkSrc || imgAttrs === undefined) return whole;
+    const lightSrc = imgAttrs.match(/\bsrc="([^"]*)"/i)?.[1];
+    if (!lightSrc) return whole;
+
+    const keep = ['alt', 'width', 'height', 'align']
+      .map((a) => {
+        const v = imgAttrs.match(new RegExp(`\\b${a}="([^"]*)"`, 'i'))?.[1];
+        return v === undefined ? null : `${a}="${v}"`;
+      })
+      .filter(Boolean)
+      .join(' ');
+
+    return (
+      `<img class="rm-only-dark" src="${darkSrc}" ${keep}>` +
+      `<img class="rm-only-light" src="${lightSrc}" ${keep}>`
+    );
+  });
 } catch {
   html = '<p style="text-align:center;margin:0">README preview unavailable — <a href="https://github.com/adrijshikhar/adrijshikhar">view it on GitHub →</a></p>';
 }
