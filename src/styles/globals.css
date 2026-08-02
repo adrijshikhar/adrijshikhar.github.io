@@ -80,16 +80,14 @@
    ink marks. The sky canvas inverts to match: dark stars on cream, the way a
    printed celestial atlas reads. */
 :root[data-mode="light"] {
-  /* Paper, not white. At the old 97.6% the ground sat at 0.93 luminance and
-     the pure-white cards on top of it reached a 1.055 contrast ratio -- no
-     separation at all, and a viewport-filling glare. Dropping the ground is
-     one change that fixes both: 12% dimmer, and cards now lift 3.4x harder. */
-  --bg:        oklch(86% .007 250);
-  --surface:   oklch(97% .002 250);
-  --surface-2: oklch(92% .005 250);
-  --heading:   oklch(26%   .018 255);   /* ink, not black */
-  --text:      oklch(37%   .020 255);
-  --muted:     oklch(44%   .014 252);
+  /* One warm family, hue 66-78 — paper and ink, matching the bronze accent and
+     the already-warm hairlines. Nothing here is a cool neutral; see DESIGN.md. */
+  --bg:        oklch(86%   .012 76);
+  --surface:   oklch(94.5% .005 78);
+  --surface-2: oklch(90.5% .007 72);
+  --heading:   oklch(26%   .016 68);    /* ink, not black */
+  --text:      oklch(37%   .017 68);
+  --muted:     oklch(44%   .013 66);
   --border: 0 0 0;                     /* used as rgb(var(--border) / a) */
   --border-color: oklch(28% .02 60 / .18);
   --hairline:     oklch(28% .02 60 / .18);
@@ -108,7 +106,7 @@
      fails here, and again so the ground could drop to 86% without the accent
      falling under 4.5:1 against it. Measured 4.83. */
   --accent: oklch(46% .148 62);
-  --accent-contrast: oklch(97.6% .005 250);
+  --accent-contrast: oklch(97.6% .005 80);
 
   /* shadcn token bridge — flip to light so ui/* components adapt */
   --background: 60 14% 96%;
@@ -178,9 +176,9 @@
   :root[data-mode="light"] body::before {
     height: 100vh;
     background:
-      radial-gradient(85% 55% at 20% 2%, oklch(50% .145 62 / .16), transparent 60%),
-      radial-gradient(70% 50% at 88% 6%, oklch(45% .06 250 / .12), transparent 64%),
-      radial-gradient(120% 95% at 50% 42%, transparent 38%, oklch(30% .02 255 / .16) 100%);
+      radial-gradient(85% 55% at 20% 2%, oklch(50% .145 62 / .11), transparent 60%),
+      radial-gradient(70% 50% at 88% 6%, oklch(45% .022 235 / .10), transparent 64%),
+      radial-gradient(120% 95% at 50% 42%, transparent 38%, oklch(32% .022 62 / .17) 100%);
   }
 
   /* Film grain — fixed and pointer-events:none, never on a scrolling container.
