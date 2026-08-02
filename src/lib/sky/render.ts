@@ -454,17 +454,19 @@ export function drawGraticule(
   const altR = (a: number) => ((90 - a) / (90 - FLOOR)) * GR;
 
   ctx.strokeStyle = colors.muted;
-  ctx.lineWidth = 1;
   for (const a of [60, 30, 0, -15]) {
-    ctx.globalAlpha = a === 0 ? 0.15 : 0.055; // the horizon ring is emphasised
-    ctx.setLineDash(a === 0 ? [] : [2, 6]);
+    const horizon = a === 0;
+    ctx.globalAlpha = horizon ? 0.26 : 0.105;
+    ctx.lineWidth = horizon ? 1.25 : 1;
+    ctx.setLineDash(a === -15 ? [2, 6] : []);
     ctx.beginPath();
     ctx.arc(cx, cy, altR(a), 0, Math.PI * 2);
     ctx.stroke();
   }
+  ctx.lineWidth = 1;
 
   ctx.setLineDash([2, 8]);
-  ctx.globalAlpha = 0.045;
+  ctx.globalAlpha = 0.06;
   for (let az = 0; az < 360; az += 30) {
     const t = (az - 180) * D2R; // fixed to the instrument, not the sky
     ctx.beginPath();
@@ -474,15 +476,26 @@ export function drawGraticule(
   }
   ctx.setLineDash([]);
 
+  ctx.globalAlpha = 0.3;
+  for (let az = 0; az < 360; az += 10) {
+    const t = (az - 180) * D2R;
+    const major = az % 30 === 0;
+    const r0 = altR(0), len = major ? 7 : 3.5;
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.sin(t) * r0, cy - Math.cos(t) * r0);
+    ctx.lineTo(cx + Math.sin(t) * (r0 + len), cy - Math.cos(t) * (r0 + len));
+    ctx.stroke();
+  }
+
   ctx.font = '500 8px ui-monospace,Menlo,monospace';
   ctx.textAlign = 'left';
-  ctx.globalAlpha = 0.22;
+  ctx.globalAlpha = 0.34;
   ctx.fillStyle = colors.muted;
   for (const a of [60, 30, 0]) {
     ctx.fillText(a === 0 ? 'HORIZON' : `${a}°`, cx + 6, cy - altR(a) + 11);
   }
 
-  ctx.globalAlpha = 0.2; // zenith reticle
+  ctx.globalAlpha = 0.3; // zenith reticle
   ctx.strokeStyle = colors.muted;
   ctx.beginPath();
   ctx.moveTo(cx - 7, cy); ctx.lineTo(cx - 2, cy);

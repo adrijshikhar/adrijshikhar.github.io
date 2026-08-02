@@ -32,22 +32,28 @@ and Space Grotesk sets marginally *narrower* than Geist ("Shikhar" 305px vs
 309px), not wider. Hero tracking moved `-0.045em → -0.03em` on legibility, not
 width. Type is now on component classes; four unused font packages removed.
 
-### 2. Five deltas from the Gemini reference (image in conversation)
-Highest value first. 1 and 2 are contained.
-1. **`[ 02 EXPERIENCE ]`** — amber square brackets *wrapping* the active rail
-   label, plus a vertical amber position bar on the left edge. Current rail puts
-   the reticle beside the label; wrapping it is stronger.
-2. **Three-column readout** — `OBSERVER | SIDEREAL | SOURCE` side by side along
-   the bottom edge with thin vertical rules, replacing the stacked key-value
-   rows in the corner.
-3. **Boxed values top-centre** — `[ISO 200] [f/3.5] [1/160]`. No top-centre
-   element exists today; this balances the exposure scale below.
-4. **Exposure scale** bottom-centre with an index triangle.
-5. **Graticule arcs made structural** rather than faint texture.
+### 2. Five deltas from the Gemini reference — 4 of 5 DONE
+1. ~~`[ 02 EXPERIENCE ]` amber brackets on the active rail label~~ — done, replaced
+   the separate reticle. Brackets sit at opacity 0 when inactive so they hold
+   width; otherwise the label shifts as it steps.
+2. ~~Three-column `OBSERVER | SIDEREAL | SOURCE` readout~~ — done.
+3. ~~Boxed values top-centre~~ — done, but **deliberately not the mock's
+   `[ISO 200] [f/3.5] [1/160]`**. Those are invented camera values and the sky is
+   real astronomy. Shipped `ALT +90…−35°` / `STARS 96` / live `JD` instead. See
+   the "instrument chrome must not lie" section in CLAUDE.md.
+4. **Exposure scale bottom-centre — SKIPPED, and this is a real decision, not an
+   omission.** Bottom-centre is ViewToggle (`[629, 888, 172×38]`, z-1100), a
+   functional control; the bottom edge also carries the readout row left and the
+   hint + easter-egg hook right. There is also no true continuous value for an
+   index triangle to point at — scroll position is already the rail's amber fill.
+   Revisit only if the bottom edge is re-planned.
+5. ~~Graticule made structural~~ — done. Rings continuous, horizon 1.25px at
+   alpha 0.26 with 10°/30° ticks. Azimuth spokes stay dashed and faint on
+   purpose. Legibility unmoved (peak is set by bright stars, not the graticule).
 
-Also worth considering: the mock's cards are a *thin hairline border with a
-barely-lifted fill*, no double bezel. Simpler, lets more sky through, keeps the
-opaque backdrop. Compare against `.atelier-card`.
+Still open from that review: the mock's cards are a *thin hairline border with a
+barely-lifted fill*, no double bezel. Simpler, lets more sky through. Compare
+against `.atelier-card`.
 
 ### 3. Deferred by owner, in their stated order
 Mobile UX (last, and it is a design question not breakpoints — below 1180px the
