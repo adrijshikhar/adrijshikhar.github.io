@@ -278,18 +278,29 @@ export function drawSunGlow(
     // ramp UP to it spans the entire inner radius and the fall beyond it is
     // just as long, so there is no edge anywhere sharp enough to read as a
     // ring — only a soft swell with a direction.
-    const p = phase;
-    const alpha = a * 0.5 * Math.sin(p * Math.PI) ** 1.6; // slow in, slow out
+    // MONOTONIC: brightest at the centre, falling to nothing. This is the whole
+    // constraint, and it is geometric rather than a matter of tuning.
+    //
+    // For a radially symmetric glow, "light travelling outward" means the bright
+    // zone leaves the centre — a maximum at some non-zero radius — and the eye
+    // reads any off-centre maximum as a RING. A transparent -> colour ->
+    // transparent gradient is an annulus by construction, however long its inner
+    // ramp: the ramp still has a crest at the top. Measured, that crest showed
+    // up at every phase of the cycle, which is the ring that kept appearing.
+    //
+    // So there is no shape that both travels and has no ring. Taking "no ring"
+    // as binding, the glow instead SWELLS: a disc whose reach and intensity ease
+    // up and back down. Slow and shallow enough to read as light breathing
+    // rather than a throb — the halo underneath carries most of the brightness,
+    // and this only modulates the top of it.
+    const swell = Math.sin(phase * Math.PI * 2) * 0.5 + 0.5; // 0..1, smooth, no wrap seam
+    const eased = swell * swell * (3 - 2 * swell);           // smoothstep: eases both ends
+    const alpha = a * 0.42 * eased;
     if (alpha > 0.002) {
-      // outCubic per wave, not on the shared phase: it leaves the limb quickly
-      // and settles as it spreads, while the phase itself stays linear so the
-      // loop wraps without a speed jump.
-      const eased = 1 - Math.pow(1 - p, 3);
-      const front = CR * 0.7 + eased * (CR * 1.5);
-      const outer = front * 2.1;                 // long, soft outer falloff
+      const outer = CR * (1.5 + 0.7 * eased);
       const wave = ctx.createRadialGradient(sun.x, sun.y, 0, sun.x, sun.y, outer);
-      wave.addColorStop(0, 'transparent');
-      wave.addColorStop(front / outer, fade(colors.moonLit, alpha));
+      wave.addColorStop(0, fade(colors.moonLit, alpha));
+      wave.addColorStop(0.45, fade(colors.planet, alpha * 0.38));
       wave.addColorStop(1, 'transparent');
       ctx.fillStyle = wave;
       ctx.beginPath();
