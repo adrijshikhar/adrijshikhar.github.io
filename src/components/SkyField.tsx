@@ -15,6 +15,7 @@ import { gmstDeg, julianDay } from '../lib/sky/astronomy';
 import { FLOOR } from '../lib/sky/projection';
 import { STARS } from '../lib/sky/catalogue';
 import { SkyGame, drawGame, type Tool } from '../lib/sky/game';
+import { loadPlanetSprite, planetSprite } from '../lib/sky/planet-sprite';
 import { animate, onScroll } from '../lib/motion';
 
 const ALT_RANGE = `+90…−${Math.abs(FLOOR)}°`;
@@ -364,7 +365,8 @@ export default function SkyField({ mode }: SkyFieldProps) {
         hoverIndex = nearestBody(bodies, mouse.x, mouse.y);
         // star hover wins over a constellation hover when both are under the cursor
         hoverFig = hoverIndex >= 0 ? null : figureAt(byName, figureT, mouse.x, mouse.y);
-        drawFull(ctx, W, H, bodies, byName, faint, moonPhase, figureT, hoverIndex, hoverFig, mouse, colors);
+        drawFull(ctx, W, H, bodies, byName, faint, moonPhase, figureT, hoverIndex, hoverFig, mouse, colors,
+                 planetSprite(colors.engraved, colors.planet));
         if (game && game.playing && gameCanvas && gameCtx) {
           // Ambient sky stays a direct draw (above); only the game overlay
           // goes through the offscreen buffer + single capped-alpha blit.
@@ -383,6 +385,11 @@ export default function SkyField({ mode }: SkyFieldProps) {
 
     resize();
     renderFrame();
+
+    // The glyph sheet arrives after first paint. Repaint when it lands —
+    // essential under reduced motion, where there is no loop to pick it up and
+    // the planets would stay as computed discs until the next resize.
+    loadPlanetSprite(() => renderFrame());
 
     // Respect prefers-reduced-motion: one static frame, no rAF loop — unless
     // the visitor explicitly opts in by clicking the egg (see `enter` below),

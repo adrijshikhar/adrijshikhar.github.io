@@ -26,8 +26,8 @@ const {
 // Social images must be absolute — every platform drops a relative og:image.
 // Astro.site is set in astro.config.mjs, so these resolve against the real
 // origin in production and against localhost in dev.
-const ogImage = new URL('/og-image.png', Astro.site).href;
-const twitterImage = new URL('/twitter-image.png', Astro.site).href;
+const ogImage = new URL('/og-image.jpg', Astro.site).href;
+const twitterImage = new URL('/twitter-image.jpg', Astro.site).href;
 const pageUrl = canonical ?? new URL(Astro.url.pathname, Astro.site).href;
 
 // Cloudflare Web Analytics beacon — token is public (ships in client HTML).
@@ -93,6 +93,7 @@ const cfBeaconToken =
     <meta property="og:description" content={description} />
     <meta property="og:url" content={pageUrl} />
     <meta property="og:image" content={ogImage} />
+    <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Adrij Shikhar — senior software engineer, Bengaluru" />
