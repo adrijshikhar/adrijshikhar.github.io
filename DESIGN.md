@@ -129,10 +129,16 @@ source the sky could not account for.
 The two modes state it with the mark each one already uses, exactly as stars
 are discs on black and open rings on paper:
 
-- **Dark emits** — a steady halo plus a tight core. No pulse. Sunlight does not
-  breathe, and animating it turns the whole page into a slow throb.
-- **Light engraves** — dashed rings spreading from the disc and fading, on
-  anime.js's clock with `outCubic` so they decelerate as a real ripple does.
+- **Dark emits** — a steady halo and core, plus a **centre-bright disc** that
+  grows outward from the body, fading in as it leaves and out as it spreads.
+- **Light engraves** — dashed rings spreading from the disc and fading, which
+  is how a printed chart draws radiance it cannot glow.
+
+Both run on anime.js's clock (`createTimer` + `eases.outCubic`, so the wave
+decelerates as a real ripple does), never a hand-rolled `performance.now()`
+loop. The halo and core themselves stay **steady**: breathing the whole glow
+turns the page into a slow throb, and unlike a spreading wave — a chart
+convention — a pulsing halo would be a claim about the Sun's actual output.
 
 Ring geometry is **measured off the sprite, never guessed**. The sheet blits
 into a `2r` box, so in painted-radius units the glyph is: disc to 0.53, dashed
@@ -140,12 +146,17 @@ rings at 0.58 / 0.77 / 0.96, outermost ink at 1.01, ink about ¾ of each step.
 The ripple continues that spacing. Getting these in viewport units instead of
 `vr` is what once left a dead band around the Sun.
 
-**Do not add travelling rings to dark mode.** Tried twice, ugly twice: rings
-over a continuous glow read as a bullseye, because the glow already fills the
-space they cross, so each band lands as a hard edge inside it rather than a
-wave over empty ground. That is the shape failing, not the timing — easing it
-or moving it to anime.js changes nothing. Light mode gets away with it
-precisely because it has no glow: there the rings cross bare paper.
+**Dark mode's wave must be a disc, never a ring.** Rings there were tried
+twice and were ugly twice — first as soft filled bands, then as dashed
+hairlines. Both read as a bullseye, and for the same reason: the glow already
+fills the space a ring crosses, so every ring lands as an *edge inside* it
+rather than a wave over open ground. That is the shape failing, not the timing
+— easing it or moving it to anime.js changed nothing either time. A
+centre-bright disc has no edge to read, so the identical outward motion
+registers as light spreading.
+
+Light mode gets rings precisely because it has no glow: there they cross bare
+paper, which is what a printed chart does.
 
 ## Motion
 
