@@ -136,8 +136,6 @@ export default function SkyField({ mode }: SkyFieldProps) {
       gameCanvas = document.createElement('canvas');
       gameCtx = gameCanvas.getContext('2d');
     }
-    // TEMP-DEBUG: remove before commit
-    (window as any).__skyGame = game;
 
     // Full mode only: hover is read at render time from the last known pointer
     // position rather than recomputed on every pointermove — bodies are
