@@ -24,3 +24,7 @@ design-extract-output/
 # blog-editor review output
 scratch/
 .playwright-mcp/
+.gstack/
+
+# locally-installed skills, not product code
+.claude/skills/
