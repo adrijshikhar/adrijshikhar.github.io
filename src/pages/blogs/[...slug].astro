@@ -16,7 +16,7 @@ const canonical = post.data.canonicalUrl ?? new URL(`/blogs/${post.id}/`, Astro.
 <BaseLayout title={`${post.data.title} | adrijshikhar.dev`} canonical={canonical}>
   <main class="mx-auto min-h-screen max-w-5xl px-6 py-16 md:px-12 md:py-24">
    <div class="mx-auto max-w-3xl">
-    <a href="/blogs/" class="group inline-flex items-center font-mono text-xs uppercase tracking-[0.14em] text-muted no-underline hover:text-accent">
+    <a href="/blogs/" class="group link-back">
       <span class="mr-2 transition-transform duration-[120ms] group-hover:-translate-x-1">&larr;</span>
       <span>all posts</span>
     </a>

@@ -80,12 +80,11 @@ const SOCIAL_ICON_PATHS = {
              100dvh not 100vh so the iOS address bar cannot cause a jump. Content
              below is revealed by scrolling. -->
         <header class="flex min-h-[100dvh] flex-col justify-center pb-24 pt-32">
-          <p class="mb-6 flex items-center gap-3 font-mono text-[0.6875rem] uppercase tracking-[0.2em] text-muted">
+          <p class="mb-6 flex items-center gap-3 label-data">
             <span class="live inline-block h-[5px] w-[5px] rounded-full bg-accent"></span>
             Bengaluru
           </p>
-          <h1 class="font-heading font-semibold leading-[0.92] tracking-[-0.045em] text-heading"
-              style="font-size:clamp(3rem,8.5vw,5.75rem)">
+          <h1 class="display-hero">
             <a href="/" class="no-underline">Adrij<br />Shikhar</a>
           </h1>
           <p class="mt-8 max-w-[36ch] text-[1.15rem] leading-relaxed text-text">
@@ -133,7 +132,7 @@ const SOCIAL_ICON_PATHS = {
 
         <!-- About -->
         <section id="about" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="sec-head mb-8 flex items-baseline gap-4"><span class="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-accent">01</span><span class="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-muted">about</span><span class="h-px flex-1 bg-[var(--rule)]"></span></div>
+          <div class="channel mb-8"><span class="label-data channel-no">01</span><span class="label-data">about</span></div>
           <div
             class="prose prose-invert max-w-[35rem] leading-relaxed text-text prose-p:text-text prose-p:leading-relaxed prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-strong:text-heading prose-strong:font-medium"
             set:html={marked.parse(about.content)}
@@ -145,7 +144,7 @@ const SOCIAL_ICON_PATHS = {
           <div class="sticky top-0 z-20 -mx-5 mb-6 w-screen border-b border-border bg-[color-mix(in_srgb,var(--bg)_80%,transparent)] px-5 py-5 backdrop-blur md:-mx-8 md:px-8 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
             <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Experience</h2>
           </div>
-          <div class="sec-head mb-8 flex items-baseline gap-4"><span class="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-accent">02</span><span class="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-muted">experience</span><span class="h-px flex-1 bg-[var(--rule)]"></span></div>
+          <div class="channel mb-8"><span class="label-data channel-no">02</span><span class="label-data">experience</span></div>
           <ul class="group/list border-b-0">
             {experience.meta.entries.slice(0, 2).map((exp: any) => (
               <ExpCard {...exp} />
@@ -163,7 +162,7 @@ const SOCIAL_ICON_PATHS = {
           <div class="sticky top-0 z-20 -mx-5 mb-6 w-screen border-b border-border bg-[color-mix(in_srgb,var(--bg)_80%,transparent)] px-5 py-5 backdrop-blur md:-mx-8 md:px-8 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
             <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Projects</h2>
           </div>
-          <div class="sec-head mb-8 flex items-baseline gap-4"><span class="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-accent">03</span><span class="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-muted">projects</span><span class="h-px flex-1 bg-[var(--rule)]"></span></div>
+          <div class="channel mb-8"><span class="label-data channel-no">03</span><span class="label-data">projects</span></div>
           <ul class="group/list">
             {projects.meta.entries.slice(0, 2).map((proj: any) => (
               <ProjectCard {...proj} contentHtml={marked.parse(projSections[proj.slug] || '') as string} />
@@ -181,7 +180,7 @@ const SOCIAL_ICON_PATHS = {
           <div class="sticky top-0 z-20 -mx-5 mb-6 w-screen border-b border-border bg-[color-mix(in_srgb,var(--bg)_80%,transparent)] px-5 py-5 backdrop-blur md:-mx-8 md:px-8 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
             <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Writing</h2>
           </div>
-          <div class="sec-head mb-8 flex items-baseline gap-4"><span class="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-accent">04</span><span class="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-muted">writing</span><span class="h-px flex-1 bg-[var(--rule)]"></span></div>
+          <div class="channel mb-8"><span class="label-data channel-no">04</span><span class="label-data">writing</span></div>
           {latestPosts.length === 0 ? (
             <p class="border border-border px-5 py-6 font-mono text-sm text-muted">
               <span class="text-accent">$</span> ls ./posts — <span class="text-text">no entries yet.</span>
@@ -205,12 +204,12 @@ const SOCIAL_ICON_PATHS = {
           <div class="sticky top-0 z-20 -mx-5 mb-6 w-screen border-b border-border bg-[color-mix(in_srgb,var(--bg)_80%,transparent)] px-5 py-5 backdrop-blur md:-mx-8 md:px-8 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
             <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Education</h2>
           </div>
-          <div class="sec-head mb-8 flex items-baseline gap-4"><span class="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-accent">05</span><span class="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-muted">education</span><span class="h-px flex-1 bg-[var(--rule)]"></span></div>
+          <div class="channel mb-8"><span class="label-data channel-no">05</span><span class="label-data">education</span></div>
           <ul class="grid gap-4 sm:grid-cols-2">
             {education.meta.entries.map((edu: any, i: number) => (
               <li class={`atelier-card group/list-item px-5 py-6 lg:px-6 lg:py-7`}>
-                <span class="font-mono text-[11px] uppercase tracking-[0.12em] text-muted">{edu.startDate} — {edu.endDate}</span>
-                <h3 class="mt-2 font-heading text-base font-medium leading-snug tracking-tighter text-heading">{edu.institution}</h3>
+                <span class="meta-data">{edu.startDate} — {edu.endDate}</span>
+                <h3 class="mt-2 title-entry">{edu.institution}</h3>
                 <div class="mt-1 text-sm text-text">
                   {edu.degree}{edu.field && <span class="text-muted"> — {edu.field}</span>}
                 </div>
@@ -224,7 +223,7 @@ const SOCIAL_ICON_PATHS = {
           <div class="sticky top-0 z-20 -mx-5 mb-6 w-screen border-b border-border bg-[color-mix(in_srgb,var(--bg)_80%,transparent)] px-5 py-5 backdrop-blur md:-mx-8 md:px-8 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
             <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Achievements</h2>
           </div>
-          <div class="sec-head mb-8 flex items-baseline gap-4"><span class="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-accent">06</span><span class="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-muted">achievements</span><span class="h-px flex-1 bg-[var(--rule)]"></span></div>
+          <div class="channel mb-8"><span class="label-data channel-no">06</span><span class="label-data">achievements</span></div>
           <div
             class="prose prose-invert max-w-[35rem] text-text prose-p:text-text prose-li:text-text marker:text-accent prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-strong:text-heading"
             set:html={marked.parse(achievements.content)}
@@ -233,7 +232,7 @@ const SOCIAL_ICON_PATHS = {
 
         <!-- Interests -->
         <section id="interests" class="mb-12 scroll-mt-16 md:mb-16 lg:scroll-mt-24">
-          <div class="sec-head mb-8 flex items-baseline gap-4"><span class="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-accent">07</span><span class="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-muted">interests</span><span class="h-px flex-1 bg-[var(--rule)]"></span></div>
+          <div class="channel mb-8"><span class="label-data channel-no">07</span><span class="label-data">interests</span></div>
           <div
             class="prose prose-invert max-w-[35rem] text-text prose-p:text-text prose-li:text-text marker:text-accent prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-strong:text-heading"
             set:html={marked.parse(interests.content)}
@@ -241,7 +240,7 @@ const SOCIAL_ICON_PATHS = {
         </section>
 
         <footer class="mt-32 border-t border-border pt-12 pb-20 md:mt-40 md:pb-28">
-          <p class="font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
+          <p class="meta-data">
             <span class="text-accent">&#9656;</span> Designed in the terminal. Built with Astro.
           </p>
         </footer>

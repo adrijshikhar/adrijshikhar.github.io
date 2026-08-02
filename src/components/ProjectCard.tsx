@@ -26,10 +26,10 @@ export default function ProjectCard({ title, company, date, link, builtWith = []
   return (
     <HoverCard>
       <div className="flex items-baseline justify-between gap-4">
-        <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted">{date}</span>
-        {company && <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted">{company}</span>}
+        <span className="meta-data">{date}</span>
+        {company && <span className="meta-data">{company}</span>}
       </div>
-      <h3 className="mt-2 font-heading text-base font-medium leading-snug tracking-tighter text-heading">
+      <h3 className="mt-2 title-entry">
         {link ? (
           <a href={link} target="_blank" rel="noreferrer noopener" className="text-heading no-underline hover:text-heading">
             {Title}
