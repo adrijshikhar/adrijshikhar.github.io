@@ -49,3 +49,15 @@ control from the PNG:
 
 `mask-image` needs an HTTP origin; it silently fails under `file://`.
 `space-lineal-color/` cannot be masked - masking discards the colour.
+
+## Planned use (owner's direction, 2026-08-02)
+
+Light mode should use `space-lineal-color/`. The light theme is an engraved
+chart, so full-colour illustrations against cream read as a deliberate contrast
+rather than as a palette break - and colour icons need a light ground to work,
+which dark mode cannot give them. Dark mode uses the monochrome packs via CSS
+masking to `--planet`.
+
+This is the one context where the single-accent lock is intentionally relaxed,
+because the icons sit in their own register rather than competing with the
+accent for signal.
