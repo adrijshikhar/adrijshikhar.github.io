@@ -192,7 +192,7 @@ export function fade(base: string, alpha: number): string {
  *  same 0.19 spacing, so it continues the glyph rather than orbiting it —
  *  getting these in the wrong units is what left a dead band around the Sun. */
 const TWILIGHT_FLOOR = -18;
-const GLOW_MAX_ALPHA = 0.16;
+const GLOW_MAX_ALPHA = 0.13;
 /** Engraved radiance: concentric dashed circles leaving the disc and fading as
  *  they spread — the Sun glyph's own language, continued outward. Measured off
  *  the icon rather than guessed: its dashes are arc segments with a SMALL gap
@@ -251,7 +251,10 @@ export function drawSunGlow(
 
     const CR = sun.vr * 6;
     const core = ctx.createRadialGradient(sun.x, sun.y, 0, sun.x, sun.y, CR);
-    core.addColorStop(0, fade(colors.moonLit, a * 1.6));
+    // 1.15, not 1.6: with the Sun high it lands squarely on the hero prose,
+    // and the core — not the travelling wave — was the pixel breaching the
+    // 169 ceiling. Measured worst case sits 6px from the disc.
+    core.addColorStop(0, fade(colors.moonLit, a * 1.15));
     core.addColorStop(0.45, fade(colors.planet, a * 0.5));
     core.addColorStop(1, 'transparent');
     ctx.fillStyle = core;
@@ -259,19 +262,38 @@ export function drawSunGlow(
     ctx.arc(sun.x, sun.y, CR, 0, Math.PI * 2);
     ctx.fill();
 
-    // The moving bloom. Radius grows across the cycle; alpha is a sin() bell,
-    // so it fades in leaving the disc and out again as it spreads — never
-    // popping into existence and never cutting off at the wrap.
-    const bloomR = CR * (1 + phase * 3.4);
-    const bloomA = a * 1.15 * Math.sin(phase * Math.PI);
-    if (bloomA > 0.002) {
-      const bloom = ctx.createRadialGradient(sun.x, sun.y, 0, sun.x, sun.y, bloomR);
-      bloom.addColorStop(0, fade(colors.moonLit, bloomA));
-      bloom.addColorStop(0.4, fade(colors.planet, bloomA * 0.42));
-      bloom.addColorStop(1, 'transparent');
-      ctx.fillStyle = bloom;
+    // ONE slow swell over the steady halo. Light leaves the Sun: the core above
+    // stays put and only this travels.
+    //
+    // One, not several. Multiple waves in flight is what produced concentric
+    // grey rings across the whole viewport — each wavefront is an edge, and
+    // stacking four of them at any real reach turns the page into a target.
+    // A single wave has nothing to stack against, and the steady halo covers
+    // the trough so there is never a gap.
+    //
+    // Reach stays close to the body for the same reason: a wave that travels
+    // far is a wash over the page, not light coming off a star.
+    //
+    // The profile is the other half. The peak sits at the wavefront, but the
+    // ramp UP to it spans the entire inner radius and the fall beyond it is
+    // just as long, so there is no edge anywhere sharp enough to read as a
+    // ring — only a soft swell with a direction.
+    const p = phase;
+    const alpha = a * 0.5 * Math.sin(p * Math.PI) ** 1.6; // slow in, slow out
+    if (alpha > 0.002) {
+      // outCubic per wave, not on the shared phase: it leaves the limb quickly
+      // and settles as it spreads, while the phase itself stays linear so the
+      // loop wraps without a speed jump.
+      const eased = 1 - Math.pow(1 - p, 3);
+      const front = CR * 0.7 + eased * (CR * 1.5);
+      const outer = front * 2.1;                 // long, soft outer falloff
+      const wave = ctx.createRadialGradient(sun.x, sun.y, 0, sun.x, sun.y, outer);
+      wave.addColorStop(0, 'transparent');
+      wave.addColorStop(front / outer, fade(colors.moonLit, alpha));
+      wave.addColorStop(1, 'transparent');
+      ctx.fillStyle = wave;
       ctx.beginPath();
-      ctx.arc(sun.x, sun.y, bloomR, 0, Math.PI * 2);
+      ctx.arc(sun.x, sun.y, outer, 0, Math.PI * 2);
       ctx.fill();
     }
     return;

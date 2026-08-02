@@ -129,8 +129,11 @@ source the sky could not account for.
 The two modes state it with the mark each one already uses, exactly as stars
 are discs on black and open rings on paper:
 
-- **Dark emits** — a steady halo and core, plus a **centre-bright disc** that
-  grows outward from the body, fading in as it leaves and out as it spreads.
+- **Dark emits** — a steady halo and core, plus **one** slow soft swell that
+  leaves the body and fades as it spreads. One, and close in: several waves in
+  flight stack into concentric grey rings across the whole viewport, because
+  every wavefront is an edge. The steady halo covers the trough, so a single
+  wave never leaves a gap.
 - **Light engraves** — dashed rings spreading from the disc and fading, which
   is how a printed chart draws radiance it cannot glow.
 
