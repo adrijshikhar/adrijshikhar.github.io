@@ -101,6 +101,40 @@ export function sunRaDec(when: Date): { ra: number; dec: number } {
   return eclToRaDec(sunEcliptic(when), 0);
 }
 
+/** Equatorial radius in km, plus Saturn's outer-A-ring radius. Apparent size on
+ *  screen comes from these over the live geocentric distance, so a planet grows
+ *  as it approaches: Mars swings 4.7 to 25 arcsec across its synodic cycle. */
+export const BODY_KM: Record<string, number> = {
+  Mercury: 2439.7, Venus: 6051.8, Mars: 3389.5, Jupiter: 69911, Saturn: 58232,
+};
+/** Saturn is drawn to its RING span, not its disc. The rings are 42 arcsec wide
+ *  against a 17.9 arcsec globe, which makes them the largest planetary feature
+ *  in the sky - the reason Saturn reads big despite being a dim magnitude. */
+export const SATURN_RING_KM = 136780;
+
+/** Apparent angular diameter in arcseconds, from a geocentric distance in AU. */
+export function apparentArcsec(km: number, au: number): number {
+  return Math.atan(km / (au * 149597870.7)) * 206265 * 2;
+}
+
+/** Mean orbital radius, AU. Used only for the phase triangle, where the error
+ *  from ignoring eccentricity is far below one pixel of terminator. */
+const ORBIT_AU: Record<string, number> = {
+  Mercury: 0.387, Venus: 0.723, Mars: 1.524, Jupiter: 5.203, Saturn: 9.537,
+};
+
+/** Illuminated fraction, 0..1, from the Sun-planet-Earth triangle:
+ *  cos(phase) = (r^2 + d^2 - 1) / (2rd) with the Sun-Earth leg taken as 1 AU.
+ *  Inner planets swing through real crescents (this is Galileo's observation of
+ *  Venus); outer planets sit near 1.0 and so draw as full discs on their own,
+ *  with no special-casing. */
+export function planetIllum(name: string, au: number): number {
+  const r = ORBIT_AU[name];
+  if (!r) return 1;
+  const c = (r * r + au * au - 1) / (2 * r * au);
+  return (1 + Math.max(-1, Math.min(1, c))) / 2;
+}
+
 export function moonRaDec(when: Date): { ra: number; dec: number; km: number; illum: number; waxing: boolean } {
   const d  = julianDay(when) - 2451545.0;
   const Lp = 218.316 + 13.176396 * d;                       // mean longitude
