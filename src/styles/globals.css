@@ -445,3 +445,109 @@ body.machine-mode #sky {
     transform: none !important;
   }
 }
+
+/* ============================================================================
+   ORBITAL MECHANICS — the sky's hidden easter egg (SkyField.tsx / game.ts)
+
+   Everything here is scoped to `body.playing` (and the transient drag states
+   nested under it) — outside the game the page must look and behave exactly
+   as it does everywhere else, so none of this ever applies to a visitor who
+   never finds the hook.
+   ========================================================================== */
+
+/* No text selection anywhere in game mode. Gated on .playing alone, not just
+   .grabbing — a drag that starts on empty sky (sky-travel) never sets
+   .grabbing, so gating on that alone would still let the page highlight. */
+body.playing,
+body.playing *,
+body.grabbing,
+body.grabbing *,
+body.spinning,
+body.spinning * {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Custom cursor: a small ring that trails the pointer with a hard dot at the
+   exact hit point. Only mounted (by SkyField) while playing, so it replaces
+   the default cursor rather than doubling it, and never appears otherwise.
+   Hidden on touch devices, where a synthetic pointer ring means nothing. */
+@media (hover: hover) and (pointer: fine) {
+  /* Only once the game has actually started — `cursor-custom` is added by
+     SkyField's `enter()`, not on load, so a script failure never leaves the
+     visitor with no cursor at all. Every element that sets its own `cursor`
+     must be listed here: an explicit `cursor: pointer` on a button beats the
+     inherited `none` from body, which is how the native arrow used to leak
+     back in over the game bar in the prototype. */
+  .cursor-custom,
+  .cursor-custom *,
+  .cursor-custom a,
+  .cursor-custom button {
+    cursor: none !important;
+  }
+
+  #sky-cursor-ring,
+  #sky-cursor-dot {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 46;
+    pointer-events: none;
+    border-radius: 50%;
+    will-change: transform;
+  }
+  #sky-cursor-ring {
+    width: 26px;
+    height: 26px;
+    margin: -13px 0 0 -13px;
+    border: 1px solid color-mix(in oklab, var(--muted) 70%, transparent);
+    transition:
+      width 0.22s var(--ease-out),
+      height 0.22s var(--ease-out),
+      margin 0.22s var(--ease-out),
+      border-color 0.22s var(--ease-out);
+  }
+  #sky-cursor-dot {
+    width: 4px;
+    height: 4px;
+    margin: -2px 0 0 -2px;
+    background: var(--muted);
+    transition: background-color 0.22s var(--ease-out);
+  }
+  /* over a grabbable star */
+  body.cur-star #sky-cursor-ring {
+    width: 38px;
+    height: 38px;
+    margin: -19px 0 0 -19px;
+    border-color: var(--accent);
+  }
+  body.cur-star #sky-cursor-dot {
+    background: var(--accent);
+  }
+  /* over real UI (the tool bar) */
+  body.cur-ui #sky-cursor-ring {
+    width: 16px;
+    height: 16px;
+    margin: -8px 0 0 -8px;
+    border-color: var(--accent);
+  }
+  body.cur-ui #sky-cursor-dot {
+    background: var(--accent);
+    width: 3px;
+    height: 3px;
+    margin: -1.5px 0 0 -1.5px;
+  }
+  /* dragging */
+  body.grabbing #sky-cursor-ring {
+    width: 18px;
+    height: 18px;
+    margin: -9px 0 0 -9px;
+    border-color: var(--accent);
+  }
+}
+@media (hover: none), (pointer: coarse) {
+  #sky-cursor-ring,
+  #sky-cursor-dot {
+    display: none;
+  }
+}
