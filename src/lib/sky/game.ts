@@ -9,7 +9,7 @@
  * imports React or touches the DOM itself (SkyField.tsx does that).
  */
 import type { BodyPos, SkyColors, Observer } from './render';
-import { fade, rnd, nearestPoint } from './render';
+import { fade, rnd, nearestPoint, SEGMENTS } from './render';
 import { FLOOR } from './projection';
 import { separationLabel } from './astronomy';
 import {
@@ -70,9 +70,16 @@ export class SkyGame {
   stars: GameStar[] = [];
 
   private readonly onStrike: () => void;
+  private readonly onFigure: (name: string, drawn: number, total: number) => void;
+  /** Segments of a real constellation the player has drawn, keyed by figure. */
+  readonly figureProgress = new Map<string, Set<string>>();
 
-  constructor(onStrike: () => void) {
+  constructor(
+    onStrike: () => void,
+    onFigure: (name: string, drawn: number, total: number) => void = () => {},
+  ) {
     this.onStrike = onStrike;
+    this.onFigure = onFigure;
   }
 
   /** Merge this frame's real-sky bodies into the persistent star list. The
@@ -253,8 +260,31 @@ export class SkyGame {
       !this.links.some(([a, b]) => (a === this.dragFrom && b === j) || (a === j && b === this.dragFrom))
     ) {
       this.links.push([this.dragFrom, j]);
+      this.recogniseSegment(this.stars[this.dragFrom]?.name, this.stars[j]?.name);
     }
     this.dragFrom = null;
+  }
+
+  /** Did that link happen to trace a real constellation segment? Undirected,
+   *  and deduped per figure so redrawing the same pair cannot inflate progress.
+   *  Silent on a miss — a link between two unrelated stars is a perfectly good
+   *  thing to draw, it just is not Orion. */
+  private recogniseSegment(a?: string, b?: string): void {
+    if (!a || !b) return;
+    const seg = SEGMENTS.find(
+      (s) => (s.a === a && s.b === b) || (s.a === b && s.b === a),
+    );
+    if (!seg) return;
+    let drawn = this.figureProgress.get(seg.name);
+    if (!drawn) {
+      drawn = new Set();
+      this.figureProgress.set(seg.name, drawn);
+    }
+    const key = [a, b].sort().join('|');
+    if (drawn.has(key)) return;
+    drawn.add(key);
+    const total = SEGMENTS.filter((s) => s.name === seg.name).length;
+    this.onFigure(seg.name, drawn.size, total);
   }
 
   /** Drag-the-sky travel: draw mode only, and only once the caller has
