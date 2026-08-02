@@ -124,6 +124,22 @@ const cfBeaconToken =
 
     <slot />
 
+    <script is:inline>
+      // Marks the document once the reader has left the first screen, so the
+      // hero's scroll cue can retire. Passive, and it unbinds after the first
+      // trip past the threshold rather than staying on the scroll path.
+      (function () {
+        var mark = function () {
+          if (scrollY > window.innerHeight * 0.35) {
+            document.body.classList.add('scrolled');
+            removeEventListener('scroll', mark);
+          }
+        };
+        addEventListener('scroll', mark, { passive: true });
+        mark();
+      })();
+    </script>
+
     <!-- Light/dark mode toggle, docked top-right -->
     <div class="fixed top-5 right-5 z-[1090] md:top-6 md:right-6">
       <div class="chrome-panel px-2.5 py-2">

@@ -330,7 +330,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
         // dark text far more than light marks compete with a dark page, so
         // the base colour itself carries a low alpha on top of the per-star
         // magnitude alpha already applied where this is used.
-        faint: light ? fade(ink, 0.3) : cs.getPropertyValue('--muted').trim(),
+        faint: light ? fade(ink, 0.85) : cs.getPropertyValue('--muted').trim(),
         // Light mode isn't dark mode with the colours swapped — a filled disc
         // that reads as a glowing star on black reads as a dirt speck on cream.
         // This tells the renderer to switch glyph shape, not just palette.
@@ -738,7 +738,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
           )}
 
           {playing && (
-            <div className="chrome-panel fixed right-6 bottom-24 z-[45] w-[11.5rem] flex-col items-stretch gap-0 p-0">
+            <div className="chrome-panel fixed right-6 bottom-24 z-[45] w-[13rem] flex-col items-stretch gap-0 p-0">
               <div className="chrome-group">
                 <button
                   type="button"
@@ -746,7 +746,9 @@ export default function SkyField({ mode }: SkyFieldProps) {
                   onClick={() => controlsRef.current?.setTool('sling')}
                   className="chrome-seg flex-1"
                 >
+                  <span className="chrome-bracket" aria-hidden="true">[</span>
                   sling
+                  <span className="chrome-bracket" aria-hidden="true">]</span>
                 </button>
                 <button
                   type="button"
@@ -754,7 +756,9 @@ export default function SkyField({ mode }: SkyFieldProps) {
                   onClick={() => controlsRef.current?.setTool('draw')}
                   className="chrome-seg flex-1"
                 >
+                  <span className="chrome-bracket" aria-hidden="true">[</span>
                   draw
+                  <span className="chrome-bracket" aria-hidden="true">]</span>
                 </button>
               </div>
 
