@@ -44,11 +44,11 @@ export interface SpinState {
 const LON_PER_PX = 0.075;
 const LAT_PER_PX = 0.045;
 
-/** Same ceiling `render.ts` uses for the Moon/Venus/Jupiter (`BODY_ALPHA_CAP`)
- *  — game elements (aim UI, flares) are transient, but the brief calls them
- *  out explicitly, so every non-trivial `globalAlpha` in this module's draw
- *  pass is capped here too rather than assumed safe. */
-const CAP = 0.5;
+/** Ceiling for a single primitive inside the offscreen overlay. This is not a
+ *  legibility cap — `body.playing` fades the page out, so nothing is being
+ *  protected here. It only stops one primitive from going fully opaque, which
+ *  keeps overlapping draws reading as layers rather than a flat blob. */
+const CAP = 0.92;
 const capA = (v: number): number => Math.min(CAP, v);
 
 /** Everything the easter egg needs to persist across animation frames,

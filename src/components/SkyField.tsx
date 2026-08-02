@@ -31,20 +31,16 @@ interface SkyFieldProps {
 
 const DEFAULT_OBS: Observer = { lat: 12.9716, lon: 77.5946 }; // Bengaluru
 
-/** Every game primitive already clamps its own `globalAlpha` to 0.5 (`capA`
- *  in game.ts), but overlapping draws in the SAME pass still composite —
- *  two 0.5 layers reach 0.75, four reach 0.94 — and a collision stacks a
- *  burst disc, its radiation jets, and the struck star's bloom in the same
- *  few pixels. A per-primitive cap cannot bound that composite, so the whole
- *  overlay is rendered to an offscreen canvas and blitted onto the main
- *  canvas ONCE at this alpha — four overlapping layers become one layer
- *  reaching the page. Value picked by measurement: a stacked burst drives the
- *  offscreen layer itself to near-opaque (measured ~0.95) in its hottest
- *  pixel, and the ambient sky underneath sits up to ~0.6 (152/255) at its own
- *  ceiling — composited (over-operator: src + dst·(1-src)) that bounds the
- *  page to `GAME_BLIT_ALPHA + 0.6·(1-GAME_BLIT_ALPHA)`, which only clears
- *  169/255 (~0.663) below about 0.16; this sits with margin under that. */
-const GAME_BLIT_ALPHA = 0.12;
+/** The overlay still goes through one offscreen canvas and a single blit, so
+ *  overlapping primitives (a burst disc, its jets, the struck star's bloom in
+ *  the same pixels) composite once instead of stacking on the page.
+ *
+ *  The alpha itself is no longer bounded by text legibility. It used to be
+ *  0.12, derived from keeping a stacked burst under the 169/255 ceiling for
+ *  prose underneath — but that clamped a slingshot line to an effective 0.06
+ *  and made the game nearly invisible. `body.playing` now fades `.human-view`
+ *  to 0.08, so there is no prose to protect while the game is running. */
+const GAME_BLIT_ALPHA = 0.92;
 
 /** Every UI-visible piece of game state SkyField exposes to its JSX buttons,
  *  assigned once by the effect and invoked from onClick handlers outside it.
@@ -120,6 +116,62 @@ export default function SkyField({ mode }: SkyFieldProps) {
     tick();
     return () => window.clearTimeout(id);
   }, [mode, coords]);
+
+  // Site-wide custom cursor, as the prototype had it — its own rAF, independent
+  // of the sky loop, so it runs on every page and in `quiet` mode where the sky
+  // does not animate. Skipped entirely on coarse pointers and under reduced
+  // motion: the ring's lag IS the motion, and a frozen ring beside a hidden
+  // native cursor is worse than no ring. `cursor-custom` (which sets
+  // `cursor: none`) is added only once the loop is confirmed running, so a
+  // failure here can never leave a visitor with no pointer at all.
+  useEffect(() => {
+    if (machine) return;
+    const fine = window.matchMedia('(hover: hover) and (pointer: fine)');
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (!fine.matches || still.matches) return;
+
+    const ring = cursorRingRef.current;
+    const dot = cursorDotRef.current;
+    if (!ring || !dot) return;
+
+    let x = -100, y = -100, rx = -100, ry = -100, id = 0;
+    const INTERACTIVE = 'a,button,[role="button"],input,select,textarea,label,summary';
+    const onMove = (e: PointerEvent) => {
+      x = e.clientX;
+      y = e.clientY;
+      dot.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      const t = e.target as Element | null;
+      document.body.classList.toggle('cur-ui', !!t?.closest?.(INTERACTIVE));
+    };
+    const onDown = () => { ring.style.opacity = '0.7'; };
+    const onUp = () => { ring.style.opacity = '1'; };
+    const onLeave = () => { ring.style.opacity = '0'; dot.style.opacity = '0'; };
+    const onEnter = () => { ring.style.opacity = '1'; dot.style.opacity = '1'; };
+
+    const follow = () => {
+      rx += (x - rx) * 0.22;
+      ry += (y - ry) * 0.22;
+      ring.style.transform = `translate3d(${rx.toFixed(2)}px, ${ry.toFixed(2)}px, 0)`;
+      id = requestAnimationFrame(follow);
+    };
+    id = requestAnimationFrame(follow);
+    document.documentElement.classList.add('cursor-custom');
+
+    window.addEventListener('pointermove', onMove, { passive: true });
+    window.addEventListener('pointerdown', onDown, { passive: true });
+    window.addEventListener('pointerup', onUp, { passive: true });
+    document.addEventListener('pointerleave', onLeave);
+    document.addEventListener('pointerenter', onEnter);
+    return () => {
+      cancelAnimationFrame(id);
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerdown', onDown);
+      window.removeEventListener('pointerup', onUp);
+      document.removeEventListener('pointerleave', onLeave);
+      document.removeEventListener('pointerenter', onEnter);
+      document.documentElement.classList.remove('cursor-custom');
+    };
+  }, [machine]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -253,28 +305,12 @@ export default function SkyField({ mode }: SkyFieldProps) {
           ctx.drawImage(gameCanvas, 0, 0, W, H);
           ctx.globalAlpha = 1;
         }
-        updateCursor();
       } else {
         const { pts, faint } = computeSky(obs, new Date(), W, H);
         drawQuiet(ctx, W, H, pts, faint, colors);
       }
     };
 
-    // Custom cursor: dot snaps to the pointer, ring eases behind it. Only
-    // relevant while playing — outside the game the page must look and
-    // behave exactly as it does everywhere else, so this never runs then.
-    let ringX = -100;
-    let ringY = -100;
-    const updateCursor = () => {
-      if (!game?.playing) return;
-      const ring = cursorRingRef.current;
-      const dot = cursorDotRef.current;
-      if (!ring || !dot) return; // one-frame gap before React mounts them
-      dot.style.transform = `translate3d(${mouse.x}px, ${mouse.y}px, 0)`;
-      ringX += (mouse.x - ringX) * 0.22; // lag gives it weight
-      ringY += (mouse.y - ringY) * 0.22;
-      ring.style.transform = `translate3d(${ringX.toFixed(2)}px, ${ringY.toFixed(2)}px, 0)`;
-    };
 
     resize();
     renderFrame();
@@ -414,12 +450,9 @@ export default function SkyField({ mode }: SkyFieldProps) {
       controlsRef.current = {
         enter: () => {
           game.enter();
-          ringX = mouse.x;
-          ringY = mouse.y;
           setPlaying(true);
           setStruck(0);
           document.body.classList.add('playing');
-          document.documentElement.classList.add('cursor-custom');
           // Explicit opt-in: this click, not page load, starts motion — the
           // one case where the game must run even under reduced motion, or
           // clicking the egg would silently do nothing.
@@ -434,7 +467,6 @@ export default function SkyField({ mode }: SkyFieldProps) {
           setPlaying(false);
           setTool('sling');
           document.body.classList.remove('playing', 'grabbing', 'spinning', 'cur-ui', 'cur-star');
-          document.documentElement.classList.remove('cursor-custom');
           if (reduced) {
             if (rafId) {
               cancelAnimationFrame(rafId);
@@ -513,7 +545,6 @@ export default function SkyField({ mode }: SkyFieldProps) {
       // Leaving the game must restore the page completely, even on an
       // unmount mid-play (route change) rather than an explicit Exit click.
       document.body.classList.remove('playing', 'grabbing', 'spinning', 'cur-ui', 'cur-star');
-      document.documentElement.classList.remove('cursor-custom');
     };
   }, [mode]);
 
@@ -644,12 +675,13 @@ export default function SkyField({ mode }: SkyFieldProps) {
             </div>
           )}
 
-          {playing && (
-            <>
-              <div ref={cursorRingRef} id="sky-cursor-ring" aria-hidden="true" />
-              <div ref={cursorDotRef} id="sky-cursor-dot" aria-hidden="true" />
-            </>
-          )}
+        </>
+      )}
+
+      {!machine && (
+        <>
+          <div ref={cursorRingRef} id="sky-cursor-ring" aria-hidden="true" />
+          <div ref={cursorDotRef} id="sky-cursor-dot" aria-hidden="true" />
         </>
       )}
     </>
