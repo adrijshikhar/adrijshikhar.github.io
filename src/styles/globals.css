@@ -701,6 +701,7 @@ body.spinning * {
   .readout-row .k {
     display: inline-block;
     width: 4.5rem;
+    text-indent: 0;
     font-size: 0.5625rem;
     letter-spacing: 0.16em;
     opacity: 0.6;
