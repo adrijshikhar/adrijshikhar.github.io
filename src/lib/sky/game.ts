@@ -143,8 +143,11 @@ export class SkyGame {
    *  solver; draw mode runs the cursor-gravity spring, so browsing/linking
    *  stars still feels alive. Ages out expired flares either way. */
   tick(mouseX: number, mouseY: number): void {
-    if (!this.playing) return;
-    if (this.tool === 'sling') {
+    // Free-body physics belongs to the sling tool alone. Browsing the page and
+    // drawing both run the cursor-gravity spring, so the sky bends under the
+    // pointer on the default landing exactly as it does in the game — which is
+    // what the corner hint ("move — stars bend") has been promising.
+    if (this.playing && this.tool === 'sling') {
       // The strike count itself lives in React state — the callback is the
       // only channel, so there is no second copy here to drift out of sync.
       gamePhysics(this.stars, this.bursts, this.onStrike);

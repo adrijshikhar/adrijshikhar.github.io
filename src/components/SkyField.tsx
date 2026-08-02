@@ -38,8 +38,8 @@ const DEFAULT_OBS: Observer = { lat: 12.9716, lon: 77.5946 }; // Bengaluru
  *  The alpha itself is no longer bounded by text legibility. It used to be
  *  0.12, derived from keeping a stacked burst under the 169/255 ceiling for
  *  prose underneath — but that clamped a slingshot line to an effective 0.06
- *  and made the game nearly invisible. `body.playing` now fades `.human-view`
- *  to 0.08, so there is no prose to protect while the game is running. */
+ *  and made the game nearly invisible. `body.playing` fades `.human-view`
+ *  back, so the prose underneath is no longer the binding constraint. */
 const GAME_BLIT_ALPHA = 0.92;
 
 /** Every UI-visible piece of game state SkyField exposes to its JSX buttons,
@@ -96,9 +96,20 @@ export default function SkyField({ mode }: SkyFieldProps) {
   // and they are the two that make the corner read as a live instrument rather
   // than a static caption — they change as the sky turns and as you travel.
   const [sky, setSky] = useState<{ up: number; total: number; brightest: string[] } | null>(null);
+  // Shown once, on the first strike. The physics really does this — mass comes
+  // from magnitude and launch speed divides by its square root — so the note is
+  // a label on something the player has just felt, not a decorative caption.
+  const [massNote, setMassNote] = useState(false);
   if (mode === 'full' && !gameRef.current) {
     gameRef.current = new SkyGame(() => setStruck((n) => n + 1));
   }
+
+  useEffect(() => {
+    if (struck !== 1) return;
+    setMassNote(true);
+    const id = window.setTimeout(() => setMassNote(false), 9000);
+    return () => window.clearTimeout(id);
+  }, [struck]);
 
   // Sidereal clock. Separate from the render effect so it survives mode
   // changes and never couples a 1Hz timer to the animation loop.
@@ -649,6 +660,13 @@ export default function SkyField({ mode }: SkyFieldProps) {
           {/* bottom-20, not bottom-6: ViewToggle (the human/machine pill) already
               owns fixed bottom-6 left-1/2, z-[1100] — sharing that spot would
               have it permanently paint over half the tool bar. */}
+          {playing && massNote && (
+            <p className="mass-note fixed left-1/2 bottom-32 z-[45] -translate-x-1/2 whitespace-nowrap font-mono text-[0.625rem] tracking-[0.14em] uppercase text-muted">
+              same pull, less mass &mdash; <b className="font-medium text-accent">faint stars fly faster</b>
+              <span className="opacity-60"> · v &prop; 1/&radic;m</span>
+            </p>
+          )}
+
           {playing && (
             <div className="fixed left-1/2 bottom-20 z-[45] flex -translate-x-1/2 items-center gap-4 rounded-full border border-[color:var(--rule)] bg-[color-mix(in_srgb,var(--surface)_88%,transparent)] px-4 py-2 font-mono text-[0.625rem] tracking-[0.14em] uppercase text-muted backdrop-blur-xl">
               <button
