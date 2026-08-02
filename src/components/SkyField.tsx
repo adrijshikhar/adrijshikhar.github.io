@@ -59,6 +59,10 @@ export default function SkyField({ mode }: SkyFieldProps) {
   // opened a game whose canvas was invisible, while `.playing` set
   // `user-select: none` and made the markdown uncopyable.
   const [machine, setMachine] = useState(false);
+  // Observer coordinates, surfaced as the bottom-left instrument readout. Held
+  // in React state (not read off `obs`) so the corner updates when the geo
+  // lookup lands, without the canvas loop having to drive a DOM write.
+  const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(null);
   if (mode === 'full' && !gameRef.current) {
     gameRef.current = new SkyGame(() => setStruck((n) => n + 1));
   }
@@ -376,6 +380,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
           obs.lon = j.longitude;
           home.lat = j.latitude;
           home.lon = j.longitude;
+          setCoords({ lat: j.latitude, lon: j.longitude });
           if (reduced) renderFrame(); // no loop running to pick this up on its own
         }
       })
@@ -411,6 +416,29 @@ export default function SkyField({ mode }: SkyFieldProps) {
   return (
     <>
       <canvas ref={canvasRef} id="sky" aria-hidden="true" className="fixed inset-0 -z-[1] pointer-events-none" />
+
+      {/* Bottom-left instrument readout — the observer this sky is actually
+          computed for. Not an atmospheric locale strip: the coordinates ARE
+          the input to every star position on screen, so the page is telling
+          you what it is showing you. Falls back to Bengaluru silently when the
+          geo lookup 404s, and says so rather than implying a real fix. */}
+      {mode === 'full' && !machine && (
+        <div className="instrument instrument-l">
+          <div>
+            <span className="k">Observer</span>
+            <b>
+              {Math.abs((coords?.lat ?? DEFAULT_OBS.lat)).toFixed(2)}&deg;
+              {(coords?.lat ?? DEFAULT_OBS.lat) >= 0 ? 'N' : 'S'}{' '}
+              {Math.abs((coords?.lon ?? DEFAULT_OBS.lon)).toFixed(2)}&deg;
+              {(coords?.lon ?? DEFAULT_OBS.lon) >= 0 ? 'E' : 'W'}
+            </b>
+          </div>
+          <div>
+            <span className="k">Source</span>
+            <b>{coords ? 'geo' : 'default'}</b>
+          </div>
+        </div>
+      )}
 
       {mode === 'full' && !machine && (
         <>

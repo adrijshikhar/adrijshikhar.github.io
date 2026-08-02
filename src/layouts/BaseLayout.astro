@@ -88,6 +88,13 @@ const cfBeaconToken =
   </head>
   <body class="antialiased text-text">
     <SkyField client:visible mode={skyMode} />
+
+    <!-- Viewfinder: corner brackets plus the top-edge measurement scale, ported
+         from the prototype's `.frame`. Decoration only — the sky carries the
+         meaning; this just makes the page read as something seen THROUGH an
+         instrument rather than a document with a sky behind it. -->
+    <div class="viewfinder" aria-hidden="true"><i></i><i></i><i></i><i></i><u></u></div>
+
     <slot />
 
     <!-- Light/dark mode toggle, docked top-right -->
