@@ -20,6 +20,24 @@ import { animate, onScroll } from '../lib/motion';
 const ALT_RANGE = `+90…−${Math.abs(FLOOR)}°`;
 const STAR_COUNT = STARS.length;
 
+/** `?t=<ISO datetime>` points the instrument at another moment — the sky over
+ *  your location on any date, past or future. Everything downstream already
+ *  takes a `when`, so this is a clock offset and nothing else: same real
+ *  ephemeris, different epoch. An unparseable value is ignored rather than
+ *  silently showing 1970. Read once; guarded for SSR. */
+const TIME_OFFSET_MS = (() => {
+  if (typeof location === 'undefined') return 0;
+  try {
+    const raw = new URLSearchParams(location.search).get('t');
+    if (!raw) return 0;
+    const at = new Date(raw).getTime();
+    return Number.isNaN(at) ? 0 : at - Date.now();
+  } catch {
+    return 0;
+  }
+})();
+const skyNow = (): Date => new Date(Date.now() + TIME_OFFSET_MS);
+
 interface SkyFieldProps {
   /** 'quiet' (every page): faint field + named stars, no interaction. 'full'
    *  (home page only): adds the alt/az graticule, planets, the Moon with a
@@ -100,8 +118,14 @@ export default function SkyField({ mode }: SkyFieldProps) {
   // from magnitude and launch speed divides by its square root — so the note is
   // a label on something the player has just felt, not a decorative caption.
   const [massNote, setMassNote] = useState(false);
+  // Draw mode recognising a real constellation segment. Transient, like the
+  // mass note — it confirms a discovery, it is not a scoreboard.
+  const [figure, setFigure] = useState<{ name: string; drawn: number; total: number } | null>(null);
   if (mode === 'full' && !gameRef.current) {
-    gameRef.current = new SkyGame(() => setStruck((n) => n + 1));
+    gameRef.current = new SkyGame(
+      () => setStruck((n) => n + 1),
+      (name, drawn, total) => setFigure({ name, drawn, total }),
+    );
   }
 
   useEffect(() => {
@@ -111,6 +135,12 @@ export default function SkyField({ mode }: SkyFieldProps) {
     return () => window.clearTimeout(id);
   }, [struck]);
 
+  useEffect(() => {
+    if (!figure) return;
+    const id = window.setTimeout(() => setFigure(null), 6000);
+    return () => window.clearTimeout(id);
+  }, [figure]);
+
   // Sidereal clock. Separate from the render effect so it survives mode
   // changes and never couples a 1Hz timer to the animation loop.
   useEffect(() => {
@@ -119,13 +149,13 @@ export default function SkyField({ mode }: SkyFieldProps) {
     const tick = () => {
       const lon = coords?.lon ?? DEFAULT_OBS.lon;
       // gmstDeg + longitude = local sidereal angle; /15 turns degrees into hours.
-      const h = (((gmstDeg(new Date()) + lon) % 360) + 360) % 360 / 15;
+      const h = (((gmstDeg(skyNow()) + lon) % 360) + 360) % 360 / 15;
       const hh = Math.floor(h);
       const mm = Math.floor((h - hh) * 60);
       const ss = Math.floor((((h - hh) * 60) - mm) * 60);
       const p = (n: number) => String(n).padStart(2, '0');
       setLst(`${p(hh)}:${p(mm)}:${p(ss)}`);
-      setJd(julianDay(new Date()).toFixed(3));
+      setJd(julianDay(skyNow()).toFixed(3));
       id = window.setTimeout(tick, 1000);
     };
     tick();
@@ -296,7 +326,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
         engraved: light,
       };
       if (mode === 'full') {
-        const { bodies, faint, moonPhase } = computeFullSky(obs, new Date(), W, H);
+        const { bodies, faint, moonPhase } = computeFullSky(obs, skyNow(), W, H);
         if (game) {
           // Merge the real sky into the persistent game star list, then splice
           // the game's live positions back into `bodies` — `bodies` is a fresh
@@ -335,7 +365,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
           ctx.globalAlpha = 1;
         }
       } else {
-        const { pts, faint } = computeSky(obs, new Date(), W, H);
+        const { pts, faint } = computeSky(obs, skyNow(), W, H);
         drawQuiet(ctx, W, H, pts, faint, colors);
       }
     };
@@ -613,6 +643,14 @@ export default function SkyField({ mode }: SkyFieldProps) {
             <span className="k">Source</span>
             <b>{obsSource}</b>
           </div>
+          {TIME_OFFSET_MS !== 0 && (
+            <div className="readout-cell">
+              <span className="k">Epoch</span>
+              <b className="text-accent">
+                {skyNow().toISOString().slice(0, 16).replace('T', ' ')}Z
+              </b>
+            </div>
+          )}
           {sky && (
             <>
               <div className="readout-cell">
@@ -660,7 +698,22 @@ export default function SkyField({ mode }: SkyFieldProps) {
           {/* bottom-20, not bottom-6: ViewToggle (the human/machine pill) already
               owns fixed bottom-6 left-1/2, z-[1100] — sharing that spot would
               have it permanently paint over half the tool bar. */}
-          {playing && massNote && (
+          {playing && figure && (
+            <p className="mass-note fixed left-1/2 bottom-32 z-[45] -translate-x-1/2 whitespace-nowrap font-mono text-[0.625rem] tracking-[0.14em] uppercase text-muted">
+              {figure.drawn === figure.total ? (
+                <>
+                  <b className="font-medium text-accent">{figure.name}</b> complete &mdash; all {figure.total} segments
+                </>
+              ) : (
+                <>
+                  that is a real segment of <b className="font-medium text-accent">{figure.name}</b>
+                  <span className="opacity-60"> · {figure.drawn}/{figure.total}</span>
+                </>
+              )}
+            </p>
+          )}
+
+          {playing && !figure && massNote && (
             <p className="mass-note fixed left-1/2 bottom-32 z-[45] -translate-x-1/2 whitespace-nowrap font-mono text-[0.625rem] tracking-[0.14em] uppercase text-muted">
               same pull, less mass &mdash; <b className="font-medium text-accent">faint stars fly faster</b>
               <span className="opacity-60"> · v &prop; 1/&radic;m</span>
