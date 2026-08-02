@@ -12,6 +12,7 @@ into `content`. Build clean, `verify:sky` 11/11 (now gated in CI), legibility
 |---|---|
 | **Cards stay** for experience / projects / writing | Bare prose reads at 108 alpha and carded at 137, both under the 169 bar — but a card is a *guarantee* where the sky tuning is only a *measurement*, and these are the entries people read. Bare prose reserved for the short About section. |
 | **Space Grotesk for display only** | Owner picked it. Geist keeps `--font-sans`. It carries monospace DNA (Space Mono's proportional sibling), which rhymes with the all-mono chrome. Quirks are an asset at 76px, a liability at 16px. **APPLIED.** |
+| **Familjen Grotesk for body** | Owner picked it from a 15-face lab. Editorial-grotesk lane, most voice of that lane and the most economical at matched optical size. Costs the IBM Plex metric match and the sub-400 weights. |
 | **No rationale comments in markup/CSS** | Owner's call. Design reasoning lives in `CLAUDE.md` or here, not inline. |
 | **Headings and labels are component classes** | Owner's call: "common classes not hand written styles". The utility strings had been copy-pasted enough that six different tracking values (0.1/0.12/0.14/0.16/0.2/0.22em) had drifted into what was meant to be one label. |
 | **No Flaticon attribution** | Owner's call, stated explicitly. For the record: account showed the `0/100` free-tier counter and "Go Premium", and the free licence requires credit. Raised once, not to be raised again. |
@@ -88,6 +89,21 @@ correctly rendered, and useless.
 
 **`lsof -ti :PORT` matches client sockets.** It reported the dev server as up
 when it was down and Chrome held a closed connection. `curl` it.
+
+**A canvas glyph-hash does not prove the DOM renders in that font.** Two different
+checks. The body-font lab passed a canvas hash on all nine faces while the
+owner correctly reported they looked identical; the real test is screenshotting
+the rendered element and hashing *that*. (They were in fact all distinct — nine
+distinct element hashes — the faces just converge at 16px.)
+
+**Neutral grotesks are indistinguishable in body copy, by design.** Comparing
+them in paragraphs shows nothing. Show the diagnostic glyphs — `a g y R Q 1 t e`
+— at ~96px, then the same string at 16px. The pair is the finding: real
+differences, sub-perceptual at reading size.
+
+**Never size a measure in `ch`.** It is the width of the font's `0`, so the
+column resizes when the face changes. Cost a widowed hero lead on the Familjen
+swap. Sizes are in `rem` now.
 
 **Test the render decision, not the physics.** The Mars terminator bug shipped
 under an invariant asserting Mars stays above 0.83 illuminated — true, and
