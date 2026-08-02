@@ -5,7 +5,7 @@ import { getCollection } from 'astro:content';
 import matter from 'gray-matter';
 import { marked } from 'marked';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import SideNav from '../components/SideNav.astro';
+import TopNav from '../components/TopNav.astro';
 import Section from '../components/Section.astro';
 import ExpCard from '../components/ExpCard.tsx';
 import ProjectCard from '../components/ProjectCard.tsx';
@@ -51,11 +51,62 @@ const rawMarkdown = await buildRawMarkdown();
   <ViewToggle client:load />
   <div class="machine-view" />
 
-  <div class="human-view mx-auto min-h-screen max-w-screen-xl px-5 py-10 md:px-8 md:py-16 lg:px-10 lg:py-0">
-    <div class="lg:flex lg:justify-between lg:gap-12">
-      <SideNav />
+  <div class="human-view min-h-screen px-5 md:px-8">
+    <TopNav />
 
-      <main id="content" class="pt-24 lg:w-[62%] lg:py-24">
+    <!-- Single centred column at the prototype's 46rem. Every other page on the
+         site is already single-column (posts max-w-3xl, lists max-w-5xl), so
+         this also makes the home page stop being the odd one out. The margins
+         it frees are the point: they are where the sky lives, and where the
+         corner instruments sit, instead of the sky and the content fighting
+         over the same band. -->
+    <div class="mx-auto max-w-[46rem]">
+      <main id="content" class="pb-8">
+
+        <!-- Identity. Was the left rail's job; in one column it becomes the
+             column's opening rather than a parallel element beside it. -->
+        <section class="mb-20 md:mb-28">
+          <p class="mb-4 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted"><span class="h-2 w-2 rounded-full bg-accent"></span> whoami</p>
+          <h1 class="font-heading text-[2.6rem] font-semibold leading-[0.95] tracking-tightest text-heading sm:text-[3.2rem]">
+            <a href="/" class="no-underline">Adrij Shikhar</a>
+          </h1>
+          <h2 class="mt-3 font-heading text-base font-medium tracking-tighter text-heading sm:text-lg">
+            Senior Software Engineer
+          </h2>
+          <p class="mt-4 max-w-[35rem] text-sm leading-relaxed text-text">
+            I build scalable data platforms and craft software that pushes boundaries.
+          </p>
+          <div class="mt-8 flex items-center gap-6">
+            <ul class="flex items-center gap-5" aria-label="Social media">
+              {[
+                { href: 'https://github.com/adrijshikhar', icon: 'fa-brands fa-github', label: 'GitHub' },
+                { href: 'https://www.linkedin.com/in/adrijshikhar/', icon: 'fa-brands fa-linkedin-in', label: 'LinkedIn' },
+                { href: 'https://dev.to/adrijshikhar', icon: 'fa-brands fa-dev', label: 'DEV' },
+                { href: 'mailto:adrijshikhar@gmail.com', icon: 'fa-solid fa-envelope', label: 'Email' },
+                { href: 'https://www.reddit.com/user/adrijshikhar', icon: 'fa-brands fa-reddit-alien', label: 'Reddit' },
+              ].map((sLink) => (
+                <li class="shrink-0 text-xs">
+                  <a
+                    class="block text-muted no-underline transition-colors duration-[120ms] hover:text-accent"
+                    href={sLink.href}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    aria-label={`${sLink.label} (opens in a new tab)`}
+                  >
+                    <i class={`${sLink.icon} text-xl`} aria-hidden="true"></i>
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <a
+              class="flex items-center gap-2 text-muted no-underline transition-colors duration-[120ms] hover:text-accent"
+              href="/resume"
+            >
+              <i class="fa-solid fa-download" aria-hidden="true"></i>
+              <span class="font-mono text-xs font-medium uppercase tracking-[0.16em]">CV</span>
+            </a>
+          </div>
+        </section>
 
         <!-- About -->
         <section id="about" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
@@ -174,6 +225,7 @@ const rawMarkdown = await buildRawMarkdown();
 
 
       </main>
+    </div>
     </div>
   </div>
 
