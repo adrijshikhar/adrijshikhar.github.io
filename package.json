@@ -8,7 +8,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "verify:sky": "bun scripts/verify-sky.mjs",
-    "deploy": "gh-pages -d dist -b master"
+    "deploy": "gh-pages -d dist -b master",
+    "verify:code": "bun scripts/verify-code-theme.mjs"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.19",

@@ -442,8 +442,11 @@
   font-weight: var(--shiki-dark-font-weight);
   text-decoration: var(--shiki-dark-text-decoration);
 }
+/* Pane fill comes from the surface token, never from --shiki-*-bg: the theme's
+   own background is a baked hex that cannot follow a token change, and a code
+   block is the one place a stale near-white would be most obvious. */
 .astro-code {
-  background-color: var(--shiki-dark-bg);
+  background-color: var(--surface);
 }
 :root[data-mode="light"] .astro-code,
 :root[data-mode="light"] .astro-code span {
@@ -451,9 +454,6 @@
   font-style: var(--shiki-light-font-style);
   font-weight: var(--shiki-light-font-weight);
   text-decoration: var(--shiki-light-text-decoration);
-}
-:root[data-mode="light"] .astro-code {
-  background-color: var(--shiki-light-bg);
 }
 
 /* Code blocks styled as Terminal Atelier panes: atelier-card surface (card radius,
