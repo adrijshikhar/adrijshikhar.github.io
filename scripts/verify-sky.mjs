@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { altAz, planetRaDec, moonRaDec, gmstDeg } from '../src/lib/sky/astronomy.ts';
+import { altAz, planetRaDec, moonRaDec, gmstDeg, sunRaDec } from '../src/lib/sky/astronomy.ts';
 
 const now = new Date();
 let passed = 0;
@@ -96,6 +96,28 @@ check('Moon distance stays within the perigee/apogee envelope and actually varie
     lo = Math.min(lo, km); hi = Math.max(hi, km);
   }
   assert.ok(hi - lo > 20000, `range ${lo}..${hi} barely varies — km may be constant`);
+});
+
+// The Sun's declination is the cleanest invariant in the whole file: it is the
+// obliquity of the ecliptic at the solstices and zero at the equinoxes, by
+// definition. If the ecliptic-to-equatorial rotation is wrong, this moves.
+check('Sun declination hits the solstices and equinoxes', () => {
+  const dec = (m, d) => sunRaDec(new Date(Date.UTC(2026, m, d, 12))).dec;
+  assert.ok(Math.abs(dec(5, 21) - 23.44) < 0.3, `Jun solstice dec ${dec(5, 21)}, expected +23.44`);
+  assert.ok(Math.abs(dec(11, 21) + 23.44) < 0.3, `Dec solstice dec ${dec(11, 21)}, expected -23.44`);
+  assert.ok(Math.abs(dec(8, 22)) < 0.6, `Sep equinox dec ${dec(8, 22)}, expected ~0`);
+});
+
+// And it has to be up in the day and down at night, or the whole projection is
+// mirrored somewhere.
+check('Sun is above the horizon at local noon, below at local midnight', () => {
+  const at = (utcH) => {
+    const d = new Date(Date.UTC(2026, 7, 2, Math.floor(utcH), (utcH % 1) * 60));
+    const { ra, dec } = sunRaDec(d);
+    return altAz(ra, dec, 12.97, 77.59, d).alt;
+  };
+  assert.ok(at(6.5) > 60, `noon IST alt ${at(6.5)}, expected well above the horizon`);
+  assert.ok(at(18.5) < -30, `midnight IST alt ${at(18.5)}, expected well below`);
 });
 
 console.log(`\n${passed} checks passed`);
