@@ -61,7 +61,7 @@ const rawMarkdown = await buildRawMarkdown();
         <section id="about" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
           <p class="mb-5 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted"><span class="h-2 w-2 rounded-full bg-accent"></span> about</p>
           <div
-            class="prose prose-invert max-w-none text-[0.975rem] leading-relaxed text-text prose-p:text-text prose-p:leading-relaxed prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-strong:text-heading prose-strong:font-medium"
+            class="prose prose-invert max-w-[35rem] leading-relaxed text-text prose-p:text-text prose-p:leading-relaxed prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-strong:text-heading prose-strong:font-medium"
             set:html={marked.parse(about.content)}
           />
         </section>
@@ -152,7 +152,7 @@ const rawMarkdown = await buildRawMarkdown();
           </div>
           <p class="mb-5 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted hidden lg:flex"><span class="h-2 w-2 rounded-full bg-accent"></span> achievements</p>
           <div
-            class="prose prose-invert max-w-none text-text prose-p:text-text prose-li:text-text marker:text-accent prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-strong:text-heading"
+            class="prose prose-invert max-w-[35rem] text-text prose-p:text-text prose-li:text-text marker:text-accent prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-strong:text-heading"
             set:html={marked.parse(achievements.content)}
           />
         </section>
@@ -161,7 +161,7 @@ const rawMarkdown = await buildRawMarkdown();
         <section id="interests" class="mb-12 scroll-mt-16 md:mb-16 lg:scroll-mt-24">
           <p class="mb-5 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted"><span class="h-2 w-2 rounded-full bg-accent"></span> interests</p>
           <div
-            class="prose prose-invert max-w-none text-text prose-p:text-text prose-li:text-text marker:text-accent prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-strong:text-heading"
+            class="prose prose-invert max-w-[35rem] text-text prose-p:text-text prose-li:text-text marker:text-accent prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-strong:text-heading"
             set:html={marked.parse(interests.content)}
           />
         </section>
