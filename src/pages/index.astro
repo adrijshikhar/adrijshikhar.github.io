@@ -63,20 +63,25 @@ const rawMarkdown = await buildRawMarkdown();
     <div class="mx-auto max-w-[46rem]">
       <main id="content" class="pb-8">
 
-        <!-- Identity. Was the left rail's job; in one column it becomes the
-             column's opening rather than a parallel element beside it. -->
-        <section class="mb-20 md:mb-28">
-          <p class="mb-4 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted"><span class="h-2 w-2 rounded-full bg-accent"></span> whoami</p>
-          <h1 class="font-heading text-[2.6rem] font-semibold leading-[0.95] tracking-tightest text-heading sm:text-[3.2rem]">
-            <a href="/" class="no-underline">Adrij Shikhar</a>
-          </h1>
-          <h2 class="mt-3 font-heading text-base font-medium tracking-tighter text-heading sm:text-lg">
-            Senior Software Engineer
-          </h2>
-          <p class="mt-4 max-w-[35rem] text-sm leading-relaxed text-text">
-            I build scalable data platforms and craft software that pushes boundaries.
+        <!-- Landing view: the hero owns the first screen, vertically centred,
+             exactly as the prototype does it (min-height:100dvh, flex, centre).
+             100dvh not 100vh so the iOS address bar cannot cause a jump. Content
+             below is revealed by scrolling. -->
+        <header class="flex min-h-[100dvh] flex-col justify-center pb-24 pt-32">
+          <p class="mb-6 flex items-center gap-3 font-mono text-[0.6875rem] uppercase tracking-[0.2em] text-muted">
+            <span class="live inline-block h-[5px] w-[5px] rounded-full bg-accent"></span>
+            Bengaluru
           </p>
-          <div class="mt-8 flex items-center gap-6">
+          <h1 class="font-heading font-semibold leading-[0.92] tracking-[-0.045em] text-heading"
+              style="font-size:clamp(3rem,8.5vw,5.75rem)">
+            <a href="/" class="no-underline">Adrij<br />Shikhar</a>
+          </h1>
+          <p class="mt-8 max-w-[36ch] text-[1.15rem] leading-relaxed text-text">
+            Senior software engineer at Hevo Data. I move data between systems that were
+            never designed to agree, and <em class="not-italic text-heading">write down what
+            breaks on the way</em>.
+          </p>
+          <div class="mt-10 flex items-center gap-6">
             <ul class="flex items-center gap-5" aria-label="Social media">
               {[
                 { href: 'https://github.com/adrijshikhar', icon: 'fa-brands fa-github', label: 'GitHub' },
@@ -86,31 +91,25 @@ const rawMarkdown = await buildRawMarkdown();
                 { href: 'https://www.reddit.com/user/adrijshikhar', icon: 'fa-brands fa-reddit-alien', label: 'Reddit' },
               ].map((sLink) => (
                 <li class="shrink-0 text-xs">
-                  <a
-                    class="block text-muted no-underline transition-colors duration-[120ms] hover:text-accent"
-                    href={sLink.href}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    aria-label={`${sLink.label} (opens in a new tab)`}
-                  >
+                  <a class="block text-muted no-underline transition-colors duration-[120ms] hover:text-accent"
+                     href={sLink.href} target="_blank" rel="noreferrer noopener"
+                     aria-label={`${sLink.label} (opens in a new tab)`}>
                     <i class={`${sLink.icon} text-xl`} aria-hidden="true"></i>
                   </a>
                 </li>
               ))}
             </ul>
-            <a
-              class="flex items-center gap-2 text-muted no-underline transition-colors duration-[120ms] hover:text-accent"
-              href="/resume"
-            >
+            <a class="flex items-center gap-2 text-muted no-underline transition-colors duration-[120ms] hover:text-accent"
+               href="/resume">
               <i class="fa-solid fa-download" aria-hidden="true"></i>
               <span class="font-mono text-xs font-medium uppercase tracking-[0.16em]">CV</span>
             </a>
           </div>
-        </section>
+        </header>
 
         <!-- About -->
         <section id="about" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <p class="mb-5 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted"><span class="h-2 w-2 rounded-full bg-accent"></span> about</p>
+          <div class="sec-head mb-8 flex items-baseline gap-4"><span class="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-accent">01</span><span class="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-muted">about</span><span class="h-px flex-1 bg-[var(--rule)]"></span></div>
           <div
             class="prose prose-invert max-w-[35rem] leading-relaxed text-text prose-p:text-text prose-p:leading-relaxed prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-strong:text-heading prose-strong:font-medium"
             set:html={marked.parse(about.content)}
@@ -122,7 +121,7 @@ const rawMarkdown = await buildRawMarkdown();
           <div class="sticky top-0 z-20 -mx-5 mb-6 w-screen border-b border-border bg-[color-mix(in_srgb,var(--bg)_80%,transparent)] px-5 py-5 backdrop-blur md:-mx-8 md:px-8 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
             <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Experience</h2>
           </div>
-          <p class="mb-5 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted hidden lg:flex"><span class="h-2 w-2 rounded-full bg-accent"></span> experience</p>
+          <div class="sec-head mb-8 flex items-baseline gap-4"><span class="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-accent">02</span><span class="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-muted">experience</span><span class="h-px flex-1 bg-[var(--rule)]"></span></div>
           <ul class="group/list border-b-0">
             {experience.meta.entries.slice(0, 2).map((exp: any, i: number) => (
               <ExpCard {...exp} index={i} />
@@ -140,7 +139,7 @@ const rawMarkdown = await buildRawMarkdown();
           <div class="sticky top-0 z-20 -mx-5 mb-6 w-screen border-b border-border bg-[color-mix(in_srgb,var(--bg)_80%,transparent)] px-5 py-5 backdrop-blur md:-mx-8 md:px-8 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
             <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Projects</h2>
           </div>
-          <p class="mb-5 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted hidden lg:flex"><span class="h-2 w-2 rounded-full bg-accent"></span> projects</p>
+          <div class="sec-head mb-8 flex items-baseline gap-4"><span class="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-accent">03</span><span class="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-muted">projects</span><span class="h-px flex-1 bg-[var(--rule)]"></span></div>
           <ul class="group/list">
             {projects.meta.entries.slice(0, 2).map((proj: any, i: number) => (
               <ProjectCard {...proj} index={i} contentHtml={marked.parse(projSections[proj.slug] || '') as string} />
@@ -158,7 +157,7 @@ const rawMarkdown = await buildRawMarkdown();
           <div class="sticky top-0 z-20 -mx-5 mb-6 w-screen border-b border-border bg-[color-mix(in_srgb,var(--bg)_80%,transparent)] px-5 py-5 backdrop-blur md:-mx-8 md:px-8 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
             <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Writing</h2>
           </div>
-          <p class="mb-5 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted hidden lg:flex"><span class="h-2 w-2 rounded-full bg-accent"></span> writing</p>
+          <div class="sec-head mb-8 flex items-baseline gap-4"><span class="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-accent">04</span><span class="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-muted">writing</span><span class="h-px flex-1 bg-[var(--rule)]"></span></div>
           {latestPosts.length === 0 ? (
             <p class="border border-border px-5 py-6 font-mono text-sm text-muted">
               <span class="text-accent">$</span> ls ./posts — <span class="text-text">no entries yet.</span>
@@ -182,7 +181,7 @@ const rawMarkdown = await buildRawMarkdown();
           <div class="sticky top-0 z-20 -mx-5 mb-6 w-screen border-b border-border bg-[color-mix(in_srgb,var(--bg)_80%,transparent)] px-5 py-5 backdrop-blur md:-mx-8 md:px-8 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
             <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Education</h2>
           </div>
-          <p class="mb-5 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted hidden lg:flex"><span class="h-2 w-2 rounded-full bg-accent"></span> education</p>
+          <div class="sec-head mb-8 flex items-baseline gap-4"><span class="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-accent">05</span><span class="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-muted">education</span><span class="h-px flex-1 bg-[var(--rule)]"></span></div>
           <ul class="grid gap-4 sm:grid-cols-2">
             {education.meta.entries.map((edu: any, i: number) => (
               <li class={`atelier-card group/list-item px-5 py-6 lg:px-6 lg:py-7`}>
@@ -201,7 +200,7 @@ const rawMarkdown = await buildRawMarkdown();
           <div class="sticky top-0 z-20 -mx-5 mb-6 w-screen border-b border-border bg-[color-mix(in_srgb,var(--bg)_80%,transparent)] px-5 py-5 backdrop-blur md:-mx-8 md:px-8 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
             <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Achievements</h2>
           </div>
-          <p class="mb-5 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted hidden lg:flex"><span class="h-2 w-2 rounded-full bg-accent"></span> achievements</p>
+          <div class="sec-head mb-8 flex items-baseline gap-4"><span class="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-accent">06</span><span class="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-muted">achievements</span><span class="h-px flex-1 bg-[var(--rule)]"></span></div>
           <div
             class="prose prose-invert max-w-[35rem] text-text prose-p:text-text prose-li:text-text marker:text-accent prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-strong:text-heading"
             set:html={marked.parse(achievements.content)}
@@ -210,7 +209,7 @@ const rawMarkdown = await buildRawMarkdown();
 
         <!-- Interests -->
         <section id="interests" class="mb-12 scroll-mt-16 md:mb-16 lg:scroll-mt-24">
-          <p class="mb-5 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted"><span class="h-2 w-2 rounded-full bg-accent"></span> interests</p>
+          <div class="sec-head mb-8 flex items-baseline gap-4"><span class="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-accent">07</span><span class="font-mono text-[0.6875rem] uppercase tracking-[0.22em] text-muted">interests</span><span class="h-px flex-1 bg-[var(--rule)]"></span></div>
           <div
             class="prose prose-invert max-w-[35rem] text-text prose-p:text-text prose-li:text-text marker:text-accent prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-strong:text-heading"
             set:html={marked.parse(interests.content)}
