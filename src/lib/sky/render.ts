@@ -152,7 +152,7 @@ function markStar(
     ctx.stroke();
     return;
   }
-  ctx.globalAlpha = engraved ? alpha * 0.72 : alpha;
+  ctx.globalAlpha = alpha;
   ctx.fillStyle = colour;
   ctx.beginPath();
   ctx.arc(x, y, vr, 0, Math.PI * 2);
@@ -186,9 +186,9 @@ export function drawQuiet(
     // Engraved mode drops the faintest half of the field. On black these are
     // atmospheric dust; on cream the same marks are just grubby stipple, and
     // they were the bulk of the ink on the page.
-    if (colors.engraved && f.mag > 4.6) continue;
+    if (colors.engraved && f.mag > 5.3) continue;
     const below = f.alt < 0 ? 0.22 : 1;
-    const dust = colors.engraved ? 0.45 : 1;
+    const dust = colors.engraved ? 1 : 1;
     ctx.globalAlpha = (0.3 - (f.mag - 3.6) * 0.055) * below * dust;
     ctx.fillStyle = colors.faint;
     ctx.beginPath();
@@ -579,9 +579,9 @@ export function drawFull(
 
   for (const f of faint) {
     if (f.alt < FLOOR) continue;
-    if (colors.engraved && f.mag > 4.6) continue; // see drawQuiet: stipple on cream
+    if (colors.engraved && f.mag > 5.3) continue; // see drawQuiet: stipple on cream
     const below = f.alt < 0 ? 0.22 : 1;
-    const dust = colors.engraved ? 0.45 : 1;
+    const dust = colors.engraved ? 1 : 1;
     ctx.globalAlpha = (0.3 - (f.mag - 3.6) * 0.055) * below * dust;
     ctx.fillStyle = colors.faint;
     ctx.beginPath();

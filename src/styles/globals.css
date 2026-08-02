@@ -84,17 +84,17 @@
      the pure-white cards on top of it reached a 1.055 contrast ratio -- no
      separation at all, and a viewport-filling glare. Dropping the ground is
      one change that fixes both: 12% dimmer, and cards now lift 3.4x harder. */
-  --bg:        oklch(93.5% .006 250);
-  --surface:   oklch(99.5% .002 250);
-  --surface-2: oklch(96.5% .004 250);
+  --bg:        oklch(86% .007 250);
+  --surface:   oklch(97% .002 250);
+  --surface-2: oklch(92% .005 250);
   --heading:   oklch(26%   .018 255);   /* ink, not black */
   --text:      oklch(37%   .020 255);
-  --muted:     oklch(49%   .012 252);
+  --muted:     oklch(44%   .014 252);
   --border: 0 0 0;                     /* used as rgb(var(--border) / a) */
-  --border-color: oklch(28% .02 60 / .14);
-  --hairline:     oklch(28% .02 60 / .14);
-  --rule:         oklch(28% .02 60 / .14);
-  --rule-hi:      oklch(28% .02 60 / .32);
+  --border-color: oklch(28% .02 60 / .18);
+  --hairline:     oklch(28% .02 60 / .18);
+  --rule:         oklch(28% .02 60 / .18);
+  --rule-hi:      oklch(28% .02 60 / .38);
   /* Engraved star-chart ink (SkyField, light mode) — dark marks on paper,
      not an inverted photograph. Same hue/lightness family as --heading/--rule,
      kept as its own token since it's opaque (star fills) where those carry
@@ -104,8 +104,10 @@
   --card-core:  var(--surface);
   --card-shadow:    0 1px 2px oklch(30% .03 60 / .07), 0 10px 26px oklch(30% .03 60 / .07);
 
-  /* Bronze darkened for AA on paper — the dark-mode value fails contrast here. */
-  --accent: oklch(50% .145 62);
+  /* Bronze darkened twice for AA on paper: once because the dark-mode value
+     fails here, and again so the ground could drop to 86% without the accent
+     falling under 4.5:1 against it. Measured 4.83. */
+  --accent: oklch(46% .148 62);
   --accent-contrast: oklch(97.6% .005 250);
 
   /* shadcn token bridge — flip to light so ui/* components adapt */
@@ -529,6 +531,9 @@ body.playing .human-view {
   opacity: 0.3;
   pointer-events: none;
 }
+/* On paper, 0.3 is not receding -- it is grey text on a grey ground with
+   nothing to look at. Light mode needs the content genuinely out of the way. */
+:root[data-mode='light'] body.playing .human-view { opacity: 0.12; }
 
 .mass-note {
   pointer-events: none;
@@ -733,13 +738,13 @@ body.spinning * {
      sit ON the glass, not above it. */
   .chrome-panel {
     display: flex;
-    align-items: center;
+    align-items: stretch;
     border: 1px solid var(--rule);
     background: color-mix(in srgb, var(--surface) 88%, transparent);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     font-family: var(--font-mono);
-    font-size: 0.625rem;
+    font-size: 0.5625rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--muted);
@@ -749,13 +754,12 @@ body.spinning * {
      sling/draw pairs. Selection is the accent plus a brighter edge, never a
      filled pill. */
   .chrome-seg {
-    border: 1px solid transparent;
-    padding: 0.25rem 0.6rem;
+    padding: 0.25rem 0.5rem;
     /* Explicit, not inherited: shadcn's Toggle ships text-sm font-medium and a
        text-transform reset, which put HUMAN/MACHINE at 14px sentence case
        inside a 10px uppercase panel. */
     font-family: var(--font-mono);
-    font-size: 0.625rem;
+    font-size: 0.5625rem;
     font-weight: 400;
     letter-spacing: 0.16em;
     text-transform: uppercase;
@@ -766,11 +770,22 @@ body.spinning * {
       border-color 0.22s var(--ease-out);
   }
   .chrome-seg:hover { color: var(--heading); }
-  .chrome-seg[aria-pressed='true'],
-  .chrome-seg[data-state='on'] {
+  .chrome-panel > .chrome-seg + .chrome-seg { border-left: 1px solid var(--rule); }
+
+  /* Selection is the bracket pair alone — no box. The panel already draws a
+     rectangle, so a second one around the active item read as a doubled
+     border. Real spans, not ::before/::after: Tailwind's preflight sets
+     `content: var(--tw-content)` on both pseudos and was silently eating the
+     closing bracket, which shipped as "[ HUMAN" with no "]". */
+  .chrome-bracket {
     color: var(--accent);
-    border-color: var(--rule-hi);
+    opacity: 0;
+    transition: opacity 0.22s var(--ease-out);
   }
+  .chrome-seg[aria-pressed='true'] .chrome-bracket,
+  .chrome-seg[data-state='on'] .chrome-bracket { opacity: 1; }
+  .chrome-seg[aria-pressed='true'],
+  .chrome-seg[data-state='on'] { color: var(--accent); }
 
   /* Banded rows inside a vertical chrome panel: tools, then live status, then
      actions. Hairlines between bands do the grouping, so the panel reads as an
@@ -793,6 +808,47 @@ body.spinning * {
     text-align: left;
   }
   .chrome-status-val b { color: var(--accent); font-weight: 500; }
+
+  /* Scroll cue. States a real consequence -- the constellation figures are
+     drawn by scroll progress -- rather than saying "scroll down". Fades out
+     once the reader has started, so it never nags. */
+  .scroll-cue {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    opacity: 0.75;
+    transition: opacity 0.5s var(--ease-out);
+  }
+  .scroll-cue-rail {
+    position: relative;
+    width: 1px;
+    height: 2.4rem;
+    background: var(--rule);
+    overflow: hidden;
+  }
+  .scroll-cue-rail::after {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 45%;
+    background: var(--accent);
+    animation: cue-run 2.4s var(--ease-out) infinite;
+  }
+  @keyframes cue-run {
+    0%   { transform: translateY(-100%); opacity: 0; }
+    35%  { opacity: 1; }
+    100% { transform: translateY(240%); opacity: 0; }
+  }
+  /* Past the first screen it has done its job. */
+  body.scrolled .scroll-cue { opacity: 0; pointer-events: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .scroll-cue-rail::after { animation: none; transform: none; height: 100%; opacity: .5; }
+  }
 
   .expo {
     position: fixed;
