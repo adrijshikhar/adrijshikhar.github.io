@@ -6,7 +6,7 @@ fastest way to settle an argument is to ask which reading it supports.
 
 `CLAUDE.md` holds the mechanics (how theming works, which classes exist).
 This file holds the **principles and the token contract** — what is allowed to
-look like what. Roadmap and research live in `~/Projects/my-projects/projects/adrijshikhar.github.io/`.
+look like what. Roadmap and research are kept outside this repo.
 
 ---
 
