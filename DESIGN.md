@@ -10,7 +10,7 @@ look like what. Roadmap and research live in `~/Projects/my-projects/projects/ad
 
 ---
 
-## The three principles
+## The principles
 
 **1. The instrument must not lie.**
 Every value on screen is a true statement about the render. The sky is real
@@ -31,7 +31,24 @@ A control that floats over the sky belongs to the chrome. Giving it a card's
 radius and shadow makes it read as a widget stuck on top of the instrument
 rather than a part of it.
 
-**3. Legibility is measured, not eyeballed.**
+**3. Brightness is a contrast problem, not a lightness problem.**
+A page reads as glare when its pixels all sit in one luminance band, not when
+its lightest value is high. Light mode once had **88% of every rendered pixel
+inside a single decile** — dimming the ground only slid that band down, it
+never added range. The fix is range, and only a **large-area** element can
+supply it: the ground gradient (warm bloom top-left, cool counter top-right,
+vignette settling the edges) plus opaque cards floating above it. That took the
+hero's peak band to 57% and gave card views a three-band spread.
+
+The sky **cannot** do this work. It is line art over less than 1% of the frame,
+so boosting the graticule and stars moves the histogram by fractions of a
+percent while pushing straight through the legibility ceiling — measured: a
+2.6x graticule boost moved the peak band 88.7 → 88.4 and broke text legibility
+to 216 against the 169 bar. The engraved multipliers (`K = 1.35`, `dust = 1.2`
+in `render.ts`) exist only so ink-on-paper reads at the same *strength* as
+light-on-black. They are not a brightness control. Do not raise them.
+
+**4. Legibility is measured, not eyeballed.**
 Canvas alpha is sampled under every text rectangle and held under **169/255**.
 Any change to the sky, the graticule, or the chrome requires re-measuring.
 `bun run verify:sky` holds 14 physical invariants, in CI, because eyes cannot

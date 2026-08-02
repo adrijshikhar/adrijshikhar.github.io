@@ -174,10 +174,13 @@
          warm signal, instead of one warm wash over a warm page. */
       radial-gradient(70% 50% at 88% 6%, oklch(70% .050 250 / .07), transparent 66%);
   }
+  /* Light mode's tonal range lives here, not in the sky — see DESIGN.md. */
   :root[data-mode="light"] body::before {
+    height: 100vh;
     background:
-      radial-gradient(90% 62% at 22% 0%, oklch(50% .145 62 / .08), transparent 62%),
-      radial-gradient(70% 50% at 88% 6%, oklch(55% .05 250 / .05), transparent 66%);
+      radial-gradient(85% 55% at 20% 2%, oklch(50% .145 62 / .16), transparent 60%),
+      radial-gradient(70% 50% at 88% 6%, oklch(45% .06 250 / .12), transparent 64%),
+      radial-gradient(120% 95% at 50% 42%, transparent 38%, oklch(30% .02 255 / .16) 100%);
   }
 
   /* Film grain — fixed and pointer-events:none, never on a scrolling container.

@@ -188,8 +188,9 @@ export function drawQuiet(
     // they were the bulk of the ink on the page.
     if (colors.engraved && f.mag > 5.3) continue;
     const below = f.alt < 0 ? 0.22 : 1;
-    const dust = colors.engraved ? 1 : 1;
-    ctx.globalAlpha = (0.3 - (f.mag - 3.6) * 0.055) * below * dust;
+    const dust = colors.engraved ? 1.2 : 1; // ink on paper — see DESIGN.md
+
+    ctx.globalAlpha = Math.min(1, (0.3 - (f.mag - 3.6) * 0.055) * below * dust);
     ctx.fillStyle = colors.faint;
     ctx.beginPath();
     ctx.arc(f.x, f.y, f.mag < 4.6 ? 1.15 : 0.8, 0, Math.PI * 2);
@@ -472,15 +473,16 @@ export function drawGraticule(
   ctx: CanvasRenderingContext2D,
   W: number,
   H: number,
-  colors: { muted: string },
+  colors: { muted: string; engraved?: boolean },
 ): void {
+  const K = colors.engraved ? 1.35 : 1; // ink on paper — see DESIGN.md
   const GR = Math.hypot(W, H) * 0.52, cx = W / 2, cy = H / 2;
   const altR = (a: number) => ((90 - a) / (90 - FLOOR)) * GR;
 
   ctx.strokeStyle = colors.muted;
   for (const a of [60, 30, 0, -15]) {
     const horizon = a === 0;
-    ctx.globalAlpha = horizon ? 0.26 : 0.105;
+    ctx.globalAlpha = (horizon ? 0.26 : 0.105) * K;
     ctx.lineWidth = horizon ? 1.25 : 1;
     ctx.setLineDash(a === -15 ? [2, 6] : []);
     ctx.beginPath();
@@ -490,7 +492,7 @@ export function drawGraticule(
   ctx.lineWidth = 1;
 
   ctx.setLineDash([2, 8]);
-  ctx.globalAlpha = 0.06;
+  ctx.globalAlpha = 0.06 * K;
   for (let az = 0; az < 360; az += 30) {
     const t = (az - 180) * D2R; // fixed to the instrument, not the sky
     ctx.beginPath();
@@ -500,7 +502,7 @@ export function drawGraticule(
   }
   ctx.setLineDash([]);
 
-  ctx.globalAlpha = 0.3;
+  ctx.globalAlpha = 0.3 * K;
   for (let az = 0; az < 360; az += 10) {
     const t = (az - 180) * D2R;
     const major = az % 30 === 0;
@@ -513,13 +515,13 @@ export function drawGraticule(
 
   ctx.font = '500 8px ui-monospace,Menlo,monospace';
   ctx.textAlign = 'left';
-  ctx.globalAlpha = 0.34;
+  ctx.globalAlpha = Math.min(1, 0.34 * K);
   ctx.fillStyle = colors.muted;
   for (const a of [60, 30, 0]) {
     ctx.fillText(a === 0 ? 'HORIZON' : `${a}°`, cx + 6, cy - altR(a) + 11);
   }
 
-  ctx.globalAlpha = 0.3; // zenith reticle
+  ctx.globalAlpha = Math.min(1, 0.3 * K); // zenith reticle
   ctx.strokeStyle = colors.muted;
   ctx.beginPath();
   ctx.moveTo(cx - 7, cy); ctx.lineTo(cx - 2, cy);
@@ -581,8 +583,9 @@ export function drawFull(
     if (f.alt < FLOOR) continue;
     if (colors.engraved && f.mag > 5.3) continue; // see drawQuiet: stipple on cream
     const below = f.alt < 0 ? 0.22 : 1;
-    const dust = colors.engraved ? 1 : 1;
-    ctx.globalAlpha = (0.3 - (f.mag - 3.6) * 0.055) * below * dust;
+    const dust = colors.engraved ? 1.2 : 1; // ink on paper — see DESIGN.md
+
+    ctx.globalAlpha = Math.min(1, (0.3 - (f.mag - 3.6) * 0.055) * below * dust);
     ctx.fillStyle = colors.faint;
     ctx.beginPath();
     ctx.arc(f.x, f.y, f.mag < 4.6 ? 1.15 : 0.8, 0, Math.PI * 2);
