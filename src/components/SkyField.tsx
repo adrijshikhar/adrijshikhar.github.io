@@ -64,6 +64,12 @@ export default function SkyField({ mode }: SkyFieldProps) {
   // in React state (not read off `obs`) so the corner updates when the geo
   // lookup lands, without the canvas loop having to drive a DOM write.
   const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(null);
+  // Kept separate from `coords` on purpose. `coords` is wherever the observer
+  // currently IS; this is how we came to be there. Travelling the sky moves the
+  // observer without a lookup ever succeeding, so conflating the two made the
+  // readout claim 'geo' for a position the user had dragged to by hand - a lie
+  // in the one element whose entire value is that it reports what is true.
+  const [obsSource, setObsSource] = useState<'default' | 'geo' | 'travel'>('default');
   // Local sidereal time — the angle of sky currently overhead. This is the
   // number an observatory actually reads, and unlike a wall clock it is
   // genuinely tied to what the canvas is drawing: LST is what decides which
@@ -109,6 +115,24 @@ export default function SkyField({ mode }: SkyFieldProps) {
     // position rather than recomputed on every pointermove — bodies are
     // already recomputed every frame, so this avoids doing the hit-test twice.
     const mouse = { x: -1000, y: -1000 };
+    // The readout claims to show the observer the sky is computed for, so it has
+    // to follow sky travel, not just the initial geo lookup. Travel fires on
+    // pointermove, though, and a setState per move would re-render the tree on
+    // every frame of a drag - so publish at ~8Hz while dragging and settle on
+    // the exact value when it ends.
+    let coordsPublishedAt = 0;
+    let homeSource: 'default' | 'geo' = 'default';
+    const publishCoords = (
+      lat: number, lon: number,
+      source: 'default' | 'geo' | 'travel',
+      force = false,
+    ) => {
+      const t = performance.now();
+      if (!force && t - coordsPublishedAt < 120) return;
+      coordsPublishedAt = t;
+      setCoords({ lat, lon });
+      setObsSource(source);
+    };
     let hoverIndex = -1;
     let hoverFig: string | null = null;
     // Reduced motion: constellations render fully formed (no scroll-driven reveal).
@@ -267,6 +291,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
         if (next) {
           obs.lat = next.lat;
           obs.lon = next.lon;
+          publishCoords(next.lat, next.lon, 'travel');
           if (reduced) renderFrame();
         }
         return;
@@ -311,6 +336,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
       document.body.classList.remove('grabbing');
       if (game?.spin) {
         game.endSpin();
+        publishCoords(obs.lat, obs.lon, 'travel', true); // settle on the exact final position
         document.body.classList.remove('spinning');
       }
       if (!game || !game.playing) return;
@@ -377,6 +403,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
         home: () => {
           obs.lat = home.lat;
           obs.lon = home.lon;
+          publishCoords(home.lat, home.lon, homeSource, true);
           if (reduced) renderFrame();
         },
       };
@@ -406,7 +433,8 @@ export default function SkyField({ mode }: SkyFieldProps) {
           obs.lon = j.longitude;
           home.lat = j.latitude;
           home.lon = j.longitude;
-          setCoords({ lat: j.latitude, lon: j.longitude });
+          homeSource = 'geo';
+          publishCoords(j.latitude, j.longitude, 'geo', true);
           if (reduced) renderFrame(); // no loop running to pick this up on its own
         }
       })
@@ -465,7 +493,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
           </div>
           <div>
             <span className="k">Source</span>
-            <b>{coords ? 'geo' : 'default'}</b>
+            <b>{obsSource}</b>
           </div>
         </div>
       )}
