@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import {
-  computeSky,
   computeFullSky,
   drawQuiet,
   drawFull,
@@ -122,7 +121,12 @@ export default function SkyField({ mode }: SkyFieldProps) {
   // Draw mode recognising a real constellation segment. Transient, like the
   // mass note — it confirms a discovery, it is not a scoreboard.
   const [figure, setFigure] = useState<{ name: string; drawn: number; total: number } | null>(null);
-  if (mode === 'full' && !gameRef.current) {
+  // Built in BOTH modes. Quiet mode never calls `enter()`, so no game is
+  // reachable there — but `tick()` runs the cursor-gravity spring whenever it
+  // is not slinging, and that spring is the wobble. Withholding the instance
+  // from quiet pages is the only reason the sky sat frozen everywhere except
+  // home while the hint promised otherwise.
+  if (!gameRef.current) {
     gameRef.current = new SkyGame(
       () => setStruck((n) => n + 1),
       (name, drawn, total) => setFigure({ name, drawn, total }),
@@ -377,8 +381,20 @@ export default function SkyField({ mode }: SkyFieldProps) {
           ctx.globalAlpha = 1;
         }
       } else {
-        const { pts, faint } = computeSky(obs, skyNow(), W, H);
-        drawQuiet(ctx, W, H, pts, faint, colors);
+        // Quiet gets the same computed bodies as home — planets, Moon and Sun
+        // included — and the same physics splice, so the field bends under the
+        // cursor here too. What it does not get is the instrument: no
+        // graticule, constellations, hover readout or game.
+        const { bodies, faint, moonPhase } = computeFullSky(obs, skyNow(), W, H);
+        if (game) {
+          game.sync(bodies);
+          for (let i = 0; i < bodies.length; i++) {
+            bodies[i].x = game.stars[i].x;
+            bodies[i].y = game.stars[i].y;
+          }
+        }
+        drawQuiet(ctx, W, H, bodies, faint, moonPhase, colors,
+                  planetSprite(colors.engraved, colors.planet));
       }
     };
 
@@ -462,9 +478,10 @@ export default function SkyField({ mode }: SkyFieldProps) {
       document.body.classList.toggle('cur-ui', ui);
       document.body.classList.toggle('cur-star', !ui && game.nearest(e.clientX, e.clientY, 22) >= 0);
     };
-    if (mode === 'full') {
-      window.addEventListener('pointermove', onPointerMove, { passive: true });
-    }
+    // Both modes: the wobble needs a cursor to bend toward. Every branch below
+    // the position update is already gated on game state, so on quiet pages
+    // this only ever moves `mouse`.
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
 
     // --- orbital-mechanics interaction: sling / draw / travel -------------
     // Outside the game the sky is LOOK-ONLY: hover names things, nothing is
@@ -604,7 +621,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
       window.removeEventListener('resize', onResize);
       modeObserver.disconnect();
       machineObserver.disconnect();
-      if (mode === 'full') window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointermove', onPointerMove);
       if (mode === 'full' && game) {
         window.removeEventListener('pointerdown', onPointerDown);
         window.removeEventListener('pointerup', onPointerUp);

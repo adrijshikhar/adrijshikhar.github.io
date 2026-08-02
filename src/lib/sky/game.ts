@@ -200,10 +200,18 @@ export class SkyGame {
     }
   }
 
+  /** Quit HIDES the game; it does not end it. Only the in-flight gestures are
+   *  dropped — drawn links, bursts and star positions survive, so re-entering
+   *  resumes the session rather than handing back an empty sky. Clearing is
+   *  what `reset()` is for, and it stays on its own control.
+   *
+   *  Safe to leave stars displaced: the game paints to its own canvas, which
+   *  `drawFull` only blits while `playing`. */
   exit(): void {
-    this.reset();
-    this.playing = false;
+    this.aim = null;
+    this.dragFrom = null;
     this.spin = null;
+    this.playing = false;
   }
 
   setTool(tool: Tool): void {

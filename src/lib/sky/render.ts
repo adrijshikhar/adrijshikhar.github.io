@@ -168,16 +168,22 @@ export function fade(base: string, alpha: number): string {
   return `color-mix(in srgb, ${base} ${(alpha * 100).toFixed(2)}%, transparent)`;
 }
 
-/** Quiet-mode draw: faint field + named stars only — no graticule, planets,
- *  Moon, labels, hover or interaction. Stars below the horizon (down to FLOOR)
- *  are drawn dimmer rather than hidden, matching the wider-than-horizon disc. */
+/** Quiet-mode draw: the faint field, the named stars, and the planets, Moon
+ *  and Sun — the bodies that make it a sky on a given night rather than a
+ *  generic starfield. What quiet still withholds is the *instrument*: no
+ *  graticule, no constellations, no hover readout, no game.
+ *
+ *  Stars below the horizon (down to FLOOR) are drawn dimmer rather than
+ *  hidden, matching the wider-than-horizon disc. */
 export function drawQuiet(
   ctx: CanvasRenderingContext2D,
   W: number,
   H: number,
-  pts: NamedStarPos[],
+  bodies: BodyPos[],
   faint: FaintStarPos[],
+  moonPhase: MoonPhase,
   colors: SkyColors,
+  sprite?: PlanetSpriteRef | null,
 ): void {
   ctx.clearRect(0, 0, W, H);
 
@@ -197,33 +203,10 @@ export function drawQuiet(
     ctx.fill();
   }
 
-  for (const s of pts) {
-    if (s.alt < FLOOR) continue;
-    const below = s.alt < 0 ? 0.3 : 1;      // under the earth -> dim, not hidden
-    // Same ceiling drawFull applies. It was originally added for the home page
-    // only, which left every other route uncapped at ~200 alpha over prose
-    // against home's 155 - and those are the routes that exist to be read.
-    const a = Math.min(BODY_ALPHA_CAP, starAlpha(s.mag)) * below;
-
-    markStar(ctx, s.x, s.y, s.vr, s.mag < 1.0 ? colors.bright : colors.muted, a * 0.92, colors.engraved);
-
-    // Bloom on the brightest stars — MUST be a radial gradient; a flat-alpha
-    // disc has a hard edge and reads as a grey ring, not a glow. Skipped when
-    // engraved: dark ink fading outward on cream is a smudge, not a glow, and
-    // print star charts express brightness through mark size, not halo.
-    if (s.mag < 0.6 && s.alt > 0 && !colors.engraved) {
-      const R = s.vr * 4.2;
-      const g = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, R);
-      g.addColorStop(0, fade(colors.bright, a * 0.3));
-      g.addColorStop(0.35, fade(colors.bright, a * 0.1));
-      g.addColorStop(1, 'transparent');
-      ctx.globalAlpha = 1;
-      ctx.fillStyle = g;
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, R, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
+  // Same renderer the home page uses, with hover disabled. The per-body alpha
+  // ceiling it applies is what keeps this safe over prose — these are the
+  // routes that exist to be read.
+  drawBodies(ctx, bodies, moonPhase, -1, colors, sprite);
 
   ctx.globalAlpha = 1;
 }
@@ -540,59 +523,22 @@ export function drawGraticule(
  *  constellation hover when both are under the cursor. Draw order matches the
  *  prototype: constellation lines sit UNDER the graticule and the bodies, so
  *  named stars always read clearly on top of the instrument. */
-export function drawFull(
+/** Paints stars, planets, the Moon and the Sun — the one body renderer, shared
+ *  by both views so a planet can never look like two different objects
+ *  depending on which page you are on. Everything above it (graticule,
+ *  constellations) and below it (hover readout) belongs to `drawFull` alone.
+ *
+ *  `hoverIndex` is -1 in quiet mode, which disables every hover branch. */
+export function drawBodies(
   ctx: CanvasRenderingContext2D,
-  W: number,
-  H: number,
   bodies: BodyPos[],
-  byName: Map<string, BodyPos>,
-  faint: FaintStarPos[],
   moonPhase: MoonPhase,
-  scrollT: number,
   hoverIndex: number,
-  hoverFig: string | null,
-  mouse: { x: number; y: number },
   colors: SkyColors,
   sprite?: PlanetSpriteRef | null,
 ): void {
-  ctx.clearRect(0, 0, W, H);
   const { accent, muted, bright, moonLit, moonGlow, planet } = colors;
 
-  // Constellations join progressively with scroll — every segment starts at
-  // the same moment and finishes at the same moment, across the whole page.
-  // (Sequential reveal gave each line ~2% of the page and they snapped.)
-  if (scrollT > 0) {
-    ctx.lineCap = 'round';
-    for (const seg of SEGMENTS) {
-      const a = byName.get(seg.a), b = byName.get(seg.b);
-      if (!a || !b) continue;
-      const lit = hoverFig === seg.name;
-      ctx.strokeStyle = accent;
-      ctx.globalAlpha = (lit ? 0.95 : 0.3) * Math.min(1, scrollT * 6); // fade in over the first sixth
-      ctx.lineWidth = lit ? 1.6 : 1;
-      ctx.beginPath();
-      ctx.moveTo(a.x, a.y);
-      ctx.lineTo(a.x + (b.x - a.x) * scrollT, a.y + (b.y - a.y) * scrollT);
-      ctx.stroke();
-    }
-  }
-
-  drawGraticule(ctx, W, H, colors);
-
-  for (const f of faint) {
-    if (f.alt < FLOOR) continue;
-    if (colors.engraved && f.mag > 5.3) continue; // see drawQuiet: stipple on cream
-    const below = f.alt < 0 ? 0.22 : 1;
-    const dust = colors.engraved ? 1.2 : 1; // ink on paper — see DESIGN.md
-
-    ctx.globalAlpha = Math.min(1, (0.3 - (f.mag - 3.6) * 0.055) * below * dust);
-    ctx.fillStyle = colors.faint;
-    ctx.beginPath();
-    ctx.arc(f.x, f.y, f.mag < 4.6 ? 1.15 : 0.8, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  // stars/planets/Moon — below-horizon ones are dimmed, not hidden (the wider field)
   for (let i = 0; i < bodies.length; i++) {
     const s = bodies[i];
     if (s.alt < FLOOR) continue;
@@ -783,6 +729,63 @@ export function drawFull(
       ctx.fill();
     }
   }
+  ctx.globalAlpha = 1;
+}
+
+export function drawFull(
+  ctx: CanvasRenderingContext2D,
+  W: number,
+  H: number,
+  bodies: BodyPos[],
+  byName: Map<string, BodyPos>,
+  faint: FaintStarPos[],
+  moonPhase: MoonPhase,
+  scrollT: number,
+  hoverIndex: number,
+  hoverFig: string | null,
+  mouse: { x: number; y: number },
+  colors: SkyColors,
+  sprite?: PlanetSpriteRef | null,
+): void {
+  ctx.clearRect(0, 0, W, H);
+  const { accent, muted, bright, moonLit, moonGlow, planet } = colors;
+
+  // Constellations join progressively with scroll — every segment starts at
+  // the same moment and finishes at the same moment, across the whole page.
+  // (Sequential reveal gave each line ~2% of the page and they snapped.)
+  if (scrollT > 0) {
+    ctx.lineCap = 'round';
+    for (const seg of SEGMENTS) {
+      const a = byName.get(seg.a), b = byName.get(seg.b);
+      if (!a || !b) continue;
+      const lit = hoverFig === seg.name;
+      ctx.strokeStyle = accent;
+      ctx.globalAlpha = (lit ? 0.95 : 0.3) * Math.min(1, scrollT * 6); // fade in over the first sixth
+      ctx.lineWidth = lit ? 1.6 : 1;
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(a.x + (b.x - a.x) * scrollT, a.y + (b.y - a.y) * scrollT);
+      ctx.stroke();
+    }
+  }
+
+  drawGraticule(ctx, W, H, colors);
+
+  for (const f of faint) {
+    if (f.alt < FLOOR) continue;
+    if (colors.engraved && f.mag > 5.3) continue; // see drawQuiet: stipple on cream
+    const below = f.alt < 0 ? 0.22 : 1;
+    const dust = colors.engraved ? 1.2 : 1; // ink on paper — see DESIGN.md
+
+    ctx.globalAlpha = Math.min(1, (0.3 - (f.mag - 3.6) * 0.055) * below * dust);
+    ctx.fillStyle = colors.faint;
+    ctx.beginPath();
+    ctx.arc(f.x, f.y, f.mag < 4.6 ? 1.15 : 0.8, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // stars/planets/Moon — below-horizon ones are dimmed, not hidden (the wider field)
+  drawBodies(ctx, bodies, moonPhase, hoverIndex, colors, sprite);
 
   // hover readout — star name wins over the constellation name when both are
   // under the cursor
