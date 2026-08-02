@@ -93,6 +93,14 @@ function eclToRaDec(lam: number, bet: number): { ra: number; dec: number } {
   return { ra: ((Math.atan2(y, x) * R2D + 360) % 360) / 15, dec: Math.asin(z) * R2D };
 }
 
+/** The Sun's apparent position. `sunEcliptic` already exists for the Moon's
+ *  phase; this just runs it through the same ecliptic-to-equatorial rotation
+ *  the planets use. Latitude is 0 by definition - the ecliptic IS the Sun's
+ *  apparent path, so the Sun never leaves it. */
+export function sunRaDec(when: Date): { ra: number; dec: number } {
+  return eclToRaDec(sunEcliptic(when), 0);
+}
+
 export function moonRaDec(when: Date): { ra: number; dec: number; km: number; illum: number; waxing: boolean } {
   const d  = julianDay(when) - 2451545.0;
   const Lp = 218.316 + 13.176396 * d;                       // mean longitude

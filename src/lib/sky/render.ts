@@ -10,7 +10,7 @@
  * sky by adding more draw passes here, alongside `drawQuiet`.
  */
 import { STARS, PLANETS, FIGURES } from './catalogue';
-import { altAz, planetRaDec, moonRaDec } from './astronomy';
+import { altAz, planetRaDec, moonRaDec, sunRaDec } from './astronomy';
 import { project, FLOOR } from './projection';
 
 const D2R = Math.PI / 180;
@@ -229,6 +229,9 @@ export function drawQuiet(
 export interface BodyPos extends NamedStarPos {
   isPlanet: boolean;
   isMoon: boolean;
+  /** The Sun. Drawn as a rayed disc: the rays break the silhouette, which is
+   *  the only reason a body this small stays identifiable at 11px. */
+  isSun: boolean;
 }
 
 export interface MoonPhase {
@@ -246,6 +249,10 @@ const MOON_MAG = -8;
 // Running the Moon's real magnitude (-12.7) through the star size curve
 // produces an absurd disc — it's fixed at a plausible instrument radius instead.
 const MOON_VR = 13;
+/** Sun and Moon subtend almost the same angle from Earth (~0.5 deg), so they
+ *  share a size. Rays then extend to ~1.05x beyond this. */
+const SUN_VR = 11;
+const SUN_MAG = -26.7;
 
 /** Ceiling on how opaque any single body (star, planet, or Moon) may draw in
  *  the full instrument view. `starAlpha`'s own clamp tops out at 1.0 — fully
@@ -293,14 +300,14 @@ export function computeFullSky(
   H: number,
 ): { bodies: BodyPos[]; faint: FaintStarPos[]; moonPhase: MoonPhase } {
   const { pts, faint } = computeSky(obs, when, W, H);
-  const stars: BodyPos[] = pts.map((s) => ({ ...s, isPlanet: false, isMoon: false }));
+  const stars: BodyPos[] = pts.map((s) => ({ ...s, isPlanet: false, isMoon: false, isSun: false }));
 
   const planets: BodyPos[] = Object.keys(PLANETS).map((name) => {
     const { ra, dec } = planetRaDec(name, when);
     const { alt, az } = altAz(ra, dec, obs.lat, obs.lon, when);
     const p = project(alt, az, W, H);
     const mag = PLANETS[name][2] ?? 0;
-    return { name, mag, alt, az, x: p.x, y: p.y, vr: vrFor(mag), isPlanet: true, isMoon: false };
+    return { name, mag, alt, az, x: p.x, y: p.y, vr: vrFor(mag), isPlanet: true, isMoon: false, isSun: false };
   });
 
   const moon = moonRaDec(when);
@@ -308,11 +315,21 @@ export function computeFullSky(
   const p = project(alt, az, W, H);
   const moonBody: BodyPos = {
     name: 'Moon', mag: MOON_MAG, alt, az, x: p.x, y: p.y, vr: MOON_VR,
-    isPlanet: false, isMoon: true,
+    isPlanet: false, isMoon: true, isSun: false,
+  };
+
+  // The Sun. Below the horizon it dims like everything else, which is exactly
+  // the point: it is the body that explains why the rest of the sky is visible.
+  const sunPos = sunRaDec(when);
+  const sunAA = altAz(sunPos.ra, sunPos.dec, obs.lat, obs.lon, when);
+  const sp = project(sunAA.alt, sunAA.az, W, H);
+  const sunBody: BodyPos = {
+    name: 'Sun', mag: SUN_MAG, alt: sunAA.alt, az: sunAA.az, x: sp.x, y: sp.y,
+    vr: SUN_VR, isPlanet: false, isMoon: false, isSun: true,
   };
 
   return {
-    bodies: [...stars, ...planets, moonBody],
+    bodies: [...stars, ...planets, moonBody, sunBody],
     faint,
     moonPhase: { illum: moon.illum, waxing: moon.waxing },
   };
@@ -512,7 +529,64 @@ export function drawFull(
       ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
       ctx.stroke();
     } else {
-      const colour = i === hoverIndex ? accent : s.isPlanet ? planet : s.mag < 1.0 ? bright : muted;
+      const colour = i === hoverIndex ? accent : s.isPlanet || s.isSun ? planet : s.mag < 1.0 ? bright : muted;
+
+      // Silhouette glyphs. Only three bodies get one, and only because each has
+      // a real feature that survives ~10px: the Sun's rays and Saturn's ring
+      // both extend BEYOND the disc (so they read at any size), and Jupiter's
+      // bands terminate on the disc edge rather than fading (so they stay
+      // crisp instead of blurring to grey). Mercury, Venus and Mars have no
+      // such feature, so they stay plain discs -- inventing surface texture for
+      // them would be decoration dressed as data.
+      if (s.isSun) {
+        ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.92);
+        ctx.strokeStyle = colour;
+        ctx.lineWidth = Math.max(0.75, r * 0.085);
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, r * 0.62, 0, Math.PI * 2);
+        ctx.stroke();
+        const rays = 12;
+        for (let k = 0; k < rays; k++) {
+          const ang = (k / rays) * Math.PI * 2;
+          ctx.beginPath();
+          ctx.moveTo(s.x + Math.cos(ang) * r * 0.8, s.y + Math.sin(ang) * r * 0.8);
+          ctx.lineTo(s.x + Math.cos(ang) * r * 1.05, s.y + Math.sin(ang) * r * 1.05);
+          ctx.stroke();
+        }
+      } else if (s.name === 'Saturn') {
+        ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.92);
+        ctx.strokeStyle = colour;
+        ctx.lineWidth = Math.max(0.7, r * 0.085);
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, r * 0.68, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.save();
+        ctx.translate(s.x, s.y);
+        ctx.rotate(-0.38); // ring tilt, eyeballed to read as a ring not an ellipse
+        ctx.beginPath();
+        ctx.ellipse(0, 0, r * 1.25, r * 0.34, 0, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      } else if (s.name === 'Jupiter') {
+        ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.92);
+        ctx.strokeStyle = colour;
+        ctx.lineWidth = Math.max(0.7, r * 0.085);
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, r * 0.9, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, r * 0.9, 0, Math.PI * 2);
+        ctx.clip(); // bands stop at the limb, which is what keeps them crisp
+        for (const off of [-0.34, 0.06, 0.42]) {
+          ctx.beginPath();
+          ctx.moveTo(s.x - r, s.y + r * off);
+          ctx.lineTo(s.x + r, s.y + r * off);
+          ctx.stroke();
+        }
+        ctx.restore();
+      } else {
       // Planets keep their solid disc even when engraved — a filled disc against
       // ringed stars is exactly how a print chart distinguishes a planet from a
       // star, so here the shape difference is signal rather than noise.
@@ -533,12 +607,13 @@ export function drawFull(
         ctx.arc(s.x, s.y, r + 3.5, 0, Math.PI * 2);
         ctx.stroke();
       }
+      }
     }
 
     // persistent label for planets and the Moon — they earn a name without hover.
     // Same cap as the disc: near the zenith this formula alone reaches 0.67,
     // which is exactly the kind of "bright body over prose" the cap exists for.
-    if ((s.isPlanet || s.isMoon) && s.alt > 0 && i !== hoverIndex) {
+    if ((s.isPlanet || s.isMoon || s.isSun) && s.alt > 0 && i !== hoverIndex) {
       ctx.globalAlpha = Math.min(BODY_ALPHA_CAP, 0.42 + 0.25 * (s.alt / 90));
       ctx.fillStyle = planet;
       ctx.font = '500 9px ui-monospace,Menlo,monospace';
