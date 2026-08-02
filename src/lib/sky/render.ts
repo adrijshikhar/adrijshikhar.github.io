@@ -12,9 +12,10 @@
 import { STARS, PLANETS, FIGURES } from './catalogue';
 import {
   altAz, planetRaDec, moonRaDec, sunRaDec,
-  BODY_KM, SATURN_RING_KM, apparentArcsec, planetIllum, D2R,
+  BODY_KM, SATURN_RING_KM, apparentArcsec, planetIllum, D2R, AU_LY, AU_KM,
 } from './astronomy';
 import { project, FLOOR } from './projection';
+import { DIST_LY } from './catalogue';
 
 export interface Observer {
   lat: number;
@@ -30,6 +31,13 @@ export interface NamedStarPos {
   y: number;
   /** Radius the star is painted at — single source of truth, matches the prototype. */
   vr: number;
+  /** J2000 right ascension (hours) and declination (degrees). Kept on the
+   *  rendered body because true 3-D separation needs the direction vector, not
+   *  just where the body landed on screen. */
+  ra: number;
+  dec: number;
+  /** Distance from the Sun in light years. Absent when unknown. */
+  distLy?: number;
 }
 
 export interface FaintStarPos {
@@ -77,7 +85,7 @@ export function computeSky(
   const pts: NamedStarPos[] = STARS.map(([name, ra, dec, mag]) => {
     const { alt, az } = altAz(ra, dec, obs.lat, obs.lon, when);
     const p = project(alt, az, W, H);
-    return { name, mag, alt, az, x: p.x, y: p.y, vr: vrFor(mag) };
+    return { name, mag, alt, az, ra, dec, distLy: DIST_LY[name], x: p.x, y: p.y, vr: vrFor(mag) };
   });
   const faint: FaintStarPos[] = FAINT_FIELD.map((f) => {
     const { alt, az } = altAz(f.ra, f.dec, obs.lat, obs.lon, when);
@@ -240,6 +248,9 @@ export interface BodyPos extends NamedStarPos {
   /** Illuminated fraction, 0..1. Inner planets show real crescents; outer ones
    *  sit at ~1 and draw full without needing a special case. */
   illum?: number;
+  /** Distance from Earth in AU — solar-system bodies only. Its presence is what
+   *  tells `separationLabel` to answer in km rather than light years. */
+  au?: number;
 }
 
 export interface MoonPhase {
@@ -348,18 +359,21 @@ export function computeFullSky(
     const p = project(alt, az, W, H);
     const mag = PLANETS[name][2] ?? 0;
     return {
-      name, mag, alt, az, x: p.x, y: p.y,
+      name, mag, alt, az, ra, dec, x: p.x, y: p.y,
       vr: planetVr(name, au), isPlanet: true, isMoon: false, isSun: false,
       illum: planetIllum(name, au),
+      au, distLy: au * AU_LY,
     };
   });
 
   const moon = moonRaDec(when);
   const { alt, az } = altAz(moon.ra, moon.dec, obs.lat, obs.lon, when);
   const p = project(alt, az, W, H);
+  const moonAu = moon.km / AU_KM;
   const moonBody: BodyPos = {
-    name: 'Moon', mag: MOON_MAG, alt, az, x: p.x, y: p.y, vr: MOON_VR,
+    name: 'Moon', mag: MOON_MAG, alt, az, ra: moon.ra, dec: moon.dec, x: p.x, y: p.y, vr: MOON_VR,
     isPlanet: false, isMoon: true, isSun: false,
+    au: moonAu, distLy: moonAu * AU_LY,
   };
 
   // The Sun. Below the horizon it dims like everything else, which is exactly
@@ -368,8 +382,9 @@ export function computeFullSky(
   const sunAA = altAz(sunPos.ra, sunPos.dec, obs.lat, obs.lon, when);
   const sp = project(sunAA.alt, sunAA.az, W, H);
   const sunBody: BodyPos = {
-    name: 'Sun', mag: SUN_MAG, alt: sunAA.alt, az: sunAA.az, x: sp.x, y: sp.y,
-    vr: SUN_VR, isPlanet: false, isMoon: false, isSun: true,
+    name: 'Sun', mag: SUN_MAG, alt: sunAA.alt, az: sunAA.az, ra: sunPos.ra, dec: sunPos.dec,
+    x: sp.x, y: sp.y, vr: SUN_VR, isPlanet: false, isMoon: false, isSun: true,
+    au: 1, distLy: AU_LY,
   };
 
   return {
