@@ -15,7 +15,7 @@ import { FLOOR } from '../lib/sky/projection';
 import { STARS } from '../lib/sky/catalogue';
 import { SkyGame, drawGame, type Tool } from '../lib/sky/game';
 import { loadPlanetSprite, planetSprite } from '../lib/sky/planet-sprite';
-import { animate, createTimer, eases, onScroll } from '../lib/motion';
+import { animate, createTimer, onScroll } from '../lib/motion';
 
 const ALT_RANGE = `+90…−${Math.abs(FLOOR)}°`;
 const STAR_COUNT = STARS.length;
@@ -356,7 +356,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
     // real duration to ease against. Reduced motion simply never starts it, and
     // `ripple.p` stays 0 — one frame of static rings, which is the same chart
     // convention standing still.
-    const SUN_PULSE_MS = 4200;
+    const SUN_PULSE_MS = 11000;
     const ripple = { p: 0 };
     const renderFrame = () => {
       const cs = getComputedStyle(document.documentElement);
@@ -633,12 +633,15 @@ export default function SkyField({ mode }: SkyFieldProps) {
     // scrollbar 1:1, which is what makes the reveal feel fluid rather than
     // jerky. Skipped entirely under reduced motion.
     if (!reduced) {
-      // outCubic, so a ring leaves the limb quickly and settles as it spreads —
-      // the shape a real ripple has, and a plain linear sawtooth does not.
+      // LINEAR on purpose. Easing the loop's own progress makes the wave
+      // decelerate toward the end of each iteration and then snap back to full
+      // speed at the wrap — a visible reset every cycle — and it bunches the
+      // staggered wave offsets, since they are spaced on an already-eased
+      // value. The easing is applied per wave, to the radius, in `drawSunGlow`.
       rippleTimer = createTimer({
         duration: SUN_PULSE_MS,
         loop: true,
-        onUpdate: (t) => { ripple.p = eases.outCubic(t.iterationProgress); },
+        onUpdate: (t) => { ripple.p = t.iterationProgress; },
       });
     }
 
