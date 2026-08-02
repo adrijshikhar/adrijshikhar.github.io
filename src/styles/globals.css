@@ -706,11 +706,12 @@ body.spinning * {
      Tucked under the viewfinder bracket, with a narrower label column than the
      bottom readout: those labels are two words, these are one, and carrying the
      wide column up here left the values stranded mid-corner. */
-  /* Flush with the viewfinder bracket, which sits at 14px/14px and is 18px
-     square. Left edges aligned and only a few px below it — offset by 6px and
-     9.6px it read as the block having drifted away from the corner rather than
-     belonging to it. */
-  .instrument-tl { left: 0.875rem; top: 2.25rem; bottom: auto; }
+  /* Mirrors the bottom-left readout exactly: same 1.6rem indent, so the
+     viewfinder bracket (14px, 18px square) FRAMES the text the way it does
+     down there. Aligning the block flush to the bracket's own left edge
+     instead left the bracket sitting on top of it, framing nothing — which is
+     what read as a gap, even though the vertical spacing already matched. */
+  .instrument-tl { left: 1.6rem; top: 1.2rem; bottom: auto; }
   .instrument-tl .k { width: 4.2rem; }
   .instrument-tl .readout-cell { padding-left: 4.2rem; text-indent: -4.2rem; }
   /* Two instruments share the right corner: this usage hint sits at the base
