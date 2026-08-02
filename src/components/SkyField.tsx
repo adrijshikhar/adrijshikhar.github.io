@@ -26,6 +26,21 @@ interface SkyFieldProps {
 
 const DEFAULT_OBS: Observer = { lat: 12.9716, lon: 77.5946 }; // Bengaluru
 
+/** Every game primitive already clamps its own `globalAlpha` to 0.5 (`capA`
+ *  in game.ts), but overlapping draws in the SAME pass still composite —
+ *  two 0.5 layers reach 0.75, four reach 0.94 — and a collision stacks a
+ *  burst disc, its radiation jets, and the struck star's bloom in the same
+ *  few pixels. A per-primitive cap cannot bound that composite, so the whole
+ *  overlay is rendered to an offscreen canvas and blitted onto the main
+ *  canvas ONCE at this alpha — four overlapping layers become one layer
+ *  reaching the page. Value picked by measurement: a stacked burst drives the
+ *  offscreen layer itself to near-opaque (measured ~0.95) in its hottest
+ *  pixel, and the ambient sky underneath sits up to ~0.6 (152/255) at its own
+ *  ceiling — composited (over-operator: src + dst·(1-src)) that bounds the
+ *  page to `GAME_BLIT_ALPHA + 0.6·(1-GAME_BLIT_ALPHA)`, which only clears
+ *  169/255 (~0.663) below about 0.16; this sits with margin under that. */
+const GAME_BLIT_ALPHA = 0.12;
+
 /** Every UI-visible piece of game state SkyField exposes to its JSX buttons,
  *  assigned once by the effect and invoked from onClick handlers outside it.
  *  Physics itself lives entirely inside the effect's closure (the `SkyGame`
@@ -111,6 +126,19 @@ export default function SkyField({ mode }: SkyFieldProps) {
     let W = 0;
     let H = 0;
 
+    // Offscreen buffer the game overlay draws into instead of the main
+    // canvas — see GAME_BLIT_ALPHA above for why. Created once (not
+    // 'quiet' mode, which has no game) and resized alongside the main
+    // canvas in `resize()`, never per frame.
+    let gameCanvas: HTMLCanvasElement | null = null;
+    let gameCtx: CanvasRenderingContext2D | null = null;
+    if (mode === 'full' && game) {
+      gameCanvas = document.createElement('canvas');
+      gameCtx = gameCanvas.getContext('2d');
+    }
+    // TEMP-DEBUG: remove before commit
+    (window as any).__skyGame = game;
+
     // Full mode only: hover is read at render time from the last known pointer
     // position rather than recomputed on every pointermove — bodies are
     // already recomputed every frame, so this avoids doing the hit-test twice.
@@ -148,6 +176,13 @@ export default function SkyField({ mode }: SkyFieldProps) {
       canvas.style.width = `${W}px`;
       canvas.style.height = `${H}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (gameCanvas && gameCtx) {
+        // Same backing-store size and DPR transform as the main canvas, so
+        // the single blit in renderFrame() is pixel-for-pixel, not a scale.
+        gameCanvas.width = W * dpr;
+        gameCanvas.height = H * dpr;
+        gameCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
     };
 
     const renderFrame = () => {
@@ -204,7 +239,15 @@ export default function SkyField({ mode }: SkyFieldProps) {
         // star hover wins over a constellation hover when both are under the cursor
         hoverFig = hoverIndex >= 0 ? null : figureAt(byName, figureT, mouse.x, mouse.y);
         drawFull(ctx, W, H, bodies, byName, faint, moonPhase, figureT, hoverIndex, hoverFig, mouse, colors);
-        if (game && game.playing) drawGame(ctx, W, H, game, mouse, colors);
+        if (game && game.playing && gameCanvas && gameCtx) {
+          // Ambient sky stays a direct draw (above); only the game overlay
+          // goes through the offscreen buffer + single capped-alpha blit.
+          gameCtx.clearRect(0, 0, W, H);
+          drawGame(gameCtx, W, H, game, mouse, colors);
+          ctx.globalAlpha = GAME_BLIT_ALPHA;
+          ctx.drawImage(gameCanvas, 0, 0, W, H);
+          ctx.globalAlpha = 1;
+        }
         updateCursor();
       } else {
         const { pts, faint } = computeSky(obs, new Date(), W, H);
@@ -460,6 +503,8 @@ export default function SkyField({ mode }: SkyFieldProps) {
       scrollAnim?.revert(); // tears down the linked anime.js ScrollObserver too
       window.clearTimeout(timeoutId);
       controller.abort();
+      gameCanvas = null;
+      gameCtx = null;
       // Leaving the game must restore the page completely, even on an
       // unmount mid-play (route change) rather than an explicit Exit click.
       document.body.classList.remove('playing', 'grabbing', 'spinning', 'cur-ui', 'cur-star');
