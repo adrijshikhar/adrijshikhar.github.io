@@ -98,6 +98,19 @@ actual input to every position on screen.
 the renderer also draws a procedural faint field below that, so any `MAG n` label would be
 false. Don't "improve" it into one.
 
+The corner readouts are the same contract. Top-left carries `SUN` (the altitude
+driving the twilight glow, plus its standard band), `MOON` (the illuminated
+fraction the terminator is drawn from) and `PLANETS` (a live count) — all read
+off the frame the canvas just painted, so they cannot drift from it. Bottom-left
+carries the observer. **Animation runs on anime.js** (`src/lib/motion.ts`
+re-exports it) — not hand-rolled `performance.now()` loops.
+
+Only `index.astro` passes `skyMode="full"`; every other route gets `quiet`,
+which since the `drawBodies` extraction shares the *same* body renderer — so
+planets, the Moon and the Sun appear everywhere, and `tick()` runs the
+cursor-gravity wobble everywhere. What quiet withholds is the instrument:
+graticule, constellations, hover readout, game.
+
 The graticule (`drawGraticule` in `render.ts`) is structural, not texture: altitude rings are
 continuous, the horizon is a heavier solid rule carrying 10°/30° ticks. Only the **azimuth
 spokes stay dashed and faint** — they are the one element with no honest label, because a fixed

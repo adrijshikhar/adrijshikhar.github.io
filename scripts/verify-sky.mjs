@@ -212,4 +212,58 @@ check('separation reproduces published star-to-star distances', () => {
   }
 });
 
+check('planet oppositions and conjunctions land on their published dates', () => {
+  // The strongest end-to-end check available: an opposition date is the product
+  // of the orbital elements, the Sun's position and the Earth-Sun geometry all
+  // being right at once. A single wrong element moves it by days.
+  const sep = (a, b) => {
+    const rad = Math.PI / 180;
+    const r1 = a.ra * 15 * rad, d1 = a.dec * rad, r2 = b.ra * 15 * rad, d2 = b.dec * rad;
+    return Math.acos(Math.min(1, Math.sin(d1) * Math.sin(d2) +
+      Math.cos(d1) * Math.cos(d2) * Math.cos(r1 - r2))) / rad;
+  };
+  const extreme = (planet, want) => {
+    let best = { s: want === 'max' ? -1 : 1e9, d: null };
+    for (let k = 0; k < 730; k++) {
+      const d = new Date(Date.UTC(2025, 11, 1) + k * 864e5);
+      const s = sep(sunRaDec(d), planetRaDec(planet, d));
+      if (want === 'max' ? s > best.s : s < best.s) best = { s, d };
+    }
+    return best;
+  };
+  // published opposition dates, +/- 2 days for the model's simplifications
+  for (const [planet, iso] of [['Jupiter', '2026-01-10'], ['Saturn', '2026-10-04']]) {
+    const got = extreme(planet, 'max');
+    const drift = Math.abs(got.d - new Date(iso + 'T00:00:00Z')) / 864e5;
+    assert.ok(drift <= 2,
+      `${planet} opposition: got ${got.d.toISOString().slice(0, 10)}, expected ~${iso}`);
+    assert.ok(got.s > 165, `${planet} opposition elongation only ${got.s.toFixed(1)} deg`);
+  }
+  // Inferior planets never reach opposition — that is what makes them inferior.
+  for (const [planet, maxElong] of [['Venus', 48], ['Mercury', 29]]) {
+    const got = extreme(planet, 'max');
+    assert.ok(got.s < maxElong,
+      `${planet} reached ${got.s.toFixed(1)} deg elongation, impossible for an inferior planet`);
+  }
+  // Every planet must pass close to the Sun once in two years (conjunction).
+  for (const planet of ['Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn']) {
+    assert.ok(extreme(planet, 'min').s < 6, `${planet} never reaches conjunction`);
+  }
+});
+
+check("the Sun's own track matches the almanac", () => {
+  // Solstice declination IS the obliquity, and the equinox crossing IS zero.
+  // These are definitional, so they catch a broken solar position immediately.
+  const dec = (iso) => sunRaDec(new Date(iso + 'T12:00:00Z')).dec;
+  assert.ok(Math.abs(dec('2026-06-21') - 23.44) < 0.1, `June solstice dec ${dec('2026-06-21')}`);
+  assert.ok(Math.abs(dec('2026-12-21') + 23.44) < 0.1, `Dec solstice dec ${dec('2026-12-21')}`);
+  assert.ok(Math.abs(dec('2026-03-20')) < 0.5, `March equinox dec ${dec('2026-03-20')}`);
+  assert.ok(Math.abs(dec('2026-09-23')) < 0.5, `Sept equinox dec ${dec('2026-09-23')}`);
+  // RA advances a full 24h over the year, monotonically modulo the wrap.
+  const ra = (iso) => sunRaDec(new Date(iso + 'T12:00:00Z')).ra;
+  assert.ok(Math.abs(ra('2026-03-20') % 24) < 0.1 || Math.abs(ra('2026-03-20') - 24) < 0.1,
+    `March equinox RA should be ~0h, got ${ra('2026-03-20')}`);
+  assert.ok(Math.abs(ra('2026-09-23') - 12) < 0.2, `Sept equinox RA ${ra('2026-09-23')}`);
+});
+
 console.log(`\n${passed} checks passed`);
