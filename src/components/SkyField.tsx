@@ -52,6 +52,13 @@ export default function SkyField({ mode }: SkyFieldProps) {
   const [playing, setPlaying] = useState(false);
   const [tool, setTool] = useState<Tool>('sling');
   const [struck, setStruck] = useState(0);
+  // The machine view is the raw-markdown surface; the sky and everything that
+  // belongs to it are suppressed there. `#sky` is hidden in CSS, but the hook
+  // and tool bar are separate nodes outside `.human-view`, so they need their
+  // own gate — without it the hook stayed clickable over the machine view and
+  // opened a game whose canvas was invisible, while `.playing` set
+  // `user-select: none` and made the markdown uncopyable.
+  const [machine, setMachine] = useState(false);
   if (mode === 'full' && !gameRef.current) {
     gameRef.current = new SkyGame(() => setStruck((n) => n + 1));
   }
@@ -113,25 +120,32 @@ export default function SkyField({ mode }: SkyFieldProps) {
       if (mode === 'full') {
         const { bodies, faint, moonPhase } = computeFullSky(obs, new Date(), W, H);
         if (game) {
-          // Merge the real sky into the persistent game star list, then
-          // advance physics one frame (a no-op unless `game.playing`), then
-          // splice the game's live positions back into `bodies` — `bodies`
-          // is a fresh array `computeFullSky` builds every frame and throws
-          // away after this draw, so overwriting it here is the one place
-          // physics reaches the ambient renderer without `render.ts` having
-          // to know a game exists.
+          // Merge the real sky into the persistent game star list, then splice
+          // the game's live positions back into `bodies` — `bodies` is a fresh
+          // array `computeFullSky` builds every frame and throws away after
+          // this draw, so overwriting it here is the one place physics reaches
+          // the ambient renderer without `render.ts` having to know a game
+          // exists. Integration itself lives in `loop()`, NOT here: renderFrame
+          // is also called from resize, the mode observer, pointermove and the
+          // geo callback, and stepping physics from each of those would tie the
+          // simulation rate to the event rate (dragging the mouse literally ran
+          // it at ~2x, worst under reduced motion where pointermove is the only
+          // other driver).
           game.sync(bodies);
-          game.tick(mouse.x, mouse.y);
           for (let i = 0; i < bodies.length; i++) {
             bodies[i].x = game.stars[i].x;
             bodies[i].y = game.stars[i].y;
           }
         }
+        // Constellation figures step aside during play: their vertices are the
+        // very bodies physics is flinging around, so at scroll-bottom (t≈1) all
+        // 47 segments would whip across the page chasing them.
+        const figureT = game?.playing ? 0 : scrollP.t;
         const byName = bodyIndex(bodies); // built once, shared by figureAt and drawFull
         hoverIndex = nearestBody(bodies, mouse.x, mouse.y);
         // star hover wins over a constellation hover when both are under the cursor
-        hoverFig = hoverIndex >= 0 ? null : figureAt(byName, scrollP.t, mouse.x, mouse.y);
-        drawFull(ctx, W, H, bodies, byName, faint, moonPhase, scrollP.t, hoverIndex, hoverFig, mouse, colors);
+        hoverFig = hoverIndex >= 0 ? null : figureAt(byName, figureT, mouse.x, mouse.y);
+        drawFull(ctx, W, H, bodies, byName, faint, moonPhase, figureT, hoverIndex, hoverFig, mouse, colors);
         if (game && game.playing) drawGame(ctx, W, H, game, mouse, colors);
         updateCursor();
       } else {
@@ -164,6 +178,9 @@ export default function SkyField({ mode }: SkyFieldProps) {
     // since that click, not page load, is the thing driving the motion.
     let rafId = 0;
     const loop = () => {
+      // One integration step per displayed frame — the only place physics
+      // advances, so the sim runs on the frame clock and nothing else.
+      game?.tick(mouse.x, mouse.y);
       renderFrame();
       rafId = requestAnimationFrame(loop);
     };
@@ -184,6 +201,19 @@ export default function SkyField({ mode }: SkyFieldProps) {
     // other listener (resize, pointermove) happened to fire one.
     const modeObserver = new MutationObserver(() => renderFrame());
     modeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-mode'] });
+
+    // ViewToggle flips `.machine-mode` on <body> to cross into the raw-markdown
+    // view. Mirror it into React so the game UI unmounts, and bail out of a
+    // game already in progress — otherwise `.playing` / `.cursor-custom` would
+    // be stranded on a view that must stay plain and selectable.
+    const syncMachine = () => {
+      const on = document.body.classList.contains('machine-mode');
+      setMachine(on);
+      if (on && gameRef.current?.playing) controlsRef.current?.exit();
+    };
+    syncMachine();
+    const machineObserver = new MutationObserver(syncMachine);
+    machineObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
     // Hover tracking — full mode only. Look-only outside the game: hover
     // names a body or a drawn constellation segment, nothing is draggable.
@@ -354,6 +384,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
       if (rafId) cancelAnimationFrame(rafId);
       window.removeEventListener('resize', onResize);
       modeObserver.disconnect();
+      machineObserver.disconnect();
       if (mode === 'full') window.removeEventListener('pointermove', onPointerMove);
       if (mode === 'full' && game) {
         window.removeEventListener('pointerdown', onPointerDown);
@@ -377,7 +408,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
     <>
       <canvas ref={canvasRef} id="sky" aria-hidden="true" className="fixed inset-0 -z-[1] pointer-events-none" />
 
-      {mode === 'full' && (
+      {mode === 'full' && !machine && (
         <>
           {/* The hook — an easter egg, not a call to action. Nearly invisible
               until hovered; no label hints at what it opens. */}

@@ -39,10 +39,6 @@ export interface GameStar {
 export interface Burst {
   x: number;
   y: number;
-  nx: number;
-  ny: number;
-  tx: number;
-  ty: number;
   rot: number;
   /** Departure velocity of each star in the collision, for the radiation jets. */
   ax: number;
@@ -66,15 +62,15 @@ export interface HitResult {
   directness: number;
 }
 
-export const RADIUS = 150; // gravity well influence radius
-export const MAX_PULL = 6; // max px a star is ever displaced from home
-export const K = 0.14; // spring stiffness toward target
-export const DAMP = 0.78; // velocity retained per frame
-export const DRAG = 0.994; // near-frictionless space, sling mode
+const RADIUS = 150; // gravity well influence radius
+const MAX_PULL = 6; // max px a star is ever displaced from home
+const K = 0.14; // spring stiffness toward target
+const DAMP = 0.78; // velocity retained per frame
+const DRAG = 0.994; // near-frictionless space, sling mode
 export const MAX_PULL_PX = 110; // drag distance that reaches 100% power
 /** Launch speed at 100% power for a mass-1 star, in px/frame. At 60fps:
  *  9px/frame ~= 540px/s ~= 2.2s to cross a 1200px viewport. */
-export const LAUNCH_SPEED = 9;
+const LAUNCH_SPEED = 9;
 export const RESTITUTION = 0.94;
 export const BURST_LIFE = 34; // frames
 
@@ -159,15 +155,12 @@ export function gamePhysics(stars: GameStar[], bursts: Burst[], onStrike: () => 
       if (wasAsleep) onStrike();
 
       // FLARE at the contact point. Captures the collision geometry so the
-      // shape can express it: the impact normal, the tangent, and where each
-      // star actually departs to.
+      // shape can express it: the impact orientation and where each star
+      // actually departs to. (The normal/tangent pair itself is not stored —
+      // `rot` is the only part of it the flare draws from.)
       bursts.push({
         x: a.x + nx * a.r,
         y: a.y + ny * a.r,
-        nx,
-        ny,
-        tx: -ny,
-        ty: nx, // normal + tangent
         rot: Math.atan2(ny, nx),
         ax: a.vx,
         ay: a.vy,
