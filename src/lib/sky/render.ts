@@ -225,79 +225,89 @@ export function drawSunGlow(
   const t = Math.min(1, (sun.alt - TWILIGHT_FLOOR) / -TWILIGHT_FLOOR);
   const a = GLOW_MAX_ALPHA * t * t; // eased: twilight ramps, it does not switch
 
-  if (colors.engraved) {
-    const r0 = sun.vr * RING_START;   // starts outside the glyph's own dashes
-    const reach = sun.vr * RING_REACH;
-    ctx.strokeStyle = colors.planet;
-    ctx.lineWidth = 1;
-    ctx.lineCap = 'butt';             // square ends, like the glyph's segments
-    for (let k = 0; k < RING_COUNT; k++) {
-      const p = (phase + k / RING_COUNT) % 1; // evenly spaced along one cycle
-      // A ripple, not a decay: sin() takes each ring from nothing at the limb,
-      // up to full mid-travel, back to nothing at the edge. Fading only outward
-      // makes rings appear from thin air at the disc, which reads as a glitch.
-      const alpha = a * 1.5 * Math.sin(p * Math.PI);
-      if (alpha <= 0.004) continue;
-      const rad = r0 + p * reach;
-      // Dash length is derived from the circumference so every ring carries the
-      // same segment COUNT — a fixed pixel dash would multiply the segments as
-      // the ring grows and the pattern would visibly churn.
-      const step = (2 * Math.PI * rad) / RING_DASHES;
-      ctx.globalAlpha = alpha;
-      ctx.setLineDash([step * RING_INK, step * (1 - RING_INK)]);
-      ctx.lineDashOffset = k % 2 ? step * 0.5 : 0; // stagger, as the glyph does
-      ctx.beginPath();
-      ctx.arc(sun.x, sun.y, rad, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-    ctx.setLineDash([]);
-    ctx.lineDashOffset = 0;
+  // Dark mode. A steady halo and core hold the light, and a third layer makes
+  // it move: a bloom that grows outward from the disc, fading in as it leaves
+  // and out as it goes.
+  //
+  // It is a centre-bright DISC, not an annulus. Rings — soft bands or dashed
+  // hairlines either way — are what failed here repeatedly: the glow already
+  // fills the space they cross, so every ring lands as an edge inside it and
+  // the whole thing reads as a bullseye. A disc has no edge to read, so the
+  // same outward motion registers as light spreading instead.
+  if (!colors.engraved) {
+    // Kept tight on purpose: a wide wash is indistinguishable from the corner
+    // blob this replaced. A contained bloom reads as light coming off a body.
+    const R = Math.hypot(W, H) * 0.24;
+    const halo = ctx.createRadialGradient(sun.x, sun.y, 0, sun.x, sun.y, R);
+    halo.addColorStop(0, fade(colors.moonLit, a));
+    halo.addColorStop(0.22, fade(colors.planet, a * 0.5));
+    halo.addColorStop(0.55, fade(colors.planet, a * 0.16));
+    halo.addColorStop(1, 'transparent');
     ctx.globalAlpha = 1;
+    ctx.fillStyle = halo;
+    ctx.beginPath();
+    ctx.arc(sun.x, sun.y, R, 0, Math.PI * 2);
+    ctx.fill();
+
+    const CR = sun.vr * 6;
+    const core = ctx.createRadialGradient(sun.x, sun.y, 0, sun.x, sun.y, CR);
+    core.addColorStop(0, fade(colors.moonLit, a * 1.6));
+    core.addColorStop(0.45, fade(colors.planet, a * 0.5));
+    core.addColorStop(1, 'transparent');
+    ctx.fillStyle = core;
+    ctx.beginPath();
+    ctx.arc(sun.x, sun.y, CR, 0, Math.PI * 2);
+    ctx.fill();
+
+    // The moving bloom. Radius grows across the cycle; alpha is a sin() bell,
+    // so it fades in leaving the disc and out again as it spreads — never
+    // popping into existence and never cutting off at the wrap.
+    const bloomR = CR * (1 + phase * 3.4);
+    const bloomA = a * 1.15 * Math.sin(phase * Math.PI);
+    if (bloomA > 0.002) {
+      const bloom = ctx.createRadialGradient(sun.x, sun.y, 0, sun.x, sun.y, bloomR);
+      bloom.addColorStop(0, fade(colors.moonLit, bloomA));
+      bloom.addColorStop(0.4, fade(colors.planet, bloomA * 0.42));
+      bloom.addColorStop(1, 'transparent');
+      ctx.fillStyle = bloom;
+      ctx.beginPath();
+      ctx.arc(sun.x, sun.y, bloomR, 0, Math.PI * 2);
+      ctx.fill();
+    }
     return;
   }
 
-  // Kept tight on purpose: a wide wash is indistinguishable from the corner
-  // blob this replaced. A contained bloom reads as light coming off a body.
-  //
-  // Three layers: a wide halo for the sky glow, a tight core for the light off
-  // the body, and the same outward ripple the engraved mode runs — stated as
-  // soft bands here rather than dashed rings, for the same reason the stars are
-  // discs on black and open rings on paper.
-  //
-  // Halo and core stay STEADY. Only the ripple moves. Breathing the whole glow
-  // turned the page into a slow throb, and unlike the ripple — which is a chart
-  // convention — a pulsing halo would be a claim about the Sun's output.
-  const R = Math.hypot(W, H) * 0.24;
-  const halo = ctx.createRadialGradient(sun.x, sun.y, 0, sun.x, sun.y, R);
-  halo.addColorStop(0, fade(colors.moonLit, a));
-  halo.addColorStop(0.22, fade(colors.planet, a * 0.5));
-  halo.addColorStop(0.55, fade(colors.planet, a * 0.16));
-  halo.addColorStop(1, 'transparent');
+  // Engraved only. Dashed rings continuing the glyph's own, across bare paper —
+  // which is the one context where rings work, because there is no glow behind
+  // them for the edges to sit inside.
+  const r0 = sun.vr * RING_START;   // starts outside the glyph's own dashes
+  const reach = sun.vr * RING_REACH;
+  ctx.strokeStyle = colors.planet;
+  ctx.lineWidth = 1;
+  ctx.lineCap = 'butt';             // square ends, like the glyph's segments
+  const punch = 1.5;
+  for (let k = 0; k < RING_COUNT; k++) {
+    const p = (phase + k / RING_COUNT) % 1; // evenly spaced along one cycle
+    // A ripple, not a decay: sin() takes each ring from nothing at the limb,
+    // up to full mid-travel, back to nothing at the edge. Fading only outward
+    // makes rings appear from thin air at the disc, which reads as a glitch.
+    const alpha = a * punch * Math.sin(p * Math.PI);
+    if (alpha <= 0.004) continue;
+    const rad = r0 + p * reach;
+    // Dash length is derived from the circumference so every ring carries the
+    // same segment COUNT — a fixed pixel dash would multiply the segments as
+    // the ring grows and the pattern would visibly churn.
+    const step = (2 * Math.PI * rad) / RING_DASHES;
+    ctx.globalAlpha = Math.min(1, alpha);
+    ctx.setLineDash([step * RING_INK, step * (1 - RING_INK)]);
+    ctx.lineDashOffset = k % 2 ? step * 0.5 : 0; // stagger, as the glyph does
+    ctx.beginPath();
+    ctx.arc(sun.x, sun.y, rad, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  ctx.setLineDash([]);
+  ctx.lineDashOffset = 0;
   ctx.globalAlpha = 1;
-  ctx.fillStyle = halo;
-  ctx.beginPath();
-  ctx.arc(sun.x, sun.y, R, 0, Math.PI * 2);
-  ctx.fill();
-
-  const CR = sun.vr * 6;
-  const core = ctx.createRadialGradient(sun.x, sun.y, 0, sun.x, sun.y, CR);
-  core.addColorStop(0, fade(colors.moonLit, a * 1.6));
-  core.addColorStop(0.45, fade(colors.planet, a * 0.5));
-  core.addColorStop(1, 'transparent');
-  ctx.fillStyle = core;
-  ctx.beginPath();
-  ctx.arc(sun.x, sun.y, CR, 0, Math.PI * 2);
-  ctx.fill();
-
-  // No travelling rings here, deliberately. Tried twice: concentric bands over
-  // a continuous glow read as a bullseye rather than a ripple, because the glow
-  // already fills the space the rings move through, so each band lands as a
-  // hard edge inside it instead of a wave crossing empty ground. That is a
-  // structural problem with the shape, not with the timing — easing it or
-  // driving it from anime.js changes nothing.
-  //
-  // The engraved mode gets away with it precisely because it has NO glow: there
-  // the rings cross bare paper, which is exactly what a printed chart does.
 }
 
 /** Quiet-mode draw: the faint field, the named stars, and the planets, Moon
