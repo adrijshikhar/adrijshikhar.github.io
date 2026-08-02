@@ -84,6 +84,20 @@ Every heading and label uses a **component class** from the `@layer components` 
 Repeating the utilities inline is what let six different tracking values drift into the same
 label; add a class instead. Hand-written styles only where a thing is genuinely one-off.
 
+## The instrument chrome must not lie
+
+The sky is real computed astronomy, and that is the design's entire argument. Every value in
+the chrome therefore has to be a true statement about the render, not camera-flavoured
+decoration. The reference mock's `[ISO 200] [f/3.5] [1/160]` were deliberately **not** built.
+
+The top-centre `.expo` cluster shows `ALT +90…−35°` (the projection's real altitude span, from
+`FLOOR` in `projection.ts`), `STARS 96` (`STARS.length`), and a live Julian Date — which is the
+actual input to every position on screen.
+
+`STARS n` is a **count, not a limiting magnitude.** The catalogue bottoms out at mag 3.35 but
+the renderer also draws a procedural faint field below that, so any `MAG n` label would be
+false. Don't "improve" it into one.
+
 ## Human / Machine view toggle (a hard contract)
 
 `ViewToggle.tsx` (the primary `client:load` island, driven by GSAP via `src/lib/gsap.ts`)

@@ -1,13 +1,13 @@
 ---
 /**
  * The EVF readout — in-page navigation rendered as a mirrorless viewfinder's
- * live info cluster, not a lens-barrel focus scale. A fixed reticle bracket
- * marks a constant vertical position; section labels step past it as you
- * scroll, the way a focal-length readout advances past its index mark — the
- * active one held bright, neighbours dimmed. Beside it, a hairline track
- * fills continuously with real position through the whole document: two
- * separate readouts, exactly like a real EVF's discrete-value cluster next
- * to its always-live zoom/battery meter.
+ * live info cluster, not a lens-barrel focus scale. Section labels step past a
+ * constant vertical position as you scroll, the way a focal-length readout
+ * advances past its index mark; the active one is held bright and wrapped in
+ * amber brackets, neighbours dimmed. Beside it, a hairline track fills
+ * continuously with real position through the whole document: two separate
+ * readouts, exactly like a real EVF's discrete-value cluster next to its
+ * always-live zoom/battery meter.
  *
  * Keeps the scroll-spy contract intact: `data-section`, `.nav-link`, same
  * rootMargin. Motion is transform/opacity only — the stepping is driven by
@@ -30,14 +30,14 @@ const sections = [
   <div class="rail-progress" aria-hidden="true"><span class="rail-progress-fill"></span></div>
 
   <div class="rail-window">
-    <!-- The fixed index mark. Constant position — it never moves; the labels move past it. -->
-    <div class="rail-reticle" aria-hidden="true"></div>
     <ul class="rail-stack">
       {sections.map((s, i) => (
         <li>
           <a class="nav-link" href={`#${s.id}`} data-section={s.id}>
+            <span class="rail-bracket" aria-hidden="true">[</span>
             <span class="rail-no">{String(i + 1).padStart(2, '0')}</span>
             <span class="nav-text">{s.label}</span>
+            <span class="rail-bracket" aria-hidden="true">]</span>
           </a>
         </li>
       ))}
@@ -94,7 +94,7 @@ const sections = [
   }
 
   /* ── Windowed readout: three graduations tall, so the active label centres
-     on the reticle with one dimmed neighbour above and below — the same
+     in the window with one dimmed neighbour above and below — the same
      silhouette as a focal-length dial's visible run. */
   .rail-window {
     position: relative;
@@ -103,36 +103,12 @@ const sections = [
     height: calc(var(--item-h) * 3);
   }
 
-  /* The reticle: a left bracket at a constant vertical position, the way an
-     EVF's focus point is a bracket rather than an underline. */
-  .rail-reticle {
-    position: absolute;
-    left: -0.7rem;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 0.5rem;
-    height: var(--item-h);
-    border-left: 1px solid var(--accent);
-    opacity: 0.9;
-  }
-  .rail-reticle::before,
-  .rail-reticle::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    width: 0.5rem;
-    height: 1px;
-    background: var(--accent);
-  }
-  .rail-reticle::before { top: 0; }
-  .rail-reticle::after { bottom: 0; }
-
   .rail-stack {
     margin: 0;
     padding: 0;
     list-style: none;
     --i: 0;
-    /* Centres the active (index --i) item on the reticle: shift the whole
+    /* Centres the active (index --i) item in the window: shift the whole
        stack up by one item-height per step, then re-add one item-height so
        index 0 sits centred rather than flush with the window's top edge. */
     transform: translateY(calc(var(--item-h) * (1 - var(--i))));
@@ -146,7 +122,7 @@ const sections = [
     display: flex;
     height: 100%;
     align-items: center;
-    gap: 0.6rem;
+    gap: 0.5rem;
     text-decoration: none;
     opacity: 0.4;
     transition: opacity 0.6s cubic-bezier(0.32, 0.72, 0, 1);
@@ -154,6 +130,16 @@ const sections = [
   .nav-link:hover,
   .nav-link:focus-visible { opacity: 0.75; }
   .nav-link.is-at { opacity: 1; }
+
+  .rail-bracket {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    font-weight: 500;
+    color: var(--accent);
+    opacity: 0;
+    transition: opacity 0.45s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .nav-link.is-at .rail-bracket { opacity: 1; }
 
   .rail-no {
     font-family: var(--font-mono);
@@ -185,11 +171,10 @@ const sections = [
   .side-rail { transition: opacity 0.5s var(--ease-out); }
 
   /* Reduced motion: fall back to the static list this replaces — no
-     travelling reticle, no windowing, just the active label highlighted in
-     place among all six, all visible at once. */
+     stepping, no windowing, just the active label highlighted in place among
+     all six, all visible at once. */
   @media (prefers-reduced-motion: reduce) {
-    .rail-progress,
-    .rail-reticle { display: none; }
+    .rail-progress { display: none; }
     .rail-window { overflow: visible; height: auto; }
     .rail-stack { transform: none; transition: none; }
     .nav-link,
@@ -210,7 +195,7 @@ const sections = [
         if (!entry.isIntersecting) return;
         const idx = [...navLinks].findIndex((l) => l.getAttribute('data-section') === entry.target.id);
         navLinks.forEach((link, i) => link.classList.toggle('is-at', i === idx));
-        // Drives the reticle-centred stepping via CSS calc() — see .rail-stack.
+        // Drives the window-centred stepping via CSS calc() — see .rail-stack.
         // A no-op under reduced motion, where .rail-stack transform is forced
         // to none regardless of --i.
         if (idx !== -1) stack?.style.setProperty('--i', String(idx));

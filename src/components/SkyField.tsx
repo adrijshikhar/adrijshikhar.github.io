@@ -11,9 +11,14 @@ import {
   type Observer,
   type SkyColors,
 } from '../lib/sky/render';
-import { gmstDeg } from '../lib/sky/astronomy';
+import { gmstDeg, julianDay } from '../lib/sky/astronomy';
+import { FLOOR } from '../lib/sky/projection';
+import { STARS } from '../lib/sky/catalogue';
 import { SkyGame, drawGame, type Tool } from '../lib/sky/game';
 import { animate, onScroll } from '../lib/motion';
+
+const ALT_RANGE = `+90…−${Math.abs(FLOOR)}°`;
+const STAR_COUNT = STARS.length;
 
 interface SkyFieldProps {
   /** 'quiet' (every page): faint field + named stars, no interaction. 'full'
@@ -90,6 +95,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
   // genuinely tied to what the canvas is drawing: LST is what decides which
   // right ascension sits on the meridian. Ticked once a second, not per frame.
   const [lst, setLst] = useState<string>('--:--:--');
+  const [jd, setJd] = useState<string>('—');
   if (mode === 'full' && !gameRef.current) {
     gameRef.current = new SkyGame(() => setStruck((n) => n + 1));
   }
@@ -108,6 +114,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
       const ss = Math.floor((((h - hh) * 60) - mm) * 60);
       const p = (n: number) => String(n).padStart(2, '0');
       setLst(`${p(hh)}:${p(mm)}:${p(ss)}`);
+      setJd(julianDay(new Date()).toFixed(3));
       id = window.setTimeout(tick, 1000);
     };
     tick();
@@ -520,8 +527,16 @@ export default function SkyField({ mode }: SkyFieldProps) {
           you what it is showing you. Falls back to Bengaluru silently when the
           geo lookup 404s, and says so rather than implying a real fix. */}
       {mode === 'full' && !machine && (
-        <div className="instrument instrument-l">
-          <div>
+        <div className="expo" aria-hidden="true">
+          <span className="expo-cell">ALT {ALT_RANGE}</span>
+          <span className="expo-cell">STARS {STAR_COUNT}</span>
+          <span className="expo-cell">JD {jd}</span>
+        </div>
+      )}
+
+      {mode === 'full' && !machine && (
+        <div className="instrument instrument-l readout-row">
+          <div className="readout-cell">
             <span className="k">Observer</span>
             <b>
               {Math.abs((coords?.lat ?? DEFAULT_OBS.lat)).toFixed(2)}&deg;
@@ -530,11 +545,11 @@ export default function SkyField({ mode }: SkyFieldProps) {
               {(coords?.lon ?? DEFAULT_OBS.lon) >= 0 ? 'E' : 'W'}
             </b>
           </div>
-          <div>
+          <div className="readout-cell">
             <span className="k">Sidereal</span>
             <b>{lst}</b>
           </div>
-          <div>
+          <div className="readout-cell">
             <span className="k">Source</span>
             <b>{obsSource}</b>
           </div>
