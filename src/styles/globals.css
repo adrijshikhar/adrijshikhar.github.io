@@ -507,6 +507,19 @@ body.machine-mode #sky {
    never finds the hook.
    ========================================================================== */
 
+/* Playing is not reading. The page recedes so the overlay is no longer clamped
+   by the text-legibility ceiling — that ceiling is what forced the game to
+   render at an effective 0.06 alpha. pointer-events go with it, so a drag
+   crossing a link cannot navigate mid-throw. The game's own toolbar lives
+   outside .human-view and stays at full strength. */
+.human-view {
+  transition: opacity 0.4s var(--ease-out);
+}
+body.playing .human-view {
+  opacity: 0.08;
+  pointer-events: none;
+}
+
 /* No text selection anywhere in game mode. Gated on .playing alone, not just
    .grabbing — a drag that starts on empty sky (sky-travel) never sets
    .grabbing, so gating on that alone would still let the page highlight. */
@@ -521,20 +534,23 @@ body.spinning * {
 }
 
 /* Custom cursor: a small ring that trails the pointer with a hard dot at the
-   exact hit point. Only mounted (by SkyField) while playing, so it replaces
-   the default cursor rather than doubling it, and never appears otherwise.
-   Hidden on touch devices, where a synthetic pointer ring means nothing. */
+   exact hit point. Site-wide, as the prototype had it — not game-only.
+   Hidden on touch devices, where a synthetic pointer ring means nothing, and
+   skipped under reduced motion, where the ring's lag has nowhere to go. */
 @media (hover: hover) and (pointer: fine) {
-  /* Only once the game has actually started — `cursor-custom` is added by
-     SkyField's `enter()`, not on load, so a script failure never leaves the
-     visitor with no cursor at all. Every element that sets its own `cursor`
-     must be listed here: an explicit `cursor: pointer` on a button beats the
-     inherited `none` from body, which is how the native arrow used to leak
-     back in over the game bar in the prototype. */
+  /* `cursor-custom` is added by SkyField only after its rAF is confirmed
+     running, so a script failure never leaves the visitor with no cursor at
+     all. Every element that sets its own `cursor` must be listed: an explicit
+     `cursor: pointer` on a button beats the inherited `none` from body, which
+     is how the native arrow used to leak back in over the game bar. */
   .cursor-custom,
   .cursor-custom *,
   .cursor-custom a,
-  .cursor-custom button {
+  .cursor-custom button,
+  .cursor-custom [role='button'],
+  .cursor-custom input,
+  .cursor-custom label,
+  .cursor-custom summary {
     cursor: none !important;
   }
 
@@ -685,22 +701,6 @@ body.spinning * {
   }
   .readout-row b { font-variant-numeric: tabular-nums; }
 
-  @media (min-width: 1440px) {
-    .readout-row {
-      flex-direction: row;
-      align-items: stretch;
-      line-height: 1.5;
-    }
-    .readout-cell {
-      display: flex;
-      flex-direction: column;
-      gap: 0.15rem;
-      padding: 0 1.15rem;
-      border-left: 1px solid var(--rule);
-    }
-    .readout-cell:first-child { padding-left: 0; border-left: 0; }
-    .readout-row .k { width: auto; letter-spacing: 0.2em; }
-  }
 
   .expo {
     position: fixed;
