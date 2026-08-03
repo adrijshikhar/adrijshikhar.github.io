@@ -653,9 +653,17 @@ export default function SkyField({ mode }: SkyFieldProps) {
       });
     }
 
-    // Real location, best-effort — never block first paint on the network.
+    // Real location, best-effort — never blocks first paint. The Bengaluru
+    // fallback is already on screen before this resolves, and the readout says
+    // SOURCE DEFAULT until it lands, so a slow answer costs nothing and a late
+    // one is still an improvement.
+    //
+    // 1200ms was too tight to be that generous in practice: the edge answers in
+    // ~75ms warm, but a cold mobile handshake (DNS + TCP + TLS on a fresh
+    // radio) routinely spends more than a second before the request is even
+    // sent, and the abort then silently pinned every such visitor to Bengaluru.
     const controller = new AbortController();
-    const timeoutId = window.setTimeout(() => controller.abort(), 1200);
+    const timeoutId = window.setTimeout(() => controller.abort(), 5000);
     fetch('/api/geo', { signal: controller.signal })
       .then((r) => (r.ok ? r.json() : null))
       .then((j) => {
