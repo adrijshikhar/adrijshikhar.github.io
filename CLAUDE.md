@@ -17,7 +17,34 @@ bun run preview             # serve the production build
 bun x astro sync            # regenerate content-collection types after schema changes
 ```
 
-No test or lint scripts exist. Prettier is a dependency but is not wired to a script. The
+### Verification
+
+```bash
+bun run verify:sky          # 16 physical astronomy invariants — pure Node, runs in CI
+bun run verify:code         # dual-theme code-block contrast — runs in CI
+bun run verify:legibility   # 169/255 canvas-alpha ceiling — needs a browser, NOT in CI
+```
+
+`verify:legibility` enforces the ceiling DESIGN.md calls a hard contract. It cannot be pure
+Node like `verify:sky`, because legibility depends on what the browser actually rasterised —
+so it attaches over CDP to a Chrome you start yourself and runs its sampling **inside** the
+page (only numbers cross the wire, so nothing has to decode an image). Deliberately not
+wired into CI: adding a browser would make every build and deploy install one, and the check
+only means something when you are changing the palette or the sky.
+
+```bash
+bun run dev                                          # terminal 1
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+  --remote-debugging-port=9222 --user-data-dir=/tmp/legibility-profile   # terminal 2
+bun run verify:legibility                            # terminal 3 (--all, --json available)
+```
+
+It reports `exposed/sampled` per route: text with an **opaque** ancestor between it and the
+canvas cannot be harmed, so only unshielded text can fail. That split is diagnostic in its
+own right — `/resume/` currently reports `26/26 exposed` (nothing carded), which is why sky
+glyphs collide with prose there. Readings drift ±1 between runs because the sky is live.
+
+No lint script exists. Prettier is a dependency but is not wired to a script. The
 `deploy` npm script (`gh-pages`) is legacy/unused — deployment is via GitHub Actions (below).
 
 If a dev-server React island fails to hydrate with `jsxDEV is not a function` after editing
