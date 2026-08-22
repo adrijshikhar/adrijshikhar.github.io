@@ -14,7 +14,7 @@ const prose =
   'mt-3 text-[0.975rem] leading-relaxed text-text prose prose-invert max-w-none ' +
   'prose-headings:text-heading prose-headings:text-base prose-headings:font-semibold prose-headings:tracking-tighter prose-headings:mt-4 prose-headings:mb-2 ' +
   'prose-p:text-text prose-li:text-text prose-li:my-0.5 prose-ul:my-1.5 marker:text-muted ' +
-  'prose-a:text-accent prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-heading prose-strong:font-medium';
+  'prose-a:text-accent prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-spectral-k prose-strong:font-medium';
 
 export default function ProjectCard({ title, company, date, link, builtWith = [], contentHtml }: ProjectCardProps) {
   const Title = (
@@ -28,7 +28,7 @@ export default function ProjectCard({ title, company, date, link, builtWith = []
     <HoverCard>
       <div className="flex items-baseline justify-between gap-4">
         <span className="meta-data">{date}</span>
-        {company && <span className="meta-data">{company}</span>}
+        {company && <span className="meta-data meta-data--muted">{company}</span>}
       </div>
       <h3 className="mt-2 title-entry">
         {link ? (

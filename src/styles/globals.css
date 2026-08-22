@@ -39,10 +39,16 @@
   --surface:   #12161d;                 /* panel: footers, telemetry strips */
   --surface-2: #161b22;                 /* pane: code only */
 
-  --heading:   #edebe6;                 /* F · Procyon    16.33:1 */
-  --heading-hi:#e8ecf1;
-  --text:      #bfc6d0;                 /* ink            11.31:1 */
-  --muted:     #848e9c;                 /* labels          5.87:1 */
+  /* One temperature. Every substrate token is cool, so the UI neutrals are cool
+     too. --heading was #edebe6, which is WARM: warm cream text on a cool
+     blue-grey ground neutralises both and is the main reason the palette read as
+     dull rather than as a deliberate choice. Chroma is also lifted a little, so
+     these are a cool family instead of near-greyscale (heading was 3% sat).
+     Every ratio IMPROVED in the swap. */
+  --heading:   #e9edf4;                 /* 16.57:1 on ground, was 16.33 */
+  --heading-hi:#f2f5fa;                 /* emphasis above heading */
+  --text:      #c3ccdb;                 /* ink  12.03:1, was 11.31 */
+  --muted:     #8a95a8;                 /* labels 6.44:1, was 5.87 */
 
   --border: 255 255 255;                /* used as rgb(var(--border) / a) */
   --border-color: #242a33;
@@ -69,7 +75,10 @@
   /* Spectral ramp — one hue, one job. Do not reuse a hue for a second job. */
   --spectral-ob: #7fa8f5;               /* Rigel · Spica       8.17:1  links, active nav */
   --spectral-a:  #bfd2f2;               /* Sirius · Vega      12.71:1  types, infra tags */
-  --spectral-f:  #edebe6;               /* Procyon            16.33:1  headings */
+  --spectral-f:  #edebe6;               /* Procyon  16.33:1  bright STARS on canvas.
+                                           UI headings use --heading (cool): Procyon
+                                           really is warm-white, but warm type on a
+                                           cool ground fights the substrate. */
   --spectral-g:  #f0ce72;               /* the Sun · Capella  12.77:1  strings, Sun values */
   --spectral-k:  #eda05b;               /* Arcturus            9.06:1  numbers, lang tags */
   --spectral-m:  #e8776a;               /* Betelgeuse          6.74:1  errors ONLY */
@@ -288,13 +297,18 @@
   }
 
   /* Dates, companies, locations — the readout beside an entry. */
+  /* Dates are numbers, and K owns numbers. Every card carries one, so this is
+     where the ramp earns its keep outside code blocks. Non-numeric metadata
+     (a company name) takes .meta-data--muted instead. */
   .meta-data {
     font-family: var(--font-mono);
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    color: var(--muted);
+    color: var(--spectral-k);
+    font-variant-numeric: tabular-nums;
   }
+  .meta-data--muted { color: var(--muted); }
 
   .link-back {
     display: inline-flex;
@@ -828,7 +842,12 @@ body.spinning * {
     top: 1.9rem;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 30;
+    /* BEHIND the page content, above the sky. A fixed element with z-index >= 0
+       paints over static in-flow content no matter how small the number, which is
+       why the hero title used to run under this cluster. -1 sits behind all
+       in-flow content, and still above #sky (also -1, earlier in the DOM) and
+       body::before (-2). Do not "fix" a collision here by moving it. */
+    z-index: -1;
     display: flex;
     gap: 0.5rem;
     pointer-events: none;
@@ -838,8 +857,8 @@ body.spinning * {
     border: 1px solid var(--rule);
     padding: 0.2rem 0.55rem;
     font-family: var(--font-mono);
-    font-size: 0.5625rem;
-    letter-spacing: 0.16em;
+    font-size: 0.6875rem;            /* 11px: the mono floor. Was 9px. */
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--muted);
     font-variant-numeric: tabular-nums;
