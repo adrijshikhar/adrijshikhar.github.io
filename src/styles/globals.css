@@ -157,17 +157,16 @@
     pointer-events: none;
     background: radial-gradient(70% 50% at 88% 6%, oklch(70% .050 250 / .07), transparent 66%);
   }
-  /* Film grain — fixed and pointer-events:none, never on a scrolling container.
-     ~400 bytes inline, no request. Breaks the flatness of a large dark field. */
-  body::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: 40;
-    pointer-events: none;
-    opacity: .028;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
-  }
+
+  /* NO FILM GRAIN. There was a fixed, full-viewport body::after whose background
+     was an SVG generated at runtime by feTurbulence, composited at opacity .028.
+     Browsers rasterise and TILE that across the layer, and on tab restore the
+     tiles are re-rasterised: the result is a hard vertical seam near a GPU tile
+     boundary (~1024px), which reads as the page being broken.
+
+     Do not reintroduce it as a runtime filter. If the flat field ever needs
+     breaking again, use a small pre-rendered raster so the tiling is
+     deterministic, and check it survives a tab switch. */
 
   body {
     background-color: var(--bg);
@@ -719,7 +718,7 @@ body.spinning * {
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     font-family: var(--font-mono);
-    font-size: 0.5625rem;
+    font-size: 0.6875rem;   /* 11px: the mono floor. This was 9px. */
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--muted);

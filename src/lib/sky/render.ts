@@ -225,29 +225,36 @@ export type KeepOut = { x: number; y: number; w: number; h: number; strength?: n
  *  This is `destination-out`, not a translucent wash on top. That distinction is
  *  the whole point: a wash ADDS a layer and leaves canvas alpha untouched, so
  *  text over it still fails the 169/255 ceiling. Erasing genuinely lowers the
- *  alpha `verify:legibility` samples, while leaving a fraction of the sky
- *  visible, so the graticule and stars still read behind the prose instead of
- *  being hidden under an opaque plane.
+ *  alpha `verify:legibility` samples, while leaving most of the sky visible.
  *
- *  Feathered at the edges: a hard rectangle of erased sky is just the plane
- *  again with extra steps, and the seam is exactly what read as a floating card. */
-function applyKeepOut(ctx: CanvasRenderingContext2D, k: KeepOut): void {
-  const strength = k.strength ?? 0.82;
-  const feather = 96;
+ *  FULL WIDTH, on purpose. An earlier version erased only a column-width band
+ *  and feathered 96px at each side. Feathering does not remove a brightness
+ *  step, it only softens its edge, so the result read as a vertical fade down
+ *  both sides of the text — a lighting artifact with no cause in the sky. Erasing
+ *  across the whole width has no vertical edge to notice at all.
+ *
+ *  Strength is deliberately low. Worst measured alpha with no keep-out was 193;
+ *  at 0.45 that lands at ~106 against a ceiling of 169, so the sky keeps more
+ *  than half its ink and still clears the contract with 63 to spare. Do not
+ *  raise this to "be safe" — every point costs sky. */
+function applyKeepOut(ctx: CanvasRenderingContext2D, k: KeepOut, W: number): void {
+  const strength = k.strength ?? 0.45;
+  const feather = 140;
   const prev = ctx.globalCompositeOperation;
   ctx.globalCompositeOperation = 'destination-out';
-  const g = ctx.createLinearGradient(k.x - feather, 0, k.x, 0);
-  g.addColorStop(0, `rgba(0,0,0,0)`);
-  g.addColorStop(1, `rgba(0,0,0,${strength})`);
-  ctx.fillStyle = g;
-  ctx.fillRect(k.x - feather, k.y, feather, k.h);
+
+  // Vertical feather at the top edge only: that boundary is where the hero hands
+  // over to the content, so a gradient there reads as the sky receding rather
+  // than as a seam. The bottom simply runs to the end of the content.
+  const top = ctx.createLinearGradient(0, k.y - feather, 0, k.y);
+  top.addColorStop(0, 'rgba(0,0,0,0)');
+  top.addColorStop(1, `rgba(0,0,0,${strength})`);
+  ctx.fillStyle = top;
+  ctx.fillRect(0, k.y - feather, W, feather);
+
   ctx.fillStyle = `rgba(0,0,0,${strength})`;
-  ctx.fillRect(k.x, k.y, k.w, k.h);
-  const g2 = ctx.createLinearGradient(k.x + k.w, 0, k.x + k.w + feather, 0);
-  g2.addColorStop(0, `rgba(0,0,0,${strength})`);
-  g2.addColorStop(1, `rgba(0,0,0,0)`);
-  ctx.fillStyle = g2;
-  ctx.fillRect(k.x + k.w, k.y, feather, k.h);
+  ctx.fillRect(0, k.y, W, k.h);
+
   ctx.globalCompositeOperation = prev;
 }
 
@@ -288,7 +295,7 @@ export function drawQuiet(
 
   ctx.globalAlpha = 1;
   // Last: erase, so everything drawn above is thinned inside the reading column.
-  if (keepOut) applyKeepOut(ctx, keepOut);
+  if (keepOut) applyKeepOut(ctx, keepOut, W);
 }
 
 /* ===========================================================================
@@ -872,5 +879,5 @@ export function drawFull(
     ctx.fillText(hoverFig.toUpperCase(), mouse.x + 14, mouse.y - 10);
   }
   ctx.globalAlpha = 1;
-  if (keepOut) applyKeepOut(ctx, keepOut);
+  if (keepOut) applyKeepOut(ctx, keepOut, W);
 }
