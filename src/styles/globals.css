@@ -331,30 +331,26 @@
   .atelier-btn:hover { background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule-hi); }
   @media (prefers-reduced-motion: reduce) { .atelier-btn:hover { transform: none; } }
 
-  /* A real card, in every state. The previous version was a hybrid: transparent
-     at rest with only a bottom rule, then an unbordered grey fill on hover, which
-     painted a bare rectangle with hard edges and a stray rule beneath it.
-     A card is a card at rest too, or the hover invents one out of nowhere.
+  /* Outline card: border only, no fill, so the ground (and whatever the ground
+     lets through) reads inside the card as well as around it. State is the border
+     promoting from --rule (1.42:1) to --rule-hi (3.00:1). No fill change on hover:
+     an unbordered grey rectangle appearing under the pointer was the previous bug.
 
-     The fill is FULLY OPAQUE on purpose: it is the legibility guarantee against
-     the sky canvas (137 alpha covered vs 108 bare, ceiling 169), not decoration.
-     Removing it breaks verify:legibility.
-
-     Radius follows the repo's own scale (--radius, 2px) so cards, inputs and
-     buttons share one shape system. State is carried by colour and by the border
-     promoting from --rule to --rule-hi (1.42:1 -> 3.00:1), never by opacity. */
+     NOTE ON LEGIBILITY: the shield is no longer here. It is the section-level
+     plane (.content-plane / .reading-plane). If that plane is ever removed to let
+     the sky through, canvas ink under this text goes to ~193/255 against a ceiling
+     of 169 and verify:legibility fails. The fix then is a sky keep-out under the
+     reading column, not the removal of this contract. */
   .atelier-card {
     position: relative;
     border-radius: var(--radius);
-    background: var(--card-core);
+    background: transparent;
     box-shadow: inset 0 0 0 1px var(--rule);
-    transition: background-color var(--dur-hover) var(--ease-out),
-                box-shadow var(--dur-hover) var(--ease-out);
+    transition: box-shadow var(--dur-hover) var(--ease-out);
   }
   @media (min-width: 1024px) {
     .group\/list-item:hover .atelier-card,
     .atelier-card:hover {
-      background: var(--surface-2);
       box-shadow: inset 0 0 0 1px var(--rule-hi);
     }
   }
