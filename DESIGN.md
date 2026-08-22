@@ -37,16 +37,26 @@ reintroduce it without solving that.
 
 ### Substrate
 
-| Name | Hex | Role |
-|---|---|---|
-| Ground | `#0a0d12` | The page. Dark enough that a 3.00:1 major rule still reads. |
-| Panel | `#12161d` | Footers, telemetry strips. |
-| Pane | `#161b22` | Fenced code only. |
-| Ink | `#bfc6d0` | Body copy. 11.31:1 on ground. |
-| Ink High | `#e8ecf1` | Entry titles, emphasis. |
-| Muted | `#848e9c` | Labels, metadata. 5.87:1. |
-| Rule | `#242a33` | Minor hairline **on the ground** — 1.42:1. |
-| Rule High | `#555f6c` | Major rule on the ground — 3.00:1. |
+Blue, and committed to it. Every substrate value was solved for a target L\* in one
+blue family rather than picked, so the elevation steps are perceptible (ΔL\* ≥ 3 is
+the floor; below that a raised plane does not read as raised) and the temperature
+never fluctuates. Substrate saturation is ~58%: a dark UI whose neutrals sit near
+greyscale reads as dull no matter how good the accents are.
+
+| Name | Hex | L\* | Role |
+|---|---|---|---|
+| Ground | `#080B14` | 3.2 | The page. |
+| Panel | `#101626` | 7.4 | Footers, telemetry strips. ΔL\* +4.2. |
+| Pane | `#12182A` | 8.6 | Fenced code only. |
+| Ink | `#C2CEE4` | — | Body copy. 12.40:1 on ground, 15% sat. |
+| Heading | `#EDF2FC` | — | 17.51:1 on ground. |
+| Muted | `#8795AF` | — | Labels, metadata. 6.50:1, 23% sat. |
+| Rule | `#1F2B4A` | — | Minor hairline **on the ground** — 1.40:1. |
+| Rule High | `#425C9E` | — | Major rule on the ground — 3.04:1. |
+
+Text is tinted from the substrate hue, never grey. `--heading` was warm `#edebe6`
+against a cool ground once; warm type on a cool ground neutralises both, and that
+is what "dull" looks like numerically.
 
 ### The spectral ramp — one hue, one job
 
@@ -55,14 +65,23 @@ names a real surface temperature, so they track a blackbody curve and cannot cla
 Each owns exactly one job. Reusing a hue for a second job is the failure mode this
 system exists to prevent.
 
-| Class | Hex | Ratio | Job | Named for |
-|---|---|---|---|---|
-| O/B | `#7fa8f5` | 8.17:1 | links, active nav | Rigel, Spica |
-| A | `#bfd2f2` | 12.71:1 | types, infra tags, planets | Sirius, Vega |
-| F | `#edebe6` | 16.33:1 | headings, bright stars | Procyon |
-| G | `#f0ce72` | 12.77:1 | strings, Sun values, the Sun | the Sun, Capella |
-| K | `#eda05b` | 9.06:1 | numbers, language tags | Arcturus |
-| M | `#e8776a` | 6.74:1 | **errors only** | Betelgeuse |
+Chroma is deliberate. The first version of this ramp was too washed to register —
+measured on the rendered page, only 25.3% of visible text carried any chroma and
+the warm hues appeared on exactly one element. Saturation was raised across the
+board and every hue re-verified against ground, card **and** pane.
+
+| Class | Hex | Sat | On ground | Job | Named for |
+|---|---|---|---|---|---|
+| O/B | `#5C9BFF` | 64% | 7.10:1 | links, active nav | Rigel, Spica |
+| A | `#A8C8FF` | 34% | 11.58:1 | types, infra tags, planets | Sirius, Vega |
+| F | `#EDF2FC` | 6% | 17.51:1 | headings, bright stars | Procyon |
+| G | `#FFD166` | 60% | 13.63:1 | strings, Sun values, the Sun | the Sun, Capella |
+| K | `#FF9F4A` | 71% | 9.65:1 | numbers, **dates**, language tags | Arcturus |
+| M | `#FF6B5C` | 64% | 7.03:1 | **errors only** | Betelgeuse |
+
+Dates take K because a date is a number, and that single assignment is what moved
+the page from 25.3% to 41.3% chromatic. A ramp of six hues is worth nothing if
+five of them never appear.
 
 `--accent` is an alias for O/B. There is one accent. The other five are role
 colours, not accents, which is why six hues does not mean six accents.
@@ -76,10 +95,14 @@ against the card fill rather than the ground:
 
 | Name | Hex | Measurement |
 |---|---|---|
-| Card fill | `#161c26` | L\* 10.1, ΔL\* **6.5** above ground |
-| Card fill high | `#1c232f` | +3.44 L\* above rest. Hover **lifts**. |
-| Card edge | `#3e4855` | 1.84:1 on the fill |
-| Card edge high | `#555f6c` | 2.64:1 on the fill |
+| Card fill | `#161F35` | L\* 12.0, ΔL\* **+8.8** above ground |
+| Card fill high | `#1E2A48` | L\* 17.5, +5.5 above rest. Hover **lifts**. |
+| Card edge | `#35476B` | 1.85:1 on the fill |
+| Card edge high | `#4E6AAE` | 2.72:1 on the fill |
+
+Cards carry a shadow with a real offset and a soft blur, tinted to the ground hue
+(`0 1px 2px`, `0 12px 32px -8px`). A zero-offset coloured halo is decoration; an
+offset plus blur is depth.
 
 ΔL\* below ~3 is the threshold where a plane stops reading as a plane at all. An
 earlier translucent fill measured 2.65 and looked like a smudge because
