@@ -1,4 +1,5 @@
 import HoverCard from './HoverCard';
+import { techHue, HUE_CLASS } from '../lib/tech-hue';
 
 interface ProjectCardProps {
   title: string;
@@ -12,7 +13,7 @@ interface ProjectCardProps {
 const prose =
   'mt-3 text-[0.975rem] leading-relaxed text-text prose prose-invert max-w-none ' +
   'prose-headings:text-heading prose-headings:text-base prose-headings:font-semibold prose-headings:tracking-tighter prose-headings:mt-4 prose-headings:mb-2 ' +
-  'prose-p:text-text prose-li:text-text prose-li:my-0.5 prose-ul:my-1.5 marker:text-accent ' +
+  'prose-p:text-text prose-li:text-text prose-li:my-0.5 prose-ul:my-1.5 marker:text-muted ' +
   'prose-a:text-accent prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-heading prose-strong:font-medium';
 
 export default function ProjectCard({ title, company, date, link, builtWith = [], contentHtml }: ProjectCardProps) {
@@ -43,7 +44,7 @@ export default function ProjectCard({ title, company, date, link, builtWith = []
           {builtWith.map((tech) => (
             <li
               key={tech}
-              className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted before:mr-1.5 before:text-accent before:content-['+']"
+              className={`font-mono text-[11px] uppercase tracking-[0.1em] ${HUE_CLASS[techHue(tech)]} before:mr-1.5 before:text-rule-hi before:content-['+']`}
             >
               {tech}
             </li>

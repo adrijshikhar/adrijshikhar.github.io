@@ -54,10 +54,15 @@
      --rule on a lifted card is 1.18:1 and invisible, which is the bug this fixes.
        fill      #161c26   L* 10.1, ΔL* 6.5 above ground (>3 is where a plane
                            becomes visible at all; the old value was 2.65)
+       fill-hi   #1c232f   +3.44 L* above rest — hover LIFTS. --surface-2 was
+                           0.55 L* darker than the rest fill, so hovering used
+                           to sink the card; a ground-scale token is not a
+                           hover scale.
        edge      #3e4855   1.84:1 on the fill  — present but quiet at rest
        edge-hi   #555f6c   2.64:1 on the fill  — the hover promotion
      Text on the fill: heading 14.35:1, ink 9.94:1, muted 5.15:1. All AA. */
   --card-fill:    #161c26;
+  --card-fill-hi: #1c232f;              /* +3.44 L* above rest; ink 9.17:1 */
   --card-edge:    #3e4855;
   --card-edge-hi: #555f6c;
 
@@ -362,7 +367,7 @@
   @media (min-width: 1024px) {
     .group\/list-item:hover .atelier-card,
     .atelier-card:hover {
-      background: var(--surface-2);
+      background: var(--card-fill-hi);
       box-shadow: inset 0 0 0 1px var(--card-edge-hi);
     }
   }
