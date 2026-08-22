@@ -45,14 +45,20 @@ greyscale reads as dull no matter how good the accents are.
 
 | Name | Hex | L\* | Role |
 |---|---|---|---|
-| Ground | `#080B14` | 3.2 | The page. |
-| Panel | `#101626` | 7.4 | Footers, telemetry strips. ΔL\* +4.2. |
-| Pane | `#12182A` | 8.6 | Fenced code only. |
-| Ink | `#C2CEE4` | — | Body copy. 12.40:1 on ground, 15% sat. |
-| Heading | `#EDF2FC` | — | 17.51:1 on ground. |
-| Muted | `#8795AF` | — | Labels, metadata. 6.50:1, 23% sat. |
-| Rule | `#1F2B4A` | — | Minor hairline **on the ground** — 1.40:1. |
-| Rule High | `#425C9E` | — | Major rule on the ground — 3.04:1. |
+| Ground | `#090B0E` | 3.0 | The page. |
+| Panel | `#16191C` | 8.6 | Footers, telemetry strips. ΔL\* +5.6. |
+| Pane | `#1B1E22` | 11.1 | Fenced code only. |
+| Ink | `#D3D7DC` | — | Body copy. 8.30:1 worst surface. |
+| Heading | `#F5F7F9` | — | 11.18:1 worst surface. |
+| Muted | `#9CA1A9` | — | Labels, metadata. 4.62:1 worst. |
+| Rule | `#2D3136` | — | Minor hairline on the ground — 1.51:1. |
+| Rule High | `#5C646E` | — | Major rule on the ground — 3.29:1. |
+
+**60-30-10 is the rule that finally fixed this.** Earlier attempts pushed the accent
+hue into the substrate, so the whole page became the accent: a blue-black page went
+muddy, and a violet seed turned the ground to mauve-grey. One colour has to dominate.
+The substrate is now near-neutral, carrying ~60% with only a whisper of the accent
+hue so it is not dead grey; the accent is the 10%.
 
 Text is tinted from the substrate hue, never grey. `--heading` was warm `#edebe6`
 against a cool ground once; warm type on a cool ground neutralises both, and that
@@ -70,14 +76,18 @@ measured on the rendered page, only 25.3% of visible text carried any chroma and
 the warm hues appeared on exactly one element. Saturation was raised across the
 board and every hue re-verified against ground, card **and** pane.
 
-| Class | Hex | Sat | On ground | Job | Named for |
+| Class | Hex | Sat | Worst surface | Job | Named for |
 |---|---|---|---|---|---|
-| O/B | `#5C9BFF` | 64% | 7.10:1 | links, active nav | Rigel, Spica |
-| A | `#A8C8FF` | 34% | 11.58:1 | types, infra tags, planets | Sirius, Vega |
-| F | `#EDF2FC` | 6% | 17.51:1 | headings, bright stars | Procyon |
-| G | `#FFD166` | 60% | 13.63:1 | strings, Sun values, the Sun | the Sun, Capella |
-| K | `#FF9F4A` | 71% | 9.65:1 | numbers, **dates**, language tags | Arcturus |
-| M | `#FF6B5C` | 64% | 7.03:1 | **errors only** | Betelgeuse |
+| O/B | `#71AAFF` | 56% | 5.08:1 | links, active nav — **the one accent** | Rigel, Spica |
+| A | `#BBD6FF` | 27% | 8.10:1 | types, infra tags, planets | Sirius, Vega |
+| F | `#F6F8FA` | 2% | 11.28:1 | headings, bright stars | Procyon |
+| G | `#FAD661` | 61% | 8.49:1 | strings, Sun values | the Sun, Capella |
+| K | `#FFA863` | 61% | 6.31:1 | numbers, **dates**, language tags | Arcturus |
+| M | `#FF8382` | 49% | 5.04:1 | **errors only** | Betelgeuse |
+
+Every value is verified against **all four surfaces** — ground, card, pane and the
+hovered fill — not just the page, because code sits on the pane and hovered text
+sits on the lifted card. "Worst surface" above is the minimum of those four.
 
 Dates take K because a date is a number, and that single assignment is what moved
 the page from 25.3% to 41.3% chromatic. A ramp of six hues is worth nothing if
@@ -95,10 +105,10 @@ against the card fill rather than the ground:
 
 | Name | Hex | Measurement |
 |---|---|---|
-| Card fill | `#161F35` | L\* 12.0, ΔL\* **+8.8** above ground |
-| Card fill high | `#1E2A48` | L\* 17.5, +5.5 above rest. Hover **lifts**. |
-| Card edge | `#35476B` | 1.85:1 on the fill |
-| Card edge high | `#4E6AAE` | 2.72:1 on the fill |
+| Card fill | `#212529` | L\* 14.4, ΔL\* **+11.4** above ground |
+| Card fill high | `#32373D` | L\* 22.8, +8.4 above rest. Hover **lifts**. |
+| Card edge | `#464C54` | 1.78:1 on the fill |
+| Card edge high | `#636B76` | 2.86:1 on the fill |
 
 Cards carry a shadow with a real offset and a soft blur, tinted to the ground hue
 (`0 1px 2px`, `0 12px 32px -8px`). A zero-offset coloured halo is decoration; an
