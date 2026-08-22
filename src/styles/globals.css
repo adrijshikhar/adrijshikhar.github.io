@@ -47,8 +47,19 @@
   --border: 255 255 255;                /* used as rgb(var(--border) / a) */
   --border-color: #242a33;
   --hairline:     #242a33;
-  --rule:         #242a33;              /* minor  1.42:1 */
-  --rule-hi:      #555f6c;              /* major  3.00:1 */
+  --rule:         #242a33;              /* minor hairline, on the GROUND  1.42:1 */
+  --rule-hi:      #555f6c;              /* major rule, on the ground       3.00:1 */
+
+  /* Card plane and its own edges. Measured against the card fill, not the ground:
+     --rule on a lifted card is 1.18:1 and invisible, which is the bug this fixes.
+       fill      #161c26   L* 10.1, ΔL* 6.5 above ground (>3 is where a plane
+                           becomes visible at all; the old value was 2.65)
+       edge      #3e4855   1.84:1 on the fill  — present but quiet at rest
+       edge-hi   #555f6c   2.64:1 on the fill  — the hover promotion
+     Text on the fill: heading 14.35:1, ink 9.94:1, muted 5.15:1. All AA. */
+  --card-fill:    #161c26;
+  --card-edge:    #3e4855;
+  --card-edge-hi: #555f6c;
 
   /* Spectral ramp — one hue, one job. Do not reuse a hue for a second job. */
   --spectral-ob: #7fa8f5;               /* Rigel · Spica       8.17:1  links, active nav */
@@ -331,30 +342,28 @@
   .atelier-btn:hover { background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule-hi); }
   @media (prefers-reduced-motion: reduce) { .atelier-btn:hover { transform: none; } }
 
-  /* Tinted card. The fill is TRANSLUCENT, not opaque, so the graticule and stars
-     still read through it — the card has presence without becoming a lid.
+  /* Card plane. OPAQUE, and that costs nothing now: the sky keep-out already
+     erases ~90% of the canvas ink under the reading column (alpha 25/255), so
+     there is almost no sky left inside the card to show through. The previous
+     78% tint bought a view of nothing and cost the card its presence, landing
+     at ΔL* 2.65 above the ground — below the threshold where a plane reads as a
+     plane at all.
 
-     This is only safe because the sky now yields: applyKeepOut in render.ts
-     erases most of the canvas ink under the reading column, so alpha there is
-     ~25/255 against a ceiling of 169. A translucent fill over the old 193 would
-     have been decoration pretending to be protection. If the keep-out is ever
-     weakened, this fill does NOT compensate for it.
-
-     Note: Tailwind's /opacity modifier does not compile against CSS-var colours
-     (bg-surface/70 renders invisible), which is why this is color-mix. */
+     Edges use --card-edge, measured against the FILL rather than the ground.
+     --rule is a ground hairline and only manages 1.18:1 here. */
   .atelier-card {
     position: relative;
     border-radius: var(--radius);
-    background: color-mix(in srgb, var(--surface) 78%, transparent);
-    box-shadow: inset 0 0 0 1px var(--rule);
+    background: var(--card-fill);
+    box-shadow: inset 0 0 0 1px var(--card-edge);
     transition: background-color var(--dur-hover) var(--ease-out),
                 box-shadow var(--dur-hover) var(--ease-out);
   }
   @media (min-width: 1024px) {
     .group\/list-item:hover .atelier-card,
     .atelier-card:hover {
-      background: color-mix(in srgb, var(--surface-2) 88%, transparent);
-      box-shadow: inset 0 0 0 1px var(--rule-hi);
+      background: var(--surface-2);
+      box-shadow: inset 0 0 0 1px var(--card-edge-hi);
     }
   }
   @media (prefers-reduced-motion: reduce) {

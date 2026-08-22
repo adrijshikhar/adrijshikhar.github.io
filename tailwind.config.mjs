@@ -20,6 +20,9 @@ export default {
         'heading-hi': 'var(--heading-hi)',
         rule: 'var(--rule)',
         'rule-hi': 'var(--rule-hi)',
+        'card-fill': 'var(--card-fill)',
+        'card-edge': 'var(--card-edge)',
+        'card-edge-hi': 'var(--card-edge-hi)',
         /* Spectral ramp. One hue, one job — see globals.css. Reach for the
            semantic name (accent, heading) first; these are for the jobs that
            have no semantic token: syntax, tags, metrics. */
