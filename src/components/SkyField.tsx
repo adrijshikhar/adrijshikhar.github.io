@@ -387,11 +387,11 @@ export default function SkyField({ mode }: SkyFieldProps) {
       const colors: SkyColors = {
         accent: cs.getPropertyValue('--accent').trim(),
         muted: cs.getPropertyValue('--muted').trim(),
-        bright: light ? ink : '#F6F8FA',   // F
-        moonLit: light ? ink : '#DCE0E6',  // near-neutral grey: the Moon is grey, not warm
+        bright: light ? ink : '#edeef0',   // F  (Radix slate-12)
+        moonLit: light ? ink : '#d8dade',  // Radix slate near-neutral: the Moon is grey, not warm
         moonGlow: light ? fade(ink, 0.1) : 'rgba(232,236,241,0.10)',
-        planet: light ? ink : '#BBD6FF',   // A · cool blue, reflected light
-        sun: light ? ink : '#FAD661',      // G · the Sun's real class
+        planet: light ? ink : '#c2e6ff',   // A · Radix blue-12, reflected light
+        sun: light ? ink : '#ffca16',      // G  (Radix amber-11) · the Sun's real class
         // Faint field is dimmer still in light mode: dark marks compete with
         // dark text far more than light marks compete with a dark page, so
         // the base colour itself carries a low alpha on top of the per-star
