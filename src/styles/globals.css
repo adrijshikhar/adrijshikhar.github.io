@@ -62,10 +62,10 @@
   --accent: var(--spectral-ob);
   --accent-contrast: #0a0d12;
 
-  /* No cards. Structure is rules. Radius 0 everywhere: a machined readout has
-     square corners. --card-* are kept only so shadcn ui/* keeps compiling. */
+  /* One shape system: --radius 2px, shared by cards, inputs and buttons. Shadows
+     stay off; a card is defined by its border and its fill, not by floating. */
   --card-core:  var(--surface);
-  --card-radius: 0px;
+  --card-radius: 2px;
   --card-shadow: none;
 
   /* Motion: four durations, one per interaction class. ONE element gets ONE
@@ -331,25 +331,31 @@
   .atelier-btn:hover { background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule-hi); }
   @media (prefers-reduced-motion: reduce) { .atelier-btn:hover { transform: none; } }
 
-  /* A ruled band, not a card. Radius 0, no shadow, no lift: structure comes from
-     the rule under each row. The fill stays FULLY OPAQUE on purpose — it is the
-     legibility guarantee against the sky canvas (137 alpha covered vs 108 bare,
-     ceiling 169), not decoration. Removing it would break verify:legibility.
-     State is carried by COLOUR, never opacity and never motion, so there is one
-     duration on this element and no transform. */
+  /* A real card, in every state. The previous version was a hybrid: transparent
+     at rest with only a bottom rule, then an unbordered grey fill on hover, which
+     painted a bare rectangle with hard edges and a stray rule beneath it.
+     A card is a card at rest too, or the hover invents one out of nowhere.
+
+     The fill is FULLY OPAQUE on purpose: it is the legibility guarantee against
+     the sky canvas (137 alpha covered vs 108 bare, ceiling 169), not decoration.
+     Removing it breaks verify:legibility.
+
+     Radius follows the repo's own scale (--radius, 2px) so cards, inputs and
+     buttons share one shape system. State is carried by colour and by the border
+     promoting from --rule to --rule-hi (1.42:1 -> 3.00:1), never by opacity. */
   .atelier-card {
     position: relative;
-    border-radius: 0;
-    background: transparent;
-    box-shadow: inset 0 -1px 0 0 var(--rule);
+    border-radius: var(--radius);
+    background: var(--card-core);
+    box-shadow: inset 0 0 0 1px var(--rule);
     transition: background-color var(--dur-hover) var(--ease-out),
                 box-shadow var(--dur-hover) var(--ease-out);
   }
   @media (min-width: 1024px) {
     .group\/list-item:hover .atelier-card,
     .atelier-card:hover {
-      background: var(--surface);
-      box-shadow: inset 0 -1px 0 0 var(--rule-hi);
+      background: var(--surface-2);
+      box-shadow: inset 0 0 0 1px var(--rule-hi);
     }
   }
   @media (prefers-reduced-motion: reduce) {
