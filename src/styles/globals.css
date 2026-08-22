@@ -114,16 +114,7 @@
     transition: background-color 0.45s ease;
   }
 
-  /* Atomic light/dark swap: ModeToggle adds .mode-switching for one frame so every element
-     flips in the same paint — no lagging background, no gradient-name flash. */
-  :root.mode-switching,
-  :root.mode-switching *,
-  :root.mode-switching *::before,
-  :root.mode-switching *::after {
-    transition: none !important;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     html {
       scroll-behavior: auto;
     }
@@ -539,7 +530,7 @@ body.spinning * {
     position: fixed;
     top: 0;
     left: 0;
-    /* Above every fixed control (ViewToggle 1100, ModeToggle 1090): while the
+    /* Above every fixed control (ViewToggle 1100): while the
        game hides the native cursor page-wide, a lower stack order made the
        pointer vanish completely whenever it crossed one of those toggles. */
     z-index: 1200;
@@ -604,7 +595,7 @@ body.spinning * {
    Ported from the prototype's `.frame`. Four corner brackets plus measurement
    ticks along the top edge, so the page reads as something seen THROUGH an
    instrument rather than a document with a sky behind it. Purely decorative:
-   fixed, aria-hidden, pointer-events:none, and it sits under the ModeToggle
+   fixed, aria-hidden, pointer-events:none, and it sits under the ViewToggle
    (z-1090) and ViewToggle (z-1100) rather than over them.
    Hidden in machine view along with the rest of the instrument. */
 @layer components {

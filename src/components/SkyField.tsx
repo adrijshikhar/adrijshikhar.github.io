@@ -473,7 +473,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
     };
     window.addEventListener('resize', onResize);
 
-    // ModeToggle flips data-mode live (no reload). renderFrame already
+    // data-mode is stamped once and never changes now. renderFrame already
     // re-reads dataset.mode + getComputedStyle on every call, so the rAF loop
     // picks the swap up on its own next frame — but under reduced motion
     // there's no loop, so the toggle would otherwise sit stale until some
