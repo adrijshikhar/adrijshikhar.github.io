@@ -32,18 +32,18 @@
  */
 
 const SPECTRAL = {
-  bg: '#12182A',
-  fg: '#C2CEE4',
-  ink: '#C2CEE4',
-  keyword: '#5C9BFF',
-  type: '#A8C8FF',
-  string: '#FFD166',
-  number: '#FF9F4A',
-  error: '#FF6B5C',
-  muted: '#8795AF',
+  bg: '#1D182C',
+  fg: '#D5D1E3',
+  ink: '#D5D1E3',
+  keyword: '#A79BFF',
+  type: '#D9C6FF',
+  string: '#FBD452',
+  number: '#FFA65E',
+  error: '#FF807F',
+  muted: '#A09AB4',
   // kept so existing scope maps keep resolving
-  bronze: '#5C9BFF',
-  literal: '#FFD166',
+  bronze: '#A79BFF',
+  literal: '#FBD452',
 };
 
 const LIGHT = SPECTRAL;

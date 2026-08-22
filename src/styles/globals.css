@@ -35,9 +35,9 @@
 :root {
   /* Substrate. Rules carry structure, so the ground stays dark enough for a
      3.00:1 major rule to read. */
-  --bg:        #080B14;                 /* ground   L*  3.2 */
-  --surface:   #101626;                 /* panel    L*  7.4, dL* +4.2 */
-  --surface-2: #12182A;                 /* pane     L*  8.6, code only */
+  --bg:        #0B0715;              /* ground   L*  2.5 */
+  --surface:   #181426;              /* panel    L*  7.5, dL* +5.0 */
+  --surface-2: #1D182C;              /* pane     L*  9.8, code only */
 
   /* One temperature. Every substrate token is cool, so the UI neutrals are cool
      too. --heading was #edebe6, which is WARM: warm cream text on a cool
@@ -45,16 +45,16 @@
      dull rather than as a deliberate choice. Chroma is also lifted a little, so
      these are a cool family instead of near-greyscale (heading was 3% sat).
      Every ratio IMPROVED in the swap. */
-  --heading:   #EDF2FC;                 /* 17.51:1 on ground */
+  --heading:   #F5F4FD;              /* 18.23:1 on ground */
   --heading-hi:#FFFFFF;                 /* emphasis above heading */
-  --text:      #C2CEE4;                 /* ink    12.40:1, sat 15% */
-  --muted:     #8795AF;                 /* labels  6.50:1, sat 23% */
+  --text:      #D5D1E3;              /* ink    13.32:1 */
+  --muted:     #A09AB4;              /* labels  7.37:1 */
 
   --border: 255 255 255;                /* used as rgb(var(--border) / a) */
-  --border-color: #1F2B4A;
-  --hairline:     #1F2B4A;
-  --rule:         #1F2B4A;              /* minor hairline on the ground  1.40:1 */
-  --rule-hi:      #425C9E;              /* major rule on the ground      3.04:1 */
+  --border-color: #2F2942;
+  --hairline:     #2F2942;
+  --rule:         #2F2942;              /* minor hairline on the ground  1.44:1 */
+  --rule-hi:      #645986;              /* major rule on the ground      3.14:1 */
 
   /* Card plane and its own edges. Measured against the card fill, not the ground:
      --rule on a lifted card is 1.18:1 and invisible, which is the bug this fixes.
@@ -67,31 +67,31 @@
        edge      #3e4855   1.84:1 on the fill  — present but quiet at rest
        edge-hi   #555f6c   2.64:1 on the fill  — the hover promotion
      Text on the fill: heading 14.35:1, ink 9.94:1, muted 5.15:1. All AA. */
-  --card-fill:    #161F35;              /* L* 12.0, dL* +8.8 above ground */
-  --card-fill-hi: #1E2A48;              /* L* 17.5, dL* +5.5 — hover LIFTS */
-  --card-edge:    #35476B;              /* 1.85:1 on the fill */
-  --card-edge-hi: #4E6AAE;              /* 2.72:1 on the fill */
+  --card-fill:    #241F35;              /* L* 13.3, dL* +10.8 above ground */
+  --card-fill-hi: #362F4C;              /* L* 21.4, +8.1 above rest — hover LIFTS */
+  --card-edge:    #4A4165;              /* 1.69:1 on the fill */
+  --card-edge-hi: #6C5F92;              /* 2.79:1 on the fill */
 
   /* Spectral ramp — one hue, one job. Do not reuse a hue for a second job. */
-  --spectral-ob: #5C9BFF;               /* Rigel · Spica   7.10:1  links, active nav */
-  --spectral-a:  #A8C8FF;               /* Sirius · Vega  11.58:1  types, infra tags */
-  --spectral-f:  #edebe6;               /* Procyon  16.33:1  bright STARS on canvas.
-                                           UI headings use --heading (cool): Procyon
-                                           really is warm-white, but warm type on a
-                                           cool ground fights the substrate. */
-  --spectral-g:  #FFD166;               /* the Sun        13.63:1  strings, Sun values */
-  --spectral-k:  #FF9F4A;               /* Arcturus            9.06:1  numbers, lang tags */
-  --spectral-m:  #FF6B5C;               /* Betelgeuse      7.03:1  errors ONLY */
+  --spectral-ob: #A79BFF;              /* links, active nav      8.31:1 */
+  --spectral-a:  #D9C6FF;              /* types, infra, planets 12.76:1 */
+  /* F is the one hue shared by UI headings and bright stars on the canvas. In the
+     violet world they finally agree: both are a near-white tinted from the same
+     hue, so nothing fights the substrate. */
+  --spectral-f:  #F7F6FD;              /* headings, bright stars 18.53:1 */
+  --spectral-g:  #FBD452;              /* strings, Sun values   13.87:1 */
+  --spectral-k:  #FFA65E;              /* numbers, dates        10.30:1 */
+  --spectral-m:  #FF807F;              /* errors ONLY            8.19:1 */
 
   /* The accent IS O/B. One hue for links and active nav, never more. */
   --accent: var(--spectral-ob);
-  --accent-contrast: #080B14;
+  --accent-contrast: #0B0715;
 
   /* One shape system: --radius 2px, shared by cards, inputs and buttons. Shadows
      stay off; a card is defined by its border and its fill, not by floating. */
   --card-core:  var(--surface);
   --card-radius: 2px;
-  --card-shadow: 0 1px 2px rgb(4 7 14 / .55), 0 12px 32px -8px rgb(4 7 14 / .65);
+  --card-shadow: 0 1px 2px rgb(6 4 12 / .6), 0 14px 36px -10px rgb(6 4 12 / .7);
 
   /* Motion: four durations, one per interaction class. ONE element gets ONE
      duration across all its animated properties; a second duration on the same

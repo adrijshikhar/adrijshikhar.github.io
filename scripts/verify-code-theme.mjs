@@ -88,7 +88,22 @@ for (const [mode, theme, pane] of [
   else pass(`${mode}: ${used.size} distinct token colours, within budget of ${MAX_COLOURS}`);
 
   const hues = [...used.keys()].map(hue).filter((h) => h !== null);
-  const spread = hues.length ? Math.max(...hues) - Math.min(...hues) : 0;
+  // Circular spread: the SMALLEST arc containing every hue, not max-minus-min.
+  // Hue is an angle, so linear arithmetic is wrong the moment a palette spans
+  // 0deg: violet at 285 plus amber at 45 is a narrow 120deg arc through zero,
+  // but max-min calls it 240 and fails a palette that is actually disciplined.
+  // Found when the palette moved to a violet seed; the old blue/amber theme
+  // never crossed zero, so the bug could not surface.
+  const circularSpread = (hs) => {
+    if (hs.length < 2) return 0;
+    const sorted = [...hs].sort((a, b) => a - b);
+    let widestGap = (sorted[0] + 360) - sorted[sorted.length - 1];
+    for (let i = 1; i < sorted.length; i += 1) {
+      widestGap = Math.max(widestGap, sorted[i] - sorted[i - 1]);
+    }
+    return Math.round(360 - widestGap);
+  };
+  const spread = circularSpread(hues);
   if (spread > MAX_HUE_SPREAD) fail(`${mode}: hue spread ${spread}deg exceeds ${MAX_HUE_SPREAD}deg`);
   else pass(`${mode}: hue spread ${spread}deg, within ${MAX_HUE_SPREAD}deg`);
 }
