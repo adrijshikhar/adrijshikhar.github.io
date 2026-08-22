@@ -1,40 +1,53 @@
 /**
  * Shiki themes for fenced code, authored in the site palette.
  *
- * Every bundled light theme was measured against our paper ground and rejected:
- * they assume a pure-white editor background, spread 190-320 degrees of hue
- * (red + green + blue + purple in one block), and land 3-8 tokens under 4.5:1
- * once the background stops being #fff. See DESIGN.md.
+ * The ramp IS the syntax palette. This is where most of the colour on the site
+ * actually lives, since the blog is code-heavy, so it is the place the spectral
+ * system has to earn its keep. Each role takes exactly the hue that role owns
+ * everywhere else on the site:
  *
- * Four colours, distinguished by role rather than by hue variety:
- *   ink      identifiers, punctuation, operators   (entity names take bold)
- *   bronze   keywords, storage, control flow, tags (the site's one accent)
- *   literal  strings, numbers, constants           (low-chroma deep teal)
- *   muted    comments                              (italic)
+ *   keyword   O/B  #7fa8f5   7.27:1   also links and active nav
+ *   type      A    #bfd2f2  11.30:1   also infra tags
+ *   string    G    #f0ce72  11.35:1   also Sun values
+ *   number    K    #eda05b   8.06:1   also language tags
+ *   error     M    #e8776a   6.00:1   errors ONLY, nowhere else
+ *   ink       -    #bfc6d0  10.05:1   identifiers, punctuation, operators
+ *   comment   -    #848e9c   5.21:1   italic
  *
- * Verified by scripts/verify-code-theme.mjs, which fails the build if any
- * token drops under 4.5:1 against its own pane.
+ * Ratios are measured against the pane (--surface-2 #161b22), not the page
+ * ground, because that is what code actually sits on. All clear AA.
+ *
+ * Two things this replaces, both flagged in the design review: bronze was
+ * assigned to KEYWORDS, so the site's single accent meant "SQL keyword" inside
+ * a <pre> and "link" everywhere else; and a teal literal sat at hue 191 inside
+ * a palette declared as hue 66-78. Keywords now take the link hue because a
+ * keyword IS the structural element of a line, and nothing is invented
+ * per-language.
+ *
+ * The site is dark only, so both entries carry the same values; the dual-theme
+ * mechanism in astro.config stays wired rather than being ripped out.
+ *
+ * Verified by scripts/verify-code-theme.mjs, which fails the build if any token
+ * drops under 4.5:1 against its own pane.
  */
 
-/** Light: warm ink on paper. Pane background is --surface (oklch 94.5% .005 78). */
-const LIGHT = {
-  bg: '#efece9',
-  fg: '#3a352f',
-  ink: '#3a352f',
-  bronze: '#8a4405',
-  literal: '#215c69',
-  muted: '#635d56',
+const SPECTRAL = {
+  bg: '#161b22',
+  fg: '#bfc6d0',
+  ink: '#bfc6d0',
+  keyword: '#7fa8f5',
+  type: '#bfd2f2',
+  string: '#f0ce72',
+  number: '#eda05b',
+  error: '#e8776a',
+  muted: '#848e9c',
+  // kept so existing scope maps keep resolving
+  bronze: '#7fa8f5',
+  literal: '#f0ce72',
 };
 
-/** Dark: the same four roles, inverted onto --surface (oklch 19.2% .012 250). */
-const DARK = {
-  bg: '#10151a',
-  fg: '#cbc5bd',
-  ink: '#cbc5bd',
-  bronze: '#d1a05e',
-  literal: '#8fb9c4',
-  muted: '#9a938b',
-};
+const LIGHT = SPECTRAL;
+const DARK = SPECTRAL;
 
 const SCOPES = (c) => [
   {

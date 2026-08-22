@@ -31,11 +31,11 @@ const proseClass =
   'prose prose-invert prose-sm max-w-none text-text prose-p:text-text prose-li:text-text ' +
   'prose-li:my-0.5 marker:text-accent prose-headings:text-heading prose-headings:text-sm ' +
   'prose-headings:font-semibold prose-headings:tracking-tighter prose-a:text-accent ' +
-  'prose-a:no-underline hover:prose-a:underline prose-strong:text-heading prose-strong:font-medium';
+  'prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-heading prose-strong:font-medium';
 ---
 
 <BaseLayout title="Resume | adrijshikhar.dev">
-  <main class="mx-auto min-h-screen max-w-3xl px-6 py-16 md:px-12 md:py-24">
+  <main id="content" class="reading-plane mx-auto min-h-screen max-w-3xl px-6 py-16 md:px-12 md:py-24">
     <a href="/" class="group link-back">
       <span class="mr-2 transition-transform duration-[120ms] group-hover:-translate-x-1">&larr;</span>
       <span>adrij_shikhar</span>

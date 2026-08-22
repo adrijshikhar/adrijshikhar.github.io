@@ -17,6 +17,24 @@ export default {
         'accent-contrast': 'var(--accent-contrast)',
         border: 'var(--border-color)',
         ring: 'var(--accent)',
+        'heading-hi': 'var(--heading-hi)',
+        rule: 'var(--rule)',
+        'rule-hi': 'var(--rule-hi)',
+        /* Spectral ramp. One hue, one job — see globals.css. Reach for the
+           semantic name (accent, heading) first; these are for the jobs that
+           have no semantic token: syntax, tags, metrics. */
+        'spectral-ob': 'var(--spectral-ob)',
+        'spectral-a': 'var(--spectral-a)',
+        'spectral-f': 'var(--spectral-f)',
+        'spectral-g': 'var(--spectral-g)',
+        'spectral-k': 'var(--spectral-k)',
+        'spectral-m': 'var(--spectral-m)',
+      },
+      transitionDuration: {
+        tap: '120ms',
+        hover: '220ms',
+        ui: '300ms',
+        view: '500ms',
       },
       /* Point at the CSS tokens rather than repeating the stacks. These were
          hardcoded and drifted: font-mono still resolved to JetBrains Mono after

@@ -2,8 +2,8 @@
    Inter, which never painted — 'Geist Variable' always won the stack ahead of it. */
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/familjen-grotesk";
-@import "@fontsource-variable/space-grotesk";
+@import "@fontsource-variable/archivo";
+@import "@fontsource/archivo-black/400.css";
 @import "@fontsource/ibm-plex-mono/400.css";
 @import "@fontsource/ibm-plex-mono/500.css";
 @import "@fontsource/ibm-plex-mono/600.css";
@@ -19,108 +19,87 @@
 @tailwind utilities;
 
 /* ============================================================================
-   OBSERVATORY — semantic design tokens
+   SPECTRAL — semantic design tokens, dark only
 
-   Lightness ramp in oklch. The ground sits at 14.5% rather than near-black, so
-   it reads as a surface instead of a hole, and surfaces LIFT in two steps.
-   Muted text is deliberately bright (72.5%): dim grey on near-black is the
-   single biggest cause of eye strain in a dark UI.
-   Chroma stays low — a loud accent is what makes a dark theme look cheap.
+   Six hues taken from stellar classification (O/B, A, F, G, K, M). They are
+   derived, not picked: each names a real surface temperature, so they track a
+   blackbody curve and cannot clash. Every hue has exactly ONE job, listed
+   beside it. Every ratio below was measured in a browser, not estimated.
+
+   There is no light mode. A spectral ramp is an EMISSION curve; to clear AA on
+   a light ground every warm hue has to be darkened until it is brown, and all
+   six then compress into ~5.5 L* of each other, so the ramp stops being a
+   ramp. See design/README.md.
    ========================================================================== */
 
 :root {
-  --bg:        oklch(14.5%  .010 250);
-  --surface:   oklch(19.2%  .012 250);   /* lifted card */
-  --surface-2: oklch(24.8%  .014 250);   /* lifted again */
-  --heading:   oklch(95%    .006 250);
-  --text:      oklch(85%    .008 250);
-  --muted:     oklch(70%    .012 250);
+  /* Substrate. Rules carry structure, so the ground stays dark enough for a
+     3.00:1 major rule to read. */
+  --bg:        #0a0d12;                 /* ground */
+  --surface:   #12161d;                 /* panel: footers, telemetry strips */
+  --surface-2: #161b22;                 /* pane: code only */
+
+  --heading:   #edebe6;                 /* F · Procyon    16.33:1 */
+  --heading-hi:#e8ecf1;
+  --text:      #bfc6d0;                 /* ink            11.31:1 */
+  --muted:     #848e9c;                 /* labels          5.87:1 */
+
   --border: 255 255 255;                /* used as rgb(var(--border) / a) */
-  --border-color: oklch(100% 0 0 / .11);
-  --hairline:     oklch(100% 0 0 / .11);
-  --rule:         oklch(100% 0 0 / .11);
-  --rule-hi:      oklch(100% 0 0 / .26);
+  --border-color: #242a33;
+  --hairline:     #242a33;
+  --rule:         #242a33;              /* minor  1.42:1 */
+  --rule-hi:      #555f6c;              /* major  3.00:1 */
 
-  --accent: oklch(76% .130 70);         /* warm bronze, low chroma on purpose */
-  --accent-contrast: oklch(14.5% .010 250);
+  /* Spectral ramp — one hue, one job. Do not reuse a hue for a second job. */
+  --spectral-ob: #7fa8f5;               /* Rigel · Spica       8.17:1  links, active nav */
+  --spectral-a:  #bfd2f2;               /* Sirius · Vega      12.71:1  types, infra tags */
+  --spectral-f:  #edebe6;               /* Procyon            16.33:1  headings */
+  --spectral-g:  #f0ce72;               /* the Sun · Capella  12.77:1  strings, Sun values */
+  --spectral-k:  #eda05b;               /* Arcturus            9.06:1  numbers, lang tags */
+  --spectral-m:  #e8776a;               /* Betelgeuse          6.74:1  errors ONLY */
 
-  /* Card — one plane: hairline edge over an opaque fill.
-     Shadows are warm-tinted; pure black shadow is a tell. */
+  /* The accent IS O/B. One hue for links and active nav, never more. */
+  --accent: var(--spectral-ob);
+  --accent-contrast: #0a0d12;
+
+  /* No cards. Structure is rules. Radius 0 everywhere: a machined readout has
+     square corners. --card-* are kept only so shadcn ui/* keeps compiling. */
   --card-core:  var(--surface);
-  --card-radius: 12px;
-  --card-shadow:    0 1px 2px oklch(0% 0 0 / .28), 0 10px 26px oklch(0% 0 0 / .22);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --card-radius: 0px;
+  --card-shadow: none;
+
+  /* Motion: four durations, one per interaction class. ONE element gets ONE
+     duration across all its animated properties; a second duration on the same
+     element makes it resolve in two visible stages. */
+  --dur-tap:   0.12s;                   /* colour-only feedback */
+  --dur-hover: 0.22s;                   /* hover, cursor ring */
+  --dur-ui:    0.3s;                    /* toggles, discrete state */
+  --dur-view:  0.5s;                    /* full-view crossfades only */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);  /* sky drag-release ONLY */
   --ease-out: cubic-bezier(.32, .72, 0, 1);
 
-  /* Typography — three voices, no fourth. */
-  --font-heading: 'Space Grotesk Variable', system-ui, sans-serif;
-  --font-sans:    'Familjen Grotesk Variable', system-ui, sans-serif;
+  /* Typography — two families. Archivo Black for display, Archivo for prose,
+     IBM Plex Mono for every piece of data. 11px mono is the floor. */
+  --font-heading: 'Archivo Black', 'Archivo Variable', system-ui, sans-serif;
+  --font-sans:    'Archivo Variable', system-ui, sans-serif;
   --font-mono:    'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
   /* shadcn token bridge (kept for ui/* components) */
-  --radius: 2px;
-  --background: 0 0% 5.5%;
-  --foreground: 0 0% 90%;
-  --card: 0 0% 8.6%;
-  --card-foreground: 0 0% 90%;
-  --popover: 0 0% 8.6%;
-  --popover-foreground: 0 0% 90%;
-  --primary: 0 0% 90%;
-  --primary-foreground: 0 0% 8%;
-  --secondary: 0 0% 11%;
-  --secondary-foreground: 0 0% 90%;
-  --muted-fg: 0 0% 44%;
-  --destructive: 0 72% 51%;
+  --radius: 0px;
+  --background: 220 22% 6%;
+  --foreground: 213 17% 79%;
+  --card: 218 23% 9%;
+  --card-foreground: 213 17% 79%;
+  --popover: 218 23% 9%;
+  --popover-foreground: 213 17% 79%;
+  --primary: 213 17% 79%;
+  --primary-foreground: 220 22% 6%;
+  --secondary: 217 20% 11%;
+  --secondary-foreground: 213 17% 79%;
+  --muted-fg: 217 10% 56%;
+  --destructive: 6 71% 66%;
   --input: 0 0% 100% / 12%;
   --ring: var(--accent);
-}
-
-
-/* LIGHT — an engraved star chart rather than a night sky. Warm paper ground,
-   ink marks. The sky canvas inverts to match: dark stars on cream, the way a
-   printed celestial atlas reads. */
-:root[data-mode="light"] {
-  /* One warm family, hue 66-78 — paper and ink, matching the bronze accent and
-     the already-warm hairlines. Nothing here is a cool neutral; see DESIGN.md. */
-  --bg:        oklch(86%   .012 76);
-  --surface:   oklch(94.5% .005 78);
-  --surface-2: oklch(90.5% .007 72);
-  --heading:   oklch(26%   .016 68);    /* ink, not black */
-  --text:      oklch(37%   .017 68);
-  --muted:     oklch(44%   .013 66);
-  --border: 0 0 0;                     /* used as rgb(var(--border) / a) */
-  --border-color: oklch(28% .02 60 / .18);
-  --hairline:     oklch(28% .02 60 / .18);
-  --rule:         oklch(28% .02 60 / .18);
-  --rule-hi:      oklch(28% .02 60 / .38);
-  /* Engraved star-chart ink (SkyField, light mode) — dark marks on paper,
-     not an inverted photograph. Same hue/lightness family as --heading/--rule,
-     kept as its own token since it's opaque (star fills) where those carry
-     their own baked-in alpha. */
-  --sky-ink:      oklch(28% .02 60);
-
-  --card-core:  var(--surface);
-  --card-shadow:    0 1px 2px oklch(30% .03 60 / .07), 0 10px 26px oklch(30% .03 60 / .07);
-
-  /* Bronze darkened twice for AA on paper: once because the dark-mode value
-     fails here, and again so the ground could drop to 86% without the accent
-     falling under 4.5:1 against it. Measured 4.83. */
-  --accent: oklch(46% .148 62);
-  --accent-contrast: oklch(97.6% .005 80);
-
-  /* shadcn token bridge — flip to light so ui/* components adapt */
-  --background: 60 14% 96%;
-  --foreground: 0 0% 8%;
-  --card: 0 0% 100%;
-  --card-foreground: 0 0% 8%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 0 0% 8%;
-  --primary: 0 0% 8%;
-  --primary-foreground: 0 0% 98%;
-  --secondary: 60 6% 94%;
-  --secondary-foreground: 0 0% 8%;
-  --muted-fg: 0 0% 42%;
-  --input: 0 0% 0% / 14%;
 }
 
 /* --accent-contrast stays #0e0e0e (dark) — accent swatches are saturated mid-tones,
@@ -170,15 +149,6 @@
     pointer-events: none;
     background: radial-gradient(70% 50% at 88% 6%, oklch(70% .050 250 / .07), transparent 66%);
   }
-  /* Light mode's tonal range lives here, not in the sky — see DESIGN.md. */
-  :root[data-mode="light"] body::before {
-    height: 100vh;
-    background:
-      radial-gradient(85% 55% at 20% 2%, oklch(50% .145 62 / .11), transparent 60%),
-      radial-gradient(70% 50% at 88% 6%, oklch(45% .022 235 / .10), transparent 64%),
-      radial-gradient(120% 95% at 50% 42%, transparent 38%, oklch(32% .022 62 / .17) 100%);
-  }
-
   /* Film grain — fixed and pointer-events:none, never on a scrolling container.
      ~400 bytes inline, no request. Breaks the flatness of a large dark field. */
   body::after {
@@ -263,23 +233,29 @@
 }
 
 @layer components {
-  /* ── Type scale. Three display steps and one data label; every heading in the
-     site uses one of these rather than a hand-assembled utility string. */
+  /* ── Type scale: five steps, two families. Archivo Black ships at weight 400
+     ONLY, so display steps must not request 600 or the browser synthesises a
+     fake bold and the tracking goes with it. Display tracking is -0.04em; that
+     is tuned for Archivo Black at 92px and collides if loosened.
+     11px mono is the floor for data. Nothing smaller, anywhere. */
   .display-hero {
     font-family: var(--font-heading);
-    font-size: clamp(3rem, 8.5vw, 5.75rem);
-    font-weight: 600;
-    line-height: 0.92;
-    letter-spacing: -0.03em;
+    font-size: clamp(3rem, 8.5vw, 7rem);
+    font-weight: 400;
+    line-height: 0.88;
+    letter-spacing: -0.04em;
+    text-transform: uppercase;
     color: var(--heading);
   }
+  .display-hero a,
+  .display-page a { color: inherit; }
 
   .display-page {
     font-family: var(--font-heading);
     font-size: 2.25rem;
-    font-weight: 600;
-    line-height: 1.08;
-    letter-spacing: -0.03em;
+    font-weight: 400;
+    line-height: 0.96;
+    letter-spacing: -0.035em;
     color: var(--heading);
   }
   @media (min-width: 640px) {
@@ -287,19 +263,20 @@
   }
 
   .title-entry {
-    font-family: var(--font-heading);
-    font-size: 1rem;
-    font-weight: 500;
-    line-height: 1.375;
-    letter-spacing: -0.02em;
-    color: var(--heading);
+    font-family: var(--font-sans);
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.015em;
+    color: var(--heading-hi);
   }
 
   .label-data {
     font-family: var(--font-mono);
-    font-size: 0.6875rem;
+    font-size: 0.6875rem;                /* 11px — the floor */
+    font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.22em;
+    letter-spacing: 0.14em;
     color: var(--muted);
   }
 
@@ -320,7 +297,10 @@
     text-transform: uppercase;
     letter-spacing: 0.14em;
     color: var(--muted);
-    text-decoration: none;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.25em;
+    text-decoration-color: var(--rule-hi);
   }
   .link-back:hover { color: var(--accent); opacity: 1; }
 
@@ -343,35 +323,41 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    border-radius: 9999px;
-    background: var(--surface-2);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: inset 0 0 0 1px var(--rule-hi);
     padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-    font-weight: 600;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
     color: var(--accent);
-    transition: transform 0.3s var(--ease-spring), background-color 0.3s ease;
+    transition: background-color var(--dur-hover) var(--ease-out),
+                box-shadow var(--dur-hover) var(--ease-out);
   }
-  .atelier-btn:hover { transform: translateY(-2px); background: color-mix(in srgb, var(--accent) 14%, var(--surface)); }
+  .atelier-btn:hover { background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule-hi); }
   @media (prefers-reduced-motion: reduce) { .atelier-btn:hover { transform: none; } }
 
-  /* Single plane: hairline edge over an opaque, barely-lifted fill. The fill
-     must stay fully opaque — it is the legibility guarantee (137 alpha carded
-     vs 108 bare), not a decorative wash. */
+  /* A ruled band, not a card. Radius 0, no shadow, no lift: structure comes from
+     the rule under each row. The fill stays FULLY OPAQUE on purpose — it is the
+     legibility guarantee against the sky canvas (137 alpha covered vs 108 bare,
+     ceiling 169), not decoration. Removing it would break verify:legibility.
+     State is carried by COLOUR, never opacity and never motion, so there is one
+     duration on this element and no transform. */
   .atelier-card {
     position: relative;
-    border-radius: var(--card-radius);
-    background: var(--card-core);
-    box-shadow: 0 0 0 1px var(--rule);
-    transition: transform 0.5s var(--ease-out),
-                background-color 0.35s var(--ease-out),
-                box-shadow 0.35s var(--ease-out);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: inset 0 -1px 0 0 var(--rule);
+    transition: background-color var(--dur-hover) var(--ease-out),
+                box-shadow var(--dur-hover) var(--ease-out);
   }
   @media (min-width: 1024px) {
     .group\/list-item:hover .atelier-card,
     .atelier-card:hover {
-      transform: translateY(-2px);
-      background: var(--surface-2);
-      box-shadow: 0 0 0 1px var(--rule-hi), var(--card-shadow);
+      background: var(--surface);
+      box-shadow: inset 0 -1px 0 0 var(--rule-hi);
     }
   }
   @media (prefers-reduced-motion: reduce) {
@@ -393,30 +379,6 @@
   }
 
 
-}
-
-/* Light mode: the `prose prose-invert` content uses prose-* utility overrides
-   for most colors, but a few Tailwind-typography defaults (bullets, hr, captions,
-   counters, table borders) come from prose-invert's light-on-dark palette and
-   would be near-invisible on the light bg. Re-point those base prose vars to the
-   semantic tokens so all .md/.mdx content stays AA in light mode.
-   (Dark mode keeps prose-invert's defaults — unchanged.) */
-:root[data-mode="light"] .prose {
-  --tw-prose-body: var(--text);
-  --tw-prose-headings: var(--heading);
-  --tw-prose-lead: var(--text);
-  --tw-prose-bold: var(--heading);
-  --tw-prose-counters: var(--muted);
-  --tw-prose-bullets: var(--muted);
-  --tw-prose-hr: var(--border-color);
-  --tw-prose-quotes: var(--muted);
-  --tw-prose-quote-borders: var(--accent);
-  --tw-prose-captions: var(--muted);
-  --tw-prose-code: var(--heading);
-  --tw-prose-pre-code: var(--heading);
-  --tw-prose-pre-bg: var(--surface);
-  --tw-prose-th-borders: var(--border-color);
-  --tw-prose-td-borders: var(--border-color);
 }
 
 /* Fenced code: the inline-code chrome (border/bg/padding from the prose-code utilities)
@@ -446,14 +408,6 @@
 .astro-code {
   background-color: var(--surface);
 }
-:root[data-mode="light"] .astro-code,
-:root[data-mode="light"] .astro-code span {
-  color: var(--shiki-light);
-  font-style: var(--shiki-light-font-style);
-  font-weight: var(--shiki-light-font-weight);
-  text-decoration: var(--shiki-light-text-decoration);
-}
-
 /* Code blocks styled as Terminal Atelier panes: atelier-card surface (card radius,
    hairline border, soft shadow) with the signature accent top edge — matching the
    card/button language instead of a flat default <pre>. */
@@ -959,3 +913,84 @@ body.spinning * {
     transition: none !important;
   }
 }
+
+/* Skip link: off-screen until focused, then a real target at the top-left.
+   Never display:none — that removes it from the tab order entirely. */
+@layer components {
+  .skip-link {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 2000;
+    transform: translateY(-120%);
+    padding: 0.75rem 1rem;
+    background: var(--surface);
+    color: var(--heading-hi);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    box-shadow: inset 0 0 0 1px var(--rule-hi);
+    transition: transform var(--dur-ui) var(--ease-out);
+  }
+  .skip-link:focus-visible {
+    transform: translateY(0);
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+}
+
+/* Reading plane. On /resume and /blogs/[slug] there is no card between the sky
+   canvas and the prose, so canvas alpha under 16px body text measured 187/255
+   against a hard ceiling of 169 (verify:legibility). This is an OPAQUE plane in
+   the ground colour: visually identical to bare ground, but it stands between
+   the text and the canvas. The sky still reads to the left and right of the
+   column, which is where it was doing the work anyway.
+   Do not change this to a translucent fill. The opacity IS the fix. */
+@layer components {
+  .reading-plane {
+    position: relative;
+    background: var(--bg);
+  }
+}
+
+/* The column, not each row, carries the legibility shield. Rows are rules with
+   no fill (the design's "no cards" contract), so the opaque plane has to live
+   one level up or canvas ink lands straight under the prose. The hero is
+   excluded: it is meant to sit IN the sky, and it measures 139/169 there. */
+@layer components {
+  .content-plane > section[id] {
+    position: relative;
+    background: var(--bg);
+  }
+}
+
+/* Section heading, the 48px tier. The number above it is the eyebrow and the
+   rail's anchor; the word is not repeated at 11px underneath it, which is what
+   made every section read as "01 ABOUT / About". */
+@layer components {
+  .display-section {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    font-weight: 400;
+    line-height: 0.96;
+    letter-spacing: -0.035em;
+    color: var(--heading);
+  }
+  @media (min-width: 640px) {
+    .display-section { font-size: 3rem; }
+  }
+}
+
+/* Colour alone is not a link indicator (WCAG 1.4.1). The prose-a:* utilities
+   miss links nested in raw HTML inside MDX (a link inside <sub> was still bare),
+   so this backstops every anchor in prose regardless of how it got there.
+   Excludes headings, where the underline would fight the display tracking. */
+.prose a:not(.no-underline),
+.prose sub a,
+.prose sup a {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+.prose :is(h1, h2, h3, h4) a { text-decoration: none; }

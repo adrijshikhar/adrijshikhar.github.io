@@ -732,7 +732,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
           All three are read off the same frame the canvas just painted, so none
           of them can drift from it. */}
       {mode === 'full' && !machine && sky && (
-        <div className="instrument instrument-tl readout-row">
+        <div className="instrument instrument-tl readout-row" aria-hidden="true">
           <div className="readout-cell">
             <span className="k">Sun</span>
             <b>
@@ -755,7 +755,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
       )}
 
       {mode === 'full' && !machine && (
-        <div className="instrument instrument-l readout-row">
+        <div className="instrument instrument-l readout-row" aria-hidden="true">
           <div className="readout-cell">
             <span className="k">Observer</span>
             <b>
@@ -801,7 +801,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
           sky is interactive at all. Sits above the easter-egg hook rather than
           replacing it: two instruments, one corner, stacked. */}
       {mode === 'full' && !machine && !playing && (
-        <div className="instrument instrument-r">
+        <div className="instrument instrument-r" aria-hidden="true">
           move &middot; stars bend
           <br />
           hover &middot; name it
@@ -818,8 +818,8 @@ export default function SkyField({ mode }: SkyFieldProps) {
             onClick={() => controlsRef.current?.enter()}
             aria-hidden={playing}
             tabIndex={playing ? -1 : 0}
-            className={`tap-44 fixed right-6 bottom-24 z-[45] hidden font-mono text-[0.625rem] tracking-[0.18em] uppercase text-muted transition-opacity duration-500 hover:text-accent md:block ${
-              playing ? 'pointer-events-none opacity-0' : 'opacity-30 hover:opacity-100'
+            className={`tap-44 fixed right-6 bottom-24 z-[45] hidden font-mono text-[0.6875rem] tracking-[0.14em] uppercase text-muted transition-colors duration-[var(--dur-ui)] hover:text-accent focus-visible:text-accent md:block ${
+              playing ? 'pointer-events-none opacity-0' : ''
             }`}
           >
             ✦ orbital mechanics
