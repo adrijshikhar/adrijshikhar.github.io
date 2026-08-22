@@ -60,18 +60,16 @@ export function rnd(seed: number): () => number {
 
 const R2D = 180 / Math.PI;
 
-/** Faint field: 420 anonymous stars spread UNIFORMLY over the celestial sphere
- *  — dec = asin(uniform), NOT uniform-in-dec, which would clump them at the
- *  poles. They are not catalogued objects; they exist so the sky has real
- *  density, and they rise/set with the true sky because they live in RA/Dec too. */
-export const FAINT_FIELD: Array<{ ra: number; dec: number; mag: number }> = (() => {
-  const r = rnd(20260801);
-  const out: Array<{ ra: number; dec: number; mag: number }> = [];
-  for (let i = 0; i < 420; i++) {
-    out.push({ ra: r() * 24, dec: Math.asin(r() * 2 - 1) * R2D, mag: 3.6 + r() * 2.6 });
-  }
-  return out;
-})();
+/** Faint field: deliberately EMPTY. There were 420 anonymous procedural stars
+ *  here. They could not be hovered, named, or looked up, so on an instrument
+ *  whose whole argument is that every mark is a true statement they were the one
+ *  purely decorative element — and at 1px they read as dust on the display
+ *  rather than as sky. Every dot on the canvas is now a catalogued object.
+ *
+ *  Kept as an empty export rather than deleted so the draw loops and the
+ *  computeSky signature stay intact for whoever wants a real faint catalogue
+ *  here later. Populate it and the renderer picks it up with no other change. */
+export const FAINT_FIELD: Array<{ ra: number; dec: number; mag: number }> = [];
 
 const vrFor = (mag: number): number => 1.4 + Math.max(0, 3.0 - mag) * 1.15;
 

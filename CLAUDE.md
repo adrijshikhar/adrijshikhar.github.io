@@ -134,9 +134,17 @@ The top-centre `.expo` cluster shows `ALT +90…−35°` (the projection's real 
 `FLOOR` in `projection.ts`), `STARS 96` (`STARS.length`), and a live Julian Date — which is the
 actual input to every position on screen.
 
-`STARS n` is a **count, not a limiting magnitude.** The catalogue bottoms out at mag 3.35 but
-the renderer also draws a procedural faint field below that, so any `MAG n` label would be
-false. Don't "improve" it into one.
+`STARS n` is a **count**, and since the procedural faint field was removed it is now the
+whole truth: every dot on the canvas is a catalogued object, so there is nothing drawn below
+the catalogue's mag 3.35 floor. That makes a `MAG 3.35` label defensible for the first time —
+but it is still a different claim from a count, so if you add one, add it alongside, and
+re-check it against `STARS.length` rather than replacing the count with it.
+
+The faint field (`FAINT_FIELD` in `render.ts`) is an intentionally empty export, not dead
+code: the draw loops and `computeSky` signature still handle it, so dropping a real faint
+catalogue in there works with no other change. What it must not go back to is 420 procedural
+dots that cannot be hovered or named — on an instrument arguing every mark is a true
+statement, those were the one decorative element, and at 1px they read as dust on the display.
 
 The corner readouts are the same contract. Top-left carries `SUN` (the altitude
 driving the twilight glow, plus its standard band), `MOON` (the illuminated
