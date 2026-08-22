@@ -347,7 +347,7 @@ const SUN_MAG = -26.7;
  *  Picked by measurement (see task-7-report.md's fix addendum), driving the
  *  clock across a day and several dates and sampling `getImageData` over
  *  every `main p`/`main li`/`.atelier-card` on the home page: 0.5 keeps the
- *  Moon/Venus/Jupiter worst case (disc + earthshine + bloom, the most
+ *  Moon/Venus/Jupiter worst case (disc only now; earthshine and bloom are gone,
  *  layered case) at alpha ~137–153/255 in the worst positions found, under
  *  the ≤169 every other sampled element sits under. Left out of `starAlpha`
  *  itself (used by `drawQuiet` too) — quiet mode has no planets or Moon, and
@@ -573,7 +573,7 @@ export function drawBodies(
   colors: SkyColors,
   sprite?: PlanetSpriteRef | null,
 ): void {
-  const { accent, muted, bright, moonLit, moonGlow, planet } = colors;
+  const { accent, muted, bright, moonLit, planet } = colors;
 
   for (let i = 0; i < bodies.length; i++) {
     const s = bodies[i];
@@ -588,10 +588,8 @@ export function drawBodies(
       // which side waxing/waning tells us.
       const k = moonPhase.illum;
       ctx.globalAlpha = a;
-      ctx.fillStyle = moonGlow; // faint earthshine disc behind the lit portion
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
-      ctx.fill();
+      // No earthshine disc: glow is gone from every body, so the Moon is the
+      // terminator and nothing else. The unlit side is simply not drawn.
       const side = moonPhase.waxing ? 1 : -1; // lit limb on the right if waxing
       ctx.fillStyle = i === hoverIndex ? accent : moonLit;
       ctx.beginPath();
@@ -750,20 +748,8 @@ export function drawBodies(
       ctx.textAlign = 'start';
     }
 
-    // Bloom on the brightest stars. MUST be a radial gradient — a flat-alpha
-    // disc has a hard edge and reads as a grey ring around the star, not a glow.
-    if (s.mag < 0.6 && s.alt > 0 && !colors.engraved) {
-      const R = r * 4.2;
-      const g = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, R);
-      g.addColorStop(0, fade(bright, a * 0.3));
-      g.addColorStop(0.35, fade(bright, a * 0.1));
-      g.addColorStop(1, 'transparent');
-      ctx.globalAlpha = 1;
-      ctx.fillStyle = g;
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, R, 0, Math.PI * 2);
-      ctx.fill();
-    }
+    // No bloom. Bright bodies are discs at their real magnitude-scaled radius;
+    // a radial halo was the last glow in the renderer and it is gone too.
   }
   ctx.globalAlpha = 1;
 }
