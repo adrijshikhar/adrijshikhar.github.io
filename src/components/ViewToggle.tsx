@@ -31,7 +31,32 @@ const buildMachineHtml = (): string => {
         : match,
   );
   const withBold = withLinks.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  return `<div class="machine-content-wrapper"><pre class="machine-pre">${withBold}</pre></div>`;
+
+  // Colour the markdown by its own syntax, so the machine view uses the same
+  // spectral ramp as the rest of the site instead of one flat grey. The design
+  // frame (11 - MACHINE VIEW) assigns: # to F, ## to G, ### to A, list markers
+  // to muted, everything else to ink.
+  //
+  // This runs LINE-WISE on already-escaped text, after links and bold, so the
+  // spans it adds cannot be re-escaped and cannot swallow an <a> or <strong>.
+  // Matching is anchored to the start of a line: a '#' inside prose is not a
+  // heading, and neither is one inside a fenced block.
+  const coloured = withBold
+    .split('\n')
+    .map((line: string) => {
+      const h = /^(#{1,6})(\s+)(.*)$/.exec(line);
+      if (h) {
+        const cls = h[1].length === 1 ? 'mk-h1' : h[1].length === 2 ? 'mk-h2' : 'mk-h3';
+        return `<span class="${cls}">${h[1]}${h[2]}${h[3]}</span>`;
+      }
+      const li = /^(\s*)([-*+]|\d+\.)(\s+)(.*)$/.exec(line);
+      if (li) return `${li[1]}<span class="mk-mark">${li[2]}</span>${li[3]}${li[4]}`;
+      if (/^\s*(---+|===+)\s*$/.test(line)) return `<span class="mk-rule">${line}</span>`;
+      return line;
+    })
+    .join('\n');
+
+  return `<div class="machine-content-wrapper"><pre class="machine-pre">${coloured}</pre></div>`;
 };
 
 export default function ViewToggle() {

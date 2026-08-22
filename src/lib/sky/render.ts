@@ -110,8 +110,13 @@ export interface SkyColors {
   moonLit: string;
   /** Moon's earthshine disc — a low-alpha wash behind the lit limb. */
   moonGlow: string;
-  /** Planet disc/ring/persistent-label colour. */
+  /** Planet disc/ring/persistent-label colour. Spectral A (#bfd2f2, Sirius and
+   *  Vega): planets shine by reflected sunlight, so they read cool, and A is
+   *  visibly distinct from the near-white F the bright stars take. */
   planet: string;
+  /** The Sun only. Spectral G (#f0ce72) — the class the Sun actually IS, and the
+   *  same hue the chrome uses for Sun values, so the readout and the disc agree. */
+  sun: string;
   /** Faint background field colour — already faded, since the faint field's
    *  per-star magnitude alpha still multiplies on top of it. */
   faint: string;
@@ -645,7 +650,7 @@ export function drawBodies(
       ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
       ctx.stroke();
     } else {
-      const colour = i === hoverIndex ? accent : s.isPlanet || s.isSun ? planet : s.mag < 1.0 ? bright : muted;
+      const colour = i === hoverIndex ? accent : s.isSun ? colors.sun : s.isPlanet ? planet : s.mag < 1.0 ? bright : muted;
       let drawn = false;
 
       // Glyph sheet first. Six bodies draw from it; the Moon never does, its
