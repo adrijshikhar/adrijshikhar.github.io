@@ -1,206 +1,220 @@
-# Observatory — design system
+# Design System: Spectral — adrijshikhar.dev
 
-The site is a **scientific instrument you look through**, not a page with a
-space background. Every rule below follows from that one sentence, and the
-fastest way to settle an argument is to ask which reading it supports.
+> Every colour value below was measured in a browser, not estimated. Where a ratio
+> is quoted it came from `verify:legibility`, `verify:code`, or a canvas probe on
+> the running site. If you change a value, re-measure rather than reasoning about it.
+>
+> This file was rewritten when the Spectral system shipped. The previous version
+> described a bronze accent, a light mode, and oklch authoring — all three are gone.
+> It is preserved in git history if you need the reasoning behind the old world.
 
-`CLAUDE.md` holds the mechanics (how theming works, which classes exist).
-This file holds the **principles and the token contract** — what is allowed to
-look like what. Roadmap and research are kept outside this repo.
+## 1. Visual Theme & Atmosphere
 
----
+An instrument, not a page. The background is real computed astronomy — true J2000
+positions for the visitor's own coordinates — and the argument of the whole design
+is that **every mark on screen is a true statement about the render.** That single
+idea decides more than any aesthetic preference: values in the chrome are read off
+the frame the canvas just painted, so they cannot drift from it, and anything that
+could not be named or verified has been removed rather than styled.
 
-## The principles
+Dense but unhurried. Structure comes from rules and planes rather than fills and
+shadows, so the page reads as machined rather than soft. Dark only, and not as a
+preference: see §2.
 
-**1. The instrument must not lie.**
-Every value on screen is a true statement about the render. The sky is real
-astronomy — J2000 catalogue positions, Standish orbital elements, live phase,
-true apparent size — and that credibility is the whole argument. So: no
-invented camera values, no readout that claims `geo` after a manual drag, no
-`MAG n` label when a procedural field is drawn below the catalogue floor. If a
-number cannot be computed, it does not get displayed. A count is always
-available and always true; prefer it to a fabricated measurement.
+Dials: **variance 6, motion 4, density 5.** Motion sits deliberately low. The
+contract is that state is carried by colour, never by opacity and never by
+movement, so the interface stays still and legible while the sky does the moving.
 
-**2. There are two registers, and they never blend.**
-- **Content** — prose, cards, headings. Rounded, opaque, shadowed. Meant to be
-  read and trusted.
-- **Chrome** — the instrument. Square, hairline, unshadowed, micro-mono. Meant
-  to be glanced at and believed.
+## 2. Colour Palette & Roles
 
-A control that floats over the sky belongs to the chrome. Giving it a card's
-radius and shadow makes it read as a widget stuck on top of the instrument
-rather than a part of it.
+### Why dark only
 
-**3. Brightness is a contrast problem, not a lightness problem.**
-A page reads as glare when its pixels all sit in one luminance band, not when
-its lightest value is high. Light mode once had **88% of every rendered pixel
-inside a single decile** — dimming the ground only slid that band down, it
-never added range. The fix is range, and only a **large-area** element can
-supply it: the ground gradient (warm bloom top-left, cool counter top-right,
-vignette settling the edges) plus opaque cards floating above it. That took the
-hero's peak band to 57% and gave card views a three-band spread.
+A spectral ramp is a blackbody **emission** curve. To clear AA on a light ground
+every warm hue has to be darkened until it turns brown — G falls to `#7e6013`, K
+to `#9a5518` — and all six then compress into **5.5 L\*** of one another, so the
+ramp stops being a ramp. Light mode was deleted rather than retuned. Do not
+reintroduce it without solving that.
 
-The sky **cannot** do this work. It is line art over less than 1% of the frame,
-so boosting the graticule and stars moves the histogram by fractions of a
-percent while pushing straight through the legibility ceiling — measured: a
-2.6x graticule boost moved the peak band 88.7 → 88.4 and broke text legibility
-to 216 against the 169 bar. The engraved multipliers (`K = 1.35`, `dust = 1.2`
-in `render.ts`) exist only so ink-on-paper reads at the same *strength* as
-light-on-black. They are not a brightness control. Do not raise them.
+### Substrate
 
-**4. Legibility is measured, not eyeballed.**
-Canvas alpha is sampled under every text rectangle and held under **169/255**.
-Any change to the sky, the graticule, or the chrome requires re-measuring.
-`bun run verify:sky` holds 14 physical invariants, in CI, because eyes cannot
-catch a wrong orbital element or a bad distance.
-
----
-
-## Token contract
-
-**Never hand-roll a value that a token already covers.** Three different
-alphas for the same hairline is how the floating controls drifted apart.
-
-| Need | Use | Never |
+| Name | Hex | Role |
 |---|---|---|
-| Hairline edge | `var(--rule)` | `rgb(var(--border)/0.14)`, any ad-hoc alpha |
-| Brighter edge (hover, active) | `var(--rule-hi)` | a second hand-picked alpha |
-| Card fill | `var(--card-core)` — **opaque** | a translucent wash |
-| Chrome fill over sky | `color-mix(… var(--surface) 88%, transparent)` | a second percentage |
-| Accent | `var(--accent)` | any literal bronze |
-| Ground | `var(--bg)` | `#0e0e0e` and other stale neutrals |
+| Ground | `#0a0d12` | The page. Dark enough that a 3.00:1 major rule still reads. |
+| Panel | `#12161d` | Footers, telemetry strips. |
+| Pane | `#161b22` | Fenced code only. |
+| Ink | `#bfc6d0` | Body copy. 11.31:1 on ground. |
+| Ink High | `#e8ecf1` | Entry titles, emphasis. |
+| Muted | `#848e9c` | Labels, metadata. 5.87:1. |
+| Rule | `#242a33` | Minor hairline **on the ground** — 1.42:1. |
+| Rule High | `#555f6c` | Major rule on the ground — 3.00:1. |
 
-**Light mode is one warm family — hue 66–78.** Ground, both surfaces, heading,
-text and muted all sit there, alongside the bronze accent and the hairlines
-(which were always warm). It drifted once: the foundation tokens were authored
-at hue 250–255 while the hairlines and accent stayed at 60, so cool blue-grey
-paper carried warm bronze marks and the page read as a palette at war with
-itself. Cards at `97%` made it worse by adding a cold near-white on top. If a
-light-mode neutral needs a hue, it is warm. Dark mode stays cool (250) — a
-night sky should be.
+### The spectral ramp — one hue, one job
 
-Colour is authored in **oklch**. Tailwind's `/opacity` modifier does not
-compile against CSS-var colours — `bg-foo/70` renders invisible. Use solid
-token colours.
+Six hues taken from stellar classification. They are **derived, not picked**: each
+names a real surface temperature, so they track a blackbody curve and cannot clash.
+Each owns exactly one job. Reusing a hue for a second job is the failure mode this
+system exists to prevent.
 
-### Radius
+| Class | Hex | Ratio | Job | Named for |
+|---|---|---|---|---|
+| O/B | `#7fa8f5` | 8.17:1 | links, active nav | Rigel, Spica |
+| A | `#bfd2f2` | 12.71:1 | types, infra tags, planets | Sirius, Vega |
+| F | `#edebe6` | 16.33:1 | headings, bright stars | Procyon |
+| G | `#f0ce72` | 12.77:1 | strings, Sun values, the Sun | the Sun, Capella |
+| K | `#eda05b` | 9.06:1 | numbers, language tags | Arcturus |
+| M | `#e8776a` | 6.74:1 | **errors only** | Betelgeuse |
 
-| Surface | Radius |
-|---|---|
-| Content card | `var(--card-radius)` (12px) |
-| Instrument chrome | **0** — square, like `.expo-cell` |
-| Pill button (`.atelier-btn`) | full — content CTAs only |
+`--accent` is an alias for O/B. There is one accent. The other five are role
+colours, not accents, which is why six hues does not mean six accents.
 
-Square corners are not an aesthetic preference. A machined readout has square
-corners; a rounded glass pill is a different product.
+### Card plane
 
-### Type
+Ground tokens do **not** transfer to a raised plane. `--rule` measures 1.42:1 on
+the ground but only **1.18:1** on a card, so a card using it loses its outline at
+the moment it gains a fill. The card carries its own pair, every figure measured
+against the card fill rather than the ground:
 
-Three voices, no fourth. See `CLAUDE.md` for the mechanics.
-
-| Role | Face | Size |
+| Name | Hex | Measurement |
 |---|---|---|
-| Display | Space Grotesk | `.display-hero` / `.display-page` |
-| Prose | Familjen Grotesk | 1rem / 1.15rem |
-| **All chrome and data** | IBM Plex Mono | **0.5625–0.6875rem**, uppercase, 0.16–0.22em |
+| Card fill | `#161c26` | L\* 10.1, ΔL\* **6.5** above ground |
+| Card fill high | `#1c232f` | +3.44 L\* above rest. Hover **lifts**. |
+| Card edge | `#3e4855` | 1.84:1 on the fill |
+| Card edge high | `#555f6c` | 2.64:1 on the fill |
 
-Anything in the chrome that renders at 14px has left the register. The
-instrument scale tops out at 11px.
+ΔL\* below ~3 is the threshold where a plane stops reading as a plane at all. An
+earlier translucent fill measured 2.65 and looked like a smudge because
+perceptually it was one.
 
-### Elevation
+Text on the card fill: heading 14.35:1, ink 9.94:1, muted 5.15:1. All AA.
 
-Content cards get `var(--card-shadow)`. **Chrome gets none.** The viewfinder,
-the expo cluster, the corner readouts and the rail carry no shadow, because a
-drop shadow implies the element floats above the glass rather than being
-etched into it.
+## 3. Typography Rules
 
----
+Three voices, no fourth.
 
-## The Sun is the only ambient light
+| Role | Face | Notes |
+|---|---|---|
+| Display | Space Grotesk | Space Mono's proportional sibling, so display rhymes with the all-mono chrome. Tracking **-0.03em**; the -0.04em an ultra-black face wants collides here. |
+| Prose | Familjen Grotesk | Ships `wght 400-700`. There are **no weights below 400** — `font-light` and `font-thin` silently render at 400. |
+| Data | IBM Plex Mono | Every date, coordinate, metric, label. **11px is the floor.** Nothing smaller, anywhere. |
 
-There is no decorative glow anywhere. The page's warmth comes from
-`drawSunGlow`, anchored to the Sun's real computed position and faded by its
-real altitude on the standard twilight bands — full with the Sun up, out
-entirely at **−18°**, where astronomical night begins. Below that the page is
-black because it should be. What this replaced was a fixed warm blob pinned to
-the top-left corner (the last survivor of the old three-blob aurora): a light
-source the sky could not account for.
+Space Grotesk stays **out of body copy**: its straight-tailed single-storey `y`
+reads as noise at paragraph length.
 
-The two modes state it with the mark each one already uses, exactly as stars
-are discs on black and open rings on paper:
+**Never size a measure in `ch`.** A `ch` is the width of the font's `0`, so a
+`ch`-based max-width silently resizes when the body face changes. Use `rem`.
 
-- **Dark emits** — a steady halo and core, plus one slow **swell**: a disc whose
-  reach and intensity ease up and back down on a smoothstep, shallow enough
-  that the halo underneath still carries most of the brightness.
-- **Light engraves** — dashed rings spreading from the disc and fading, which
-  is how a printed chart draws radiance it cannot glow.
+Every heading and label uses a **component class** from the `@layer components`
+block in `globals.css` — `.display-hero`, `.display-page`, `.display-section`,
+`.title-entry`, `.label-data`, `.meta-data`, `.link-back`, `.channel`. Repeating
+utilities inline is what let six different tracking values drift into one label.
 
-Both run on anime.js's clock (`createTimer` + `eases.outCubic`, so the wave
-decelerates as a real ripple does), never a hand-rolled `performance.now()`
-loop. The halo and core themselves stay **steady**: breathing the whole glow
-turns the page into a slow throb, and unlike a spreading wave — a chart
-convention — a pulsing halo would be a claim about the Sun's actual output.
+## 4. Component Behaviours
 
-Ring geometry is **measured off the sprite, never guessed**. The sheet blits
-into a `2r` box, so in painted-radius units the glyph is: disc to 0.53, dashed
-rings at 0.58 / 0.77 / 0.96, outermost ink at 1.01, ink about ¾ of each step.
-The ripple continues that spacing. Getting these in viewport units instead of
-`vr` is what once left a dead band around the Sun.
+**Cards.** Border at rest, border promotes on hover, fill lifts. Radius 2px, from
+the repo's `--radius` scale, so cards, inputs and buttons share one shape system.
+No shadows — a card is defined by its border and fill, not by floating. A card that
+is transparent at rest and grows an unbordered fill on hover is a half-card, and
+reads as one.
 
-**Dark mode's glow profile must be monotonic — brightest at the centre,
-falling to nothing.** This is geometry, not tuning, and it took five attempts
-to admit:
+**Buttons.** Square, mono, uppercase, 11px, accent text on a `--rule-hi` outline.
+No lift, no spring. `--ease-spring` is reserved for the **sky drag-release** and
+nothing else: overshoot is only honest when the gesture carried momentum, and a
+hover carries none.
 
-> For a radially symmetric glow, *travelling outward* means the bright zone
-> leaves the centre — a maximum at some non-zero radius — and the eye reads
-> **any** off-centre maximum as a ring. So "spreads outward" and "has no ring"
-> cannot both hold. Pick one.
+**Tags.** Hue-coded by category using hues the ramp already owns — K for language,
+A for infra, G for data. Unrecognised tags stay muted **on purpose**: a wrong
+colour is a false statement about the tag, while grey is merely silent, and silence
+is the right default when the classifier does not know.
 
-A `transparent → colour → transparent` gradient is an annulus by construction
-however long its inner ramp: the ramp still has a crest at the top. Measured,
-that crest appeared at every phase of the cycle. Soft filled bands, dashed
-hairlines, one wave, four waves — all the same failure, and neither easing nor
-moving the clock to anime.js touched it, because none of them changed the
-shape.
+**Links.** O/B, and always with a non-colour indicator. Colour alone fails WCAG
+1.4.1. Prose links underline, including links nested in raw HTML inside MDX where
+the `prose-a:*` utilities do not reach.
 
-Taking "no ring" as binding, the dark glow **swells** instead of travelling.
-Verify any change with a radial alpha profile sampled across a full cycle: it
-must fall monotonically from the disc at every phase.
+**The rail.** Wayfinding, not a dial: all six destinations visible, active marked
+by colour. It previously rendered `--muted` at `opacity: 0.4` for **1.79:1** on the
+only in-page navigation the site has, and its window hid 4 of 6 links while letting
+focus land outside the visible run.
 
-Light mode gets rings precisely because it has no glow: there they cross bare
-paper, which is what a printed chart does.
+**Motion.** Four durations, one per interaction class: tap `0.12s`, hover `0.22s`,
+ui `0.3s`, view `0.5s`. **One element gets one duration** across all its animated
+properties; a second duration on the same element makes it resolve in two visible
+stages.
 
-## Motion
+## 5. Layout Principles
 
-- `transform` and `opacity` only. Never width, height, top or left.
-- Micro-interactions 150–300ms, easing `var(--ease-out)`.
-- No `transition: all` — list the properties.
-- Every animation carries meaning. The rail steps because a focal-length
-  readout steps; the cursor ring lags because lag reads as mass.
-- `prefers-reduced-motion` is honoured everywhere, and the fallback must still
-  be *useful* — the rail degrades to a plain highlighted list, not a frozen
-  one. A frozen indicator carries no information, which is worse than none.
+8px spacing scale. Section rhythm is a consistent 112px. Content column ~46rem,
+centred, with the rail in the left gutter.
 
----
+**Reveals must default to visible.** The home page once set `opacity: 0` on every
+section in JS and relied on an IntersectionObserver to lift it, so print,
+save-as-PDF, reader mode and any non-scrolling capture rendered a blank page. A CSS
+rewrite using `animation: … both` on a `view()` timeline reproduced the same bug,
+because `both` holds the `from` state outside the range. There is now no reveal at
+all: a per-section fade was decoration, not hierarchy.
 
-## Hard contracts — do not break
+Full-height uses `min-h-[100dvh]`, never `h-screen`.
 
-- `?machine=true`, `window.__RAW_MARKDOWN__`, and human/machine content parity.
-- The 169/255 legibility ceiling.
-- `render.ts` stays DOM-blind so `verify-sky.mjs` can import it under Node.
-- Sizes in `rem`, never `ch` — a `ch` is the width of the font's `0`, so a
-  ch-based measure silently resizes when the body face changes.
-- Absolute URLs for `og:image`. Every platform drops a relative one.
+## 6. The Canvas Contract
 
----
+**Canvas alpha under text stays at or below 169/255.** This is a hard contract and
+`verify:legibility` enforces it.
 
-## What this is not
+It is satisfied by the sky **yielding**, not by covering it. `applyKeepOut` in
+`render.ts` uses `destination-out` to erase a fraction of the canvas's own ink
+inside the reading rectangle. That distinction is the whole mechanism: a
+translucent wash *adds* a layer and leaves canvas alpha untouched, so text over it
+still fails; erasing genuinely lowers the sampled alpha while leaving the graticule
+and stars readable behind the prose. Edges feather over 96px, because a hard
+rectangle of erased sky is an opaque plane again with extra steps, and that seam is
+exactly what read as a floating card.
 
-No purple gradients, no three-column feature grid, no icons in coloured
-circles, no decorative blobs, no emoji as UI. The palette is one accent
-(bronze) against cool neutrals; a second accent would need a reason stronger
-than variety.
+Measured with every opaque plane removed: `/experience` and `/archive` went from
+**193/169 and 172/169 failing** to **25/169**, fully exposed. `/` sits at 117/169
+and stays exposed on purpose — the hero is meant to be *in* the sky.
 
-The one sanctioned exception: planet glyphs use the lineal-colour icon set in
-light mode, because colour needs a light ground to read. They sit in their own
-register and do not license colour elsewhere.
+`render.ts` must stay **DOM-blind** so `scripts/verify-sky.mjs` can import it under
+Node. `KeepOut` is a plain `{x,y,w,h}` object, measured in `SkyField.tsx` and passed
+as numbers.
+
+**The chrome must not lie.** Every readout is a value from the frame just painted.
+When the Sun glow was removed, the `SUN` readout stopped claiming to drive it,
+because that sentence had become false. When the 420 procedural faint stars were
+removed, the footer stopped calling the field "representative". `STARS 96` is a
+count, and now that nothing is drawn below the catalogue's mag 3.35 floor it is the
+whole truth.
+
+## 7. Anti-Patterns (banned)
+
+- **No glows.** The Sun's halo, core and pulsing bloom, the Moon's earthshine disc,
+  and the radial bloom on bright bodies are all removed. Bodies are discs and glyphs.
+- **No unnameable marks.** 420 procedural stars were deleted because they could not
+  be hovered, named or looked up. At 1px they read as dust on the display.
+- **No decorative dots.** A coloured dot before a nav item, a section label or a
+  list row is a tell. Only real semantic state earns one.
+- **No duplicated section titles.** `01 ABOUT` above a 48px `ABOUT` printed the same
+  word twice. The number is the eyebrow and the rail's anchor; the word is the h2.
+- **No opacity for state.** It broke the rail at 1.79:1, the orbital-mechanics
+  control at 1.55:1, and footer text at 3.4:1.
+- **No accent on punctuation.** Bullet markers took O/B, spending the accent budget
+  on list glyphs.
+- **No `ch` measures. No pure `#000000`. No emoji as UI. No custom cursors.**
+- **No sub-11px mono.** The rail shipped 8px and 10px labels.
+- **Tailwind's `/opacity` modifier does not compile against CSS-var colours**
+  (`bg-surface/70` renders invisible). Use `color-mix` or a solid token.
+
+## 8. Verification
+
+```bash
+bun run build              # must stay green
+bun run verify:sky         # 16 physical astronomy invariants, in CI
+bun run verify:code        # dual-theme code contrast, in CI
+bun run verify:legibility  # the 169/255 ceiling, needs a browser, NOT in CI
+```
+
+Two headless-browser traps, both hit in anger:
+
+1. **Playwright reports `prefers-reduced-motion: reduce` by default.** Emulate
+   `no-preference` or you exercise the static path.
+2. **Never resize the viewport to full page height to capture a tall page.** It
+   inflates every `min-h-screen` box — a 900px hero became 4464px — and the result
+   looks like a broken layout that is not broken. Use CDP `captureBeyondViewport`.

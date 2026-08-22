@@ -535,15 +535,14 @@ body.spinning * {
      `cursor: pointer` on a button beats the inherited `none` from body, which
      is how the native arrow used to leak back in over the game bar. */
   .cursor-custom,
-  .cursor-custom *,
-  .cursor-custom a,
-  .cursor-custom button,
-  .cursor-custom [role='button'],
-  .cursor-custom input,
-  .cursor-custom label,
-  .cursor-custom summary {
-    cursor: none !important;
-  }
+  /* The native cursor is NOT hidden any more. Hiding it took away the pointer
+     the OS renders, and with it every accessibility setting attached to it:
+     cursor size, high-contrast cursor, and the pointer shape that tells you a
+     thing is clickable at all. Both design skills call a custom cursor
+     accessibility-hostile, and this was the part that actually did harm.
+
+     The ring and dot stay as an ADDITIVE mark: they track the pointer and carry
+     the sky's cursor-gravity wobble, on top of a cursor that is still there. */
 
   #sky-cursor-ring,
   #sky-cursor-dot {
