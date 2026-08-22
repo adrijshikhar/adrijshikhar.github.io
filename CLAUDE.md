@@ -41,8 +41,21 @@ bun run verify:legibility                            # terminal 3 (--all, --json
 
 It reports `exposed/sampled` per route: text with an **opaque** ancestor between it and the
 canvas cannot be harmed, so only unshielded text can fail. That split is diagnostic in its
-own right — `/resume/` currently reports `26/26 exposed` (nothing carded), which is why sky
-glyphs collide with prose there. Readings drift ±1 between runs because the sky is live.
+own right. Every route except `/` now reports `0/n exposed`, because the Spectral work moved
+the legibility shield up from the individual rows to the reading column (`.reading-plane` /
+`.content-plane` in `globals.css`) — rows are rules with no fill, so the plane has to live
+one level up or canvas ink lands under the prose. `/` stays intentionally exposed at
+`45/45`: the hero is meant to sit *in* the sky, and it measures 139/169 there. Readings
+drift ±1 between runs because the sky is live.
+
+Two traps when verifying in a headless browser, both hit in anger:
+
+1. **Playwright reports `prefers-reduced-motion: reduce` by default.** Emulate
+   `no-preference` or you exercise the static path.
+2. **Never resize the viewport to the full page height to capture a tall page.** It inflates
+   every `min-h-screen`/`100dvh` box (a 900px hero became 4464px) and the result looks like
+   a broken layout that is not broken. Use CDP `captureBeyondViewport` with the viewport
+   left at 1440x900.
 
 No lint script exists. Prettier is a dependency but is not wired to a script. The
 `deploy` npm script (`gh-pages`) is legacy/unused — deployment is via GitHub Actions (below).

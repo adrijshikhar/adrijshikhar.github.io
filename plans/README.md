@@ -7,7 +7,23 @@ in a live browser rather than inferred.
 Source report: the published review artifact, and `scratchpad/SYNTHESIS.md` for the full
 30-defect list.
 
-## Gate — design approval comes first
+## Status: superseded by the Spectral implementation
+
+**These plans are historical.** The design was signed off in OpenPencil
+(`design/spectral.fig`, 14 surfaces) and implemented in one pass, so the plans were
+absorbed rather than executed one by one:
+
+| Plan | Outcome |
+|---|---|
+| 001 motion tokens | **Landed.** `--dur-*` scale added; the card's two clocks became one; the five hand-written beziers in `SideRail.astro` now use `--ease-out`. The `-4px` hover lift was *not* taken: the design carries state by colour, never motion. |
+| 002 loops and reduced motion | **Partly landed** via the duration scale. The loop easings are untouched. |
+| 003 critical defects | **Landed**, except §2 (sky keep-out). The prose collision was solved differently, by shielding the reading column, which the legibility verifier confirms at `0/n exposed`. |
+| 004 palette refinement | **Obsolete.** It refined the bronze world; that world is gone. The fork it names as "a separate decision" is the one that was taken. |
+
+Kept for the measurements and the reasoning, which are still the best record of why each
+defect mattered. The original gate text follows.
+
+## Gate — design approval comes first (historical)
 
 **Nothing here is cleared to start.** The design must be signed off in Figma before any
 code changes land. The board is:
