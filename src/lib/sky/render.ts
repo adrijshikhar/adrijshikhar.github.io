@@ -208,6 +208,44 @@ const RING_REACH = 1.55;
  *
  *  Stars below the horizon (down to FLOOR) are drawn dimmer rather than
  *  hidden, matching the wider-than-horizon disc. */
+/** A rectangle, in canvas pixels, where the sky must give way to reading.
+ *
+ *  Kept as a plain object on purpose: `render.ts` has to stay DOM-blind so
+ *  `scripts/verify-sky.mjs` can import it under Node. The caller measures the
+ *  reading column and passes numbers. */
+export type KeepOut = { x: number; y: number; w: number; h: number; strength?: number };
+
+/** Erase a fraction of the sky's own ink inside `k`.
+ *
+ *  This is `destination-out`, not a translucent wash on top. That distinction is
+ *  the whole point: a wash ADDS a layer and leaves canvas alpha untouched, so
+ *  text over it still fails the 169/255 ceiling. Erasing genuinely lowers the
+ *  alpha `verify:legibility` samples, while leaving a fraction of the sky
+ *  visible, so the graticule and stars still read behind the prose instead of
+ *  being hidden under an opaque plane.
+ *
+ *  Feathered at the edges: a hard rectangle of erased sky is just the plane
+ *  again with extra steps, and the seam is exactly what read as a floating card. */
+function applyKeepOut(ctx: CanvasRenderingContext2D, k: KeepOut): void {
+  const strength = k.strength ?? 0.82;
+  const feather = 96;
+  const prev = ctx.globalCompositeOperation;
+  ctx.globalCompositeOperation = 'destination-out';
+  const g = ctx.createLinearGradient(k.x - feather, 0, k.x, 0);
+  g.addColorStop(0, `rgba(0,0,0,0)`);
+  g.addColorStop(1, `rgba(0,0,0,${strength})`);
+  ctx.fillStyle = g;
+  ctx.fillRect(k.x - feather, k.y, feather, k.h);
+  ctx.fillStyle = `rgba(0,0,0,${strength})`;
+  ctx.fillRect(k.x, k.y, k.w, k.h);
+  const g2 = ctx.createLinearGradient(k.x + k.w, 0, k.x + k.w + feather, 0);
+  g2.addColorStop(0, `rgba(0,0,0,${strength})`);
+  g2.addColorStop(1, `rgba(0,0,0,0)`);
+  ctx.fillStyle = g2;
+  ctx.fillRect(k.x + k.w, k.y, feather, k.h);
+  ctx.globalCompositeOperation = prev;
+}
+
 export function drawQuiet(
   ctx: CanvasRenderingContext2D,
   W: number,
@@ -218,6 +256,7 @@ export function drawQuiet(
   colors: SkyColors,
   sprite?: PlanetSpriteRef | null,
   sunPhase = 0,
+  keepOut?: KeepOut | null,
 ): void {
   ctx.clearRect(0, 0, W, H);
 
@@ -243,6 +282,8 @@ export function drawQuiet(
   drawBodies(ctx, bodies, moonPhase, -1, colors, sprite);
 
   ctx.globalAlpha = 1;
+  // Last: erase, so everything drawn above is thinned inside the reading column.
+  if (keepOut) applyKeepOut(ctx, keepOut);
 }
 
 /* ===========================================================================
@@ -767,6 +808,7 @@ export function drawFull(
   colors: SkyColors,
   sprite?: PlanetSpriteRef | null,
   sunPhase = 0,
+  keepOut?: KeepOut | null,
 ): void {
   ctx.clearRect(0, 0, W, H);
   const { accent } = colors;
@@ -825,4 +867,5 @@ export function drawFull(
     ctx.fillText(hoverFig.toUpperCase(), mouse.x + 14, mouse.y - 10);
   }
   ctx.globalAlpha = 1;
+  if (keepOut) applyKeepOut(ctx, keepOut);
 }

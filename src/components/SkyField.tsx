@@ -358,6 +358,24 @@ export default function SkyField({ mode }: SkyFieldProps) {
     // convention standing still.
     const SUN_PULSE_MS = 6000;
     const ripple = { p: 0 };
+
+    // The rectangle where prose lives, in canvas pixels. render.ts stays
+    // DOM-blind, so the measuring happens here and only numbers cross over.
+    // Returns null while the hero owns the screen: the hero is MEANT to sit in
+    // the sky and measures 137/169 there, so thinning it would cost the one
+    // place the sky is the point.
+    const readingRect = (): { x: number; y: number; w: number; h: number } | null => {
+      const col = document.querySelector('main');
+      if (!col) return null;
+      const r = col.getBoundingClientRect();
+      if (r.width === 0 || r.bottom < 0 || r.top > window.innerHeight) return null;
+      const firstSection = col.querySelector('section[id]');
+      const top = firstSection ? firstSection.getBoundingClientRect().top : r.top;
+      const y = Math.max(0, top);
+      const h = Math.min(window.innerHeight, r.bottom) - y;
+      if (h <= 0) return null;
+      return { x: r.left, y, w: r.width, h };
+    };
     const renderFrame = () => {
       const cs = getComputedStyle(document.documentElement);
       // Read mode fresh every frame (and on the MutationObserver's forced
@@ -414,7 +432,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
         hoverFig = hoverIndex >= 0 ? null : figureAt(byName, figureT, mouse.x, mouse.y);
         drawFull(ctx, W, H, bodies, byName, faint, moonPhase, figureT, hoverIndex, hoverFig, mouse, colors,
                  planetSprite(colors.engraved, colors.planet),
-                 ripple.p);
+                 ripple.p, readingRect());
         if (game && game.playing && gameCanvas && gameCtx) {
           // Ambient sky stays a direct draw (above); only the game overlay
           // goes through the offscreen buffer + single capped-alpha blit.
@@ -439,7 +457,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
         }
         drawQuiet(ctx, W, H, bodies, faint, moonPhase, colors,
                   planetSprite(colors.engraved, colors.planet),
-                  ripple.p);
+                  ripple.p, readingRect());
       }
     };
 

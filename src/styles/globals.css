@@ -331,26 +331,29 @@
   .atelier-btn:hover { background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule-hi); }
   @media (prefers-reduced-motion: reduce) { .atelier-btn:hover { transform: none; } }
 
-  /* Outline card: border only, no fill, so the ground (and whatever the ground
-     lets through) reads inside the card as well as around it. State is the border
-     promoting from --rule (1.42:1) to --rule-hi (3.00:1). No fill change on hover:
-     an unbordered grey rectangle appearing under the pointer was the previous bug.
+  /* Tinted card. The fill is TRANSLUCENT, not opaque, so the graticule and stars
+     still read through it — the card has presence without becoming a lid.
 
-     NOTE ON LEGIBILITY: the shield is no longer here. It is the section-level
-     plane (.content-plane / .reading-plane). If that plane is ever removed to let
-     the sky through, canvas ink under this text goes to ~193/255 against a ceiling
-     of 169 and verify:legibility fails. The fix then is a sky keep-out under the
-     reading column, not the removal of this contract. */
+     This is only safe because the sky now yields: applyKeepOut in render.ts
+     erases most of the canvas ink under the reading column, so alpha there is
+     ~25/255 against a ceiling of 169. A translucent fill over the old 193 would
+     have been decoration pretending to be protection. If the keep-out is ever
+     weakened, this fill does NOT compensate for it.
+
+     Note: Tailwind's /opacity modifier does not compile against CSS-var colours
+     (bg-surface/70 renders invisible), which is why this is color-mix. */
   .atelier-card {
     position: relative;
     border-radius: var(--radius);
-    background: transparent;
+    background: color-mix(in srgb, var(--surface) 78%, transparent);
     box-shadow: inset 0 0 0 1px var(--rule);
-    transition: box-shadow var(--dur-hover) var(--ease-out);
+    transition: background-color var(--dur-hover) var(--ease-out),
+                box-shadow var(--dur-hover) var(--ease-out);
   }
   @media (min-width: 1024px) {
     .group\/list-item:hover .atelier-card,
     .atelier-card:hover {
+      background: color-mix(in srgb, var(--surface-2) 88%, transparent);
       box-shadow: inset 0 0 0 1px var(--rule-hi);
     }
   }
@@ -945,17 +948,14 @@ body.spinning * {
   /* Full-bleed, not column-width. A column-width plane is a card with a hard
      edge halfway across the canvas, which is exactly what the design forbids.
      The pseudo-element spans the viewport so there is no seam anywhere. */
-  /* Full-bleed ground. margin-inline: calc(50% - 50vw) does NOT work here: these
-     elements ARE the max-width container, so 50% resolves against the full-width
-     body and computes to 0, and it destroys mx-auto centring on the way. A spread
-     shadow paints the ground outward instead, clipped to the horizontal axis so it
-     never bleeds over the hero. Background stays ON the element so the legibility
-     verifier can still see it as an opaque ancestor. */
+  /* No opaque plane any more. Legibility over the canvas is handled by the sky
+     itself: `applyKeepOut` in render.ts erases a fraction of the canvas ink
+     inside this rectangle, so the graticule and stars still read behind the
+     prose while the alpha under text stays under the 169/255 ceiling.
+     If verify:legibility ever fails here, tune `strength` in applyKeepOut
+     rather than reintroducing a plane. */
   .reading-plane {
     position: relative;
-    background: var(--bg);
-    box-shadow: 0 0 0 100vw var(--bg);
-    clip-path: inset(0 -100vw);
   }
 }
 
@@ -966,9 +966,6 @@ body.spinning * {
 @layer components {
   .content-plane > section[id] {
     position: relative;
-    background: var(--bg);
-    box-shadow: 0 0 0 100vw var(--bg);
-    clip-path: inset(0 -100vw);
   }
 }
 
