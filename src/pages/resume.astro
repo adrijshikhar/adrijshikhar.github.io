@@ -43,7 +43,6 @@ const proseClass =
 
     <header class="mt-10 flex flex-col gap-6 border-b border-border pb-10 md:flex-row md:items-end md:justify-between">
       <div>
-        <p class="mb-4 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted"><span class="h-2 w-2 rounded-full bg-accent"></span> resume.txt</p>
         <h1 class="display-page">{about.meta.name ?? 'Adrij Shikhar'}</h1>
         <p class="mt-2 font-heading text-base font-medium tracking-tighter text-heading">Senior Software Engineer</p>
       </div>
@@ -58,7 +57,7 @@ const proseClass =
 
     <!-- Experience -->
     <section class="mt-12">
-      <p class="mb-6 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted"><span class="h-2 w-2 rounded-full bg-accent"></span> experience</p>
+      <p class="label-data mb-6">experience</p>
       <ul class="border-t border-border">
         {experience.meta.entries.map((exp: any) => (
           <li class="border-b border-border py-6">
@@ -79,7 +78,7 @@ const proseClass =
 
     <!-- Education -->
     <section class="mt-12">
-      <p class="mb-6 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted"><span class="h-2 w-2 rounded-full bg-accent"></span> education</p>
+      <p class="label-data mb-6">education</p>
       <ul class="border-t border-border">
         {education.meta.entries.map((edu: any) => (
           <li class="flex flex-col gap-1 border-b border-border py-5 md:flex-row md:items-baseline md:justify-between">
@@ -95,13 +94,13 @@ const proseClass =
 
     <!-- Skills -->
     <section class="mt-12">
-      <p class="mb-6 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted"><span class="h-2 w-2 rounded-full bg-accent"></span> skills</p>
+      <p class="label-data mb-6">skills</p>
       <div class={proseClass} set:html={marked.parse(skills.content)} />
     </section>
 
     <!-- Achievements -->
     <section class="mt-12">
-      <p class="mb-6 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.2em] text-muted"><span class="h-2 w-2 rounded-full bg-accent"></span> achievements</p>
+      <p class="label-data mb-6">achievements</p>
       <div class={proseClass} set:html={marked.parse(achievements.content)} />
     </section>
   </main>

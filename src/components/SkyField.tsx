@@ -310,7 +310,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
         brightest: [...above].sort((a, b) => a.mag - b.mag).slice(0, 3).map((b) => b.name),
         sunAlt: sun ? sun.alt : null,
         // The standard bands, so the label is a definition rather than a mood.
-        // This is also the number driving the twilight glow, which makes the
+        // Reported for its own sake now that the glow is gone; it makes the
         // readout an explanation of what is on screen rather than a decoration.
         twilight: !sun ? '—'
           : sun.alt > 0 ? 'day'
@@ -637,7 +637,8 @@ export default function SkyField({ mode }: SkyFieldProps) {
       // decelerate toward the end of each iteration and then snap back to full
       // speed at the wrap — a visible reset every cycle — and it bunches the
       // staggered wave offsets, since they are spaced on an already-eased
-      // value. The easing is applied per wave, to the radius, in `drawSunGlow`.
+      // value. Retained for the cursor-gravity wobble; the Sun glow it used to
+      // drive has been removed.
       rippleTimer = createTimer({
         duration: SUN_PULSE_MS,
         loop: true,
@@ -726,9 +727,10 @@ export default function SkyField({ mode }: SkyFieldProps) {
       )}
 
       {/* Top-left: the three numbers that explain what is on screen. SUN is the
-          altitude driving the twilight glow, with the standard band it falls in
-          — so the warmth on the page has a stated cause. MOON is the phase the
-          terminator is drawn from. PLANETS is a count of what is actually up.
+          real altitude and the standard twilight band it falls in. It no longer
+          claims to drive any warmth on the page: the Sun glow was removed, so
+          saying so would be a false statement about the render. MOON is the
+          phase the terminator is drawn from. PLANETS is a count of what is up.
           All three are read off the same frame the canvas just painted, so none
           of them can drift from it. */}
       {mode === 'full' && !machine && sky && (

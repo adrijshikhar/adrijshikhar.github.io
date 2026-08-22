@@ -41,7 +41,7 @@ const canonical = post.data.canonicalUrl ?? new URL(`/blogs/${post.id}/`, Astro.
       {post.data.description && (
         <p class="mt-4 text-lg leading-relaxed text-muted">{post.data.description}</p>
       )}
-      <p class="mt-5 flex items-center gap-3 font-mono text-xs uppercase tracking-[0.16em] text-muted"><span class="h-1.5 w-1.5 rounded-full bg-accent"></span> {fmt(post.data.date)}</p>
+      <p class="label-data mt-5">{fmt(post.data.date)}</p>
     </header>
 
     <article

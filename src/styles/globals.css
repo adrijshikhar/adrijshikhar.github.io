@@ -2,8 +2,8 @@
    Inter, which never painted — 'Geist Variable' always won the stack ahead of it. */
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/archivo";
-@import "@fontsource/archivo-black/400.css";
+@import "@fontsource-variable/familjen-grotesk";
+@import "@fontsource-variable/space-grotesk";
 @import "@fontsource/ibm-plex-mono/400.css";
 @import "@fontsource/ibm-plex-mono/500.css";
 @import "@fontsource/ibm-plex-mono/600.css";
@@ -78,10 +78,13 @@
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);  /* sky drag-release ONLY */
   --ease-out: cubic-bezier(.32, .72, 0, 1);
 
-  /* Typography — two families. Archivo Black for display, Archivo for prose,
-     IBM Plex Mono for every piece of data. 11px mono is the floor. */
-  --font-heading: 'Archivo Black', 'Archivo Variable', system-ui, sans-serif;
-  --font-sans:    'Archivo Variable', system-ui, sans-serif;
+  /* Typography — three voices, no fourth. Space Grotesk display, Familjen
+     Grotesk prose, IBM Plex Mono for every piece of data (11px is the floor).
+     Space Grotesk stays OUT of body copy: its straight-tailed single-storey y
+     reads as noise at paragraph length. Familjen ships wght 400-700, so never
+     reach for font-light or font-thin; they silently render at 400. */
+  --font-heading: 'Space Grotesk Variable', system-ui, sans-serif;
+  --font-sans:    'Familjen Grotesk Variable', system-ui, sans-serif;
   --font-mono:    'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
   /* shadcn token bridge (kept for ui/* components) */
@@ -125,12 +128,10 @@
     }
   }
 
-  /* Dark mode's ambient light is the Sun, drawn on the canvas at its real
-     computed position and faded by its real altitude (`drawSunGlow`). What
-     used to be here was a fixed warm blob pinned to the top-left corner — the
-     last survivor of the old three-blob aurora, and a light source the sky
-     could not account for. Only the faint cool counter remains, which reads as
-     atmosphere rather than as a lamp. */
+  /* The Sun glow is gone (removed deliberately, not lost). What remains here is
+     only a faint cool wash at 7% alpha, which reads as atmosphere rather than as
+     a lamp, and is not attributable to any body on the canvas. If even this
+     reads as a light source the sky cannot account for, delete it too. */
   body::before {
     content: "";
     position: fixed;
@@ -225,16 +226,16 @@
 
 @layer components {
   /* ── Type scale: five steps, two families. Archivo Black ships at weight 400
-     ONLY, so display steps must not request 600 or the browser synthesises a
-     fake bold and the tracking goes with it. Display tracking is -0.04em; that
-     is tuned for Archivo Black at 92px and collides if loosened.
+     Space Grotesk is Space Mono's proportional sibling, so display rhymes with
+     the all-mono instrument chrome. It is already tightly set, so tracking is
+     -0.03em; the -0.04em an ultra-black face needs collides here.
      11px mono is the floor for data. Nothing smaller, anywhere. */
   .display-hero {
     font-family: var(--font-heading);
-    font-size: clamp(3rem, 8.5vw, 7rem);
-    font-weight: 400;
-    line-height: 0.88;
-    letter-spacing: -0.04em;
+    font-size: clamp(3rem, 8.5vw, 6.5rem);
+    font-weight: 700;
+    line-height: 0.9;
+    letter-spacing: -0.03em;
     text-transform: uppercase;
     color: var(--heading);
   }
@@ -244,9 +245,9 @@
   .display-page {
     font-family: var(--font-heading);
     font-size: 2.25rem;
-    font-weight: 400;
+    font-weight: 700;
     line-height: 0.96;
-    letter-spacing: -0.035em;
+    letter-spacing: -0.03em;
     color: var(--heading);
   }
   @media (min-width: 640px) {
@@ -254,7 +255,7 @@
   }
 
   .title-entry {
-    font-family: var(--font-sans);
+    font-family: var(--font-heading);
     font-size: 1.25rem;
     font-weight: 600;
     line-height: 1.3;
@@ -939,9 +940,20 @@ body.spinning * {
    column, which is where it was doing the work anyway.
    Do not change this to a translucent fill. The opacity IS the fix. */
 @layer components {
+  /* Full-bleed, not column-width. A column-width plane is a card with a hard
+     edge halfway across the canvas, which is exactly what the design forbids.
+     The pseudo-element spans the viewport so there is no seam anywhere. */
+  /* Full-bleed ground. margin-inline: calc(50% - 50vw) does NOT work here: these
+     elements ARE the max-width container, so 50% resolves against the full-width
+     body and computes to 0, and it destroys mx-auto centring on the way. A spread
+     shadow paints the ground outward instead, clipped to the horizontal axis so it
+     never bleeds over the hero. Background stays ON the element so the legibility
+     verifier can still see it as an opaque ancestor. */
   .reading-plane {
     position: relative;
     background: var(--bg);
+    box-shadow: 0 0 0 100vw var(--bg);
+    clip-path: inset(0 -100vw);
   }
 }
 
@@ -953,6 +965,8 @@ body.spinning * {
   .content-plane > section[id] {
     position: relative;
     background: var(--bg);
+    box-shadow: 0 0 0 100vw var(--bg);
+    clip-path: inset(0 -100vw);
   }
 }
 
@@ -963,9 +977,9 @@ body.spinning * {
   .display-section {
     font-family: var(--font-heading);
     font-size: 2rem;
-    font-weight: 400;
+    font-weight: 700;
     line-height: 0.96;
-    letter-spacing: -0.035em;
+    letter-spacing: -0.03em;
     color: var(--heading);
   }
   @media (min-width: 640px) {
