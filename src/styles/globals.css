@@ -533,7 +533,6 @@ body.spinning * {
      all. Every element that sets its own `cursor` must be listed: an explicit
      `cursor: pointer` on a button beats the inherited `none` from body, which
      is how the native arrow used to leak back in over the game bar. */
-  .cursor-custom,
   /* The native cursor is NOT hidden any more. Hiding it took away the pointer
      the OS renders, and with it every accessibility setting attached to it:
      cursor size, high-contrast cursor, and the pointer shape that tells you a

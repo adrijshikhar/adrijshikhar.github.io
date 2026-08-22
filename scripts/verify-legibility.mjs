@@ -240,6 +240,7 @@ await cdp.send('Emulation.setDeviceMetricsOverride', {
 const report = [];
 let worstOverall = { maxAlpha: -1 };
 
+let structuralFailures = 0;
 for (const mode of MODES) {
   for (const [name, path] of ROUTES) {
     const url = `${BASE}${path}?mode=${mode}`;
@@ -248,6 +249,41 @@ for (const mode of MODES) {
     await loaded;
     // The canvas paints on rAF after fonts settle; give it room on a cold cache.
     await sleep(1800);
+
+    // Scroll sanity. Cheap, and it catches a whole class of catastrophic CSS bug
+    // this script is already in the right place to see: if anything gives the
+    // ROOT element `position: fixed`, the document leaves flow, clientHeight
+    // collapses to one viewport, and the page silently cannot scroll. That
+    // shipped once, from a dangling selector left behind by an edit — the root
+    // picked up `position: fixed` from the rule it merged into, and it only
+    // surfaced after an island added its class at runtime.
+    const scrollCheck = await cdp.send('Runtime.evaluate', {
+      returnByValue: true,
+      expression: `(() => {
+        const de = document.documentElement;
+        return {
+          rootPosition: getComputedStyle(de).position,
+          docScrollHeight: de.scrollHeight,
+          bodyScrollHeight: document.body.scrollHeight,
+        };
+      })()`,
+    });
+    const sc = scrollCheck.result?.value;
+    if (sc) {
+      if (sc.rootPosition !== 'static') {
+        console.error(
+          `\n${mode}/${name}: <html> has position: ${sc.rootPosition}. The root must stay in flow ` +
+          `or the page cannot scroll. Look for a dangling selector merging into a fixed-position rule.`,
+        );
+        structuralFailures += 1;
+      } else if (sc.bodyScrollHeight - sc.docScrollHeight > 2) {
+        console.error(
+          `\n${mode}/${name}: body is ${sc.bodyScrollHeight}px but <html> only ${sc.docScrollHeight}px — ` +
+          `content overflows the root and is unreachable by scrolling.`,
+        );
+        structuralFailures += 1;
+      }
+    }
 
     const { result, exceptionDetails } = await cdp.send('Runtime.evaluate', {
       expression: SAMPLER,
@@ -319,7 +355,7 @@ if (AS_JSON) {
   );
 }
 
-if (failures.length) {
+if (failures.length || structuralFailures) {
   console.error(
     `\n${failures.length} element(s) exceed the ${CEILING}/255 ceiling. ` +
       `DESIGN.md treats this as a hard contract — either reduce the sky's ink under those ` +
