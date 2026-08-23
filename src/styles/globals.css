@@ -263,114 +263,17 @@
      the all-mono instrument chrome. It is already tightly set, so tracking is
      -0.03em; the -0.04em an ultra-black face needs collides here.
      11px mono is the floor for data. Nothing smaller, anywhere. */
-  .display-hero {
-    font-family: var(--font-heading);
-    font-size: clamp(3rem, 8.5vw, 6.5rem);
-    font-weight: 700;
-    line-height: 0.9;
-    letter-spacing: -0.03em;
-    text-transform: uppercase;
-    color: var(--foreground);
-  }
-  .display-hero a,
-  .display-page a { color: inherit; }
 
-  .display-page {
-    font-family: var(--font-heading);
-    font-size: 2.25rem;
-    font-weight: 700;
-    line-height: 0.96;
-    letter-spacing: -0.03em;
-    color: var(--foreground);
-  }
-  @media (min-width: 640px) {
-    .display-page { font-size: 3rem; }
-  }
 
-  .title-entry {
-    font-family: var(--font-heading);
-    font-size: 1.25rem;
-    font-weight: 600;
-    line-height: 1.3;
-    letter-spacing: -0.015em;
-    color: var(--foreground);
-  }
-
-  .label-data {
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;                /* 11px — the floor */
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    color: var(--muted-foreground);
-  }
 
   /* Dates, companies, locations — the readout beside an entry. */
   /* Dates are numbers, and K owns numbers. Every card carries one, so this is
      where the ramp earns its keep outside code blocks. Non-numeric metadata
-     (a company name) takes .meta-data--muted instead. */
-  .meta-data {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    /* Orange, not Green. This class is on the date of EVERY card, one per row all
-       the way down a list, so whatever hue it takes becomes the page's cast.
-       A date is a numeric datum, which is the job the ramp gives G/Orange;
-       Green stays on the language tags and on strings in the code pane. */
-    color: var(--primary);
-    font-variant-numeric: tabular-nums;
-  }
-  .meta-data--muted { color: var(--muted-foreground); }
 
-  .link-back {
-    display: inline-flex;
-    align-items: center;
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    color: var(--muted-foreground);
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.25em;
-    text-decoration-color: var(--muted-foreground);
-  }
-  .link-back:hover { color: var(--primary); opacity: 1; }
 
   /* ── Numbered section channel: index, name, and a rule running to the edge. */
-  .channel {
-    display: flex;
-    align-items: baseline;
-    gap: 1rem;
-  }
-  .channel-no { color: var(--primary); }
-  .channel::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
 
   /* C-style soft pill button */
-  .atelier-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    border-radius: 0;
-    background: transparent;
-    box-shadow: inset 0 0 0 1px var(--muted-foreground);
-    padding: 0.5rem 1rem;
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    color: var(--primary);
-    transition: background-color var(--dur-hover) var(--ease-out),
-                box-shadow var(--dur-hover) var(--ease-out);
-  }
-  .atelier-btn:hover { background: var(--card); box-shadow: inset 0 0 0 1px var(--muted-foreground); }
   @media (prefers-reduced-motion: reduce) { .atelier-btn:hover { transform: none; } }
 
   /* Card plane. OPAQUE, and that costs nothing now: the sky keep-out already
@@ -382,25 +285,6 @@
 
      Edges use --card-edge, measured against the FILL rather than the ground.
      --rule is a ground hairline and only manages 1.18:1 here. */
-  .atelier-card {
-    position: relative;
-    border-radius: var(--radius);
-    background: var(--card);
-    box-shadow: inset 0 0 0 1px var(--border);
-    transition: background-color var(--dur-hover) var(--ease-out),
-                box-shadow var(--dur-hover) var(--ease-out);
-  }
-  @media (min-width: 1024px) {
-    .group\/list-item:hover .atelier-card,
-    .atelier-card:hover {
-      background: var(--secondary);
-      box-shadow: inset 0 0 0 1px var(--muted-foreground);
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .atelier-card { transition: background-color 0.3s ease; }
-    .atelier-card:hover { transform: none; }
-  }
 
 
   /* Machine view FOLLOWS the active light/dark mode: it's token-driven (see machine.css), so its
@@ -851,35 +735,6 @@ body.spinning * {
     .scroll-cue-rail::after { animation: none; transform: none; height: 100%; opacity: .5; }
   }
 
-  .expo {
-    position: fixed;
-    top: 1.9rem;
-    left: 50%;
-    transform: translateX(-50%);
-    /* BEHIND the page content, above the sky. A fixed element with z-index >= 0
-       paints over static in-flow content no matter how small the number, which is
-       why the hero title used to run under this cluster. -1 sits behind all
-       in-flow content, and still above #sky (also -1, earlier in the DOM) and
-       body::before (-2). Do not "fix" a collision here by moving it. */
-    z-index: -1;
-    display: flex;
-    gap: 0.5rem;
-    pointer-events: none;
-    transition: opacity 0.5s var(--ease-out);
-  }
-  .expo-cell {
-    border: 1px solid var(--border);
-    padding: 0.2rem 0.55rem;
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;            /* 11px: the mono floor. Was 9px. */
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--muted-foreground);
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
-  }
-  html.machine-mode .expo,
-  body.machine-mode .expo { opacity: 0; }
 
 
   /* The instrument frame belongs to the sky, so it leaves with the sky. */
@@ -897,9 +752,7 @@ body.spinning * {
   /* Below md the corners collide with content and the toolbar; the frame is
      an enhancement, not load-bearing, so it simply steps aside. */
   @media (max-width: 767px) {
-    .viewfinder u,
-    .expo,
-    .instrument { display: none; }
+    .viewfinder u { display: none; }
   }
   @media (max-width: 1179px) {
     .instrument { display: none; }

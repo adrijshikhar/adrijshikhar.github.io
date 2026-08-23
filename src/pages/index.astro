@@ -85,11 +85,11 @@ const SOCIAL_ICON_PATHS = {
              100dvh not 100vh so the iOS address bar cannot cause a jump. Content
              below is revealed by scrolling. -->
         <header class="flex min-h-[100dvh] flex-col justify-center pb-24 pt-32">
-          <p class="mb-6 flex items-center gap-3 label-data">
+          <p class="mb-6 flex items-center gap-3 font-mono text-xs uppercase tracking-wider text-muted-foreground">
             <span class="live inline-block h-[5px] w-[5px] rounded-full bg-primary"></span>
             Bengaluru
           </p>
-          <h1 class="display-hero">
+          <h1 class="text-6xl font-bold tracking-tight sm:text-7xl">
             <a href="/" class="no-underline">Adrij<br />Shikhar</a>
           </h1>
           <p class="mt-8 max-w-[36rem] text-[1.15rem] leading-relaxed text-foreground">
@@ -142,7 +142,7 @@ const SOCIAL_ICON_PATHS = {
 
         <!-- About -->
         <section id="about" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="channel mb-4"><span class="label-data channel-no">01</span></div>
+          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground text-muted-foreground">01</span></div>
           <h2 class="display-section mb-8">About</h2>
           <div
             class="prose prose-invert max-w-[35rem] leading-relaxed text-foreground prose-p:text-foreground prose-p:leading-relaxed prose-a:text-primary prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-foreground prose-strong:font-medium"
@@ -152,7 +152,7 @@ const SOCIAL_ICON_PATHS = {
 
         <!-- Experience -->
         <section id="experience" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="channel mb-4"><span class="label-data channel-no">02</span></div>
+          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground text-muted-foreground">02</span></div>
           <h2 class="display-section mb-8">Experience</h2>
           <ul class="group/list border-b-0">
             {experience.meta.entries.slice(0, 2).map((exp: any) => (
@@ -160,7 +160,7 @@ const SOCIAL_ICON_PATHS = {
             ))}
           </ul>
           <div class="mt-10">
-            <a class="group atelier-btn" href="/experience/">
+            <a class="group inline-flex items-center justify-center rounded-md border bg-card px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground" href="/experience/">
               <span>View full work experience</span><span class="transition-transform group-hover:translate-x-1">&rarr;</span>
             </a>
           </div>
@@ -168,7 +168,7 @@ const SOCIAL_ICON_PATHS = {
 
         <!-- Projects -->
         <section id="projects" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="channel mb-4"><span class="label-data channel-no">03</span></div>
+          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground text-muted-foreground">03</span></div>
           <h2 class="display-section mb-8">Projects</h2>
           <ul class="group/list">
             {projects.meta.entries.slice(0, 2).map((proj: any) => (
@@ -176,7 +176,7 @@ const SOCIAL_ICON_PATHS = {
             ))}
           </ul>
           <div class="mt-10">
-            <a class="group atelier-btn" href="/archive/">
+            <a class="group inline-flex items-center justify-center rounded-md border bg-card px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground" href="/archive/">
               <span>View full project archive</span><span class="transition-transform group-hover:translate-x-1">&rarr;</span>
             </a>
           </div>
@@ -184,7 +184,7 @@ const SOCIAL_ICON_PATHS = {
 
         <!-- Writing -->
         <section id="writing" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="channel mb-4"><span class="label-data channel-no">04</span></div>
+          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground text-muted-foreground">04</span></div>
           <h2 class="display-section mb-8">Writing</h2>
           {latestPosts.length === 0 ? (
             <p class="border border-border px-5 py-6 font-mono text-sm text-muted-foreground">
@@ -198,7 +198,7 @@ const SOCIAL_ICON_PATHS = {
             </ul>
           )}
           <div class="mt-10">
-            <a class="group atelier-btn" href="/blogs/">
+            <a class="group inline-flex items-center justify-center rounded-md border bg-card px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground" href="/blogs/">
               <span>View all posts</span><span class="transition-transform group-hover:translate-x-1">&rarr;</span>
             </a>
           </div>
@@ -206,13 +206,13 @@ const SOCIAL_ICON_PATHS = {
 
         <!-- Education -->
         <section id="education" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="channel mb-4"><span class="label-data channel-no">05</span></div>
+          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground text-muted-foreground">05</span></div>
           <h2 class="display-section mb-8">Education</h2>
           <ul class="grid gap-4 sm:grid-cols-2">
             {education.meta.entries.map((edu: any, i: number) => (
-              <li class={`atelier-card group/list-item px-5 py-6 lg:px-6 lg:py-7`}>
-                <span class="meta-data">{edu.startDate} — {edu.endDate}</span>
-                <h3 class="mt-2 title-entry">{edu.institution}</h3>
+              <li class={`rounded-xl border bg-card text-card-foreground shadow-sm group/list-item px-5 py-6 lg:px-6 lg:py-7`}>
+                <span class="font-mono text-xs uppercase tracking-wider text-muted-foreground">{edu.startDate} — {edu.endDate}</span>
+                <h3 class="mt-2 text-xl font-semibold leading-none">{edu.institution}</h3>
                 <div class="mt-1 text-sm text-foreground">
                   {edu.degree}{edu.field && <span class="text-muted-foreground"> — {edu.field}</span>}
                 </div>
@@ -223,7 +223,7 @@ const SOCIAL_ICON_PATHS = {
 
         <!-- Achievements -->
         <section id="achievements" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="channel mb-4"><span class="label-data channel-no">06</span></div>
+          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground text-muted-foreground">06</span></div>
           <h2 class="display-section mb-8">Achievements</h2>
           <div
             class="prose prose-invert max-w-[35rem] text-foreground prose-p:text-foreground prose-li:text-foreground marker:text-muted-foreground prose-a:text-primary prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-foreground"
@@ -233,7 +233,7 @@ const SOCIAL_ICON_PATHS = {
 
         <!-- Interests -->
         <section id="interests" class="mb-12 scroll-mt-16 md:mb-16 lg:scroll-mt-24">
-          <div class="channel mb-4"><span class="label-data channel-no">07</span></div>
+          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground text-muted-foreground">07</span></div>
           <h2 class="display-section mb-8">Interests</h2>
           <div
             class="prose prose-invert max-w-[35rem] text-foreground prose-p:text-foreground prose-li:text-foreground marker:text-muted-foreground prose-a:text-primary prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-foreground"
@@ -248,11 +248,11 @@ const SOCIAL_ICON_PATHS = {
             the footer: past the last line there is nothing left to look at, so
             the same space there just reads as the page failing to end. */}
         <footer class="mt-[29vh] border-t border-border pt-12 pb-20 md:mt-[33vh] md:pb-24">
-          <p class="meta-data">
+          <p class="font-mono text-xs uppercase tracking-wider text-muted-foreground">
             <span class="text-primary">&#9656;</span> {STAR_COUNT} named stars at true J2000 positions
             for your location. Every mark on the canvas is a catalogued object.
           </p>
-          <p class="meta-data mt-2">Built with Astro.</p>
+          <p class="font-mono text-xs uppercase tracking-wider text-muted-foreground mt-2">Built with Astro.</p>
         </footer>
 
 

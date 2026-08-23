@@ -22,7 +22,7 @@ const canonical = post.data.canonicalUrl ?? new URL(`/blogs/${post.id}/`, Astro.
 >
   <main id="content" class="mx-auto min-h-screen max-w-5xl px-6 py-16 md:px-12 md:py-24">
    <div class="reading-plane mx-auto max-w-3xl px-6 py-10 md:px-10">
-    <a href="/blogs/" class="group link-back">
+    <a href="/blogs/" class="group text-sm text-muted-foreground hover:underline">
       <span class="mr-2 transition-transform duration-[120ms] group-hover:-translate-x-1">&larr;</span>
       <span>all posts</span>
     </a>
@@ -41,7 +41,7 @@ const canonical = post.data.canonicalUrl ?? new URL(`/blogs/${post.id}/`, Astro.
       {post.data.description && (
         <p class="mt-4 text-lg leading-relaxed text-muted-foreground">{post.data.description}</p>
       )}
-      <p class="label-data mt-5">{fmt(post.data.date)}</p>
+      <p class="font-mono text-xs uppercase tracking-wider text-muted-foreground mt-5">{fmt(post.data.date)}</p>
     </header>
 
     <article

@@ -27,18 +27,18 @@ const projSections = splitBySlug(projects.content);
 
 <BaseLayout title="All Projects | adrijshikhar.dev">
   <main id="content" class="reading-plane mx-auto min-h-screen max-w-5xl px-6 py-16 md:px-12 md:py-24">
-    <a class="group link-back mb-10" href="/">
+    <a class="group text-sm text-muted-foreground hover:underline mb-10" href="/">
       <span class="mr-2 transition-transform duration-[120ms] group-hover:-translate-x-1">&larr;</span>
       <span>adrij_shikhar</span>
     </a>
-    <h1 class="mb-12 display-page">
+    <h1 class="mb-12 text-4xl font-bold tracking-tight">
       Project Archive
     </h1>
 
-    <ul class="group/list columns-1 gap-5 sm:columns-2">
+    <div class="group/list grid gap-5 sm:grid-cols-2">
       {projects.meta.entries.map((proj: any, i: number) => (
         <ProjectCard {...proj} index={i} contentHtml={marked.parse(projSections[proj.slug] || '') as string} />
       ))}
-    </ul>
+    </div>
   </main>
 </BaseLayout>

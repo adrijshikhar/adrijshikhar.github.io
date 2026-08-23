@@ -1,4 +1,4 @@
-import HoverCard from './HoverCard';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface BlogCardProps {
   title: string;
@@ -8,14 +8,15 @@ interface BlogCardProps {
 
 export default function BlogCard({ title, date, href }: BlogCardProps) {
   return (
-    <HoverCard>
-      <a href={href} className="block text-inherit no-underline hover:text-inherit">
-        <span className="meta-data">{date}</span>
-        <h3 className="mt-2 title-entry">
-          <span className="transition-colors duration-[120ms] group-hover/list-item:text-primary">{title}</span>
-          <span className="ml-1 text-xs text-muted-foreground transition-colors group-hover/list-item:text-primary">&rarr;</span>
-        </h3>
-      </a>
-    </HoverCard>
+    <Card>
+      <CardHeader>
+        <div className="text-xs text-muted-foreground">{date}</div>
+        <CardTitle className="text-xl">
+          <a href={href} className="hover:underline">
+            {title} <span aria-hidden="true">&rarr;</span>
+          </a>
+        </CardTitle>
+      </CardHeader>
+    </Card>
   );
 }

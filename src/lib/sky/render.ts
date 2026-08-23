@@ -397,7 +397,7 @@ const SUN_MAG = -26.7;
  *
  *  Picked by measurement (see task-7-report.md's fix addendum), driving the
  *  clock across a day and several dates and sampling `getImageData` over
- *  every `main p`/`main li`/`.atelier-card` on the home page: 0.5 keeps the
+ *  every `main p`/`main li`/`.rounded-xl border bg-card text-card-foreground shadow-sm` on the home page: 0.5 keeps the
  *  Moon/Venus/Jupiter worst case (disc only now; earthshine and bloom are gone,
  *  layered case) at alpha ~137–153/255 in the worst positions found, under
  *  the ≤169 every other sampled element sits under. Left out of `starAlpha`
