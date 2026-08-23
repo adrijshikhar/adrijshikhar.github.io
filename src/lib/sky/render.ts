@@ -75,7 +75,10 @@ export const FAINT_FIELD: Array<{ ra: number; dec: number; mag: number }> = [];
  *  device pixel on a 1x display — below the size at which a dot reads as an
  *  object rather than as sensor noise. Floor is 1.55px: enough to read as an
  *  object, small enough that 106 of them do not fill the frame. */
-const vrFor = (mag: number): number => 1.5 + Math.max(0, 3.0 - mag) * 1.1;
+/** 1.423 / 1.044 are 1.5 / 1.1 scaled by sqrt(0.9): painted ink goes as r², so a
+ *  10% density reduction is a 5.13% radius reduction, not 10%. Scaling both terms
+ *  keeps the magnitude-to-size relationship intact rather than flattening it. */
+const vrFor = (mag: number): number => 1.423 + Math.max(0, 3.0 - mag) * 1.044;
 
 /** Recompute alt/az and screen position for every star at `when`, for `obs`. */
 export function computeSky(
