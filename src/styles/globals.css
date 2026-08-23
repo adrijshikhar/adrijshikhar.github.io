@@ -464,14 +464,25 @@ body.spinning * {
      all. Every element that sets its own `cursor` must be listed: an explicit
      `cursor: pointer` on a button beats the inherited `none` from body, which
      is how the native arrow used to leak back in over the game bar. */
-  /* The native cursor is NOT hidden any more. Hiding it took away the pointer
-     the OS renders, and with it every accessibility setting attached to it:
-     cursor size, high-contrast cursor, and the pointer shape that tells you a
-     thing is clickable at all. Both design skills call a custom cursor
-     accessibility-hostile, and this was the part that actually did harm.
+  /* The native cursor IS hidden, so the ring and dot are the only pointer on
+     screen. Scoped to (hover: hover) and (pointer: fine), and `cursor-custom` is
+     added by SkyField only once its rAF loop is confirmed running — so a script
+     failure can never leave a visitor with no cursor at all.
 
-     The ring and dot stay as an ADDITIVE mark: they track the pointer and carry
-     the sky's cursor-gravity wobble, on top of a cursor that is still there. */
+     Any element that sets its own `cursor` needs listing: an explicit
+     `cursor: pointer` on a button beats the inherited `none`, which is how the
+     native arrow used to leak back in over the game bar. */
+  html.cursor-custom,
+  html.cursor-custom body,
+  html.cursor-custom a,
+  html.cursor-custom button,
+  html.cursor-custom input,
+  html.cursor-custom textarea,
+  html.cursor-custom select,
+  html.cursor-custom label,
+  html.cursor-custom [role='button'] {
+    cursor: none;
+  }
 
   #sky-cursor-ring,
   #sky-cursor-dot {
@@ -550,7 +561,12 @@ body.spinning * {
   .viewfinder {
     position: fixed;
     inset: 0;
-    z-index: 20;
+    /* BEHIND in-flow content, above the sky. At z-index 20 the top tick strip
+       painted over any card whose top edge passed through it while scrolling —
+       and the strip is only 6px tall, so it reads as a stray rule drawn across a
+       card rather than as part of a frame. -1 keeps it above #sky (also -1,
+       earlier in the DOM) and behind every card. Same reasoning as .expo. */
+    z-index: -1;
     pointer-events: none;
   }
   .viewfinder i {
