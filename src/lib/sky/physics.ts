@@ -71,6 +71,11 @@ export interface HitResult {
 
 const RADIUS = 150; // gravity well influence radius
 const MAX_PULL = 6; // max px a star is ever displaced from home
+/** Wobble amplitude scale. Applied to the whole displacement term rather than to
+ *  MAX_PULL alone: for a star close to the cursor the `d * 0.9` branch is under
+ *  the cap, so lowering only MAX_PULL would leave those stars moving exactly as
+ *  far as before and the reduction would not be uniform. */
+const WOBBLE_SCALE = 0.75;
 const K = 0.14; // spring stiffness toward target
 const DAMP = 0.78; // velocity retained per frame
 /** Near-frictionless space, sling mode. Coast distance is v0 * DRAG/(1-DRAG),
@@ -103,7 +108,7 @@ export function gravityWell(stars: GameStar[], mouseX: number, mouseY: number): 
     const d = Math.hypot(dx, dy);
     if (d < RADIUS && d > 0.001) {
       const f = 1 - d / RADIUS;
-      const amt = Math.min(MAX_PULL, d * 0.9) * f * f; // bounded, can't overshoot
+      const amt = Math.min(MAX_PULL, d * 0.9) * f * f * WOBBLE_SCALE; // bounded, can't overshoot
       tx += (dx / d) * amt;
       ty += (dy / d) * amt;
     }
