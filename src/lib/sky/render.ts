@@ -105,12 +105,12 @@ export function computeSky(
  *  painted at 0.12-0.18 alpha. Near-white at 0.12 over a near-black ground is
  *  dark grey, which is why the field read as empty.
  *
- *  Only the FLOOR is lifted (0.12 -> 0.20); the ramp's slope is left close to the
+ *  Only the FLOOR is lifted (0.12 -> 0.30); the ramp's slope is left close to the
  *  original. That distinction is the whole fix. Widening the ramp to (3.3-m)/3.0
  *  was tried and read as noisy — it took the stars above 0.45 alpha from 25 to
  *  53, which measured as a doubling of pixels over alpha 110 on the canvas. The
  *  faint end was never the problem; inflating the middle of the range was. */
-const starAlpha = (mag: number): number => Math.max(0.20, Math.min(1, (2.8 - mag) / 3.4));
+const starAlpha = (mag: number): number => Math.max(0.30, Math.min(1, (2.8 - mag) / 3.4));
 
 /** Every colour the renderer paints with, resolved once per frame by the
  *  caller (SkyField.tsx) from CSS custom properties + the active `data-mode`.
@@ -343,14 +343,21 @@ export const FIGURE_MEMBERS: ReadonlySet<string> = new Set(
   FIGURES.flatMap(([, segs]) => segs.flatMap(([a, b]) => [a, b])),
 );
 
-/** Default-field rule: a star earns its place either by being part of a drawn
- *  constellation, or by being bright enough to be a landmark on its own. At
- *  mag 1.5 the second group is Arcturus, Vega, Capella, Procyon, Achernar,
- *  Altair, Spica and Fomalhaut — eight stars most people can name. That is 67 of
- *  96; the other 29 are loose dim stars that only add density. */
-export const LOOSE_STAR_MAG_LIMIT = 1.5;
-export const inDefaultField = (name: string, mag: number): boolean =>
-  FIGURE_MEMBERS.has(name) || mag <= LOOSE_STAR_MAG_LIMIT;
+/** Default-field rule: the ambient sky draws CONSTELLATIONS ONLY — 59 of 96.
+ *  All 37 loose stars, bright ones included, move to dark sky.
+ *
+ *  The rule is membership rather than magnitude because a magnitude cut cannot
+ *  go any deeper without fragmenting the figures: every member is by definition
+ *  an endpoint of a segment, so hiding one leaves a constellation line running
+ *  to a star that is not painted. Cutting only the loose stars by brightness
+ *  moved the field 67 -> 64, which is not a reduction anyone would notice.
+ *
+ *  Going below 59 would mean dropping whole figures. That is possible and keeps
+ *  them intact, but which figures are above the horizon depends on the hour and
+ *  the observer, so a fixed subset risks a default sky with almost nothing in
+ *  it. Not done without deciding that trade deliberately. */
+export const inDefaultField = (name: string, _mag: number): boolean =>
+  FIGURE_MEMBERS.has(name);
 
 export const SEGMENTS: Array<{ name: string; a: string; b: string }> = FIGURES.flatMap(
   ([name, segs]) => segs.map(([a, b]) => ({ name, a, b })),
