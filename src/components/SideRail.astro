@@ -28,7 +28,7 @@ const sections = [
 ---
 
 <nav class="side-rail" aria-label="In-page jump links">
-  <div class="rail-progress" aria-hidden="true"><span class="rail-progress-fill"></span></div>
+  <div class="rail-progress" aria-hidden="true" style={`--rail-count:${sections.length}`}><span class="rail-progress-fill"></span></div>
 
   <div class="rail-window">
     <ul class="rail-stack">
@@ -71,7 +71,9 @@ const sections = [
   .rail-progress {
     position: relative;
     width: 1px;
-    height: calc(2.3rem * 6);
+    /* Derived from the list, not hardcoded: this was `* 6` and silently went short
+       when a seventh section was added. */
+    height: calc(2.3rem * var(--rail-count, 6));
     background: var(--border);
     flex: none;
   }
@@ -83,7 +85,17 @@ const sections = [
     background: var(--primary);
     transform-origin: top;
     transform: scaleY(0);
-    animation: rail-progress-fill linear;
+    /* LONGHANDS, deliberately. Written as `animation: rail-progress-fill linear`
+       plus a separate `animation-timeline`, Lightning CSS merges the two into
+       `animation: linear rail-progress-fill scroll(root)` — and Chrome's animation
+       shorthand does not accept a timeline value, so it discards the whole
+       declaration and the fill never moves. Longhands cannot be merged into that
+       shape. `animation-duration: auto` matters too: the shorthand's implicit 0s
+       leaves a scroll-driven animation with no range to travel. */
+    animation-name: rail-progress-fill;
+    animation-duration: auto;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
     animation-timeline: scroll(root);
   }
   @keyframes rail-progress-fill {
