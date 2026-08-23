@@ -92,19 +92,15 @@
     }
   }
 
-  /* The Sun glow is gone (removed deliberately, not lost). What remains here is
-     only a faint cool wash at 7% alpha, which reads as atmosphere rather than as
-     a lamp, and is not attributable to any body on the canvas. If even this
-     reads as a light source the sky cannot account for, delete it too. */
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0 0 auto 0;
-    height: 85vh;
-    z-index: -2;
-    pointer-events: none;
-    background: radial-gradient(70% 50% at 88% 6%, oklch(70% .050 250 / .07), transparent 66%);
-  }
+  /* NO AMBIENT GLOW. There was a fixed body::before painting
+     radial-gradient(70% 50% at 88% 6%, oklch(70% .050 250 / .07), transparent 66%)
+     over the top-right of every page. It read as a light source the sky cannot
+     account for — nothing on the canvas is at 88% 6% emitting anything — and it
+     was also the last off-palette colour in this file, since an oklch() with
+     alpha is neither one of the thirteen nor derivable from them.
+
+     Do not reintroduce it. The sky is the only light on this page; if the flat
+     field needs breaking, the graticule and the bodies do it. */
 
   /* NO FILM GRAIN. There was a fixed, full-viewport body::after whose background
      was an SVG generated at runtime by feTurbulence, composited at opacity .028.
@@ -316,7 +312,7 @@
     position: relative;
     border-radius: var(--radius);
     background: var(--surface);
-    box-shadow: inset 0 0 0 1px var(--border), none;
+    box-shadow: inset 0 0 0 1px var(--border);
     transition: background-color var(--dur-hover) var(--ease-out),
                 box-shadow var(--dur-hover) var(--ease-out);
   }
@@ -324,7 +320,7 @@
     .group\/list-item:hover .atelier-card,
     .atelier-card:hover {
       background: var(--elevated);
-      box-shadow: inset 0 0 0 1px var(--muted), none;
+      box-shadow: inset 0 0 0 1px var(--muted);
     }
   }
   @media (prefers-reduced-motion: reduce) {
