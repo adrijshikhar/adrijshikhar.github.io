@@ -51,7 +51,7 @@ const hue = (hex) => {
 
 const BAR = 4.5;
 const MAX_COLOURS = 6;
-const MAX_HUE_SPREAD = 190; // a rainbow is what we replaced; keep it narrow
+const MAX_HUE_SPREAD = 190; // a rainbow is what we replaced; keep it narrow // a rainbow is what we replaced; keep it narrow
 
 const fails = [];
 const pass = (msg) => console.log(`  [32m✓[0m ${msg}`);
