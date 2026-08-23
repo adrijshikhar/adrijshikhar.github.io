@@ -88,8 +88,8 @@
   --spectral-ob: #61AFEF;              /* links, active nav, keywords   5.46:1 */
   --spectral-a:  #56B6C2;              /* types, infra tags, planets    5.44:1 */
   --spectral-f:  #E6E6E6;              /* headings, bright stars       10.33:1 */
-  --spectral-g:  #E5C07B;              /* data tags, numerics, the Sun. Their Orange. */
-  --spectral-k:  #98C379;              /* language tags, strong text, numerics. Green. NOTE: no
+  --spectral-g:  #E5C07B;              /* data tags, dates and metrics, the Sun. Their Orange. */
+  --spectral-k:  #98C379;              /* language tags only, plus strings in the code pane. NOTE: no
                                           star reads this token — the canvas uses A for planets, G
                                           for the Sun and F for bright stars — so unlike those
                                           three, K carries no astronomical claim and green here
@@ -320,7 +320,11 @@
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    color: var(--spectral-k);
+    /* Orange, not Green. This class is on the date of EVERY card, one per row all
+       the way down a list, so whatever hue it takes becomes the page's cast.
+       A date is a numeric datum, which is the job the ramp gives G/Orange;
+       Green stays on the language tags and on strings in the code pane. */
+    color: var(--spectral-g);
     font-variant-numeric: tabular-nums;
   }
   .meta-data--muted { color: var(--muted); }
