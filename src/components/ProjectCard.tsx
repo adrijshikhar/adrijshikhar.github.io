@@ -27,7 +27,7 @@ export default function ProjectCard({
           <span>{date}</span>
           {company && <span>{company}</span>}
         </div>
-        <CardTitle className="text-xl">
+        <CardTitle className="text-xl leading-snug">
           {link ? (
             <a href={link} target="_blank" rel="noreferrer noopener" className="hover:underline">
               {title} <span aria-hidden="true">&#8599;</span>

@@ -21,15 +21,23 @@ export default function ExpCard({
   tagline,
   contentHtml,
 }: ExpCardProps) {
+  // Stretch the company link over the whole card ONLY when the card has no body
+  // prose. On /experience/ the body carries its own links, and an overlay would
+  // sit on top of them and swallow every click. The home page renders these
+  // cards without prose, so there the whole card is safely one target.
+  const stretch = !contentHtml && !!companyLink;
+
   return (
     <Card
-      className="group transition-all duration-200 hover:-translate-y-0.5 hover:border-ring hover:shadow-lg motion-reduce:translate-none motion-reduce:transition-none"
+      className={`group h-full transition-all duration-200 hover:-translate-y-0.5 hover:border-ring hover:shadow-lg focus-within:border-ring motion-reduce:translate-none motion-reduce:transition-none${
+        stretch ? ' relative' : ''
+      }`}
     >
       <CardHeader>
-        <div className="text-xs text-muted-foreground">
+        <div className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
           {startDate} &ndash; {endDate}
         </div>
-        <CardTitle className="text-xl">
+        <CardTitle className="text-xl leading-snug">
           {position}
           <span className="text-muted-foreground"> / </span>
           {companyLink ? (
@@ -37,7 +45,9 @@ export default function ExpCard({
               href={companyLink}
               target="_blank"
               rel="noreferrer noopener"
-              className="hover:underline"
+              className={`group-hover:underline focus-visible:outline-none${
+                stretch ? " after:absolute after:inset-0 after:rounded-xl after:content-['']" : ''
+              }`}
             >
               {company} <span aria-hidden="true">&#8599;</span>
             </a>

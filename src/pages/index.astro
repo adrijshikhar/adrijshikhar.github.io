@@ -212,7 +212,7 @@ const SOCIAL_ICON_PATHS = {
             {education.meta.entries.map((edu: any, i: number) => (
               <li class={`rounded-xl border bg-card text-card-foreground shadow-sm group/list-item px-5 py-6 lg:px-6 lg:py-7`}>
                 <span class="font-mono text-xs uppercase tracking-wider text-muted-foreground">{edu.startDate} — {edu.endDate}</span>
-                <h3 class="mt-2 text-xl font-semibold leading-none">{edu.institution}</h3>
+                <h3 class="mt-2 text-xl font-semibold leading-snug">{edu.institution}</h3>
                 <div class="mt-1 text-sm text-foreground">
                   {edu.degree}{edu.field && <span class="text-muted-foreground"> — {edu.field}</span>}
                 </div>
