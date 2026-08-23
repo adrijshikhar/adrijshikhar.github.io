@@ -314,6 +314,11 @@ export interface BodyPos extends NamedStarPos {
   /** Distance from Earth in AU — solar-system bodies only. Its presence is what
    *  tells `separationLabel` to answer in km rather than light years. */
   au?: number;
+  /** Withheld from the default field: a loose dim star, not part of any drawn
+   *  constellation. Flagged rather than removed because game.sync() pairs
+   *  bodies[i] with game.stars[i] positionally and hoverIndex is an index into
+   *  this same array — dropping entries would misalign both silently. */
+  suppressed?: boolean;
 }
 
 /** The planet glyph sheet, loaded by SkyField (see planet-sprite.ts) and passed
@@ -332,6 +337,21 @@ export interface MoonPhase {
 
 /** Flat, ordered segment list — the brief's "47 segments across 14 figures"
  *  all draw simultaneously over the same scroll range, in this fixed order. */
+/** Every star named in a FIGURES segment. Derived, not hand-listed, so it cannot
+ *  drift from the constellations actually drawn. */
+export const FIGURE_MEMBERS: ReadonlySet<string> = new Set(
+  FIGURES.flatMap(([, segs]) => segs.flatMap(([a, b]) => [a, b])),
+);
+
+/** Default-field rule: a star earns its place either by being part of a drawn
+ *  constellation, or by being bright enough to be a landmark on its own. At
+ *  mag 1.5 the second group is Arcturus, Vega, Capella, Procyon, Achernar,
+ *  Altair, Spica and Fomalhaut — eight stars most people can name. That is 67 of
+ *  96; the other 29 are loose dim stars that only add density. */
+export const LOOSE_STAR_MAG_LIMIT = 1.5;
+export const inDefaultField = (name: string, mag: number): boolean =>
+  FIGURE_MEMBERS.has(name) || mag <= LOOSE_STAR_MAG_LIMIT;
+
 export const SEGMENTS: Array<{ name: string; a: string; b: string }> = FIGURES.flatMap(
   ([name, segs]) => segs.map(([a, b]) => ({ name, a, b })),
 );
@@ -487,7 +507,10 @@ export function nearestPoint<T extends { x: number; y: number }>(
 /** Nearest body under the cursor, within `max` px — the same 22px hit radius
  *  the prototype used for star hover. Returns -1 when nothing is close enough. */
 export function nearestBody(bodies: BodyPos[], mx: number, my: number, max = 22): number {
-  return nearestPoint(bodies, mx, my, max);
+  // A suppressed star is not painted, so it must not be hoverable either —
+  // otherwise the readout names a star the visitor cannot see.
+  const i = nearestPoint(bodies, mx, my, max);
+  return i >= 0 && bodies[i].suppressed ? -1 : i;
 }
 
 /** Distance from a point to a line SEGMENT (not an infinite line) — used to
@@ -621,6 +644,7 @@ export function drawBodies(
   for (let i = 0; i < bodies.length; i++) {
     const s = bodies[i];
     if (s.alt < FLOOR) continue;
+    if (s.suppressed) continue;
     const below = s.alt < 0 ? 0.3 : 1;
     const a = Math.min(BODY_ALPHA_CAP, starAlpha(s.mag)) * below;
     const r = s.vr; // single source of truth for the painted radius

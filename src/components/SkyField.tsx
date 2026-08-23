@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   computeFullSky,
+  inDefaultField,
   drawQuiet,
   drawFull,
   nearestBody,
@@ -19,6 +20,11 @@ import { animate, onScroll } from '../lib/motion';
 
 const ALT_RANGE = `+90…−${Math.abs(FLOOR)}°`;
 const STAR_COUNT = STARS.length;
+/** Stars in the default field: constellation members plus the loose ones bright
+ *  enough to be landmarks. The chrome must report what is DRAWN — CLAUDE.md
+ *  treats that readout as a true statement about the render, and it stopped
+ *  being one the moment the field became switchable. */
+const DEFAULT_STAR_COUNT = STARS.filter(([name, , , mag]) => inDefaultField(name, mag)).length;
 
 /** `?t=<ISO datetime>` points the instrument at another moment — the sky over
  *  your location on any date, past or future. Everything downstream already
@@ -92,6 +98,13 @@ export default function SkyField({ mode }: SkyFieldProps) {
   const [playing, setPlaying] = useState(false);
   const [tool, setTool] = useState<Tool>('sling');
   const [struck, setStruck] = useState(0);
+  /** Faint-field reveal. Default OFF: the ambient sky shows the constellations
+   *  plus the eight loose stars bright enough to be landmarks, which is 67 of 96.
+   *  Turning it on inside orbital mechanics reveals the other 29 — they are the
+   *  dim loose stars that make the field feel busy when nobody asked for them,
+   *  and interesting when somebody did. */
+  const [showFaint, setShowFaint] = useState(false);
+  const showFaintRef = useRef(false);
   // The machine view is the raw-markdown surface; the sky and everything that
   // belongs to it are suppressed there. `#sky` is hidden in CSS, but the hook
   // and tool bar are separate nodes outside `.human-view`, so they need their
@@ -193,6 +206,10 @@ export default function SkyField({ mode }: SkyFieldProps) {
       stop();
     };
   }, [mode, playing]);
+
+  useEffect(() => {
+    showFaintRef.current = showFaint;
+  }, [showFaint]);
 
   useEffect(() => {
     if (struck !== 1) return;
@@ -460,6 +477,13 @@ export default function SkyField({ mode }: SkyFieldProps) {
       };
       if (mode === 'full') {
         const { bodies, faint, moonPhase } = computeFullSky(obs, skyNow(), W, H);
+        // Flag, never filter: game.sync() pairs bodies[i] with game.stars[i]
+        // positionally, and hoverIndex indexes this same array.
+        if (!showFaintRef.current) {
+          for (const b of bodies) {
+            if (!b.isPlanet && !b.isMoon && !b.isSun) b.suppressed = !inDefaultField(b.name, b.mag);
+          }
+        }
         if (game) {
           // Merge the real sky into the persistent game star list, then splice
           // the game's live positions back into `bodies` — `bodies` is a fresh
@@ -780,13 +804,22 @@ export default function SkyField({ mode }: SkyFieldProps) {
           geo lookup 404s, and says so rather than implying a real fix. */}
       {mode === 'full' && !machine && (
         <div
-          className="pointer-events-none fixed left-1/2 top-[1.9rem] -z-[1] hidden -translate-x-1/2
-            gap-2 font-mono text-xs whitespace-nowrap text-muted-foreground sm:flex"
+          className="pointer-events-none fixed left-1/2 top-[1.9rem] -z-[1] flex -translate-x-1/2
+            gap-2 font-mono text-xs whitespace-nowrap text-muted-foreground"
           aria-hidden="true"
         >
+          {/* ALT is the projection's real altitude span and stays on every width:
+              it is short, and it is the one cell that explains what the canvas is
+              showing. STARS and JD are withheld below sm — three cells do not fit
+              a phone without wrapping, and a bare Julian Date is the least
+              self-explanatory value in the chrome. */}
           <span className="whitespace-nowrap rounded-md border px-2 py-1">ALT {ALT_RANGE}</span>
-          <span className="whitespace-nowrap rounded-md border px-2 py-1">STARS {STAR_COUNT}</span>
-          <span className="whitespace-nowrap rounded-md border px-2 py-1">JD {jd}</span>
+          <span className="hidden whitespace-nowrap rounded-md border px-2 py-1 sm:inline-block">
+            STARS {showFaint ? STAR_COUNT : DEFAULT_STAR_COUNT}
+          </span>
+          <span className="hidden whitespace-nowrap rounded-md border px-2 py-1 sm:inline-block">
+            JD {jd}
+          </span>
         </div>
       )}
 
@@ -938,6 +971,23 @@ export default function SkyField({ mode }: SkyFieldProps) {
                 >
                   <span className="chrome-bracket" aria-hidden="true">[</span>
                   draw
+                  <span className="chrome-bracket" aria-hidden="true">]</span>
+                </button>
+              </div>
+
+              {/* The faint field belongs here rather than in the ambient chrome:
+                  it is the one control that changes what the sky CONTAINS, so it
+                  sits with the other instrument controls and not on the landing
+                  page, where nobody asked to see 29 more dim stars. */}
+              <div className="chrome-group">
+                <button
+                  type="button"
+                  aria-pressed={showFaint}
+                  onClick={() => setShowFaint((v) => !v)}
+                  className="chrome-seg flex-1"
+                >
+                  <span className="chrome-bracket" aria-hidden="true">[</span>
+                  faint field
                   <span className="chrome-bracket" aria-hidden="true">]</span>
                 </button>
               </div>
