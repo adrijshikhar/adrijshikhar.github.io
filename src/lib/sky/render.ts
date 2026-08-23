@@ -73,9 +73,9 @@ export const FAINT_FIELD: Array<{ ra: number; dec: number; mag: number }> = [];
 
 /** Painted radius from magnitude. The faint end was 1.4px, which is a single
  *  device pixel on a 1x display — below the size at which a dot reads as an
- *  object rather than as sensor noise. Floor raised to 1.9px and the slope
- *  steepened so the bright end still separates. */
-const vrFor = (mag: number): number => 1.9 + Math.max(0, 3.4 - mag) * 1.25;
+ *  object rather than as sensor noise. Floor is 1.55px: enough to read as an
+ *  object, small enough that 106 of them do not fill the frame. */
+const vrFor = (mag: number): number => 1.55 + Math.max(0, 3.1 - mag) * 1.15;
 
 /** Recompute alt/az and screen position for every star at `when`, for `obs`. */
 export function computeSky(
@@ -100,10 +100,12 @@ export function computeSky(
 /** Alpha from magnitude. The old ramp reached zero at mag 2.6 and clamped to a
  *  0.12 floor, so 46% of the catalogue — everything fainter than mag 2.0 — was
  *  painted at 0.12-0.18 alpha. Near-white at 0.12 over a near-black ground is
- *  dark grey, which is why the field read as empty. The ramp now runs to mag 3.6
- *  (past the catalogue's 3.35 floor, so no star sits at the clamp by accident)
- *  and the floor is 0.40. */
-const starAlpha = (mag: number): number => Math.max(0.40, Math.min(1, (3.6 - mag) / 3.2));
+ *  dark grey, which is why the field read as empty. The ramp runs to mag 3.3 and
+ *  floors at 0.20 — 67% brighter than the old floor, so the faint end is present,
+ *  but a wide enough range that bright stars still dominate. A floor of 0.40 was
+ *  tried and read as crowded: it compressed bright-to-faint separation from ~76x
+ *  down to 25x, so the field became a uniform mass instead of a hierarchy. */
+const starAlpha = (mag: number): number => Math.max(0.20, Math.min(1, (3.3 - mag) / 3.0));
 
 /** Every colour the renderer paints with, resolved once per frame by the
  *  caller (SkyField.tsx) from CSS custom properties + the active `data-mode`.
