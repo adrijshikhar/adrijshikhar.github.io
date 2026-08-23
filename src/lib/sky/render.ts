@@ -240,20 +240,41 @@ export type KeepOut = { x: number; y: number; w: number; h: number; strength?: n
 function applyKeepOut(ctx: CanvasRenderingContext2D, k: KeepOut, W: number): void {
   const strength = k.strength ?? 0.45;
   const feather = 140;
+  const side = 72;
   const prev = ctx.globalCompositeOperation;
   ctx.globalCompositeOperation = 'destination-out';
 
-  // Vertical feather at the top edge only: that boundary is where the hero hands
-  // over to the content, so a gradient there reads as the sky receding rather
-  // than as a seam. The bottom simply runs to the end of the content.
-  const top = ctx.createLinearGradient(0, k.y - feather, 0, k.y);
-  top.addColorStop(0, 'rgba(0,0,0,0)');
-  top.addColorStop(1, `rgba(0,0,0,${strength})`);
-  ctx.fillStyle = top;
-  ctx.fillRect(0, k.y - feather, W, feather);
+  // Horizontal extent is the READING COLUMN, not the viewport. This used to be
+  // fillRect(0, …, W, …), which erased 45% of every mark on the canvas —
+  // including the planet labels and the hover readout out in the empty margins,
+  // where there is no text to protect. Those labels are the instrument's own
+  // voice; dimming them by half bought no legibility, it just made the sky
+  // unreadable. Text only ever sits inside the column, so that is all the
+  // keep-out needs to cover.
+  const x0 = Math.max(0, k.x - side);
+  const x1 = Math.min(W, k.x + k.w + side);
 
-  ctx.fillStyle = `rgba(0,0,0,${strength})`;
-  ctx.fillRect(0, k.y, W, k.h);
+  // Feathered on all four sides now: a hard vertical edge in open sky reads as a
+  // seam, which is exactly the failure the top edge was already feathered to
+  // avoid.
+  const band = (y: number, h: number, alpha: number) => {
+    const g = ctx.createLinearGradient(x0, 0, x1, 0);
+    g.addColorStop(0, 'rgba(0,0,0,0)');
+    g.addColorStop(Math.min(0.49, side / Math.max(1, x1 - x0)), `rgba(0,0,0,${alpha})`);
+    g.addColorStop(Math.max(0.51, 1 - side / Math.max(1, x1 - x0)), `rgba(0,0,0,${alpha})`);
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(x0, y, x1 - x0, h);
+  };
+
+  // Vertical feather at the top edge: that boundary is where the hero hands over
+  // to the content, so a gradient there reads as the sky receding, not a seam.
+  const steps = 12;
+  for (let i = 0; i < steps; i++) {
+    const t = (i + 1) / steps;
+    band(k.y - feather + (feather * i) / steps, feather / steps + 1, strength * t);
+  }
+  band(k.y, k.h, strength);
 
   ctx.globalCompositeOperation = prev;
 }

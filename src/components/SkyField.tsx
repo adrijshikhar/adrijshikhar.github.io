@@ -764,14 +764,14 @@ export default function SkyField({ mode }: SkyFieldProps) {
             <span className="k">Sun</span>
             <b>
               {sky.sunAlt === null ? '—' : `${sky.sunAlt > 0 ? '+' : '−'}${Math.abs(sky.sunAlt).toFixed(1)}°`}
-              <span className="opacity-60">{' · '}{sky.twilight}</span>
+              <span className="text-muted-foreground">{' · '}{sky.twilight}</span>
             </b>
           </div>
           <div className="readout-cell">
             <span className="k">Moon</span>
             <b>
               {Math.round(sky.moonIllum * 100)}%
-              <span className="opacity-60">{' · '}{sky.moonWaxing ? 'waxing' : 'waning'}</span>
+              <span className="text-muted-foreground">{' · '}{sky.moonWaxing ? 'waxing' : 'waning'}</span>
             </b>
           </div>
           <div className="readout-cell">
@@ -864,7 +864,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
               ) : (
                 <>
                   that is a real segment of <b className="font-medium text-primary">{figure.name}</b>
-                  <span className="opacity-60"> · {figure.drawn}/{figure.total}</span>
+                  <span className="text-muted-foreground"> · {figure.drawn}/{figure.total}</span>
                 </>
               )}
             </p>
@@ -873,7 +873,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
           {playing && !figure && massNote && (
             <p className="mass-note fixed right-6 bottom-6 z-[45] max-w-[15rem] text-right font-mono text-[0.625rem] leading-relaxed tracking-[0.14em] uppercase text-muted-foreground">
               same pull, less mass &mdash; <b className="font-medium text-primary">faint stars fly faster</b>
-              <span className="opacity-60"> · v &prop; 1/&radic;m</span>
+              <span className="text-muted-foreground"> · v &prop; 1/&radic;m</span>
             </p>
           )}
 

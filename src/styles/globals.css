@@ -227,7 +227,6 @@
   }
   a:hover {
     color: var(--primary);
-    opacity: 0.78;
   }
 
   ::selection {
@@ -374,6 +373,8 @@ body.machine-mode #sky {
   opacity: 0;
 }
 #sky {
+  /* Motion, not colour: without this the sky snaps out on toggle instead of
+     dissolving, and the machine view is contractually a pure opacity crossfade. */
   transition: opacity 0.5s var(--ease-out);
 }
 
@@ -403,12 +404,10 @@ body.machine-mode #sky {
   transition: opacity 0.4s var(--ease-out);
 }
 body.playing .human-view {
-  opacity: 0.3;
   pointer-events: none;
 }
 /* On paper, 0.3 is not receding -- it is grey text on a grey ground with
    nothing to look at. Light mode needs the content genuinely out of the way. */
-:root[data-mode='light'] body.playing .human-view { opacity: 0.12; }
 
 .mass-note {
   pointer-events: none;
@@ -539,7 +538,6 @@ body.spinning * {
     width: 18px;
     height: 18px;
     border: 0 solid var(--muted-foreground);
-    opacity: 0.55;
   }
   .viewfinder i:nth-child(1) { top: 14px; left: 14px; border-top-width: 1px; border-left-width: 1px; }
   .viewfinder i:nth-child(2) { top: 14px; right: 14px; border-top-width: 1px; border-right-width: 1px; }
@@ -555,7 +553,6 @@ body.spinning * {
     transform: translateX(-50%);
     width: min(46vw, 520px);
     height: 6px;
-    opacity: 0.4;
     background: repeating-linear-gradient(90deg, var(--muted-foreground) 0 1px, transparent 1px 100%) 0 0 / 26px 100%;
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 22%, #000 78%, transparent);
     mask-image: linear-gradient(90deg, transparent, #000 22%, #000 78%, transparent);
@@ -575,7 +572,7 @@ body.spinning * {
     pointer-events: none;
   }
   .instrument-l { left: 1.6rem; }
-  .instrument-r { right: 1.6rem; text-align: right; opacity: 0.8; }
+  .instrument-r { right: 1.6rem; text-align: right; }
   /* Top-left ephemeris block — the one corner the instrument left empty.
      Tucked under the viewfinder bracket, with a narrower label column than the
      bottom readout: those labels are two words, these are one, and carrying the
@@ -593,7 +590,7 @@ body.spinning * {
      positioned independently via its own `bottom-24` (6rem) Tailwind class —
      fixed apart so neither moves when the other appears. */
   .instrument b { color: var(--foreground); font-weight: 500; }
-  .instrument .k { display: inline-block; width: 6.5rem; opacity: 0.75; }
+  .instrument .k { display: inline-block; width: 6.5rem; }
 
   .readout-row {
     display: flex;
@@ -613,7 +610,6 @@ body.spinning * {
     text-indent: 0;
     font-size: 0.5625rem;
     letter-spacing: 0.16em;
-    opacity: 0.6;
   }
   .readout-row b { font-variant-numeric: tabular-nums; }
 
@@ -706,8 +702,6 @@ body.spinning * {
     letter-spacing: 0.2em;
     text-transform: uppercase;
     color: var(--muted-foreground);
-    opacity: 0.75;
-    transition: opacity 0.5s var(--ease-out);
   }
   .scroll-cue-rail {
     position: relative;
@@ -746,6 +740,8 @@ body.spinning * {
   }
   .viewfinder,
   .instrument {
+    /* Crossfade, not colour: the human<->machine toggle is a pure opacity
+       transition, so the instrument has to fade with it rather than snap. */
     transition: opacity 0.5s var(--ease-out);
   }
 
