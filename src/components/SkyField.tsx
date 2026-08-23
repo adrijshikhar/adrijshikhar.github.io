@@ -975,10 +975,13 @@ export default function SkyField({ mode }: SkyFieldProps) {
                 </button>
               </div>
 
-              {/* The faint field belongs here rather than in the ambient chrome:
-                  it is the one control that changes what the sky CONTAINS, so it
-                  sits with the other instrument controls and not on the landing
-                  page, where nobody asked to see 29 more dim stars. */}
+              {/* "dark sky" is the real observing term for the condition this
+                  simulates: away from light pollution, the fainter magnitudes
+                  appear. It is chosen over "faint field" (jargon) and "deep sky"
+                  (which means nebulae and galaxies, not dim stars — the chrome is
+                  not allowed to lie). It sits with the instrument controls rather
+                  than in the ambient chrome because it is the one control that
+                  changes what the sky CONTAINS. */}
               <div className="chrome-group">
                 <button
                   type="button"
@@ -987,7 +990,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
                   className="chrome-seg flex-1"
                 >
                   <span className="chrome-bracket" aria-hidden="true">[</span>
-                  faint field
+                  dark sky
                   <span className="chrome-bracket" aria-hidden="true">]</span>
                 </button>
               </div>
