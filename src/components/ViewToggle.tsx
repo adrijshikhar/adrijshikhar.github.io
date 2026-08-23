@@ -39,8 +39,11 @@ const buildMachineHtml = (): string => {
   //
   // This runs LINE-WISE on already-escaped text, after links and bold, so the
   // spans it adds cannot be re-escaped and cannot swallow an <a> or <strong>.
-  // Matching is anchored to the start of a line: a '#' inside prose is not a
-  // heading, and neither is one inside a fenced block.
+  // Matching is anchored to the start of a line, so a '#' inside prose is not a
+  // heading. KNOWN LIMITATION: there is no fence tracking here, so a '#' comment
+  // on its own line inside a fenced block IS styled as a heading. Harmless in
+  // the current posts; if it starts mattering, track fences rather than widening
+  // this regex.
   const coloured = withBold
     .split('\n')
     .map((line: string) => {
