@@ -54,7 +54,7 @@ Two claims a neighbouring portfolio could not truthfully copy:
 ## Capabilities and Constraints
 
 - **Static only.** No server, no database, no CMS. Astro 6 static build with
-  React 19 islands, Tailwind 3, MDX; Bun is the package manager; Node 22
+  React 19 islands, Tailwind 4, shadcn/ui, MDX; Bun is the package manager; Node 22
   pinned. Deploys to GitHub Pages via GitHub Actions on the `content` branch.
 - **Canonical domain is `adrijshikhar.dev`** (Cloudflare-fronted).
   `adrijshikhar.github.io` is the Pages origin behind it. Absolute URLs
@@ -72,11 +72,11 @@ Two claims a neighbouring portfolio could not truthfully copy:
 - Name: **Adrij Shikhar**. Title: Senior Software Engineer.
 - Existing tagline in content: "I build scalable data platforms and craft
   software that pushes boundaries."
-- **Retained from the incumbent design, binding through any redesign:**
+- **Binding through any redesign:**
   - the background **sky** concept — a real-astronomy sky the page sits inside;
   - the **planet glyph icon set**;
-  - **light and dark mode** as a first-class pair;
-  - the **Sun's glow in dark mode**.
+  - **dark only** — there is no light mode;
+  - **no glows** — nothing on the page emits light the sky cannot account for.
 - **The rest of the incumbent visual world is explicitly open** — palette,
   typography, layout, card system, chrome treatment, and overall branding may
   be replaced. Treat the current look outside the four retained elements as

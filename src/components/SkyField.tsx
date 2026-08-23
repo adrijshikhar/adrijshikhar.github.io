@@ -918,7 +918,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
             onClick={() => controlsRef.current?.enter()}
             aria-hidden={playing}
             tabIndex={playing ? -1 : 0}
-            className={`egg-hint tap-44 fixed right-[calc(1.4rem-var(--sb))] bottom-24 z-[45] hidden font-mono text-[0.6875rem] tracking-[0.14em] uppercase text-muted-foreground transition-colors duration-[var(--dur-ui)] hover:text-primary focus-visible:text-primary md:block ${
+            className={`egg-hint tap-44 fixed right-[1.4rem] bottom-24 z-[45] hidden font-mono text-[0.6875rem] tracking-[0.14em] uppercase text-muted-foreground transition-colors duration-[var(--dur-ui)] hover:text-primary focus-visible:text-primary md:block ${
               playing ? 'pointer-events-none opacity-0' : ''
             }`}
           >
@@ -951,7 +951,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
           )}
 
           {playing && (
-            <div className="chrome-panel fixed right-[calc(1.4rem-var(--sb))] bottom-[1.4rem] z-[45] w-[13rem] flex-col items-stretch gap-0 p-0">
+            <div className="chrome-panel fixed right-[1.4rem] bottom-[1.4rem] z-[45] w-[13rem] flex-col items-stretch gap-0 p-0">
               <div className="chrome-group">
                 <button
                   type="button"

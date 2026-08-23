@@ -145,12 +145,6 @@
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);  /* sky drag-release ONLY */
   --ease-out: cubic-bezier(.32, .72, 0, 1);
   --card-radius: var(--radius);
-  /* Scrollbar gutter width: 100vw includes it, 100% of <body> does not. Fixed
-     chrome anchored to `right` needs this subtracted, or its visible gap is the
-     nominal offset PLUS the gutter while its bottom gap is the nominal offset —
-     which is exactly how the game panel ended up 10px further from the right
-     edge than from the bottom. */
-  --sb: calc(100vw - 100%);
 }
 
 /* --accent-contrast is a substrate value (dark) — the accent is a saturated mid-tone,
@@ -267,7 +261,12 @@
 
      Cost, accepted: visitors who set scrollbars to "Always" — often because they
      want the position feedback — lose it here. The scroll cue in the hero and the
-     section rail are what stand in for it. Scrolling itself is untouched. */
+     section rail are what stand in for it. Scrolling itself is untouched.
+
+     NOTE: fixed chrome anchored to `right` depends on this. A visible scrollbar
+     reserves layout width, so `right: 1.4rem` would render as 1.4rem PLUS the
+     gutter while its `bottom` stayed 1.4rem — an off-centre corner. If the
+     scrollbar is ever restored, those offsets need the gutter subtracted. */
   html {
     scrollbar-width: none;              /* Firefox */
     -ms-overflow-style: none;           /* legacy Edge */
