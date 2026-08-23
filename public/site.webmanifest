@@ -1,7 +1,7 @@
 {
   "name": "Adrij Shikhar",
   "short_name": "adrijshikhar.dev",
-  "description": "Senior software engineer at Hevo Data. I move data between systems that were never designed to agree, and write down what breaks on the way.",
+  "description": "Senior software engineer at Hevo Data. I build connector platforms and the agent tooling that generates and operates them, and write down what breaks on the way.",
   "icons": [
     { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
     { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }

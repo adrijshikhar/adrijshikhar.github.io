@@ -80,27 +80,25 @@ entries:
 
 - Built the surface that lets LLMs generate and operate connectors: a construct library, a connector generator, an installable CLI, a skill library, and an MCP server exposing platform APIs to agents.
 - Started the internal agent-tooling platform the team now builds on — repo structure, skill conventions, CI auto-release, marketplace distribution. Other engineers extend it rather than fork it.
-- **Impact:** a connector can be scaffolded, generated and operated by an agent instead of hand-written.
 
 ### Streamlining connector development
 
 - Made connector authentication declarative. A provider used to be its own processor inside the platform — a code change, a database migration, and coordination across three services. It is now a config file, with no platform change at all.
 - Moved runtime configuration and config templates into the connector, behind a compatibility kit that gates correctness at build time instead of in review.
 - Standardised how connector repos are created, versioned and released, behind a central BOM carrying a named release policy. Before this every connector carried its own build config and drifted.
-- Removed the shared SDK dependency across the connector fleet, so a connector no longer inherits a runtime it does not control.
-- **Impact:** onboarding a connector no longer means changing the platform.
+- Decoupled the connector fleet from the shared platform SDK, so a connector no longer inherits a runtime it does not control.
 
 ### Connection reliability
 
-- Owned the test-connection contract end to end and drove its false-negative rate from **over 30% to zero** — a failing check now means an actual connection problem.
+- Owned the test-connection contract end to end and took its false-negative rate from **over 30% to nil in validation** — a failing check now means an actual connection problem rather than a flaky one.
 - Delivered configuration validation across every source and destination — Postgres, MySQL, Oracle, SQL Server, Snowflake, BigQuery, Redshift — so a misconfiguration surfaces at connect time rather than at first sync.
 - Brought p95 test-connection latency **under 10 seconds**, and shipped an end-to-end suite alongside each framework rather than leaving the contract unit-tested.
 
 ### Failure visibility
 
 - Replaced static error classification with a dynamic system. A classification change used to wait on a connector's full release cycle; it now takes **minutes instead of 3–7 days**.
-- Traced a class of production hangs to a regex engine that ignores thread interrupts, so timed-out work never released its thread. Migrating to RE2J took a 4,800-request run from a **seven-minute hang to 1m19s**, and bounded worst-case evaluation under five seconds.
-- Built metrics and dashboards for connection health, and added HTTP client metrics to the connector SDK so teams see a rate-limiting API before it becomes a sync failure.
+- Root-caused a class of production hangs to the regex engine rather than the queries being run, and migrated classification to RE2J — which bounds worst-case evaluation to **under five seconds** and took a load run from a multi-minute stall to **1m19s**.
+- Built metrics and dashboards for connection health, and put HTTP client metrics into the connector construct library so teams see a rate-limiting API before it becomes a sync failure.
 
 ### Data correctness at scale
 
@@ -108,7 +106,7 @@ entries:
 - Built parent-child object handling with inferred deletes, giving full-load objects the delete support they previously lacked.
 - Implemented real-time CDC on the Debezium engine, and built the schema catalog service behind it from scratch — schema versioning, metadata management and compatibility checks, so a pipeline survives schema evolution.
 - Scaled object handling from **1,000 to 25,000 objects**, with a **5x** gain in MySQL ingestion throughput.
-- Traced SSL failures to a hardcoded protocol that stopped the JVM negotiating, then enforced TLS 1.2 and 1.3 only across every source and destination.
+- Moved every source and destination onto negotiated TLS 1.2 and 1.3, and proved it safe across providers with a dedicated SSL test suite.
 
 ### Engineering velocity
 

@@ -1,23 +1,22 @@
 ---
 name: "Adrij Shikhar"
 title: "Senior Software Engineer"
-tagline: "I build data platforms, and the agent tooling that generates and operates them."
-email: "ashikhar@ee.iitr.ac.in"
+email: "adrijshikhar@gmail.com"
 socials:
   - platform: github
     url: "https://github.com/adrijshikhar/"
     icon: "fab fa-github"
   - platform: linkedin
-    url: "https://www.linkedin.com/in/adrij-shikhar"
+    url: "https://www.linkedin.com/in/adrijshikhar"
     icon: "fab fa-linkedin-in"
   - platform: dev
     url: "https://dev.to/adrijshikhar"
     icon: "fab fa-dev"
   - platform: email
-    url: "mailto:ashikhar@ee.iitr.ac.in"
+    url: "mailto:adrijshikhar@gmail.com"
     icon: "fa fa-envelope"
   - platform: reddit
-    url: "https://www.reddit.com/user/nemesis0009"
+    url: "https://www.reddit.com/user/adrijshikhar"
     icon: "fab fa-reddit"
   - platform: facebook
     url: "https://www.facebook.com/adrij.shikhar"

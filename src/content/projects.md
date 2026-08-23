@@ -3,7 +3,7 @@ entries:
   - slug: catalyst
     title: "Catalyst"
     company: "Open source"
-    date: "May 2026 - Present"
+    date: "May 2026"
     year: 2026
     link: "https://github.com/adrijshikhar/catalyst"
     builtWith: ["Claude Code", "Agent Skills", "Shell"]
@@ -22,7 +22,7 @@ entries:
     builtWith: ["Claude Code", "Agent Skills", "GitHub API", "Jira API"]
   - slug: retry-thread-pool
     title: "Retry Thread Pool"
-    company: "Open source"
+    company: "Maven Central"
     date: "Jun 2026"
     year: 2026
     link: "https://central.sonatype.com/artifact/io.github.adrijshikhar/retry-thread-pool"
@@ -30,7 +30,7 @@ entries:
   - slug: observatory
     title: "adrijshikhar.dev"
     company: "Personal"
-    date: "Aug 2026"
+    date: "Aug 2026 - Present"
     year: 2026
     link: "https://github.com/adrijshikhar/adrijshikhar.github.io"
     builtWith: ["Astro", "React", "Canvas", "Tailwind"]
@@ -160,14 +160,14 @@ A Claude Code skill that reads four years of engineering history and writes it b
 A retrying task executor for Java 17+. Wrap any `ExecutorService` and get retries without rewriting the task.
 
 - Backoff, retry predicates, per-attempt timeouts, listeners and stats.
-- Zero runtime dependencies. Published to Maven Central.
+- Zero runtime dependencies. Published to Maven Central; the source is not public.
 
 <!-- observatory -->
 
-This site. An observatory instrument rather than a page — the background is real computed astronomy for wherever you are reading it from.
+This site. An observatory instrument rather than a page — the background is real computed astronomy, not a texture.
 
-- Star positions, the planets, the Moon's terminator and the Sun are computed for the observer's coordinates and the current Julian date, not decorated.
-- Every mark on the canvas is a catalogued object you can hover and name; the instrument readouts report the frame that was actually painted.
+- Star positions, the planets, the Moon's terminator and the Sun are computed from the observer's coordinates and the current Julian date. It asks for your location and falls back to Bengaluru when the lookup is blocked or slow, because a wrong sky is worse than a stated one.
+- Every mark is a catalogued object rather than a procedural dot, and on the home page with a mouse you can hover any of them to have it named. The instrument readouts report the frame that was actually painted.
 - Text legibility is a hard contract, verified against the rasterised page rather than asserted.
 
 <!-- scraperql -->

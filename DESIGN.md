@@ -108,7 +108,37 @@ before adding or removing chrome.
 cursor-gravity wobble and hover-to-name are skipped when
 `(hover: none), (pointer: coarse)` matches.
 
-## 7. Banned
+## 7. Shipped artefacts that carry copy
+
+Three things state what this site is about, and they used to disagree because two
+of them had no source.
+
+**The positioning line lives in `src/lib/site.ts`.** `BaseLayout` takes its default
+`description` from it (feeding `<meta>`, `og:` and `twitter:`), the hero paragraph
+renders it, and `public/site.webmanifest` repeats it. It previously lived in three
+places plus a `tagline` in `about.md` that nothing read — so a content edit changed
+the one nobody rendered and the site kept advertising the older framing everywhere
+that mattered.
+
+**`public/og-image.jpg` and `public/twitter-image.jpg` are design exports.** Frames
+14 and 15 of `spectral.fig` (authored in `build-spectral.js`, in the design
+companion dir), exported to PNG and converted to progressive JPEG. They render the
+positioning line as *pixels*, so no string edit reaches them — when `site.ts`
+changes, rebuild the design file, re-export those two frames and reconvert. The
+cards deliberately set the display name in Space Grotesk rather than the design's
+Archivo: every other frame there is a proposal, but these two ship today against a
+site whose display face is Space Grotesk, and a card whose type disagrees with the
+page it links to is the same defect in a subtler form. The old card's warm
+top-left glow is gone on purpose — §8 bans ambient gradients.
+
+**`public/assets/resume.pdf` is generated** by `bun run gen:resume` from
+`scripts/resume-print.html`. It came out of a resume builder before, with no source
+in the repo, and went stale silently — still claiming figures the content had
+dropped while the Download button on `/resume` sat beside the current narrative.
+Its content mirrors the `hevo-senior` chunk of `experience.md`; contact details and
+references carry over verbatim as the author's own data.
+
+## 8. Banned
 
 - **No glows.** No halos, no blooms, no earthshine, no ambient gradient. Bodies are
   discs and glyphs.
@@ -130,7 +160,7 @@ cursor-gravity wobble and hover-to-name are skipped when
   in one pass here — the rAF loop, every pointer listener and the whole game — while
   every gate stayed green, because no gate exercises those.
 
-## 8. Verification
+## 9. Verification
 
 ```bash
 bun run build              # must stay green
