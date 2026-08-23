@@ -71,7 +71,11 @@ const R2D = 180 / Math.PI;
  *  here later. Populate it and the renderer picks it up with no other change. */
 export const FAINT_FIELD: Array<{ ra: number; dec: number; mag: number }> = [];
 
-const vrFor = (mag: number): number => 1.4 + Math.max(0, 3.0 - mag) * 1.15;
+/** Painted radius from magnitude. The faint end was 1.4px, which is a single
+ *  device pixel on a 1x display — below the size at which a dot reads as an
+ *  object rather than as sensor noise. Floor raised to 1.9px and the slope
+ *  steepened so the bright end still separates. */
+const vrFor = (mag: number): number => 1.9 + Math.max(0, 3.4 - mag) * 1.25;
 
 /** Recompute alt/az and screen position for every star at `when`, for `obs`. */
 export function computeSky(
@@ -93,7 +97,13 @@ export function computeSky(
   return { pts, faint };
 }
 
-const starAlpha = (mag: number): number => Math.max(0.12, Math.min(1, (2.6 - mag) / 3.4));
+/** Alpha from magnitude. The old ramp reached zero at mag 2.6 and clamped to a
+ *  0.12 floor, so 46% of the catalogue — everything fainter than mag 2.0 — was
+ *  painted at 0.12-0.18 alpha. Near-white at 0.12 over a near-black ground is
+ *  dark grey, which is why the field read as empty. The ramp now runs to mag 3.6
+ *  (past the catalogue's 3.35 floor, so no star sits at the clamp by accident)
+ *  and the floor is 0.40. */
+const starAlpha = (mag: number): number => Math.max(0.40, Math.min(1, (3.6 - mag) / 3.2));
 
 /** Every colour the renderer paints with, resolved once per frame by the
  *  caller (SkyField.tsx) from CSS custom properties + the active `data-mode`.
