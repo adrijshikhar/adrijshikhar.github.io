@@ -6,24 +6,19 @@
  * system has to earn its keep. Each role takes exactly the hue that role owns
  * everywhere else on the site:
  *
- *   keyword   Purple  #C678DD   4.75:1   keywords, storage, tags
- *   function  Blue    #61AFEF   5.92:1   function names, JSON keys; also links
- *   type      Cyan    #56B6C2   5.91:1   class and type names; also infra tags
- *   string    Green   #98C379   6.90:1   strings; also language tags
- *   number    Orange  #E5C07B   8.10:1   numerics and constants; also the Sun
- *   error     Red     #E06C75   4.38:1   invalid and deleted ONLY
- *   ink       -       #ABB2BF   6.57:1   variables, punctuation, operators
- *   comment   -       #636D7E   2.68:1   italic — BELOW AA, see below
+ *   keyword   purple-400  #C084FC   5.54:1   keywords, storage, tags
+ *   function  blue-400    #60A5FA   5.75:1   function names, JSON keys; also links
+ *   type      cyan-400    #22D3EE   8.09:1   class and type names
+ *   string    green-400   #4ADE80   8.40:1   strings
+ *   number    amber-300   #FCD34D  10.15:1   numerics and constants
+ *   error     red-400     #F87171   5.29:1   invalid and deleted ONLY
+ *   ink       slate-300   #CBD5E1   9.85:1   variables, punctuation, operators
+ *   comment   slate-400   #94A3B8   5.71:1   italic
  *
- * This is One Dark's own syntax mapping, so all six of the palette's hues have a
- * real job and none is invented. Two tokens sit under 4.5:1 against the pane:
- * comment #636D7E and error #E06C75. Both are the supplied values used verbatim,
- * which the palette owner asked for explicitly; One Dark sets comments below the
- * bar by design. scripts/verify-code-theme.mjs allows exactly these two by hex
- * and still fails on anything else that drops under, so the exemption is visible
- * rather than the bar being quietly lowered.
+ * All stock Tailwind. Every token clears 4.5:1 against the pane (slate-800), so
+ * the sub-AA allowlist the previous palette needed is gone.
  *
- * Ratios are measured against the pane (--surface-2 #282C34), not the page
+ * Ratios are measured against the pane (slate-800 #1E293B), not the page
  * ground, because that is what code actually sits on.
  *
  * An earlier revision of this file collapsed the whole map onto two colours and
@@ -41,16 +36,16 @@
  */
 
 const SPECTRAL = {
-  bg: '#282C34',        // Surface — the pane code sits on
-  fg: '#ABB2BF',        // Secondary Text
-  ink: '#ABB2BF',
-  comment: '#636D7E',   // Muted Text
-  keyword: '#C678DD',   // Purple
-  function: '#61AFEF',  // Blue
-  type: '#56B6C2',      // Cyan
-  string: '#98C379',    // Green
-  number: '#E5C07B',    // Orange
-  error: '#E06C75',     // Red
+  bg: '#1E293B',        // slate-800  — the pane code sits on
+  fg: '#CBD5E1',        // slate-300
+  ink: '#CBD5E1',       // slate-300
+  comment: '#94A3B8',   // slate-400  (slate-500 is 3.07:1 here and fails AA)
+  keyword: '#C084FC',   // purple-400
+  function: '#60A5FA',  // blue-400
+  type: '#22D3EE',      // cyan-400
+  string: '#4ADE80',    // green-400
+  number: '#FCD34D',    // amber-300
+  error: '#F87171',     // red-400
 };
 
 const LIGHT = SPECTRAL;

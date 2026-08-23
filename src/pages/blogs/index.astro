@@ -17,8 +17,8 @@ const fmt = (d) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'shor
     <h1 class="mb-12 display-page">Writing</h1>
 
     {posts.length === 0 ? (
-      <p class="border border-border px-5 py-6 font-mono text-sm text-muted">
-        <span class="text-accent">$</span> ls ./posts — <span class="text-text">no entries yet.</span>
+      <p class="border border-slate-700 px-5 py-6 font-mono text-sm text-slate-400">
+        <span class="text-blue-400">$</span> ls ./posts — <span class="text-slate-300">no entries yet.</span>
       </p>
     ) : (
       <ul class="group/list columns-1 gap-5 sm:columns-2">
@@ -26,11 +26,11 @@ const fmt = (d) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'shor
           <li class={`atelier-card group/list-item mb-5 break-inside-avoid px-5 py-6 lg:px-6 lg:py-7`}>
             <a href={`/blogs/${post.id}/`} class="block text-inherit no-underline hover:text-inherit">
               <span class="meta-data">{fmt(post.data.date)}</span>
-              <h2 class="mt-2 font-heading text-lg font-medium leading-snug tracking-tighter text-heading">
-                <span class="transition-colors duration-[120ms] group-hover/list-item:text-accent">{post.data.title}</span>
-                <span class="ml-1 text-xs text-muted transition-colors group-hover/list-item:text-accent">&rarr;</span>
+              <h2 class="mt-2 font-heading text-lg font-medium leading-snug tracking-tighter text-slate-100">
+                <span class="transition-colors duration-[120ms] group-hover/list-item:text-blue-400">{post.data.title}</span>
+                <span class="ml-1 text-xs text-slate-400 transition-colors group-hover/list-item:text-blue-400">&rarr;</span>
               </h2>
-              {post.data.description && <p class="mt-1.5 text-[0.975rem] leading-relaxed text-text">{post.data.description}</p>}
+              {post.data.description && <p class="mt-1.5 text-[0.975rem] leading-relaxed text-slate-300">{post.data.description}</p>}
             </a>
           </li>
         ))}

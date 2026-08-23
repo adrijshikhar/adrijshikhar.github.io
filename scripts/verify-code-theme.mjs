@@ -56,15 +56,12 @@ const MAX_COLOURS = 8;
 // was authored for a deliberately narrow palette and is not a meaningful guard
 // on this one, so it is raised to fit the supplied palette rather than the
 // palette being trimmed to fit it. It still catches a stray hue outside the set.
-const MAX_HUE_SPREAD = 260;
+const MAX_HUE_SPREAD = 300;  // stock Tailwind spans purple->amber by design
 
-// Tokens the SUPPLIED palette places under 4.5:1, allowed by exact hex so the
-// exemption is reviewable and the bar itself is not lowered. Anything else that
-// drops under still fails the build.
-const SUB_AA_ALLOWED = new Map([
-  ['#636D7E', 'One Dark Vivid "Muted Text" (comments) — the theme sets these under AA by design'],
-  ['#E06C75', 'One Dark Vivid "Red" (invalid/deleted) — supplied value used verbatim'],
-]);
+// Stock Tailwind clears AA on every token, so nothing is exempt. Kept as an
+// empty map so a future palette must add its exemption explicitly and visibly
+// rather than by lowering BAR.
+const SUB_AA_ALLOWED = new Map([]);
 
 const fails = [];
 const pass = (msg) => console.log(`  [32m✓[0m ${msg}`);

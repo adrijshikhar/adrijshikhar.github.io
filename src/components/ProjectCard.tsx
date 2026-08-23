@@ -10,16 +10,16 @@ interface ProjectCardProps {
 }
 
 const prose =
-  'mt-3 text-[0.975rem] leading-relaxed text-text prose prose-invert max-w-none ' +
-  'prose-headings:text-heading prose-headings:text-base prose-headings:font-semibold prose-headings:tracking-tighter prose-headings:mt-4 prose-headings:mb-2 ' +
-  'prose-p:text-text prose-li:text-text prose-li:my-0.5 prose-ul:my-1.5 marker:text-muted ' +
-  'prose-a:text-accent prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-heading prose-strong:font-medium';
+  'mt-3 text-[0.975rem] leading-relaxed text-slate-300 prose prose-invert max-w-none ' +
+  'prose-headings:text-slate-100 prose-headings:text-base prose-headings:font-semibold prose-headings:tracking-tighter prose-headings:mt-4 prose-headings:mb-2 ' +
+  'prose-p:text-slate-300 prose-li:text-slate-300 prose-li:my-0.5 prose-ul:my-1.5 marker:text-slate-400 ' +
+  'prose-a:text-blue-400 prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-slate-100 prose-strong:font-medium';
 
 export default function ProjectCard({ title, company, date, link, builtWith = [], contentHtml }: ProjectCardProps) {
   const Title = (
-    <span className="transition-colors duration-[120ms] group-hover/list-item:text-accent">
+    <span className="transition-colors duration-[120ms] group-hover/list-item:text-blue-400">
       {title}
-      {link && <span className="ml-1 text-xs text-muted transition-colors group-hover/list-item:text-accent">&#8599;</span>}
+      {link && <span className="ml-1 text-xs text-slate-400 transition-colors group-hover/list-item:text-blue-400">&#8599;</span>}
     </span>
   );
 
@@ -31,7 +31,7 @@ export default function ProjectCard({ title, company, date, link, builtWith = []
       </div>
       <h3 className="mt-2 title-entry">
         {link ? (
-          <a href={link} target="_blank" rel="noreferrer noopener" className="text-heading no-underline hover:text-heading">
+          <a href={link} target="_blank" rel="noreferrer noopener" className="text-slate-100 no-underline hover:text-slate-100">
             {Title}
           </a>
         ) : (
@@ -43,7 +43,7 @@ export default function ProjectCard({ title, company, date, link, builtWith = []
           {builtWith.map((tech) => (
             <li
               key={tech}
-              className={`font-mono text-[11px] uppercase tracking-[0.1em] text-muted before:mr-1.5 before:text-muted before:content-['+']`}
+              className={`font-mono text-[11px] uppercase tracking-[0.1em] text-slate-400 before:mr-1.5 before:text-slate-400 before:content-['+']`}
             >
               {tech}
             </li>

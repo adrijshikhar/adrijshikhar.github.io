@@ -5,25 +5,10 @@ export default {
   content: ['./src/**/*.{astro,html,js,jsx,md,mdx,ts,tsx}'],
   theme: {
     extend: {
-      colors: {
-        /* One Dark Vivid, literal. Thirteen values, no var() indirection and no
-           derived shades — the same thirteen globals.css declares. If a colour is
-           not on this list it does not belong in the UI. */
-        bg: '#1E222A',
-        surface: '#282C34',
-        elevated: '#2C323C',
-        border: '#3E4451',
-        heading: '#E6E6E6',
-        text: '#ABB2BF',
-        muted: '#636D7E',
-        accent: '#61AFEF',
-        cyan: '#56B6C2',
-        green: '#98C379',
-        purple: '#C678DD',
-        orange: '#E5C07B',
-        red: '#E06C75',
-        ring: '#61AFEF',
-      },
+      /* No `colors` key on purpose: Tailwind's stock palette applies untouched, so
+         every class in the markup is a stock class (text-slate-300, bg-slate-800,
+         text-blue-400 ...). globals.css holds the same stock values for the
+         hand-written rules. */
       transitionDuration: {
         tap: '120ms',
         hover: '220ms',

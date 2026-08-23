@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-Personal portfolio + blog. Astro 6 static site with React 19 interactive islands, Tailwind 3 (CSS-variable design tokens) + shadcn/ui, MDX. Design is **"Terminal Atelier"** — dark-default with a light mode, an accent-tinted card system, and a warm-gold ambient aurora.
+Personal portfolio + blog. Astro 6 static site with React 19 interactive islands, Tailwind 3 (**stock palette only** — `tailwind.config.mjs` declares no `colors` key), MDX. shadcn/ui was removed: four of its five components had zero imports, and its semantic token layer (`--background`, `--primary`, `--destructive`) is exactly the custom-palette indirection this design no longer has. `ViewToggle` uses the `@base-ui/react` Toggle primitive directly. Design is **"Terminal Atelier"** — dark-default with a light mode, an accent-tinted card system, and a warm-gold ambient aurora.
 
 ## Toolchain & commands
 

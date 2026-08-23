@@ -86,15 +86,15 @@ const SOCIAL_ICON_PATHS = {
              below is revealed by scrolling. -->
         <header class="flex min-h-[100dvh] flex-col justify-center pb-24 pt-32">
           <p class="mb-6 flex items-center gap-3 label-data">
-            <span class="live inline-block h-[5px] w-[5px] rounded-full bg-accent"></span>
+            <span class="live inline-block h-[5px] w-[5px] rounded-full bg-blue-400"></span>
             Bengaluru
           </p>
           <h1 class="display-hero">
             <a href="/" class="no-underline">Adrij<br />Shikhar</a>
           </h1>
-          <p class="mt-8 max-w-[36rem] text-[1.15rem] leading-relaxed text-text">
+          <p class="mt-8 max-w-[36rem] text-[1.15rem] leading-relaxed text-slate-300">
             Senior software engineer at Hevo Data. I move data between systems that were
-            never designed to agree, and <em class="not-italic text-heading">write down what
+            never designed to agree, and <em class="not-italic text-slate-100">write down what
             breaks on the way</em>.
           </p>
           <div class="mt-10 flex items-center gap-6">
@@ -107,7 +107,7 @@ const SOCIAL_ICON_PATHS = {
                 { href: 'https://www.reddit.com/user/adrijshikhar', label: 'Reddit', path: SOCIAL_ICON_PATHS.reddit },
               ].map((sLink) => (
                 <li class="shrink-0 text-xs">
-                  <a class="tap-44 block text-muted no-underline transition-colors duration-[120ms] hover:text-accent"
+                  <a class="tap-44 block text-slate-400 no-underline transition-colors duration-[120ms] hover:text-blue-400"
                      href={sLink.href} target="_blank" rel="noreferrer noopener"
                      aria-label={`${sLink.label} (opens in a new tab)`}>
                     {sLink.path ? (
@@ -124,7 +124,7 @@ const SOCIAL_ICON_PATHS = {
                 </li>
               ))}
             </ul>
-            <a class="tap-44 flex items-center gap-2 text-muted no-underline transition-colors duration-[120ms] hover:text-accent"
+            <a class="tap-44 flex items-center gap-2 text-slate-400 no-underline transition-colors duration-[120ms] hover:text-blue-400"
                href="/resume/">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5" aria-hidden="true">
                 <path d="M12 3v12m0 0l-4-4m4 4l4-4" />
@@ -145,7 +145,7 @@ const SOCIAL_ICON_PATHS = {
           <div class="channel mb-4"><span class="label-data channel-no">01</span></div>
           <h2 class="display-section mb-8">About</h2>
           <div
-            class="prose prose-invert max-w-[35rem] leading-relaxed text-text prose-p:text-text prose-p:leading-relaxed prose-a:text-accent prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-heading prose-strong:font-medium"
+            class="prose prose-invert max-w-[35rem] leading-relaxed text-slate-300 prose-p:text-slate-300 prose-p:leading-relaxed prose-a:text-blue-400 prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-slate-100 prose-strong:font-medium"
             set:html={marked.parse(about.content)}
           />
         </section>
@@ -187,8 +187,8 @@ const SOCIAL_ICON_PATHS = {
           <div class="channel mb-4"><span class="label-data channel-no">04</span></div>
           <h2 class="display-section mb-8">Writing</h2>
           {latestPosts.length === 0 ? (
-            <p class="border border-border px-5 py-6 font-mono text-sm text-muted">
-              <span class="text-accent">$</span> ls ./posts — <span class="text-text">no entries yet.</span>
+            <p class="border border-slate-700 px-5 py-6 font-mono text-sm text-slate-400">
+              <span class="text-blue-400">$</span> ls ./posts — <span class="text-slate-300">no entries yet.</span>
             </p>
           ) : (
             <ul class="group/list">
@@ -213,8 +213,8 @@ const SOCIAL_ICON_PATHS = {
               <li class={`atelier-card group/list-item px-5 py-6 lg:px-6 lg:py-7`}>
                 <span class="meta-data">{edu.startDate} — {edu.endDate}</span>
                 <h3 class="mt-2 title-entry">{edu.institution}</h3>
-                <div class="mt-1 text-sm text-text">
-                  {edu.degree}{edu.field && <span class="text-muted"> — {edu.field}</span>}
+                <div class="mt-1 text-sm text-slate-300">
+                  {edu.degree}{edu.field && <span class="text-slate-400"> — {edu.field}</span>}
                 </div>
               </li>
             ))}
@@ -226,7 +226,7 @@ const SOCIAL_ICON_PATHS = {
           <div class="channel mb-4"><span class="label-data channel-no">06</span></div>
           <h2 class="display-section mb-8">Achievements</h2>
           <div
-            class="prose prose-invert max-w-[35rem] text-text prose-p:text-text prose-li:text-text marker:text-muted prose-a:text-accent prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-heading"
+            class="prose prose-invert max-w-[35rem] text-slate-300 prose-p:text-slate-300 prose-li:text-slate-300 marker:text-slate-400 prose-a:text-blue-400 prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-slate-100"
             set:html={marked.parse(achievements.content)}
           />
         </section>
@@ -236,7 +236,7 @@ const SOCIAL_ICON_PATHS = {
           <div class="channel mb-4"><span class="label-data channel-no">07</span></div>
           <h2 class="display-section mb-8">Interests</h2>
           <div
-            class="prose prose-invert max-w-[35rem] text-text prose-p:text-text prose-li:text-text marker:text-muted prose-a:text-accent prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-heading"
+            class="prose prose-invert max-w-[35rem] text-slate-300 prose-p:text-slate-300 prose-li:text-slate-300 marker:text-slate-400 prose-a:text-blue-400 prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-slate-100"
             set:html={marked.parse(interests.content)}
           />
         </section>
@@ -247,9 +247,9 @@ const SOCIAL_ICON_PATHS = {
             Viewport-relative so the room is real on any screen. It sits BEFORE
             the footer: past the last line there is nothing left to look at, so
             the same space there just reads as the page failing to end. */}
-        <footer class="mt-[29vh] border-t border-border pt-12 pb-20 md:mt-[33vh] md:pb-24">
+        <footer class="mt-[29vh] border-t border-slate-700 pt-12 pb-20 md:mt-[33vh] md:pb-24">
           <p class="meta-data">
-            <span class="text-accent">&#9656;</span> {STAR_COUNT} named stars at true J2000 positions
+            <span class="text-blue-400">&#9656;</span> {STAR_COUNT} named stars at true J2000 positions
             for your location. Every mark on the canvas is a catalogued object.
           </p>
           <p class="meta-data mt-2">Built with Astro.</p>

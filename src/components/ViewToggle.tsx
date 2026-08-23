@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { createTimeline, utils } from '../lib/motion';
-import { Toggle } from './ui/toggle';
+import { Toggle } from '@base-ui/react/toggle';
 
 const startsInMachine = () =>
   typeof window !== 'undefined' &&
@@ -218,7 +218,7 @@ export default function ViewToggle() {
         <Toggle
           pressed={mode === 'human'}
           onPressedChange={(pressed) => { if (pressed && mode !== 'human') toggle(); }}
-          className="chrome-seg tap-44 !h-auto !min-w-0 !rounded-none !text-[0.5625rem] !font-normal !px-3 !py-1.5 flex items-center gap-1 !bg-transparent hover:!bg-transparent data-[state=on]:!bg-transparent"
+          className="chrome-seg tap-44 flex items-center gap-1"
         >
           <span className="chrome-bracket" aria-hidden="true">[</span>
           <span>Human</span>
@@ -227,7 +227,7 @@ export default function ViewToggle() {
         <Toggle
           pressed={mode === 'machine'}
           onPressedChange={(pressed) => { if (pressed && mode !== 'machine') toggle(); }}
-          className="chrome-seg tap-44 !h-auto !min-w-0 !rounded-none !text-[0.5625rem] !font-normal !px-3 !py-1.5 flex items-center gap-1 !bg-transparent hover:!bg-transparent data-[state=on]:!bg-transparent"
+          className="chrome-seg tap-44 flex items-center gap-1"
         >
           <span className="chrome-bracket" aria-hidden="true">[</span>
           <span>Machine</span>

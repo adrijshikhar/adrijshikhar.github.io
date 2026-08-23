@@ -110,11 +110,11 @@ export interface SkyColors {
   moonLit: string;
   /** Moon's earthshine disc — a low-alpha wash behind the lit limb. */
   moonGlow: string;
-  /** Planet disc/ring/persistent-label colour. Spectral A (#56B6C2, Sirius and
+  /** Planet disc/ring/persistent-label colour. slate-300 (#CBD5E1, neutral like the Moon —
    *  Vega): planets shine by reflected sunlight, so they read cool, and A is
    *  visibly distinct from the near-white F the bright stars take. */
   planet: string;
-  /** The Sun only. Spectral G (#E5C07B) — the class the Sun actually IS, and the
+  /** The Sun only. amber-300 (#FCD34D) — the Sun is a G-class star, so warm here is a
    *  same hue the chrome uses for Sun values, so the readout and the disc agree. */
   sun: string;
   /** Faint background field colour — already faded, since the faint field's

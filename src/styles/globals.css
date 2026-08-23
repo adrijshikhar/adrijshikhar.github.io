@@ -34,27 +34,31 @@
 
 :root {
   /* ==========================================================================
-     ONE DARK VIVID — the thirteen values, flat. Nothing derived, nothing mixed.
-     Every colour in this file is one of these vars; there is no second layer of
-     aliases and no color-mix() anywhere. Tailwind reads the same thirteen from
-     tailwind.config.mjs, so a utility class and a hand-written rule cannot drift.
-     ========================================================================== */
-  --bg:        #1E222A;   /* Background      page ground                        */
-  --surface:   #282C34;   /* Surface         panels, cards, code pane           */
-  --elevated:  #2C323C;   /* Elevated        card hover                         */
-  --border:    #3E4451;   /* Border          rules, hairlines, card edges       */
-  --heading:   #E6E6E6;   /* Primary Text    headings, bright stars             */
-  --text:      #ABB2BF;   /* Secondary Text  body copy, code ink                */
-  --muted:     #636D7E;   /* Muted Text      labels, tags, comments             */
-  --accent:    #61AFEF;   /* Blue            links, active nav, code functions  */
-  --cyan:      #56B6C2;   /* Cyan            code types                         */
-  --green:     #98C379;   /* Green           code strings                       */
-  --purple:    #C678DD;   /* Purple          code keywords                      */
-  --orange:    #E5C07B;   /* Orange          dates, metrics, the Sun, numerics  */
-  --red:       #E06C75;   /* Red             errors, M-class stars              */
+     STOCK TAILWIND ONLY. No custom palette, no derived shades, no color-mix.
+     Every value below is a stock Tailwind v3 colour, named by its Tailwind name
+     so there is nothing to look up and nothing invented. tailwind.config.mjs
+     declares NO colours at all, so utility classes resolve to the same stock
+     palette these vars hold.
 
-  /* Shape and motion. Flat: One Dark has no elevation shadows, so a card is its
-     fill plus its border, nothing more. */
+     Two shades are forced by contrast rather than taste:
+       slate-500 measures 3.07:1 on slate-800 and cannot carry text, so muted
+       text and code comments take slate-400 (5.71:1).
+     ========================================================================== */
+  --bg:        #0F172A;   /* slate-900  page ground                   L*  8.0 */
+  --surface:   #1E293B;   /* slate-800  panels, cards, code pane      L* 16.4 */
+  --elevated:  #334155;   /* slate-700  card hover                    L* 27.1 */
+  --border:    #334155;   /* slate-700  rules, hairlines, card edges          */
+  --heading:   #F1F5F9;   /* slate-100  headings, bright stars     9.45:1     */
+  --text:      #CBD5E1;   /* slate-300  body copy, code ink        6.97:1     */
+  --muted:     #94A3B8;   /* slate-400  labels, tags, comments     5.71:1 pane*/
+  --accent:    #60A5FA;   /* blue-400   links, active nav          5.75:1 pane*/
+  --cyan:      #22D3EE;   /* cyan-400   code types                 8.09:1 pane*/
+  --green:     #4ADE80;   /* green-400  code strings               8.40:1 pane*/
+  --purple:    #C084FC;   /* purple-400 code keywords              5.54:1 pane*/
+  --orange:    #FCD34D;   /* amber-300  dates, metrics, numerics  10.15:1 pane*/
+  --red:       #F87171;   /* red-400    errors                     5.29:1 pane*/
+
+  /* Shape and motion. Flat: a card is its fill plus its border, nothing more. */
   --card-radius: 2px;
   --radius: 0px;
   --dur-tap:   0.12s;
