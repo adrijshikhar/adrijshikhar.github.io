@@ -864,7 +864,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
           )}
 
           {playing && (
-            <div className="chrome-panel fixed right-6 bottom-24 z-[45] w-[13rem] flex-col items-stretch gap-0 p-0">
+            <div className="chrome-panel fixed right-6 bottom-[1.4rem] z-[45] w-[13rem] flex-col items-stretch gap-0 p-0">
               <div className="chrome-group">
                 <button
                   type="button"
