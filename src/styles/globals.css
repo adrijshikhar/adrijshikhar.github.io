@@ -472,16 +472,24 @@ body.spinning * {
      Any element that sets its own `cursor` needs listing: an explicit
      `cursor: pointer` on a button beats the inherited `none`, which is how the
      native arrow used to leak back in over the game bar. */
-  html.cursor-custom,
-  html.cursor-custom body,
-  html.cursor-custom a,
-  html.cursor-custom button,
-  html.cursor-custom input,
-  html.cursor-custom textarea,
-  html.cursor-custom select,
-  html.cursor-custom label,
-  html.cursor-custom [role='button'] {
-    cursor: none;
+  /* Restored verbatim from 8b1fcff^ rather than rewritten. Two details in the
+     original are load-bearing and the hand-written version lost both:
+
+     `.cursor-custom *` — the universal descendant, so NOTHING can leak. An
+     explicit tag list misses whatever sets its own cursor next.
+
+     `!important` — Tailwind's `cursor-pointer` utility sits in the utilities
+     layer and outranks this rule without it, which IS the native-arrow leak the
+     comment above describes. */
+  .cursor-custom,
+  .cursor-custom *,
+  .cursor-custom a,
+  .cursor-custom button,
+  .cursor-custom [role='button'],
+  .cursor-custom input,
+  .cursor-custom label,
+  .cursor-custom summary {
+    cursor: none !important;
   }
 
   #sky-cursor-ring,
