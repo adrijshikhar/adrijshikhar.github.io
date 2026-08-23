@@ -37,3 +37,6 @@ test-results/
 
 # planning docs are kept outside this repo
 docs/superpowers/
+
+# OS
+.DS_Store
