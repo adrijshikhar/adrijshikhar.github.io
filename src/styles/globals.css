@@ -256,14 +256,12 @@
     border-color: var(--border);
   }
 
-  /* Custom selection-marker scrollbar — subtle terminal feel */
-  ::-webkit-scrollbar { width: 10px; height: 10px; }
-  ::-webkit-scrollbar-track { background: var(--background); }
-  ::-webkit-scrollbar-thumb {
-    background: var(--card);
-    border: 2px solid var(--background);
-  }
-  ::-webkit-scrollbar-thumb:hover { background: var(--muted-foreground); }
+  /* NO custom scrollbar. Styling ::-webkit-scrollbar opts the page out of the
+     platform's overlay scrollbars and forces a permanent 10px track, which is
+     both a visible bar the design does not want and a layout gutter that made
+     fixed bottom-right chrome sit further from the right edge than the bottom.
+     Letting the platform draw it means macOS shows an overlay bar that reserves
+     no space, and --sb resolves to 0. */
 }
 
 @layer components {

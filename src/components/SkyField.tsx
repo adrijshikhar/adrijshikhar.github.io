@@ -879,7 +879,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
             onClick={() => controlsRef.current?.enter()}
             aria-hidden={playing}
             tabIndex={playing ? -1 : 0}
-            className={`egg-hint tap-44 fixed right-[calc(1.4rem-var(--sb))] bottom-[1.4rem] z-[45] hidden font-mono text-[0.6875rem] tracking-[0.14em] uppercase text-muted-foreground transition-colors duration-[var(--dur-ui)] hover:text-primary focus-visible:text-primary md:block ${
+            className={`egg-hint tap-44 fixed right-[calc(1.4rem-var(--sb))] bottom-24 z-[45] hidden font-mono text-[0.6875rem] tracking-[0.14em] uppercase text-muted-foreground transition-colors duration-[var(--dur-ui)] hover:text-primary focus-visible:text-primary md:block ${
               playing ? 'pointer-events-none opacity-0' : ''
             }`}
           >
