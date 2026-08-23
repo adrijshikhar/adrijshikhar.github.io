@@ -176,7 +176,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
 
     const start = window.setTimeout(() => {
       pulse = animate(el, {
-        '--egg': [0, 1],
+        '--egg': [0, 0.7],   // peak below 1: the hint should never fully bloom
         duration: 1900,
         alternate: true,
         loop: true,

@@ -948,9 +948,12 @@ body.spinning * {
    and cannot drift from the palette. */
 @layer components {
   .egg-hint {
+    /* Deliberately faint: a hint, not a beacon. Two layers so the falloff stays
+       soft, but at roughly half the previous radii — 10px/22px read as a halo
+       around the label rather than as the label brightening. */
     text-shadow:
-      0 0 calc(var(--egg, 0) * 10px) currentColor,
-      0 0 calc(var(--egg, 0) * 22px) currentColor;
+      0 0 calc(var(--egg, 0) * 4px) currentColor,
+      0 0 calc(var(--egg, 0) * 9px) currentColor;
   }
   @media (prefers-reduced-motion: reduce) {
     .egg-hint { text-shadow: none; }
