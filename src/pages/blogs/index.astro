@@ -1,4 +1,5 @@
 ---
+import BlogCard from '../../components/BlogCard';
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
@@ -21,20 +22,18 @@ const fmt = (d) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'shor
         <span class="text-primary">$</span> ls ./posts — <span class="text-foreground">no entries yet.</span>
       </p>
     ) : (
-      <div class="group/list grid gap-5 sm:grid-cols-2">
-        {posts.map((post, i) => (
-          <li class={`rounded-xl border bg-card text-card-foreground shadow-sm group/list-item mb-5 break-inside-avoid px-5 py-6 lg:px-6 lg:py-7`}>
-            <a href={`/blogs/${post.id}/`} class="block text-inherit no-underline hover:text-inherit">
-              <span class="font-mono text-xs uppercase tracking-wider text-muted-foreground">{fmt(post.data.date)}</span>
-              <h2 class="mt-2 font-heading text-lg font-medium leading-snug tracking-tighter text-foreground">
-                <span class="transition-colors duration-[120ms] group-hover/list-item:text-primary">{post.data.title}</span>
-                <span class="ml-1 text-xs text-muted-foreground transition-colors group-hover/list-item:text-primary">&rarr;</span>
-              </h2>
-              {post.data.description && <p class="mt-1.5 text-[0.975rem] leading-relaxed text-foreground">{post.data.description}</p>}
-            </a>
+      <ul class="group/list grid list-none grid-cols-1 gap-5 p-0 sm:grid-cols-2">
+        {posts.map((post) => (
+          <li class="group/list-item">
+            <BlogCard
+              title={post.data.title}
+              date={fmt(post.data.date)}
+              href={`/blogs/${post.id}/`}
+              description={post.data.description}
+            />
           </li>
         ))}
-      </div>
+      </ul>
     )}
   </main>
 </BaseLayout>

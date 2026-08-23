@@ -385,8 +385,13 @@ export default function SkyField({ mode }: SkyFieldProps) {
       const light = document.documentElement.dataset.mode === 'light';
       const ink = cs.getPropertyValue('--sky-ink').trim(); // only defined under [data-mode="light"]
       const colors: SkyColors = {
-        accent: cs.getPropertyValue('--accent').trim(),
-        muted: cs.getPropertyValue('--muted').trim(),
+        // shadcn's --accent and --muted are SURFACE tokens, not ink: in the dark
+        // theme both are oklch(0.269), i.e. near-black. Feeding them to the
+        // canvas painted the hover readout and every muted mark in near-black on
+        // a near-black sky, which is why the readout was invisible at full alpha.
+        // The ink equivalents are --primary and --muted-foreground.
+        accent: cs.getPropertyValue('--primary').trim(),
+        muted: cs.getPropertyValue('--muted-foreground').trim(),
         bright: light ? ink : '#F1F5F9',   // F · Primary Text
         moonLit: light ? ink : '#CBD5E1',  // Secondary: the Moon is grey, not warm
         moonGlow: light ? fade(ink, 0.1) : 'rgba(241,245,249,0.10)',
@@ -398,7 +403,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
         // dark text far more than light marks compete with a dark page, so
         // the base colour itself carries a low alpha on top of the per-star
         // magnitude alpha already applied where this is used.
-        faint: light ? fade(ink, 0.85) : cs.getPropertyValue('--muted').trim(),
+        faint: light ? fade(ink, 0.85) : cs.getPropertyValue('--muted-foreground').trim(),
         // Light mode isn't dark mode with the colours swapped — a filled disc
         // that reads as a glowing star on black reads as a dirt speck on cream.
         // This tells the renderer to switch glyph shape, not just palette.
