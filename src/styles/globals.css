@@ -48,13 +48,18 @@
   --heading:   #E6EAF0;              /* 18.23:1 on ground */
   --heading-hi:#E6EAF0;                 /* emphasis above heading */
   --text:      #ABB2BF;              /* ink    13.32:1 */
-  --muted:     #6B7280;              /* labels  7.37:1 */
+  --muted:     #9DA4B1;              /* label text. Supplied Muted #6B7280 is 2.67 on the
+                                           elevated surface, so it cannot carry text; this is the
+                                           first value on the Muted->Secondary line that clears
+                                           4.5 on all four surfaces (worst 4.57). */
 
   --border: 255 255 255;                /* used as rgb(var(--border) / a) */
   --border-color: #3E4451;
   --hairline:     #3E4451;
   --rule:         #3E4451;              /* minor hairline on the ground  1.44:1 */
-  --rule-hi:      #6B7280;              /* major rule on the ground      3.14:1 */
+  --rule-hi:      #6B7280;              /* supplied Muted, used where it belongs: 2.90 on the
+                                           background, a major-rule value. Non-text, so 4.5 does
+                                           not apply. */
 
   /* Card plane and its own edges. Measured against the card fill, not the ground:
      --rule on a lifted card is 1.18:1 and invisible, which is the bug this fixes.
@@ -70,7 +75,7 @@
   --card-fill:    #2C323C;              /* L* 13.3, dL* +10.8 above ground */
   --card-fill-hi: #333A45;              /* L* 21.4, +8.1 above rest — hover LIFTS */
   --card-edge:    #3E4451;              /* 1.69:1 on the fill */
-  --card-edge-hi: #6B7280;              /* 2.79:1 on the fill */
+  --card-edge-hi: #6B7280;              /* 2.67:1 on the card fill — hover border */
 
   /* Spectral ramp — one hue, one job. Do not reuse a hue for a second job. */
   --spectral-ob: #E6EAF0;              /* links, active nav      8.31:1 */
