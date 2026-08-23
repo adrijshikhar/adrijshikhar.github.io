@@ -740,7 +740,11 @@ export default function SkyField({ mode }: SkyFieldProps) {
           you what it is showing you. Falls back to Bengaluru silently when the
           geo lookup 404s, and says so rather than implying a real fix. */}
       {mode === 'full' && !machine && (
-        <div className="font-mono text-xs text-muted-foreground" aria-hidden="true">
+        <div
+          className="pointer-events-none fixed left-1/2 top-[1.9rem] -z-[1] flex -translate-x-1/2
+            gap-2 font-mono text-xs text-muted-foreground"
+          aria-hidden="true"
+        >
           <span className="rounded-md border px-2 py-1">ALT {ALT_RANGE}</span>
           <span className="rounded-md border px-2 py-1">STARS {STAR_COUNT}</span>
           <span className="rounded-md border px-2 py-1">JD {jd}</span>

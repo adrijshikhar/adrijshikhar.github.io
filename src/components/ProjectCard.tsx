@@ -19,7 +19,9 @@ export default function ProjectCard({
   contentHtml,
 }: ProjectCardProps) {
   return (
-    <Card>
+    <Card
+      className="group transition-all duration-200 hover:-translate-y-0.5 hover:border-ring hover:shadow-lg motion-reduce:translate-none motion-reduce:transition-none"
+    >
       <CardHeader>
         <div className="flex items-baseline justify-between gap-4 text-xs text-muted-foreground">
           <span>{date}</span>

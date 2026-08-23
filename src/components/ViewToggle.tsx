@@ -218,7 +218,7 @@ export default function ViewToggle() {
         <Toggle
           pressed={mode === 'human'}
           onPressedChange={(pressed) => { if (pressed && mode !== 'human') toggle(); }}
-          className="chrome-seg tap-44 flex items-center gap-1"
+          className="chrome-seg tap-44 flex h-auto min-w-0 items-center gap-1 rounded-none bg-transparent px-3 py-1.5 text-[0.5625rem] font-normal hover:bg-transparent aria-pressed:bg-transparent data-[state=on]:bg-transparent"
         >
           <span className="chrome-bracket" aria-hidden="true">[</span>
           <span>Human</span>
@@ -227,7 +227,7 @@ export default function ViewToggle() {
         <Toggle
           pressed={mode === 'machine'}
           onPressedChange={(pressed) => { if (pressed && mode !== 'machine') toggle(); }}
-          className="chrome-seg tap-44 flex items-center gap-1"
+          className="chrome-seg tap-44 flex h-auto min-w-0 items-center gap-1 rounded-none bg-transparent px-3 py-1.5 text-[0.5625rem] font-normal hover:bg-transparent aria-pressed:bg-transparent data-[state=on]:bg-transparent"
         >
           <span className="chrome-bracket" aria-hidden="true">[</span>
           <span>Machine</span>

@@ -22,7 +22,9 @@ export default function ExpCard({
   contentHtml,
 }: ExpCardProps) {
   return (
-    <Card>
+    <Card
+      className="group transition-all duration-200 hover:-translate-y-0.5 hover:border-ring hover:shadow-lg motion-reduce:translate-none motion-reduce:transition-none"
+    >
       <CardHeader>
         <div className="text-xs text-muted-foreground">
           {startDate} &ndash; {endDate}
