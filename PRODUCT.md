@@ -54,7 +54,7 @@ Two claims a neighbouring portfolio could not truthfully copy:
 ## Capabilities and Constraints
 
 - **Static only.** No server, no database, no CMS. Astro 6 static build with
-  React 19 islands, Tailwind 3, MDX; Bun is the package manager; Node 22
+  React 19 islands, Tailwind 4, shadcn/ui, MDX; Bun is the package manager; Node 22
   pinned. Deploys to GitHub Pages via GitHub Actions on the `content` branch.
 - **Canonical domain is `adrijshikhar.dev`** (Cloudflare-fronted).
   `adrijshikhar.github.io` is the Pages origin behind it. Absolute URLs
