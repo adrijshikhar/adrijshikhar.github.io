@@ -74,11 +74,16 @@ interface GameControls {
   home: () => void;
 }
 
+/** Grace period before the easter-egg hint starts pulsing. Long enough that it
+ *  reads as the page settling rather than as something demanding attention. */
+const EGG_HINT_DELAY_MS = 10_000;
+
 export default function SkyField({ mode }: SkyFieldProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const cursorRingRef = useRef<HTMLDivElement>(null);
   const cursorDotRef = useRef<HTMLDivElement>(null);
   const controlsRef = useRef<GameControls | null>(null);
+  const eggRef = useRef<HTMLButtonElement>(null);
 
   // The orbital-mechanics easter egg only exists on the full-instrument page.
   // Lazily created once per mount so both the effect's rAF loop and the JSX
@@ -146,6 +151,48 @@ export default function SkyField({ mode }: SkyFieldProps) {
   useEffect(() => {
     setReplay(TIME_OFFSET_MS !== 0);
   }, []);
+
+  // The easter egg is deliberately quiet, which also means nobody finds it. After
+  // a grace period it pulses a soft glow — the same claim the .live indicator
+  // makes, that this readout is alive rather than printed.
+  //
+  // anime.js drives a CSS variable rather than a colour: the glow is expressed in
+  // globals.css as a text-shadow scaled by --egg, so the motion engine never
+  // needs to know the palette, and the shadow inherits currentColor. Stops for
+  // good the moment the visitor shows any awareness of it — hover, focus, or
+  // entering the game — because a hint that keeps pulsing after discovery is
+  // just noise.
+  useEffect(() => {
+    const el = eggRef.current;
+    if (!el || mode !== 'full' || playing) return;
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    let pulse: ReturnType<typeof animate> | null = null;
+    const stop = () => {
+      pulse?.revert();
+      pulse = null;
+      el.style.removeProperty('--egg');
+    };
+
+    const start = window.setTimeout(() => {
+      pulse = animate(el, {
+        '--egg': [0, 1],
+        duration: 1900,
+        alternate: true,
+        loop: true,
+        ease: 'inOutSine',
+      });
+    }, EGG_HINT_DELAY_MS);
+
+    el.addEventListener('pointerenter', stop, { once: true });
+    el.addEventListener('focus', stop, { once: true });
+    return () => {
+      window.clearTimeout(start);
+      el.removeEventListener('pointerenter', stop);
+      el.removeEventListener('focus', stop);
+      stop();
+    };
+  }, [mode, playing]);
 
   useEffect(() => {
     if (struck !== 1) return;
@@ -827,11 +874,12 @@ export default function SkyField({ mode }: SkyFieldProps) {
               until hovered; no label hints at what it opens. */}
           <button
             type="button"
+            ref={eggRef}
             title="something else lives here"
             onClick={() => controlsRef.current?.enter()}
             aria-hidden={playing}
             tabIndex={playing ? -1 : 0}
-            className={`tap-44 fixed right-6 bottom-24 z-[45] hidden font-mono text-[0.6875rem] tracking-[0.14em] uppercase text-muted-foreground transition-colors duration-[var(--dur-ui)] hover:text-primary focus-visible:text-primary md:block ${
+            className={`egg-hint tap-44 fixed right-[calc(1.4rem-var(--sb))] bottom-[1.4rem] z-[45] hidden font-mono text-[0.6875rem] tracking-[0.14em] uppercase text-muted-foreground transition-colors duration-[var(--dur-ui)] hover:text-primary focus-visible:text-primary md:block ${
               playing ? 'pointer-events-none opacity-0' : ''
             }`}
           >
@@ -864,7 +912,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
           )}
 
           {playing && (
-            <div className="chrome-panel fixed right-6 bottom-[1.4rem] z-[45] w-[13rem] flex-col items-stretch gap-0 p-0">
+            <div className="chrome-panel fixed right-[calc(1.4rem-var(--sb))] bottom-[1.4rem] z-[45] w-[13rem] flex-col items-stretch gap-0 p-0">
               <div className="chrome-group">
                 <button
                   type="button"

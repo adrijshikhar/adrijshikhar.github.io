@@ -145,6 +145,12 @@
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);  /* sky drag-release ONLY */
   --ease-out: cubic-bezier(.32, .72, 0, 1);
   --card-radius: var(--radius);
+  /* Scrollbar gutter width: 100vw includes it, 100% of <body> does not. Fixed
+     chrome anchored to `right` needs this subtracted, or its visible gap is the
+     nominal offset PLUS the gutter while its bottom gap is the nominal offset —
+     which is exactly how the game panel ended up 10px further from the right
+     edge than from the bottom. */
+  --sb: calc(100vw - 100%);
 }
 
 /* --accent-contrast is a substrate value (dark) — the accent is a saturated mid-tone,
@@ -936,4 +942,19 @@ body.spinning * {
   --tw-prose-invert-pre-bg: var(--card);
   --tw-prose-invert-th-borders: var(--border);
   --tw-prose-invert-td-borders: var(--border);
+}
+
+/* Easter-egg hint. --egg is driven by anime.js in SkyField (see EGG_HINT_DELAY_MS);
+   at rest it is unset, so this resolves to a 0px shadow and paints nothing. The
+   glow uses currentColor, so it tracks whatever the label's own colour token is
+   and cannot drift from the palette. */
+@layer components {
+  .egg-hint {
+    text-shadow:
+      0 0 calc(var(--egg, 0) * 10px) currentColor,
+      0 0 calc(var(--egg, 0) * 22px) currentColor;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .egg-hint { text-shadow: none; }
+  }
 }
