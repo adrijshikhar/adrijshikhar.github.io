@@ -171,7 +171,7 @@ drift from it. Bottom-left carries the observer, sidereal time and the source of
 coordinates. Note the twilight glow itself no longer exists; `SUN` reports the altitude for
 its own sake.
 
-`design/exports-spectral/05-chrome-inventory.png` is the design's own audit of all fourteen
+`05-chrome-inventory.png`, in the design companion dir (see below), is the design's own audit of all fourteen
 readouts, with a KEEP / MOVE / CUT verdict and a reason for each. Consult it before adding or
 removing chrome — several of the CUT verdicts are still unactioned, deliberately.
 
@@ -242,6 +242,20 @@ must be wrapped in `<li>`. CSS columns split a shadcn `Card` across the column b
 
 Pages: `/` (home preview of each section), `/experience` (full), `/archive` (2-col masonry),
 `/blogs` (list), `/blogs/[...slug]` (post), `/resume`.
+
+## Companion directories (outside this repo)
+
+Design sources and working plans are deliberately NOT tracked here — a 3.5MB `.fig`
+and a set of planning notes do not belong in a public Pages repo. They live at:
+
+```
+../projects/adrijshikhar.github.io/design/    # spectral.fig, build scripts, 14 PNG exports
+../projects/adrijshikhar.github.io/plans/     # numbered working plans
+../projects/adrijshikhar.github.io/docs/      # longer-form notes
+```
+
+`05-chrome-inventory.png` in that `design/` dir is the KEEP / MOVE / CUT audit of the
+sky chrome, and is worth reading before changing any readout.
 
 ## Deployment
 

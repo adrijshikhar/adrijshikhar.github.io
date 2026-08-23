@@ -45,3 +45,8 @@ docs/superpowers/
 # during the redesign, not project source.
 .github/hooks/
 rtc-variant-*.png
+
+# Design sources and working plans live outside this public repo — see the
+# companion-directories section in CLAUDE.md.
+design/
+plans/

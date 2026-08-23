@@ -100,7 +100,7 @@ as numbers.
 members only), 96 with `[dark sky]` on. Anything that changes which stars are painted
 must update that number in the same commit.
 
-`design/exports-spectral/05-chrome-inventory.png` is the design's own audit of all
+`05-chrome-inventory.png`, in the design companion dir (path in CLAUDE.md), is the design's own audit of all
 fourteen readouts with a KEEP / MOVE / CUT verdict and a reason for each. Consult it
 before adding or removing chrome.
 

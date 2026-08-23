@@ -1,3 +1,0 @@
-# 3.8MB, 1 page, 0 nodes: emptied by the upstream id-space bug (see RECOVERY.md).
-# Kept on disk only so it is not silently re-created; never commit it.
-portfolio-redesign.fig
