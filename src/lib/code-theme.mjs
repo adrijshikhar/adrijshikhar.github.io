@@ -6,15 +6,15 @@
  * system has to earn its keep. Each role takes exactly the hue that role owns
  * everywhere else on the site:
  *
- *   keyword   O/B  #61AFEF   6.75:1   also links and active nav
- *   type      A    #56B6C2   6.73:1   also infra tags and planets
- *   literal   G    #E5C07B   9.23:1   strings and numerics; also Sun values
- *   number    K    #E59779   6.86:1   also language tags
- *   error     M    #E06C75   4.99:1   errors ONLY, nowhere else
- *   ink       -    #ABB2BF   7.48:1   identifiers, punctuation, operators
- *   comment   -    #939BA9   5.69:1   italic
+ *   keyword   O/B  #61AFEF   5.92:1   also links and active nav
+ *   type      A    #56B6C2   5.91:1   also infra tags and planets
+ *   literal   G    #E5C07B   8.10:1   strings and numerics; also Sun values
+ *   number    K    #E59779   6.02:1   also language tags
+ *   error     M    #E57C82   5.02:1   errors ONLY, nowhere else
+ *   ink       -    #ABB2BF   6.57:1   identifiers, punctuation, operators
+ *   comment   -    #939BA9   5.00:1   italic
  *
- * Ratios are measured against the pane (--surface-2 #1E222A), not the page
+ * Ratios are measured against the pane (--surface-2 #282C34), not the page
  * ground, because that is what code actually sits on. All clear AA.
  *
  * Two things this replaces, both flagged in the design review: bronze was
@@ -32,14 +32,14 @@
  */
 
 const SPECTRAL = {
-  bg: '#1E222A',
+  bg: '#282C34',
   fg: '#ABB2BF',
   ink: '#ABB2BF',
   keyword: '#61AFEF',
   type: '#56B6C2',
   string: '#E5C07B',
   number: '#E59779',
-  error: '#E06C75',
+  error: '#E57C82',
   muted: '#939BA9',
   // Only bronze, literal, ink and muted are reached by SCOPES below; the rest
   // are the role names the ramp is documented by. bronze IS the keyword hue.

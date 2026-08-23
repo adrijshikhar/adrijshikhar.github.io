@@ -33,15 +33,21 @@
    ========================================================================== */
 
 :root {
-  /* SUBSTRATE — One Dark Vivid, re-indexed one step down so the sky has a ground.
-     One Dark's own Background (#1E222A) is L* 13.2; the canvas draws light marks
-     on this, and at that lightness a graticule stroke only reaches 2.59:1. The
-     page ground is therefore deepened along One Dark's own hue line to L* 4.6
-     (3.10:1), and every supplied value slides down one role. Nothing is invented
-     except the ground. */
-  --bg:        #0E1014;              /* ground   L*  4.6  — new, on the One Dark hue line */
-  --surface:   #1E222A;              /* panel    L* 13.2, dL* +8.5  (their Background) */
-  --surface-2: #1E222A;              /* code pane — deepest step the ramp still clears AA on */
+  /* SUBSTRATE — One Dark Vivid, used exactly as supplied. Three values, three
+     planes, no fourth invented:
+       Background #1E222A  the page ground
+       Surface    #282C34  panels, cards and the code pane  (+4.8 L*)
+       Elevated   #2C323C  card hover only                  (+2.7 L*)
+     KNOWN COST, accepted deliberately: the canvas draws light marks on the page
+     ground, and at L* 13.2 a graticule stroke only reaches 2.59:1 against it, so
+     the sky reads flatter than it does on a near-black substrate (3.10:1 at
+     L* 4.6). Deepening the ground was tried and rejected — it lifted the
+     card-to-ground step from the supplied +4.8 L* to +13.3, which made cards pop
+     about three times harder than the palette intends. Palette fidelity won.
+     Do not "fix" the sky by darkening --bg without raising that decision again. */
+  --bg:        #1E222A;              /* their Background  L* 13.2 */
+  --surface:   #282C34;              /* their Surface     L* 17.9, dL* +4.8 */
+  --surface-2: #282C34;              /* their Surface — the code pane sits here */
 
   /* One temperature: every substrate token is cool, so the neutrals are cool too. */
   --heading:   #E6E6E6;              /* Primary Text    10.33:1 worst of four surfaces */
@@ -56,15 +62,15 @@
   --border: 255 255 255;                /* used as rgb(var(--border) / a) */
   --border-color: #3E4451;
   --hairline:     #3E4451;
-  --rule:         #3E4451;              /* supplied Border. Minor hairline, 1.95:1 on the ground */
-  --rule-hi:      #636D7E;              /* supplied Muted, used where it belongs: 3.64:1 on the
+  --rule:         #3E4451;              /* supplied Border. Minor hairline, 1.63:1 on the ground */
+  --rule-hi:      #636D7E;              /* supplied Muted, used where it belongs: 3.05:1 on the
                                            ground, a major-rule value. Non-text, so 4.5 does not
                                            apply to it. */
 
   /* Card plane and its own edges, measured against the card fill rather than the
      ground — --rule is 1.43:1 on a lifted card, which is why the card carries an
      edge token of its own. Hover LIFTS: L* 17.9 -> 20.6. */
-  --card-fill:    #282C34;              /* their Surface   L* 17.9, dL* +4.8 above the panel */
+  --card-fill:    #282C34;              /* their Surface   L* 17.9, dL* +4.8 above the ground */
   --card-fill-hi: #2C323C;              /* their Elevated  L* 20.6, dL* +2.7 above rest */
   --card-edge:    #3E4451;              /* 1.43:1 on the fill — present but quiet at rest */
   --card-edge-hi: #636D7E;              /* 2.55:1 on the fill — the hover promotion */
@@ -84,18 +90,23 @@
   --spectral-k:  #E59779;              /* numbers, dates                5.55:1 — K sits between
                                           G and M on the sequence, so it is their oklab midpoint
                                           rather than an invented hue. */
-  --spectral-m:  #E06C75;              /* errors ONLY                   4.99:1 on the code pane,
-                                          4.04 on a hovered card fill (large text only there). */
+  --spectral-m:  #E06C75;              /* errors ONLY, and M-class stars on the canvas. Kept
+                                          exactly as supplied because that is its non-text job;
+                                          error TEXT uses --spectral-m-text below, since #E06C75
+                                          is 4.38:1 on the code pane. */
+  --spectral-m-text: #E57C82;          /* error text. Their red lifted along oklch L only, so hue
+                                          and chroma survive (357 vs 355): worst 4.63 on the three
+                                          supplied surfaces, 5.02 on the code pane. */
 
   /* The accent IS O/B. One hue for links and active nav, never more. */
   --accent: var(--spectral-ob);
-  --accent-contrast: #0E1014;           /* 8.06:1 against the accent fill */
+  --accent-contrast: #1E222A;           /* 6.75:1 against the accent fill */
 
   /* One shape system: --radius 2px, shared by cards, inputs and buttons. Shadows
      stay off; a card is defined by its border and its fill, not by floating. */
   --card-core:  var(--surface);
   --card-radius: 2px;
-  --card-shadow: 0 1px 2px rgb(6 7 9 / .5), 0 12px 32px -10px rgb(6 7 9 / .6);
+  --card-shadow: 0 1px 2px rgb(12 14 17 / .5), 0 12px 32px -10px rgb(12 14 17 / .6);
 
   /* Motion: four durations, one per interaction class. ONE element gets ONE
      duration across all its animated properties; a second duration on the same
@@ -118,15 +129,15 @@
 
   /* shadcn token bridge (kept for ui/* components) */
   --radius: 0px;
-  --background: 220 18% 7%;
+  --background: 220 17% 14%;
   --foreground: 219 14% 71%;
   --card: 220 13% 18%;
   --card-foreground: 219 14% 71%;
   --popover: 220 13% 18%;
   --popover-foreground: 219 14% 71%;
   --primary: 219 14% 71%;
-  --primary-foreground: 220 18% 7%;
-  --secondary: 220 17% 14%;
+  --primary-foreground: 220 17% 14%;
+  --secondary: 220 13% 18%;
   --secondary-foreground: 219 14% 71%;
   --muted-fg: 218 11% 62%;
   --destructive: 355 65% 65%;
