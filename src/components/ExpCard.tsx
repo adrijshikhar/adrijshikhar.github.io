@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface ExpCardProps {
+  slug: string;
   position: string;
   company: string;
   companyLink?: string;
@@ -12,6 +13,7 @@ interface ExpCardProps {
 }
 
 export default function ExpCard({
+  slug,
   position,
   company,
   companyLink,
@@ -21,16 +23,17 @@ export default function ExpCard({
   tagline,
   contentHtml,
 }: ExpCardProps) {
-  // Stretch the company link over the whole card ONLY when the card has no body
-  // prose. On /experience/ the body carries its own links, and an overlay would
-  // sit on top of them and swallow every click. The home page renders these
-  // cards without prose, so there the whole card is safely one target.
-  const stretch = !contentHtml && !!companyLink;
+  // A card with no body prose is a PREVIEW (the home page). Its click target is
+  // the detail view on /experience/, deep-linked to this entry — not the
+  // company's site, which is a secondary destination. On /experience/ the card
+  // IS the detail, so it gets the anchor id instead of an overlay.
+  const isPreview = !contentHtml;
 
   return (
     <Card
-      className={`group h-full transition-all duration-200 hover:-translate-y-0.5 hover:border-ring hover:shadow-lg focus-within:border-ring motion-reduce:translate-none motion-reduce:transition-none${
-        stretch ? ' relative' : ''
+      id={isPreview ? undefined : slug}
+      className={`group h-full scroll-mt-24 transition-all duration-200 hover:-translate-y-0.5 hover:border-ring hover:shadow-lg focus-within:border-ring motion-reduce:translate-none motion-reduce:transition-none${
+        isPreview ? ' relative' : ''
       }`}
     >
       <CardHeader>
@@ -38,16 +41,25 @@ export default function ExpCard({
           {startDate} &ndash; {endDate}
         </div>
         <CardTitle className="text-xl leading-snug">
-          {position}
+          {isPreview ? (
+            <a
+              href={`/experience/#${slug}`}
+              className="after:absolute after:inset-0 after:rounded-xl after:content-[''] group-hover:underline focus-visible:outline-none"
+            >
+              {position}
+            </a>
+          ) : (
+            position
+          )}
           <span className="text-muted-foreground"> / </span>
           {companyLink ? (
+            // Sits ABOVE the stretched overlay so the company link stays its own
+            // target; without the z-index the overlay would swallow it.
             <a
               href={companyLink}
               target="_blank"
               rel="noreferrer noopener"
-              className={`group-hover:underline focus-visible:outline-none${
-                stretch ? " after:absolute after:inset-0 after:rounded-xl after:content-['']" : ''
-              }`}
+              className="relative z-10 hover:underline focus-visible:outline-none"
             >
               {company} <span aria-hidden="true">&#8599;</span>
             </a>
