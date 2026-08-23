@@ -119,7 +119,12 @@ cursor-gravity wobble and hover-to-name are skipped when
 - **No opacity for state.** It broke the rail at 1.79:1 and the orbital-mechanics
   control at 1.55:1.
 - **No accent on punctuation.**
-- **No `ch` measures. No pure `#000000`. No emoji as UI. No custom cursors.**
+- **No `ch` measures. No pure `#000000`. No emoji as UI.**
+- The sky DOES replace the native cursor with a ring and dot, scoped to
+  `(hover: hover) and (pointer: fine)`. `cursor-custom` is only applied once the rAF
+  loop is confirmed running, so a script failure cannot leave a visitor with no
+  cursor. Any element setting its own `cursor` must be listed in that rule or the
+  native arrow leaks back in.
 - **No sub-11px mono.**
 - **No multi-line regex to delete code.** It removed 188 lines of interaction wiring
   in one pass here — the rAF loop, every pointer listener and the whole game — while
