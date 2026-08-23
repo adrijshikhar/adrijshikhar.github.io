@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { createTimeline, utils } from '../lib/motion';
-import { Toggle } from '@base-ui/react/toggle';
+import { Toggle } from './ui/toggle';
 
 const startsInMachine = () =>
   typeof window !== 'undefined' &&

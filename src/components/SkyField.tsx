@@ -799,7 +799,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
           {replay && (
             <div className="readout-cell">
               <span className="k">Epoch</span>
-              <b className="text-blue-400">
+              <b className="text-primary">
                 {skyNow().toISOString().slice(0, 16).replace('T', ' ')}Z
               </b>
             </div>
@@ -841,7 +841,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
             onClick={() => controlsRef.current?.enter()}
             aria-hidden={playing}
             tabIndex={playing ? -1 : 0}
-            className={`tap-44 fixed right-6 bottom-24 z-[45] hidden font-mono text-[0.6875rem] tracking-[0.14em] uppercase text-slate-400 transition-colors duration-[var(--dur-ui)] hover:text-blue-400 focus-visible:text-blue-400 md:block ${
+            className={`tap-44 fixed right-6 bottom-24 z-[45] hidden font-mono text-[0.6875rem] tracking-[0.14em] uppercase text-muted-foreground transition-colors duration-[var(--dur-ui)] hover:text-primary focus-visible:text-primary md:block ${
               playing ? 'pointer-events-none opacity-0' : ''
             }`}
           >
@@ -852,14 +852,14 @@ export default function SkyField({ mode }: SkyFieldProps) {
               owns fixed bottom-6 left-1/2, z-[1100] — sharing that spot would
               have it permanently paint over half the tool bar. */}
           {playing && figure && (
-            <p className="mass-note fixed right-6 bottom-6 z-[45] max-w-[15rem] text-right font-mono text-[0.625rem] leading-relaxed tracking-[0.14em] uppercase text-slate-400">
+            <p className="mass-note fixed right-6 bottom-6 z-[45] max-w-[15rem] text-right font-mono text-[0.625rem] leading-relaxed tracking-[0.14em] uppercase text-muted-foreground">
               {figure.drawn === figure.total ? (
                 <>
-                  <b className="font-medium text-blue-400">{figure.name}</b> complete &mdash; all {figure.total} segments
+                  <b className="font-medium text-primary">{figure.name}</b> complete &mdash; all {figure.total} segments
                 </>
               ) : (
                 <>
-                  that is a real segment of <b className="font-medium text-blue-400">{figure.name}</b>
+                  that is a real segment of <b className="font-medium text-primary">{figure.name}</b>
                   <span className="opacity-60"> · {figure.drawn}/{figure.total}</span>
                 </>
               )}
@@ -867,8 +867,8 @@ export default function SkyField({ mode }: SkyFieldProps) {
           )}
 
           {playing && !figure && massNote && (
-            <p className="mass-note fixed right-6 bottom-6 z-[45] max-w-[15rem] text-right font-mono text-[0.625rem] leading-relaxed tracking-[0.14em] uppercase text-slate-400">
-              same pull, less mass &mdash; <b className="font-medium text-blue-400">faint stars fly faster</b>
+            <p className="mass-note fixed right-6 bottom-6 z-[45] max-w-[15rem] text-right font-mono text-[0.625rem] leading-relaxed tracking-[0.14em] uppercase text-muted-foreground">
+              same pull, less mass &mdash; <b className="font-medium text-primary">faint stars fly faster</b>
               <span className="opacity-60"> · v &prop; 1/&radic;m</span>
             </p>
           )}

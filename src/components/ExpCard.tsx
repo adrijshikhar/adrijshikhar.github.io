@@ -12,10 +12,10 @@ interface ExpCardProps {
 }
 
 const prose =
-  'mt-3 text-[0.975rem] leading-relaxed text-slate-300 prose prose-invert max-w-none ' +
-  'prose-headings:text-slate-100 prose-headings:text-base prose-headings:font-semibold prose-headings:tracking-tighter prose-headings:mt-4 prose-headings:mb-2 ' +
-  'prose-p:text-slate-300 prose-li:text-slate-300 prose-li:my-0.5 prose-ul:my-1.5 marker:text-slate-400 ' +
-  'prose-a:text-blue-400 prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-slate-100 prose-strong:font-medium';
+  'mt-3 text-[0.975rem] leading-relaxed text-foreground prose prose-invert max-w-none ' +
+  'prose-headings:text-foreground prose-headings:text-base prose-headings:font-semibold prose-headings:tracking-tighter prose-headings:mt-4 prose-headings:mb-2 ' +
+  'prose-p:text-foreground prose-li:text-foreground prose-li:my-0.5 prose-ul:my-1.5 marker:text-muted-foreground ' +
+  'prose-a:text-primary prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-foreground prose-strong:font-medium';
 
 export default function ExpCard({ position, company, companyLink, location, startDate, endDate, tagline, contentHtml }: ExpCardProps) {
   return (
@@ -26,24 +26,24 @@ export default function ExpCard({ position, company, companyLink, location, star
         </span>
       </div>
       <h3 className="mt-2 title-entry">
-        <span className="transition-colors duration-[120ms] group-hover/list-item:text-blue-400">{position}</span>
-        <span className="mx-1.5 text-slate-400">/</span>
+        <span className="transition-colors duration-[120ms] group-hover/list-item:text-primary">{position}</span>
+        <span className="mx-1.5 text-muted-foreground">/</span>
         {companyLink ? (
           <a
             href={companyLink}
             target="_blank"
             rel="noreferrer noopener"
-            className="inline-flex items-baseline text-slate-100 no-underline hover:text-blue-400"
+            className="inline-flex items-baseline text-foreground no-underline hover:text-primary"
           >
             {company}
-            <span className="ml-1 text-xs text-slate-400 transition-colors group-hover/list-item:text-blue-400">&#8599;</span>
+            <span className="ml-1 text-xs text-muted-foreground transition-colors group-hover/list-item:text-primary">&#8599;</span>
           </a>
         ) : (
-          <span className="text-slate-100">{company}</span>
+          <span className="text-foreground">{company}</span>
         )}
       </h3>
       {(tagline || location) && (
-        <p className="mt-1 text-sm text-slate-400">{tagline || location}</p>
+        <p className="mt-1 text-sm text-muted-foreground">{tagline || location}</p>
       )}
       {contentHtml && (
         <div className={prose} dangerouslySetInnerHTML={{ __html: contentHtml }} />

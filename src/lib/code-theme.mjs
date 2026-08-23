@@ -36,15 +36,17 @@
  */
 
 const SPECTRAL = {
-  bg: '#1E293B',        // slate-800  — the pane code sits on
-  fg: '#CBD5E1',        // slate-300
-  ink: '#CBD5E1',       // slate-300
-  comment: '#94A3B8',   // slate-400  (slate-500 is 3.07:1 here and fails AA)
+  bg: '#171717',        // shadcn --card, the pane code sits on
+  fg: '#FAFAFA',        // shadcn --foreground
+  ink: '#FAFAFA',       // shadcn --foreground
+  comment: '#A1A1A1',   // shadcn --muted-foreground
+  // Syntax hues: shadcn defines no syntax colours, so these are stock Tailwind
+  // at ONE uniform step (-400) rather than a shade chosen per token.
   keyword: '#C084FC',   // purple-400
   function: '#60A5FA',  // blue-400
   type: '#22D3EE',      // cyan-400
   string: '#4ADE80',    // green-400
-  number: '#FCD34D',    // amber-300
+  number: '#FBBF24',    // amber-400
   error: '#F87171',     // red-400
 };
 

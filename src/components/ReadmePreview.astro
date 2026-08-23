@@ -97,7 +97,7 @@ try {
     border: 1px solid var(--border);
     border-radius: 12px;
     overflow: hidden;
-    background: var(--surface);
+    background: var(--card);
     box-shadow: none;
   }
   .readme-embed__chrome {
@@ -105,7 +105,7 @@ try {
     align-items: center;
     gap: 8px;
     padding: 10px 14px;
-    background: var(--surface);
+    background: var(--card);
     border-bottom: 1px solid var(--border);
   }
   .readme-embed__dot {
@@ -114,39 +114,39 @@ try {
     border-radius: 50%;
     background: var(--border);
   }
-  .readme-embed__dot:first-child { background: var(--accent); }
+  .readme-embed__dot:first-child { background: var(--primary); }
   .readme-embed__path {
     margin-left: 6px;
     font-family: var(--font-mono, ui-monospace, monospace);
     font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.04em;
-    color: var(--muted);
+    color: var(--muted-foreground);
   }
   .readme-embed__body {
     padding: 26px 28px 6px;
-    color: var(--text);
+    color: var(--foreground);
     font: 15px/1.65 var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
   }
   .readme-embed__body h2 {
     font-family: var(--font-heading, inherit);
     font-size: 1.2rem;
     font-weight: 700;
-    color: var(--heading);
+    color: var(--foreground);
     border-bottom: 1px solid var(--border);
     padding-bottom: 0.3em;
     margin: 1.5em 0 0.8em;
   }
   .readme-embed__body p { margin: 0.7em 0; }
-  .readme-embed__body a { color: var(--accent); text-decoration: none; }
+  .readme-embed__body a { color: var(--primary); text-decoration: none; }
   .readme-embed__body a:hover { text-decoration: underline; }
   .readme-embed__body ul { margin: 0.6em 0; padding-left: 1.3em; }
   .readme-embed__body li { margin: 0.3em 0; }
-  .readme-embed__body strong { color: var(--heading); }
+  .readme-embed__body strong { color: var(--foreground); }
   .readme-embed__body div[align="center"] { text-align: center; margin: 1.1em 0; }
   .readme-embed__body img { display: inline; vertical-align: middle; margin: 2px; max-width: 100%; }
   .readme-embed__body code {
-    background: var(--surface);
+    background: var(--card);
     border: 1px solid var(--border);
     border-radius: 5px;
     padding: 0.1em 0.35em;
@@ -155,7 +155,7 @@ try {
   }
   .readme-embed__cap {
     padding: 6px 28px 22px;
-    color: var(--muted);
+    color: var(--muted-foreground);
     font-size: 0.8rem;
     line-height: 1.5;
   }

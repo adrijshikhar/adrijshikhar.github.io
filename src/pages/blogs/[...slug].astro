@@ -31,29 +31,29 @@ const canonical = post.data.canonicalUrl ?? new URL(`/blogs/${post.id}/`, Astro.
       <img
         src={post.data.cover}
         alt={post.data.title}
-        class="mt-8 aspect-[2/1] w-full rounded-[10px] border border-slate-700 object-cover shadow-[none]"
+        class="mt-8 aspect-[2/1] w-full rounded-[10px] border border-border object-cover shadow-[none]"
         loading="eager"
       />
     )}
 
-    <header class={`border-b border-slate-700 pb-8 ${post.data.cover ? 'mt-8' : 'mt-10'}`}>
-      <h1 class="font-heading text-3xl font-semibold leading-[1.08] tracking-tightest text-slate-100 sm:text-4xl">{post.data.title}</h1>
+    <header class={`border-b border-border pb-8 ${post.data.cover ? 'mt-8' : 'mt-10'}`}>
+      <h1 class="font-heading text-3xl font-semibold leading-[1.08] tracking-tightest text-foreground sm:text-4xl">{post.data.title}</h1>
       {post.data.description && (
-        <p class="mt-4 text-lg leading-relaxed text-slate-400">{post.data.description}</p>
+        <p class="mt-4 text-lg leading-relaxed text-muted-foreground">{post.data.description}</p>
       )}
       <p class="label-data mt-5">{fmt(post.data.date)}</p>
     </header>
 
     <article
-      class="prose prose-invert mt-10 max-w-none text-slate-300
-        prose-headings:font-heading prose-headings:tracking-tighter prose-headings:text-slate-100
-        prose-p:text-slate-300 prose-p:leading-relaxed prose-li:text-slate-300 marker:text-blue-400
-        prose-a:text-blue-400 prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em]
-        prose-strong:text-slate-100 prose-strong:font-medium
-        prose-code:rounded-none prose-code:border prose-code:border-slate-700 prose-code:bg-slate-800 prose-code:px-1.5 prose-code:py-0.5 prose-code:font-mono prose-code:text-[0.85em] prose-code:text-slate-100 prose-code:before:content-none prose-code:after:content-none
-        prose-pre:rounded-none prose-pre:border prose-pre:border-slate-700 prose-pre:bg-slate-800
-        prose-blockquote:border-l-2 prose-blockquote:border-blue-400 prose-blockquote:text-slate-400 prose-blockquote:not-italic
-        prose-hr:border-slate-700 prose-img:rounded-none prose-img:border prose-img:border-slate-700"
+      class="prose prose-invert mt-10 max-w-none text-foreground
+        prose-headings:font-heading prose-headings:tracking-tighter prose-headings:text-foreground
+        prose-p:text-foreground prose-p:leading-relaxed prose-li:text-foreground marker:text-primary
+        prose-a:text-primary prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em]
+        prose-strong:text-foreground prose-strong:font-medium
+        prose-code:rounded-none prose-code:border prose-code:border-border prose-code:bg-card prose-code:px-1.5 prose-code:py-0.5 prose-code:font-mono prose-code:text-[0.85em] prose-code:text-foreground prose-code:before:content-none prose-code:after:content-none
+        prose-pre:rounded-none prose-pre:border prose-pre:border-border prose-pre:bg-card
+        prose-blockquote:border-l-2 prose-blockquote:border-primary prose-blockquote:text-muted-foreground prose-blockquote:not-italic
+        prose-hr:border-border prose-img:rounded-none prose-img:border prose-img:border-border"
     >
       <Content />
     </article>

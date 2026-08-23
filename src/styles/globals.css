@@ -1,12 +1,14 @@
-/* Fonts are local. The old Google Fonts @import was render-blocking AND loaded
-   Inter, which never painted — 'Geist Variable' always won the stack ahead of it. */
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
+/* Tailwind v4 + shadcn/ui. Fonts are local; the old Google Fonts @import was
+   render-blocking AND loaded Inter, which never painted. */
+@import "tailwindcss";
 @import "@fontsource-variable/familjen-grotesk";
 @import "@fontsource-variable/space-grotesk";
 @import "@fontsource/ibm-plex-mono/400.css";
 @import "@fontsource/ibm-plex-mono/500.css";
 @import "@fontsource/ibm-plex-mono/600.css";
+
+@plugin "@tailwindcss/typography";
+@custom-variant dark (&:is(.dark *));
 
 @property --ring-s {
   syntax: '<number>';
@@ -14,9 +16,6 @@
   initial-value: 1;
 }
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 /* ============================================================================
    SPECTRAL — semantic design tokens, dark only
@@ -32,45 +31,116 @@
    ramp. See design/README.md.
    ========================================================================== */
 
+/* shadcn/ui default theme, verbatim. These are the values shadcn ships — not
+   picked, not contrast-tuned, not substituted. The site is dark-only, so <html>
+   carries .dark and the :root block is the light half of the same stock pair. */
 :root {
-  /* ==========================================================================
-     STOCK TAILWIND ONLY. No custom palette, no derived shades, no color-mix.
-     Every value below is a stock Tailwind v3 colour, named by its Tailwind name
-     so there is nothing to look up and nothing invented. tailwind.config.mjs
-     declares NO colours at all, so utility classes resolve to the same stock
-     palette these vars hold.
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
 
-     Two shades are forced by contrast rather than taste:
-       slate-500 measures 3.07:1 on slate-800 and cannot carry text, so muted
-       text and code comments take slate-400 (5.71:1).
-     ========================================================================== */
-  --bg:        #0F172A;   /* slate-900  page ground                   L*  8.0 */
-  --surface:   #1E293B;   /* slate-800  panels, cards, code pane      L* 16.4 */
-  --elevated:  #334155;   /* slate-700  card hover                    L* 27.1 */
-  --border:    #334155;   /* slate-700  rules, hairlines, card edges          */
-  --heading:   #F1F5F9;   /* slate-100  headings, bright stars     9.45:1     */
-  --text:      #CBD5E1;   /* slate-300  body copy, code ink        6.97:1     */
-  --muted:     #94A3B8;   /* slate-400  labels, tags, comments     5.71:1 pane*/
-  --accent:    #60A5FA;   /* blue-400   links, active nav          5.75:1 pane*/
-  --cyan:      #22D3EE;   /* cyan-400   code types                 8.09:1 pane*/
-  --green:     #4ADE80;   /* green-400  code strings               8.40:1 pane*/
-  --purple:    #C084FC;   /* purple-400 code keywords              5.54:1 pane*/
-  --orange:    #FCD34D;   /* amber-300  dates, metrics, numerics  10.15:1 pane*/
-  --red:       #F87171;   /* red-400    errors                     5.29:1 pane*/
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
 
-  /* Shape and motion. Flat: a card is its fill plus its border, nothing more. */
-  --card-radius: 2px;
-  --radius: 0px;
-  --dur-tap:   0.12s;
+/* v4 maps tokens to utilities in CSS, replacing tailwind.config.mjs. */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted-foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--primary);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --font-heading: 'Space Grotesk Variable', system-ui, sans-serif;
+  --font-sans: 'Familjen Grotesk Variable', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* Motion only. No colour lives here. */
+:root {
+  --dur-tap: 0.12s;
   --dur-hover: 0.22s;
-  --dur-ui:    0.3s;
-  --dur-view:  0.5s;
+  --dur-ui: 0.3s;
+  --dur-view: 0.5s;
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);  /* sky drag-release ONLY */
   --ease-out: cubic-bezier(.32, .72, 0, 1);
-
-  --font-heading: 'Space Grotesk Variable', system-ui, sans-serif;
-  --font-sans:    'Familjen Grotesk Variable', system-ui, sans-serif;
-  --font-mono:    'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --card-radius: var(--radius);
 }
 
 /* --accent-contrast is a substrate value (dark) — the accent is a saturated mid-tone,
@@ -80,7 +150,7 @@
   html {
     scroll-behavior: smooth;
     font-family: var(--font-sans);
-    background-color: var(--bg);
+    background-color: var(--background);
     /* ease the canvas on light/dark mode swap (cards already transition) */
     transition: background-color 0.45s ease;
   }
@@ -117,8 +187,8 @@
      deterministic, and check it survives a tab switch. */
 
   body {
-    background-color: var(--bg);
-    color: var(--text);
+    background-color: var(--background);
+    color: var(--foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -138,7 +208,7 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    color: var(--heading);
+    color: var(--foreground);
     font-family: var(--font-heading);
     font-weight: 600;
     letter-spacing: -0.02em;
@@ -152,23 +222,23 @@
   }
 
   a {
-    color: var(--accent);
+    color: var(--primary);
     transition: color 120ms ease-out;
   }
   a:hover {
-    color: var(--accent);
+    color: var(--primary);
     opacity: 0.78;
   }
 
   ::selection {
     /* subtle accent-tint highlight; keep text at --heading so it stays high-contrast in both modes */
-    background: var(--accent);
-    color: var(--heading);
+    background: var(--primary);
+    color: var(--foreground);
   }
 
   /* Visible focus rings, accent-tinted */
   :focus-visible {
-    outline: 2px solid var(--accent);
+    outline: 2px solid var(--primary);
     outline-offset: 2px;
     border-radius: 1px;
   }
@@ -179,12 +249,12 @@
 
   /* Custom selection-marker scrollbar — subtle terminal feel */
   ::-webkit-scrollbar { width: 10px; height: 10px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-track { background: var(--background); }
   ::-webkit-scrollbar-thumb {
-    background: var(--surface);
-    border: 2px solid var(--bg);
+    background: var(--card);
+    border: 2px solid var(--background);
   }
-  ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--muted-foreground); }
 }
 
 @layer components {
@@ -200,7 +270,7 @@
     line-height: 0.9;
     letter-spacing: -0.03em;
     text-transform: uppercase;
-    color: var(--heading);
+    color: var(--foreground);
   }
   .display-hero a,
   .display-page a { color: inherit; }
@@ -211,7 +281,7 @@
     font-weight: 700;
     line-height: 0.96;
     letter-spacing: -0.03em;
-    color: var(--heading);
+    color: var(--foreground);
   }
   @media (min-width: 640px) {
     .display-page { font-size: 3rem; }
@@ -223,7 +293,7 @@
     font-weight: 600;
     line-height: 1.3;
     letter-spacing: -0.015em;
-    color: var(--heading);
+    color: var(--foreground);
   }
 
   .label-data {
@@ -232,7 +302,7 @@
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.14em;
-    color: var(--muted);
+    color: var(--muted-foreground);
   }
 
   /* Dates, companies, locations — the readout beside an entry. */
@@ -248,10 +318,10 @@
        the way down a list, so whatever hue it takes becomes the page's cast.
        A date is a numeric datum, which is the job the ramp gives G/Orange;
        Green stays on the language tags and on strings in the code pane. */
-    color: var(--orange);
+    color: var(--primary);
     font-variant-numeric: tabular-nums;
   }
-  .meta-data--muted { color: var(--muted); }
+  .meta-data--muted { color: var(--muted-foreground); }
 
   .link-back {
     display: inline-flex;
@@ -260,13 +330,13 @@
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.14em;
-    color: var(--muted);
+    color: var(--muted-foreground);
     text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 0.25em;
-    text-decoration-color: var(--muted);
+    text-decoration-color: var(--muted-foreground);
   }
-  .link-back:hover { color: var(--accent); opacity: 1; }
+  .link-back:hover { color: var(--primary); opacity: 1; }
 
   /* ── Numbered section channel: index, name, and a rule running to the edge. */
   .channel {
@@ -274,7 +344,7 @@
     align-items: baseline;
     gap: 1rem;
   }
-  .channel-no { color: var(--accent); }
+  .channel-no { color: var(--primary); }
   .channel::after {
     content: '';
     flex: 1;
@@ -289,18 +359,18 @@
     gap: 0.5rem;
     border-radius: 0;
     background: transparent;
-    box-shadow: inset 0 0 0 1px var(--muted);
+    box-shadow: inset 0 0 0 1px var(--muted-foreground);
     padding: 0.5rem 1rem;
     font-family: var(--font-mono);
     font-size: 0.6875rem;
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.14em;
-    color: var(--accent);
+    color: var(--primary);
     transition: background-color var(--dur-hover) var(--ease-out),
                 box-shadow var(--dur-hover) var(--ease-out);
   }
-  .atelier-btn:hover { background: var(--surface); box-shadow: inset 0 0 0 1px var(--muted); }
+  .atelier-btn:hover { background: var(--card); box-shadow: inset 0 0 0 1px var(--muted-foreground); }
   @media (prefers-reduced-motion: reduce) { .atelier-btn:hover { transform: none; } }
 
   /* Card plane. OPAQUE, and that costs nothing now: the sky keep-out already
@@ -315,7 +385,7 @@
   .atelier-card {
     position: relative;
     border-radius: var(--radius);
-    background: var(--surface);
+    background: var(--card);
     box-shadow: inset 0 0 0 1px var(--border);
     transition: background-color var(--dur-hover) var(--ease-out),
                 box-shadow var(--dur-hover) var(--ease-out);
@@ -323,8 +393,8 @@
   @media (min-width: 1024px) {
     .group\/list-item:hover .atelier-card,
     .atelier-card:hover {
-      background: var(--elevated);
-      box-shadow: inset 0 0 0 1px var(--muted);
+      background: var(--secondary);
+      box-shadow: inset 0 0 0 1px var(--muted-foreground);
     }
   }
   @media (prefers-reduced-motion: reduce) {
@@ -373,7 +443,7 @@
    own background is a baked hex that cannot follow a token change, and a code
    block is the one place a stale near-white would be most obvious. */
 .astro-code {
-  background-color: var(--surface);
+  background-color: var(--card);
 }
 /* Code blocks styled as Terminal Atelier panes: atelier-card surface (card radius,
    hairline border, soft shadow) with the signature accent top edge — matching the
@@ -381,7 +451,7 @@
 .prose pre.astro-code {
   border-radius: var(--card-radius, 10px);
   border: 1px solid var(--border);
-  border-top: 2px solid var(--accent);
+  border-top: 2px solid var(--primary);
   box-shadow: none;
   margin: 1.75rem 0;
   padding: 1.15rem 1.3rem;
@@ -402,8 +472,8 @@
 .prose :not(pre) > code {
   border-radius: 5px;
   border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--heading);
+  background: var(--card);
+  color: var(--foreground);
 }
 
 /* Ambient sky field (SkyField.tsx) — hidden in machine view, crossfades with
@@ -522,7 +592,7 @@ body.spinning * {
     width: 26px;
     height: 26px;
     margin: -13px 0 0 -13px;
-    border: 1px solid var(--muted);
+    border: 1px solid var(--muted-foreground);
     transition:
       --ring-s 0.22s var(--ease-out),
       border-color 0.22s var(--ease-out);
@@ -531,24 +601,24 @@ body.spinning * {
     width: 4px;
     height: 4px;
     margin: -2px 0 0 -2px;
-    background: var(--muted);
+    background: var(--muted-foreground);
     transition: background-color 0.22s var(--ease-out);
   }
   /* over a grabbable star */
   body.cur-star #sky-cursor-ring {
     --ring-s: 1.462;
-    border-color: var(--accent);
+    border-color: var(--primary);
   }
   body.cur-star #sky-cursor-dot {
-    background: var(--accent);
+    background: var(--primary);
   }
   /* over real UI (the tool bar) */
   body.cur-ui #sky-cursor-ring {
     --ring-s: 0.615;
-    border-color: var(--accent);
+    border-color: var(--primary);
   }
   body.cur-ui #sky-cursor-dot {
-    background: var(--accent);
+    background: var(--primary);
     width: 3px;
     height: 3px;
     margin: -1.5px 0 0 -1.5px;
@@ -556,7 +626,7 @@ body.spinning * {
   /* dragging */
   body.grabbing #sky-cursor-ring {
     --ring-s: 0.692;
-    border-color: var(--accent);
+    border-color: var(--primary);
   }
 }
 @media (hover: none), (pointer: coarse) {
@@ -584,7 +654,7 @@ body.spinning * {
     position: absolute;
     width: 18px;
     height: 18px;
-    border: 0 solid var(--muted);
+    border: 0 solid var(--muted-foreground);
     opacity: 0.55;
   }
   .viewfinder i:nth-child(1) { top: 14px; left: 14px; border-top-width: 1px; border-left-width: 1px; }
@@ -602,7 +672,7 @@ body.spinning * {
     width: min(46vw, 520px);
     height: 6px;
     opacity: 0.4;
-    background: repeating-linear-gradient(90deg, var(--muted) 0 1px, transparent 1px 100%) 0 0 / 26px 100%;
+    background: repeating-linear-gradient(90deg, var(--muted-foreground) 0 1px, transparent 1px 100%) 0 0 / 26px 100%;
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 22%, #000 78%, transparent);
     mask-image: linear-gradient(90deg, transparent, #000 22%, #000 78%, transparent);
   }
@@ -616,7 +686,7 @@ body.spinning * {
     font-size: 0.625rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: var(--muted-foreground);
     line-height: 2;
     pointer-events: none;
   }
@@ -638,7 +708,7 @@ body.spinning * {
      .instrument bottom (1.4rem); the easter-egg hook (SkyField.tsx) is
      positioned independently via its own `bottom-24` (6rem) Tailwind class —
      fixed apart so neither moves when the other appears. */
-  .instrument b { color: var(--heading); font-weight: 500; }
+  .instrument b { color: var(--foreground); font-weight: 500; }
   .instrument .k { display: inline-block; width: 6.5rem; opacity: 0.75; }
 
   .readout-row {
@@ -671,14 +741,14 @@ body.spinning * {
     display: flex;
     align-items: stretch;
     border: 1px solid var(--border);
-    background: var(--surface);
+    background: var(--card);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     font-family: var(--font-mono);
     font-size: 0.6875rem;   /* 11px: the mono floor. This was 9px. */
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: var(--muted-foreground);
   }
 
   /* Segmented control inside a chrome panel — the human/machine and
@@ -694,13 +764,13 @@ body.spinning * {
     font-weight: 400;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: var(--muted-foreground);
     background: none;
     transition:
       color 0.22s var(--ease-out),
       border-color 0.22s var(--ease-out);
   }
-  .chrome-seg:hover { color: var(--heading); }
+  .chrome-seg:hover { color: var(--foreground); }
   .chrome-panel > .chrome-seg + .chrome-seg { border-left: 1px solid var(--border); }
 
   /* Selection is the bracket pair alone — no box. The panel already draws a
@@ -709,14 +779,14 @@ body.spinning * {
      `content: var(--tw-content)` on both pseudos and was silently eating the
      closing bracket, which shipped as "[ HUMAN" with no "]". */
   .chrome-bracket {
-    color: var(--accent);
+    color: var(--primary);
     opacity: 0;
     transition: opacity 0.22s var(--ease-out);
   }
   .chrome-seg[aria-pressed='true'] .chrome-bracket,
   .chrome-seg[data-state='on'] .chrome-bracket { opacity: 1; }
   .chrome-seg[aria-pressed='true'],
-  .chrome-seg[data-state='on'] { color: var(--accent); }
+  .chrome-seg[data-state='on'] { color: var(--primary); }
 
   /* Banded rows inside a vertical chrome panel: tools, then live status, then
      actions. Hairlines between bands do the grouping, so the panel reads as an
@@ -738,7 +808,7 @@ body.spinning * {
     line-height: 1.5;
     text-align: left;
   }
-  .chrome-status-val b { color: var(--accent); font-weight: 500; }
+  .chrome-status-val b { color: var(--primary); font-weight: 500; }
 
   /* Scroll cue. States a real consequence -- the constellation figures are
      drawn by scroll progress -- rather than saying "scroll down". Fades out
@@ -751,7 +821,7 @@ body.spinning * {
     font-size: 0.5625rem;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: var(--muted-foreground);
     opacity: 0.75;
     transition: opacity 0.5s var(--ease-out);
   }
@@ -767,7 +837,7 @@ body.spinning * {
     position: absolute;
     inset: 0 0 auto 0;
     height: 45%;
-    background: var(--accent);
+    background: var(--primary);
     animation: cue-run 2.4s var(--ease-out) infinite;
   }
   @keyframes cue-run {
@@ -804,7 +874,7 @@ body.spinning * {
     font-size: 0.6875rem;            /* 11px: the mono floor. Was 9px. */
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: var(--muted-foreground);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
   }
@@ -895,18 +965,18 @@ body.spinning * {
     z-index: 2000;
     transform: translateY(-120%);
     padding: 0.75rem 1rem;
-    background: var(--surface);
-    color: var(--heading);
+    background: var(--card);
+    color: var(--foreground);
     font-family: var(--font-mono);
     font-size: 0.6875rem;
     text-transform: uppercase;
     letter-spacing: 0.14em;
-    box-shadow: inset 0 0 0 1px var(--muted);
+    box-shadow: inset 0 0 0 1px var(--muted-foreground);
     transition: transform var(--dur-ui) var(--ease-out);
   }
   .skip-link:focus-visible {
     transform: translateY(0);
-    outline: 2px solid var(--accent);
+    outline: 2px solid var(--primary);
     outline-offset: 2px;
   }
 }
@@ -953,7 +1023,7 @@ body.spinning * {
     font-weight: 700;
     line-height: 0.96;
     letter-spacing: -0.03em;
-    color: var(--heading);
+    color: var(--foreground);
   }
   @media (min-width: 640px) {
     .display-section { font-size: 3rem; }
@@ -979,38 +1049,38 @@ body.spinning * {
    paint. */
 .prose,
 .prose-invert {
-  --tw-prose-body: var(--text);
-  --tw-prose-headings: var(--heading);
-  --tw-prose-lead: var(--text);
-  --tw-prose-links: var(--accent);
-  --tw-prose-bold: var(--heading);
-  --tw-prose-counters: var(--muted);
+  --tw-prose-body: var(--foreground);
+  --tw-prose-headings: var(--foreground);
+  --tw-prose-lead: var(--foreground);
+  --tw-prose-links: var(--primary);
+  --tw-prose-bold: var(--foreground);
+  --tw-prose-counters: var(--muted-foreground);
   --tw-prose-bullets: var(--border);
   --tw-prose-hr: var(--border);
-  --tw-prose-quotes: var(--text);
-  --tw-prose-quote-borders: var(--accent);
-  --tw-prose-captions: var(--muted);
-  --tw-prose-kbd: var(--heading);
-  --tw-prose-code: var(--heading);
-  --tw-prose-pre-code: var(--text);
-  --tw-prose-pre-bg: var(--surface);
+  --tw-prose-quotes: var(--foreground);
+  --tw-prose-quote-borders: var(--primary);
+  --tw-prose-captions: var(--muted-foreground);
+  --tw-prose-kbd: var(--foreground);
+  --tw-prose-code: var(--foreground);
+  --tw-prose-pre-code: var(--foreground);
+  --tw-prose-pre-bg: var(--card);
   --tw-prose-th-borders: var(--border);
   --tw-prose-td-borders: var(--border);
-  --tw-prose-invert-body: var(--text);
-  --tw-prose-invert-headings: var(--heading);
-  --tw-prose-invert-lead: var(--text);
-  --tw-prose-invert-links: var(--accent);
-  --tw-prose-invert-bold: var(--heading);
-  --tw-prose-invert-counters: var(--muted);
+  --tw-prose-invert-body: var(--foreground);
+  --tw-prose-invert-headings: var(--foreground);
+  --tw-prose-invert-lead: var(--foreground);
+  --tw-prose-invert-links: var(--primary);
+  --tw-prose-invert-bold: var(--foreground);
+  --tw-prose-invert-counters: var(--muted-foreground);
   --tw-prose-invert-bullets: var(--border);
   --tw-prose-invert-hr: var(--border);
-  --tw-prose-invert-quotes: var(--text);
-  --tw-prose-invert-quote-borders: var(--accent);
-  --tw-prose-invert-captions: var(--muted);
-  --tw-prose-invert-kbd: var(--heading);
-  --tw-prose-invert-code: var(--heading);
-  --tw-prose-invert-pre-code: var(--text);
-  --tw-prose-invert-pre-bg: var(--surface);
+  --tw-prose-invert-quotes: var(--foreground);
+  --tw-prose-invert-quote-borders: var(--primary);
+  --tw-prose-invert-captions: var(--muted-foreground);
+  --tw-prose-invert-kbd: var(--foreground);
+  --tw-prose-invert-code: var(--foreground);
+  --tw-prose-invert-pre-code: var(--foreground);
+  --tw-prose-invert-pre-bg: var(--card);
   --tw-prose-invert-th-borders: var(--border);
   --tw-prose-invert-td-borders: var(--border);
 }

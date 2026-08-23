@@ -28,10 +28,10 @@ const achievements = readContent('achievements.md');
 const expSections = splitBySlug(experience.content);
 
 const proseClass =
-  'prose prose-invert prose-sm max-w-none text-slate-300 prose-p:text-slate-300 prose-li:text-slate-300 ' +
-  'prose-li:my-0.5 marker:text-blue-400 prose-headings:text-slate-100 prose-headings:text-sm ' +
-  'prose-headings:font-semibold prose-headings:tracking-tighter prose-a:text-blue-400 ' +
-  'prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-slate-100 prose-strong:font-medium';
+  'prose prose-invert prose-sm max-w-none text-foreground prose-p:text-foreground prose-li:text-foreground ' +
+  'prose-li:my-0.5 marker:text-primary prose-headings:text-foreground prose-headings:text-sm ' +
+  'prose-headings:font-semibold prose-headings:tracking-tighter prose-a:text-primary ' +
+  'prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-foreground prose-strong:font-medium';
 ---
 
 <BaseLayout title="Resume | adrijshikhar.dev">
@@ -41,29 +41,29 @@ const proseClass =
       <span>adrij_shikhar</span>
     </a>
 
-    <header class="mt-10 flex flex-col gap-6 border-b border-slate-700 pb-10 md:flex-row md:items-end md:justify-between">
+    <header class="mt-10 flex flex-col gap-6 border-b border-border pb-10 md:flex-row md:items-end md:justify-between">
       <div>
         <h1 class="display-page">{about.meta.name ?? 'Adrij Shikhar'}</h1>
-        <p class="mt-2 font-heading text-base font-medium tracking-tighter text-slate-100">Senior Software Engineer</p>
+        <p class="mt-2 font-heading text-base font-medium tracking-tighter text-foreground">Senior Software Engineer</p>
       </div>
       <a
         href="/assets/resume.pdf"
         download="Adrij Shikhar Resume.pdf"
-        class="group inline-flex shrink-0 items-center gap-2 border border-slate-700 px-4 py-2.5 font-mono text-xs uppercase tracking-[0.14em] text-slate-100 no-underline transition-colors duration-[120ms] hover:border-blue-400 hover:text-blue-400"
+        class="group inline-flex shrink-0 items-center gap-2 border border-border px-4 py-2.5 font-mono text-xs uppercase tracking-[0.14em] text-foreground no-underline transition-colors duration-[120ms] hover:border-primary hover:text-primary"
       >
-        <span class="text-blue-400">&#9662;</span> Download PDF
+        <span class="text-primary">&#9662;</span> Download PDF
       </a>
     </header>
 
     <!-- Experience -->
     <section class="mt-12">
       <p class="label-data mb-6">experience</p>
-      <ul class="border-t border-slate-700">
+      <ul class="border-t border-border">
         {experience.meta.entries.map((exp: any) => (
-          <li class="border-b border-slate-700 py-6">
+          <li class="border-b border-border py-6">
             <div class="flex flex-col gap-1 md:flex-row md:items-baseline md:justify-between">
-              <h2 class="font-heading text-base font-medium tracking-tighter text-slate-100">
-                {exp.position} <span class="mx-1 text-slate-400">/</span> {exp.company}
+              <h2 class="font-heading text-base font-medium tracking-tighter text-foreground">
+                {exp.position} <span class="mx-1 text-muted-foreground">/</span> {exp.company}
               </h2>
               <span class="shrink-0 meta-data">{exp.startDate} — {exp.endDate}</span>
             </div>
@@ -79,12 +79,12 @@ const proseClass =
     <!-- Education -->
     <section class="mt-12">
       <p class="label-data mb-6">education</p>
-      <ul class="border-t border-slate-700">
+      <ul class="border-t border-border">
         {education.meta.entries.map((edu: any) => (
-          <li class="flex flex-col gap-1 border-b border-slate-700 py-5 md:flex-row md:items-baseline md:justify-between">
+          <li class="flex flex-col gap-1 border-b border-border py-5 md:flex-row md:items-baseline md:justify-between">
             <div>
-              <h3 class="font-heading text-base font-medium tracking-tighter text-slate-100">{edu.institution}</h3>
-              <p class="mt-0.5 text-sm text-slate-300">{edu.degree}{edu.field && <span class="text-slate-400"> — {edu.field}</span>}</p>
+              <h3 class="font-heading text-base font-medium tracking-tighter text-foreground">{edu.institution}</h3>
+              <p class="mt-0.5 text-sm text-foreground">{edu.degree}{edu.field && <span class="text-muted-foreground"> — {edu.field}</span>}</p>
             </div>
             <span class="shrink-0 meta-data">{edu.startDate} — {edu.endDate}</span>
           </li>

@@ -35,7 +35,7 @@ const expSections = splitBySlug(experience.content);
       Work Experience
     </h1>
 
-    <ul class="group/list border-b border-slate-700">
+    <ul class="group/list border-b border-border">
       {experience.meta.entries.map((exp: any) => (
         <ExpCard {...exp} contentHtml={marked.parse(expSections[exp.slug] || '') as string} />
       ))}
