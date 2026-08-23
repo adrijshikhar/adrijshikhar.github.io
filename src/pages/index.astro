@@ -154,7 +154,7 @@ const SOCIAL_ICON_PATHS = {
         <section id="experience" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
           <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground text-muted-foreground">02</span></div>
           <h2 class="display-section mb-8">Experience</h2>
-          <ul class="group/list border-b-0">
+          <ul class="group/list flex flex-col gap-5">
             {experience.meta.entries.slice(0, 2).map((exp: any) => (
               <ExpCard {...exp} />
             ))}
@@ -170,7 +170,7 @@ const SOCIAL_ICON_PATHS = {
         <section id="projects" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
           <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground text-muted-foreground">03</span></div>
           <h2 class="display-section mb-8">Projects</h2>
-          <ul class="group/list">
+          <ul class="group/list flex flex-col gap-5">
             {projects.meta.entries.slice(0, 2).map((proj: any) => (
               <ProjectCard {...proj} contentHtml={marked.parse(projSections[proj.slug] || '') as string} />
             ))}
@@ -191,7 +191,7 @@ const SOCIAL_ICON_PATHS = {
               <span class="text-primary">$</span> ls ./posts — <span class="text-foreground">no entries yet.</span>
             </p>
           ) : (
-            <ul class="group/list">
+            <ul class="group/list flex flex-col gap-5">
               {latestPosts.map((post) => (
                 <BlogCard title={post.data.title} date={fmtPostDate(post.data.date)} href={`/blogs/${post.id}/`} />
               ))}
