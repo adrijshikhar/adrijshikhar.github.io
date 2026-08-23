@@ -1,7 +1,7 @@
 ---
 name: "Adrij Shikhar"
 title: "Senior Software Engineer"
-tagline: "I build scalable data platforms and craft software that pushes boundaries."
+tagline: "I build data platforms, and the agent tooling that generates and operates them."
 email: "ashikhar@ee.iitr.ac.in"
 socials:
   - platform: github
@@ -27,4 +27,5 @@ socials:
 Graduated from IIT Roorkee in chemistry, then spent my freshman year discovering
 I would rather build software. I have been doing that since.
 
-These days that mostly means data infrastructure, and writing down what breaks.
+These days that mostly means connector platforms, the frameworks underneath them, and the
+agent tooling that generates and operates both. And writing down what breaks.

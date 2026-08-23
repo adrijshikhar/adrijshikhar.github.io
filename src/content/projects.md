@@ -1,5 +1,39 @@
 ---
 entries:
+  - slug: catalyst
+    title: "Catalyst"
+    company: "Open source"
+    date: "May 2026 - Present"
+    year: 2026
+    link: "https://github.com/adrijshikhar/catalyst"
+    builtWith: ["Claude Code", "Agent Skills", "Shell"]
+  - slug: binsight
+    title: "binsight"
+    company: "Open source"
+    date: "Jul 2026 - Present"
+    year: 2026
+    link: "https://github.com/adrijshikhar/binsight"
+    builtWith: ["Go", "MySQL", "SQLite", "Docker"]
+  - slug: resume-ops
+    title: "resume-ops"
+    company: "Personal"
+    date: "May 2026"
+    year: 2026
+    builtWith: ["Claude Code", "Agent Skills", "GitHub API", "Jira API"]
+  - slug: retry-thread-pool
+    title: "Retry Thread Pool"
+    company: "Open source"
+    date: "Jun 2026"
+    year: 2026
+    link: "https://central.sonatype.com/artifact/io.github.adrijshikhar/retry-thread-pool"
+    builtWith: ["Java 17", "Concurrency", "Maven Central"]
+  - slug: observatory
+    title: "adrijshikhar.dev"
+    company: "Personal"
+    date: "Aug 2026"
+    year: 2026
+    link: "https://github.com/adrijshikhar/adrijshikhar.github.io"
+    builtWith: ["Astro", "React", "Canvas", "Tailwind"]
   - slug: scraperql
     title: "ScraperQL"
     company: "Dgraph Labs"
@@ -97,6 +131,44 @@ entries:
     year: 2018
     builtWith: ["HTML", "CSS", "JavaScript", "PHP"]
 ---
+
+<!-- catalyst -->
+
+Harness engineering for Claude Code — skills that turn the model into a long-running, reliable system. Named after the chemistry: a catalyst makes a reaction faster and more reliable without being consumed by it.
+
+- Skills for handoffs between sessions, so work survives a context window ending.
+- Shipped with CI, versioned releases and a documented deep dive on the harness itself.
+
+<!-- binsight -->
+
+A local, read-only MySQL and MariaDB binlog viewer and analyzer. Point it at a directory of binlog files and it gives you the events as something you can actually read.
+
+- Filterable event stream, transaction grouping, row-image diffs, hex forensics, anomaly detection and a schema timeline, in a browser UI.
+- Backed by a zero-config SQLite index, so decoding never blocks the UI — everything the browser reads comes from the index.
+- Streams live from a running server as a replica, standing in for `mysqlbinlog` with a visual front end.
+- Distributed as a Homebrew tap and a container image.
+
+<!-- resume-ops -->
+
+A Claude Code skill that reads four years of engineering history and writes it back as evidence.
+
+- Pulls from GitHub, Jira, Confluence and Slack, reconciles the sources against each other, then synthesises the result.
+- Every claim traces to a link, and the counting traps are recorded alongside the numbers — a batch job that closes tickets in blocks will happily hand you a flattering statistic.
+
+<!-- retry-thread-pool -->
+
+A retrying task executor for Java 17+. Wrap any `ExecutorService` and get retries without rewriting the task.
+
+- Backoff, retry predicates, per-attempt timeouts, listeners and stats.
+- Zero runtime dependencies. Published to Maven Central.
+
+<!-- observatory -->
+
+This site. An observatory instrument rather than a page — the background is real computed astronomy for wherever you are reading it from.
+
+- Star positions, the planets, the Moon's terminator and the Sun are computed for the observer's coordinates and the current Julian date, not decorated.
+- Every mark on the canvas is a catalogued object you can hover and name; the instrument readouts report the frame that was actually painted.
+- Text legibility is a hard contract, verified against the rasterised page rather than asserted.
 
 <!-- scraperql -->
 
