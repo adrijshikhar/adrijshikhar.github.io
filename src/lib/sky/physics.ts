@@ -76,7 +76,11 @@ const MAX_PULL = 6; // max px a star is ever displaced from home
  *  the cap, so lowering only MAX_PULL would leave those stars moving exactly as
  *  far as before and the reduction would not be uniform. */
 const WOBBLE_SCALE = 0.75;
-const K = 0.14; // spring stiffness toward target
+/** Spring stiffness toward the target. Lowering this does not shrink the
+ *  displacement — the star still converges on the same target — it slows the
+ *  approach, so the sky lags further behind the cursor and the bend reads softer.
+ *  Amplitude is WOBBLE_SCALE's job; this is the feel. */
+const K = 0.105;
 const DAMP = 0.78; // velocity retained per frame
 /** Near-frictionless space, sling mode. Coast distance is v0 * DRAG/(1-DRAG),
  *  so this — not LAUNCH_SPEED — is the travel knob: 0.994 gave ~165x the launch
