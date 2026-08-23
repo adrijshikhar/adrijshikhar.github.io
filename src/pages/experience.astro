@@ -37,7 +37,7 @@ const expSections = splitBySlug(experience.content);
 
     <ul class="group/list flex flex-col gap-5">
       {experience.meta.entries.map((exp: any) => (
-        <ExpCard {...exp} contentHtml={marked.parse(expSections[exp.slug] || '') as string} />
+        <li><ExpCard {...exp} contentHtml={marked.parse(expSections[exp.slug] || '') as string} /></li>
       ))}
     </ul>
   </main>

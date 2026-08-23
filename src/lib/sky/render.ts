@@ -108,8 +108,6 @@ export interface SkyColors {
   bright: string;
   /** Moon's lit-limb fill + terminator-ring stroke. */
   moonLit: string;
-  /** Moon's earthshine disc — a low-alpha wash behind the lit limb. */
-  moonGlow: string;
   /** Planet disc/ring/persistent-label colour. slate-300 (#CBD5E1, neutral like the Moon —
    *  Vega): planets shine by reflected sunlight, so they read cool, and A is
    *  visibly distinct from the near-white F the bright stars take. */
@@ -171,41 +169,6 @@ export function fade(base: string, alpha: number): string {
   return `color-mix(in srgb, ${base} ${(alpha * 100).toFixed(2)}%, transparent)`;
 }
 
-/** Twilight. The one ambient light in the scene, anchored to the Sun's real
- *  computed position and driven by its real altitude — so the page is warm
- *  where the light actually comes from, and dark when the Sun is genuinely
- *  down. It replaced a fixed warm blob in the top-left corner, which was a
- *  glow from nowhere on a sky that claims to be true.
- *
- *  The ramp is the standard definition, not a taste curve: full strength with
- *  the Sun up, fading through civil/nautical/astronomical twilight, and out
- *  entirely at -18 degrees, which is where astronomical night begins and no
- *  sunlight reaches the sky. Below that the page is black because it should be.
- *
- *  The two modes state it differently, for the same reason the stars do. Dark
- *  mode EMITS: a soft bloom, because that is what light on black looks like.
- *  Light mode ENGRAVES: concentric rings spreading from the disc and fading as
- *  they go, which is how a printed chart draws radiance it cannot glow. A warm
- *  bloom on paper is a stain; a ring is a mark.
- *
- *  Geometry measured off the sprite, not guessed. The sheet blits into a 2r box,
- *  so in units of the painted radius the glyph is: orange disc to 0.53, then
- *  three dashed rings at 0.58 / 0.77 / 0.96, outermost ink at 1.01, ink about
- *  three quarters of each step. The ripple starts just past that and keeps the
- *  same 0.19 spacing, so it continues the glyph rather than orbiting it —
- *  getting these in the wrong units is what left a dead band around the Sun. */
-const TWILIGHT_FLOOR = -18;
-const GLOW_MAX_ALPHA = 0.115;
-/** Engraved radiance: concentric dashed circles leaving the disc and fading as
- *  they spread — the Sun glyph's own language, continued outward. Measured off
- *  the icon rather than guessed: its dashes are arc segments with a SMALL gap
- *  (dash roughly 3x the gap), in two staggered rings sitting at 1.4-1.7x the
- *  disc radius. So the ripple starts outside that and reaches only ~4 radii,
- *  in Sun radii rather than viewport diagonal — at diagonal scale this was
- *  just the old corner wash wearing a different shape. */
-const RING_COUNT = 3;
-const RING_START = 1.12;
-const RING_REACH = 1.55;
 /** Quiet-mode draw: the faint field, the named stars, and the planets, Moon
  *  and Sun — the bodies that make it a sky on a given night rather than a
  *  generic starfield. What quiet still withholds is the *instrument*: no
@@ -220,23 +183,15 @@ const RING_REACH = 1.55;
  *  reading column and passes numbers. */
 export type KeepOut = { x: number; y: number; w: number; h: number; strength?: number };
 
-/** Erase a fraction of the sky's own ink inside `k`.
+/** Erase canvas ink under the reading column so text keeps its contrast.
  *
- *  This is `destination-out`, not a translucent wash on top. That distinction is
- *  the whole point: a wash ADDS a layer and leaves canvas alpha untouched, so
- *  text over it still fails the 169/255 ceiling. Erasing genuinely lowers the
- *  alpha `verify:legibility` samples, while leaving most of the sky visible.
+ *  `destination-out`, not a translucent wash on top: a wash ADDS a layer and
+ *  leaves canvas alpha untouched, so it cannot lower what verify:legibility
+ *  measures. Erasing actually removes ink.
  *
- *  FULL WIDTH, on purpose. An earlier version erased only a column-width band
- *  and feathered 96px at each side. Feathering does not remove a brightness
- *  step, it only softens its edge, so the result read as a vertical fade down
- *  both sides of the text — a lighting artifact with no cause in the sky. Erasing
- *  across the whole width has no vertical edge to notice at all.
- *
- *  Strength is deliberately low. Worst measured alpha with no keep-out was 193;
- *  at 0.45 that lands at ~106 against a ceiling of 169, so the sky keeps more
- *  than half its ink and still clears the contract with 63 to spare. Do not
- *  raise this to "be safe" — every point costs sky. */
+ *  Scoped to the column, not the viewport. It used to be full width, which
+ *  erased 45% of every mark on the canvas — including the planet labels and the
+ *  hover readout out in the empty margins, where there is no text to protect. */
 function applyKeepOut(ctx: CanvasRenderingContext2D, k: KeepOut, W: number): void {
   const strength = k.strength ?? 0.45;
   const feather = 140;
@@ -288,7 +243,6 @@ export function drawQuiet(
   moonPhase: MoonPhase,
   colors: SkyColors,
   sprite?: PlanetSpriteRef | null,
-  sunPhase = 0,
   keepOut?: KeepOut | null,
 ): void {
   ctx.clearRect(0, 0, W, H);
@@ -418,7 +372,7 @@ const SUN_MAG = -26.7;
  *
  *  Picked by measurement (see task-7-report.md's fix addendum), driving the
  *  clock across a day and several dates and sampling `getImageData` over
- *  every `main p`/`main li`/`.rounded-xl border bg-card text-card-foreground shadow-sm` on the home page: 0.5 keeps the
+ *  every `main p`/`main li`/card on the home page: 0.5 keeps the
  *  Moon/Venus/Jupiter worst case (disc only now; earthshine and bloom are gone,
  *  layered case) at alpha ~137–153/255 in the worst positions found, under
  *  the ≤169 every other sampled element sits under. Left out of `starAlpha`
@@ -840,7 +794,6 @@ export function drawFull(
   mouse: { x: number; y: number },
   colors: SkyColors,
   sprite?: PlanetSpriteRef | null,
-  sunPhase = 0,
   keepOut?: KeepOut | null,
 ): void {
   ctx.clearRect(0, 0, W, H);

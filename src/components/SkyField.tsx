@@ -329,7 +329,6 @@ export default function SkyField({ mode }: SkyFieldProps) {
     // Reduced motion: constellations render fully formed (no scroll-driven reveal).
     const scrollP = { t: reduced ? 1 : 0 };
     let scrollAnim: ReturnType<typeof animate> | null = null;
-    let rippleTimer: ReturnType<typeof createTimer> | null = null;
 
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -349,15 +348,6 @@ export default function SkyField({ mode }: SkyFieldProps) {
       }
     };
 
-    // Drives the engraved Sun's ripple. anime.js owns the clock rather than a
-    // hand-rolled `performance.now() % period`: its timer is already the site's
-    // motion engine (the scroll reveal runs on it), it pauses with the document
-    // instead of burning cycles in a background tab, and it gives the loop a
-    // real duration to ease against. Reduced motion simply never starts it, and
-    // `ripple.p` stays 0 — one frame of static rings, which is the same chart
-    // convention standing still.
-    const SUN_PULSE_MS = 6000;
-    const ripple = { p: 0 };
 
     // The rectangle where prose lives, in canvas pixels. render.ts stays
     // DOM-blind, so the measuring happens here and only numbers cross over.
@@ -394,7 +384,6 @@ export default function SkyField({ mode }: SkyFieldProps) {
         muted: cs.getPropertyValue('--muted-foreground').trim(),
         bright: light ? ink : '#F1F5F9',   // F · Primary Text
         moonLit: light ? ink : '#CBD5E1',  // Secondary: the Moon is grey, not warm
-        moonGlow: light ? fade(ink, 0.1) : 'rgba(241,245,249,0.10)',
         planet: light ? ink : '#CBD5E1',   // Secondary Text. Cyan reads as teal at label
                                           // size, so the planets stay neutral like the Moon.
         sun: light ? ink : '#FCD34D',      // G · the Sun's real spectral class, so this is
@@ -440,7 +429,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
         hoverFig = hoverIndex >= 0 ? null : figureAt(byName, figureT, mouse.x, mouse.y);
         drawFull(ctx, W, H, bodies, byName, faint, moonPhase, figureT, hoverIndex, hoverFig, mouse, colors,
                  planetSprite(colors.engraved, colors.planet),
-                 ripple.p, readingRect());
+                 readingRect());
         if (game && game.playing && gameCanvas && gameCtx) {
           // Ambient sky stays a direct draw (above); only the game overlay
           // goes through the offscreen buffer + single capped-alpha blit.
@@ -465,7 +454,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
         }
         drawQuiet(ctx, W, H, bodies, faint, moonPhase, colors,
                   planetSprite(colors.engraved, colors.planet),
-                  ripple.p, readingRect());
+                  readingRect());
       }
     };
 
@@ -489,188 +478,6 @@ export default function SkyField({ mode }: SkyFieldProps) {
       renderFrame();
       rafId = requestAnimationFrame(loop);
     };
-    if (!reduced) {
-      rafId = requestAnimationFrame(loop);
-    }
-
-    const onResize = () => {
-      resize();
-      renderFrame();
-    };
-    window.addEventListener('resize', onResize);
-
-    // data-mode is stamped once and never changes now. renderFrame already
-    // re-reads dataset.mode + getComputedStyle on every call, so the rAF loop
-    // picks the swap up on its own next frame — but under reduced motion
-    // there's no loop, so the toggle would otherwise sit stale until some
-    // other listener (resize, pointermove) happened to fire one.
-    const modeObserver = new MutationObserver(() => renderFrame());
-    modeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-mode'] });
-
-    // ViewToggle flips `.machine-mode` on <body> to cross into the raw-markdown
-    // view. Mirror it into React so the game UI unmounts, and bail out of a
-    // game already in progress — otherwise `.playing` / `.cursor-custom` would
-    // be stranded on a view that must stay plain and selectable.
-    const syncMachine = () => {
-      const on = document.body.classList.contains('machine-mode');
-      setMachine(on);
-      if (on && gameRef.current?.playing) controlsRef.current?.exit();
-    };
-    syncMachine();
-    const machineObserver = new MutationObserver(syncMachine);
-    machineObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
-
-    // Hover tracking — full mode only. Look-only outside the game: hover
-    // names a body or a drawn constellation segment, nothing is draggable.
-    const overUI = (e: PointerEvent): boolean => {
-      const target = e.target as HTMLElement | null;
-      return !!(target && typeof target.closest === 'function' && target.closest('a,button,input,textarea,select'));
-    };
-
-    const onPointerMove = (e: PointerEvent) => {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
-      if (reduced) renderFrame(); // no rAF loop running to pick this up otherwise
-
-      if (!game) return;
-      if (game.spin) {
-        const next = game.updateSpin(e.clientX, e.clientY);
-        if (next) {
-          obs.lat = next.lat;
-          obs.lon = next.lon;
-          publishCoords(next.lat, next.lon, 'travel');
-          if (reduced) renderFrame();
-        }
-        return;
-      }
-      if (!game.playing) return;
-      // custom-cursor state classes: over real UI, over a grabbable star
-      const ui = overUI(e);
-      document.body.classList.toggle('cur-ui', ui);
-      document.body.classList.toggle('cur-star', !ui && game.nearest(e.clientX, e.clientY, 22) >= 0);
-    };
-    // Both modes: the wobble needs a cursor to bend toward. Every branch below
-    // the position update is already gated on game state, so on quiet pages
-    // this only ever moves `mouse`.
-    window.addEventListener('pointermove', onPointerMove, { passive: true });
-
-    // --- orbital-mechanics interaction: sling / draw / travel -------------
-    // Outside the game the sky is LOOK-ONLY: hover names things, nothing is
-    // draggable, so reading the page can never accidentally grab a star.
-    // Every listener below is a no-op unless `game.playing` (or, for the
-    // travel-drag, unless a drag it started is in progress) — that's what
-    // keeps normal browsing behaviour untouched when the egg is unfound.
-    const onPointerDown = (e: PointerEvent) => {
-      if (!game || !game.playing || overUI(e)) return;
-      // Suppress the native drag-select for ANY press in the play area, not
-      // just ones that land on a star — a miss must not start highlighting
-      // the page. Must run BEFORE the hit-test below.
-      e.preventDefault();
-      const i = game.nearest(e.clientX, e.clientY, 28);
-      if (game.tool === 'draw' && i < 0) {
-        // CHART MODE: a drag that misses every star turns the sky (browsing
-        // normally never hijacks a drag — this only runs in the draw tool).
-        game.startSpin(e.clientX, e.clientY, obs);
-        document.body.classList.add('spinning');
-        return;
-      }
-      if (i < 0) return;
-      // A star in flight is NOT stopped when grabbed — see `game.onPointerUp`.
-      game.grab(i, e.clientX, e.clientY);
-      document.body.classList.add('grabbing');
-    };
-
-    const onPointerUp = (e: PointerEvent) => {
-      document.body.classList.remove('grabbing');
-      if (game?.spin) {
-        game.endSpin();
-        publishCoords(obs.lat, obs.lon, 'travel', true); // settle on the exact final position
-        document.body.classList.remove('spinning');
-      }
-      if (!game || !game.playing) return;
-      game.onPointerUp(e.clientX, e.clientY);
-    };
-
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && game?.playing) controlsRef.current?.exit();
-    };
-
-    const onWindowPointerLeave = () => {
-      if (cursorRingRef.current) cursorRingRef.current.style.opacity = '0';
-      if (cursorDotRef.current) cursorDotRef.current.style.opacity = '0';
-    };
-    const onWindowPointerEnter = () => {
-      if (cursorRingRef.current) cursorRingRef.current.style.opacity = '1';
-      if (cursorDotRef.current) cursorDotRef.current.style.opacity = '1';
-    };
-
-    if (mode === 'full' && game) {
-      window.addEventListener('pointerdown', onPointerDown);
-      window.addEventListener('pointerup', onPointerUp);
-      window.addEventListener('keydown', onKeyDown);
-      window.addEventListener('pointerleave', onWindowPointerLeave);
-      window.addEventListener('pointerenter', onWindowPointerEnter);
-
-      controlsRef.current = {
-        enter: () => {
-          game.enter();
-          setPlaying(true);
-          setStruck(0);
-          document.body.classList.add('playing');
-          // Explicit opt-in: this click, not page load, starts motion — the
-          // one case where the game must run even under reduced motion, or
-          // clicking the egg would silently do nothing.
-          if (reduced && !rafId) rafId = requestAnimationFrame(loop);
-        },
-        reset: () => {
-          game.reset();
-          setStruck(0);
-        },
-        exit: () => {
-          game.exit();
-          setPlaying(false);
-          setTool('sling');
-          document.body.classList.remove('playing', 'grabbing', 'spinning', 'cur-ui', 'cur-star');
-          if (reduced) {
-            if (rafId) {
-              cancelAnimationFrame(rafId);
-              rafId = 0;
-            }
-            renderFrame(); // paint the restored, static frame
-          }
-        },
-        setTool: (t) => {
-          game.setTool(t);
-          setTool(t);
-          document.body.classList.remove('spinning');
-        },
-        home: () => {
-          obs.lat = home.lat;
-          obs.lon = home.lon;
-          publishCoords(home.lat, home.lon, homeSource, true);
-          if (reduced) renderFrame();
-        },
-      };
-    }
-
-    // Scroll-driven constellation reveal — every one of the 47 segments draws
-    // over the WHOLE scroll range simultaneously (see drawFull/figureAt),
-    // eased toward the scroll position (sync: 0.14) rather than tracking the
-    // scrollbar 1:1, which is what makes the reveal feel fluid rather than
-    // jerky. Skipped entirely under reduced motion.
-    if (!reduced) {
-      // LINEAR on purpose. Easing the loop's own progress makes the wave
-      // decelerate toward the end of each iteration and then snap back to full
-      // speed at the wrap — a visible reset every cycle — and it bunches the
-      // staggered wave offsets, since they are spaced on an already-eased
-      // value. Retained for the cursor-gravity wobble; the Sun glow it used to
-      // drive has been removed.
-      rippleTimer = createTimer({
-        duration: SUN_PULSE_MS,
-        loop: true,
-        onUpdate: (t) => { ripple.p = t.iterationProgress; },
-      });
-    }
 
     if (mode === 'full' && !reduced) {
       scrollAnim = animate(scrollP, {
@@ -723,7 +530,6 @@ export default function SkyField({ mode }: SkyFieldProps) {
         window.removeEventListener('pointerenter', onWindowPointerEnter);
         controlsRef.current = null;
       }
-      rippleTimer?.revert();
       scrollAnim?.revert(); // tears down the linked anime.js ScrollObserver too
       window.clearTimeout(timeoutId);
       controller.abort();

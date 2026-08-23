@@ -166,7 +166,7 @@ export class SkyGame {
     // what the corner hint ("move — stars bend") has been promising.
     if (this.playing && this.tool === 'sling') {
       // The strike count itself lives in React state — the callback is the
-      // only text-sm, so there is no second copy here to drift out of sync.
+      // only channel, so there is no second copy here to drift out of sync.
       gamePhysics(this.stars, this.bursts, this.onStrike);
     } else {
       gravityWell(this.stars, mouseX, mouseY);

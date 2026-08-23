@@ -46,7 +46,10 @@ const ROUTES = [
   ['post', '/blogs/mysql-binlog-4gib-position-wrap/'],
   ['resume', '/resume/'],
 ];
-const MODES = ['dark', 'light'];
+// Dark only. BaseLayout hard-stamps data-mode="dark" and the ?mode= override
+// was removed, so a 'light' pass re-measured the dark render and reported it
+// as a second, distinct verification.
+const MODES = ['dark'];
 
 /**
  * Runs in the page. For every element that renders visible text, sample the canvas

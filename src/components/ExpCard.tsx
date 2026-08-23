@@ -44,7 +44,7 @@ export default function ExpCard({
           {isPreview ? (
             <a
               href={`/experience/#${slug}`}
-              className="after:absolute after:inset-0 after:rounded-xl after:content-[''] group-hover:underline focus-visible:outline-none"
+              className="after:absolute after:inset-0 after:rounded-xl after:content-[''] group-hover:underline"
             >
               {position}
             </a>
@@ -59,7 +59,7 @@ export default function ExpCard({
               href={companyLink}
               target="_blank"
               rel="noreferrer noopener"
-              className="relative z-10 hover:underline focus-visible:outline-none"
+              className="relative z-10 hover:underline"
             >
               {company} <span aria-hidden="true">&#8599;</span>
             </a>

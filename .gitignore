@@ -40,3 +40,8 @@ docs/superpowers/
 
 # OS
 .DS_Store
+
+# Local tooling config and scratch screenshots — swept in by a `git add -A`
+# during the redesign, not project source.
+.github/hooks/
+rtc-variant-*.png

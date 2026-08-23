@@ -6,19 +6,21 @@
  * system has to earn its keep. Each role takes exactly the hue that role owns
  * everywhere else on the site:
  *
- *   keyword   purple-400  #C084FC   5.54:1   keywords, storage, tags
- *   function  blue-400    #60A5FA   5.75:1   function names, JSON keys; also links
- *   type      cyan-400    #22D3EE   8.09:1   class and type names
- *   string    green-400   #4ADE80   8.40:1   strings
- *   number    amber-300   #FCD34D  10.15:1   numerics and constants
- *   error     red-400     #F87171   5.29:1   invalid and deleted ONLY
- *   ink       slate-300   #CBD5E1   9.85:1   variables, punctuation, operators
- *   comment   slate-400   #94A3B8   5.71:1   italic
+ *   keyword   purple-400  #C084FC   keywords, storage, tags
+ *   function  blue-400    #60A5FA   function names, JSON keys
+ *   type      cyan-400    #22D3EE   class and type names
+ *   string    green-400   #4ADE80   strings
+ *   number    amber-400   #FBBF24   numerics and constants
+ *   error     red-400     #F87171   invalid and deleted ONLY
+ *   ink       foreground  #FAFAFA   variables, punctuation, operators
+ *   comment   muted-fg    #A1A1A1   italic
  *
- * All stock Tailwind. Every token clears 4.5:1 against the pane (slate-800), so
- * the sub-AA allowlist the previous palette needed is gone.
+ * Ratios are not repeated here on purpose: they were stale in every row the last
+ * time this table was hand-maintained. scripts/verify-code-theme.mjs measures
+ * them against the pane on every build and fails if any drops under 4.5:1, so it
+ * is the source of truth. SUB_AA_ALLOWED is currently empty — nothing is exempt.
  *
- * Ratios are measured against the pane (slate-800 #1E293B), not the page
+ * Ratios are measured against the pane (shadcn --card #171717), not the page
  * ground, because that is what code actually sits on.
  *
  * An earlier revision of this file collapsed the whole map onto two colours and
@@ -32,7 +34,7 @@
  * mechanism in astro.config stays wired rather than being ripped out.
  *
  * Verified by scripts/verify-code-theme.mjs, which fails the build if any token
- * drops under 4.5:1 against its own pane except the two allowed by hex above.
+ * drops under 4.5:1 against its own pane.
  */
 
 const SPECTRAL = {

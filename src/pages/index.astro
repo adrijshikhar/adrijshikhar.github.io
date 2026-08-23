@@ -142,7 +142,7 @@ const SOCIAL_ICON_PATHS = {
 
         <!-- About -->
         <section id="about" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground text-muted-foreground">01</span></div>
+          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground">01</span></div>
           <h2 class="display-section mb-8">About</h2>
           <div
             class="prose prose-invert max-w-[35rem] leading-relaxed text-foreground prose-p:text-foreground prose-p:leading-relaxed prose-a:text-primary prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-foreground prose-strong:font-medium"
@@ -152,11 +152,11 @@ const SOCIAL_ICON_PATHS = {
 
         <!-- Experience -->
         <section id="experience" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground text-muted-foreground">02</span></div>
+          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground">02</span></div>
           <h2 class="display-section mb-8">Experience</h2>
           <ul class="group/list flex flex-col gap-5">
             {experience.meta.entries.slice(0, 2).map((exp: any) => (
-              <ExpCard {...exp} />
+              <li><ExpCard {...exp} /></li>
             ))}
           </ul>
           <div class="mt-10">
@@ -168,11 +168,11 @@ const SOCIAL_ICON_PATHS = {
 
         <!-- Projects -->
         <section id="projects" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground text-muted-foreground">03</span></div>
+          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground">03</span></div>
           <h2 class="display-section mb-8">Projects</h2>
           <ul class="group/list flex flex-col gap-5">
             {projects.meta.entries.slice(0, 2).map((proj: any) => (
-              <ProjectCard {...proj} contentHtml={marked.parse(projSections[proj.slug] || '') as string} />
+              <li><ProjectCard {...proj} contentHtml={marked.parse(projSections[proj.slug] || '') as string} /></li>
             ))}
           </ul>
           <div class="mt-10">
@@ -184,7 +184,7 @@ const SOCIAL_ICON_PATHS = {
 
         <!-- Writing -->
         <section id="writing" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground text-muted-foreground">04</span></div>
+          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground">04</span></div>
           <h2 class="display-section mb-8">Writing</h2>
           {latestPosts.length === 0 ? (
             <p class="border border-border px-5 py-6 font-mono text-sm text-muted-foreground">
@@ -193,7 +193,7 @@ const SOCIAL_ICON_PATHS = {
           ) : (
             <ul class="group/list flex flex-col gap-5">
               {latestPosts.map((post) => (
-                <BlogCard title={post.data.title} date={fmtPostDate(post.data.date)} href={`/blogs/${post.id}/`} />
+                <li><BlogCard title={post.data.title} date={fmtPostDate(post.data.date)} href={`/blogs/${post.id}/`} /></li>
               ))}
             </ul>
           )}
@@ -206,7 +206,7 @@ const SOCIAL_ICON_PATHS = {
 
         <!-- Education -->
         <section id="education" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground text-muted-foreground">05</span></div>
+          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground">05</span></div>
           <h2 class="display-section mb-8">Education</h2>
           <ul class="grid gap-4 sm:grid-cols-2">
             {education.meta.entries.map((edu: any, i: number) => (
@@ -223,7 +223,7 @@ const SOCIAL_ICON_PATHS = {
 
         <!-- Achievements -->
         <section id="achievements" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground text-muted-foreground">06</span></div>
+          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground">06</span></div>
           <h2 class="display-section mb-8">Achievements</h2>
           <div
             class="prose prose-invert max-w-[35rem] text-foreground prose-p:text-foreground prose-li:text-foreground marker:text-muted-foreground prose-a:text-primary prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-foreground"
@@ -233,7 +233,7 @@ const SOCIAL_ICON_PATHS = {
 
         <!-- Interests -->
         <section id="interests" class="mb-12 scroll-mt-16 md:mb-16 lg:scroll-mt-24">
-          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground text-muted-foreground">07</span></div>
+          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground">07</span></div>
           <h2 class="display-section mb-8">Interests</h2>
           <div
             class="prose prose-invert max-w-[35rem] text-foreground prose-p:text-foreground prose-li:text-foreground marker:text-muted-foreground prose-a:text-primary prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-foreground"

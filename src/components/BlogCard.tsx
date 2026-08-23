@@ -20,7 +20,7 @@ export default function BlogCard({ title, date, href, description }: BlogCardPro
         <CardTitle className="text-xl leading-snug">
           <a
             href={href}
-            className="after:absolute after:inset-0 after:rounded-xl after:content-[''] group-hover:underline focus-visible:outline-none"
+            className="after:absolute after:inset-0 after:rounded-xl after:content-[''] group-hover:underline"
           >
             {title} <span aria-hidden="true">&rarr;</span>
           </a>

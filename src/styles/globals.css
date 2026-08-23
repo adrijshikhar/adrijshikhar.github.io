@@ -130,6 +130,10 @@
   --font-heading: 'Space Grotesk Variable', system-ui, sans-serif;
   --font-sans: 'Familjen Grotesk Variable', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* Display tracking contract from CLAUDE.md. This lived in tailwind.config.mjs
+     letterSpacing; when that file went away the utility silently stopped
+     compiling and the blog <h1> reverted to default tracking with no error. */
+  --tracking-tightest: -0.03em;
 }
 
 /* Motion only. No colour lives here. */
