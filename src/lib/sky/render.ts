@@ -71,7 +71,14 @@ const R2D = 180 / Math.PI;
  *  here later. Populate it and the renderer picks it up with no other change. */
 export const FAINT_FIELD: Array<{ ra: number; dec: number; mag: number }> = [];
 
-const vrFor = (mag: number): number => 1.4 + Math.max(0, 3.0 - mag) * 1.15;
+/** Painted radius from magnitude. The faint end was 1.4px, which is a single
+ *  device pixel on a 1x display — below the size at which a dot reads as an
+ *  object rather than as sensor noise. Floor is 1.55px: enough to read as an
+ *  object, small enough that 106 of them do not fill the frame. */
+/** 1.423 / 1.044 are 1.5 / 1.1 scaled by sqrt(0.9): painted ink goes as r², so a
+ *  10% density reduction is a 5.13% radius reduction, not 10%. Scaling both terms
+ *  keeps the magnitude-to-size relationship intact rather than flattening it. */
+const vrFor = (mag: number): number => 1.423 + Math.max(0, 3.0 - mag) * 1.044;
 
 /** Recompute alt/az and screen position for every star at `when`, for `obs`. */
 export function computeSky(
@@ -93,7 +100,17 @@ export function computeSky(
   return { pts, faint };
 }
 
-const starAlpha = (mag: number): number => Math.max(0.12, Math.min(1, (2.6 - mag) / 3.4));
+/** Alpha from magnitude. The old ramp reached zero at mag 2.6 and clamped to a
+ *  0.12 floor, so 46% of the catalogue — everything fainter than mag 2.0 — was
+ *  painted at 0.12-0.18 alpha. Near-white at 0.12 over a near-black ground is
+ *  dark grey, which is why the field read as empty.
+ *
+ *  Only the FLOOR is lifted (0.12 -> 0.30); the ramp's slope is left close to the
+ *  original. That distinction is the whole fix. Widening the ramp to (3.3-m)/3.0
+ *  was tried and read as noisy — it took the stars above 0.45 alpha from 25 to
+ *  53, which measured as a doubling of pixels over alpha 110 on the canvas. The
+ *  faint end was never the problem; inflating the middle of the range was. */
+const starAlpha = (mag: number): number => Math.max(0.30, Math.min(1, (2.8 - mag) / 3.4));
 
 /** Every colour the renderer paints with, resolved once per frame by the
  *  caller (SkyField.tsx) from CSS custom properties + the active `data-mode`.
@@ -297,6 +314,11 @@ export interface BodyPos extends NamedStarPos {
   /** Distance from Earth in AU — solar-system bodies only. Its presence is what
    *  tells `separationLabel` to answer in km rather than light years. */
   au?: number;
+  /** Withheld from the default field: a loose dim star, not part of any drawn
+   *  constellation. Flagged rather than removed because game.sync() pairs
+   *  bodies[i] with game.stars[i] positionally and hoverIndex is an index into
+   *  this same array — dropping entries would misalign both silently. */
+  suppressed?: boolean;
 }
 
 /** The planet glyph sheet, loaded by SkyField (see planet-sprite.ts) and passed
@@ -315,6 +337,28 @@ export interface MoonPhase {
 
 /** Flat, ordered segment list — the brief's "47 segments across 14 figures"
  *  all draw simultaneously over the same scroll range, in this fixed order. */
+/** Every star named in a FIGURES segment. Derived, not hand-listed, so it cannot
+ *  drift from the constellations actually drawn. */
+export const FIGURE_MEMBERS: ReadonlySet<string> = new Set(
+  FIGURES.flatMap(([, segs]) => segs.flatMap(([a, b]) => [a, b])),
+);
+
+/** Default-field rule: the ambient sky draws CONSTELLATIONS ONLY — 59 of 96.
+ *  All 37 loose stars, bright ones included, move to dark sky.
+ *
+ *  The rule is membership rather than magnitude because a magnitude cut cannot
+ *  go any deeper without fragmenting the figures: every member is by definition
+ *  an endpoint of a segment, so hiding one leaves a constellation line running
+ *  to a star that is not painted. Cutting only the loose stars by brightness
+ *  moved the field 67 -> 64, which is not a reduction anyone would notice.
+ *
+ *  Going below 59 would mean dropping whole figures. That is possible and keeps
+ *  them intact, but which figures are above the horizon depends on the hour and
+ *  the observer, so a fixed subset risks a default sky with almost nothing in
+ *  it. Not done without deciding that trade deliberately. */
+export const inDefaultField = (name: string, _mag: number): boolean =>
+  FIGURE_MEMBERS.has(name);
+
 export const SEGMENTS: Array<{ name: string; a: string; b: string }> = FIGURES.flatMap(
   ([name, segs]) => segs.map(([a, b]) => ({ name, a, b })),
 );
@@ -470,7 +514,10 @@ export function nearestPoint<T extends { x: number; y: number }>(
 /** Nearest body under the cursor, within `max` px — the same 22px hit radius
  *  the prototype used for star hover. Returns -1 when nothing is close enough. */
 export function nearestBody(bodies: BodyPos[], mx: number, my: number, max = 22): number {
-  return nearestPoint(bodies, mx, my, max);
+  // A suppressed star is not painted, so it must not be hoverable either —
+  // otherwise the readout names a star the visitor cannot see.
+  const i = nearestPoint(bodies, mx, my, max);
+  return i >= 0 && bodies[i].suppressed ? -1 : i;
 }
 
 /** Distance from a point to a line SEGMENT (not an infinite line) — used to
@@ -604,6 +651,7 @@ export function drawBodies(
   for (let i = 0; i < bodies.length; i++) {
     const s = bodies[i];
     if (s.alt < FLOOR) continue;
+    if (s.suppressed) continue;
     const below = s.alt < 0 ? 0.3 : 1;
     const a = Math.min(BODY_ALPHA_CAP, starAlpha(s.mag)) * below;
     const r = s.vr; // single source of truth for the painted radius
