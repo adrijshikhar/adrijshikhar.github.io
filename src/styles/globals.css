@@ -53,13 +53,15 @@
   --heading:   #E6E6E6;              /* Primary Text    10.33:1 worst of four surfaces */
   --heading-hi:#E6E6E6;              /* emphasis above heading */
   --text:      #ABB2BF;              /* Secondary Text   6.05:1 worst */
-  --muted:     #939BA9;              /* label TEXT. The supplied Muted #636D7E is 2.47:1 on the
-                                        lightest surface, so it cannot carry text; this is the
-                                        first value on the Muted->Secondary line that clears 4.5
-                                        on all four surfaces (worst 4.61). #636D7E is kept
-                                        verbatim below, as a rule, where 4.5 does not apply. */
+  --muted:     #636D7E;              /* their Muted Text, verbatim. KNOWN: 3.05:1 on the ground and
+                                        2.47:1 on the lightest surface, so it is BELOW WCAG AA for
+                                        text. That is a property of the palette — One Dark sets
+                                        de-emphasised text and comments under the bar by design —
+                                        and it is used as given at the palette owner's direction.
+                                        Do not "fix" it by lifting the value. */
 
-  --border: 255 255 255;                /* used as rgb(var(--border) / a) */
+  --border: 62 68 81;                   /* their Border #3E4451 as channels, for
+                                           rgb(var(--border) / a) hairlines */
   --border-color: #3E4451;
   --hairline:     #3E4451;
   --rule:         #3E4451;              /* supplied Border. Minor hairline, 1.63:1 on the ground */
@@ -86,17 +88,15 @@
   --spectral-ob: #61AFEF;              /* links, active nav, keywords   5.46:1 */
   --spectral-a:  #56B6C2;              /* types, infra tags, planets    5.44:1 */
   --spectral-f:  #E6E6E6;              /* headings, bright stars       10.33:1 */
-  --spectral-g:  #E5C07B;              /* strings, Sun values           7.47:1 */
-  --spectral-k:  #E59779;              /* numbers, dates                5.55:1 — K sits between
-                                          G and M on the sequence, so it is their oklab midpoint
-                                          rather than an invented hue. */
-  --spectral-m:  #E06C75;              /* errors ONLY, and M-class stars on the canvas. Kept
-                                          exactly as supplied because that is its non-text job;
-                                          error TEXT uses --spectral-m-text below, since #E06C75
-                                          is 4.38:1 on the code pane. */
-  --spectral-m-text: #E57C82;          /* error text. Their red lifted along oklch L only, so hue
-                                          and chroma survive (357 vs 355): worst 4.63 on the three
-                                          supplied surfaces, 5.02 on the code pane. */
+  --spectral-g:  #E5C07B;              /* data tags, numerics, the Sun. Their Orange. */
+  --spectral-k:  #98C379;              /* language tags, strong text, numerics. Green. NOTE: no
+                                          star reads this token — the canvas uses A for planets, G
+                                          for the Sun and F for bright stars — so unlike those
+                                          three, K carries no astronomical claim and green here
+                                          says nothing false about the sky. */
+  --spectral-m:  #E06C75;              /* errors ONLY, and M-class stars on the canvas. Verbatim:
+                                          4.38:1 on the code pane, which is under AA for text. Same
+                                          call as --muted — the palette's value wins. */
 
   /* The accent IS O/B. One hue for links and active nav, never more. */
   --accent: var(--spectral-ob);
@@ -145,7 +145,7 @@
   --ring: var(--accent);
 }
 
-/* --accent-contrast stays #0e0e0e (dark) — accent swatches are saturated mid-tones,
+/* --accent-contrast is a substrate value (dark) — the accent is a saturated mid-tone,
    so dark text/selection-fill on an accent fill still reads well in light mode. */
 
 @layer base {
@@ -469,11 +469,12 @@
   overflow-wrap: anywhere;
   word-break: break-word;
 }
-/* Inline code: a small accent-tinted chip, consistent with the block accent. */
+/* Inline code: a Surface chip. The 8% accent tint that used to sit here mixed a
+   colour outside the palette (rgb 45 54 67), so it is gone — the chip is Surface. */
 .prose :not(pre) > code {
   border-radius: 5px;
   border: 1px solid rgb(var(--border) / 0.14);
-  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+  background: var(--surface);
   color: var(--heading);
 }
 

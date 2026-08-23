@@ -5,9 +5,9 @@
  * card tells you what KIND of thing each tag is. The categories are the ones the
  * ramp already owns elsewhere, so nothing new is invented here:
  *
- *   K  #eda05b  language   — the same hue numbers take
- *   A  #bfd2f2  infra      — the same hue types take
- *   G  #f0ce72  data       — the same hue strings and Sun values take
+ *   K  #98C379  language   — the same hue numerics take (Green)
+ *   A  #56B6C2  infra      — the same hue types take (Cyan)
+ *   G  #E5C07B  data       — the same hue constants and the Sun take (Orange)
  *
  * Anything unrecognised stays muted on purpose. A wrong colour is a false
  * statement about the tag; grey is merely silent, and silence is the safe default

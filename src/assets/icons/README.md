@@ -36,7 +36,7 @@ bodies on them, a disc at centre — the graticule).
 
 **What actually shipped** is a hand-drawn SVG of that idea rather than the
 raster: `public/favicon.svg`, two rings plus two orbiting bodies on the ground
-colour, with the accent baked to `#e5a14b`. Vector means it is exact at 16px
+colour, with the accent baked to `#61AFEF`. Vector means it is exact at 16px
 and at 512, and the whole size set rasterises from the one source. The pack
 icon informed the concept; no pack pixels are in the shipped mark.
 
