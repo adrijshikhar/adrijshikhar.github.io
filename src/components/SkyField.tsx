@@ -300,6 +300,12 @@ export default function SkyField({ mode }: SkyFieldProps) {
     if (!canvas || !ctx) return;
 
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // No cursor to bend toward and no hover to reveal a name: on a touch device
+    // the wobble tracks a stale coordinate and the readout labels wherever the
+    // last tap happened to land. Gated on the input device rather than on the
+    // viewport width, so a touchscreen laptop behaves like a phone and a small
+    // window on a desktop keeps both.
+    const coarse = window.matchMedia('(hover: none), (pointer: coarse)').matches;
     const obs: Observer = { ...DEFAULT_OBS };
     const home: Observer = { ...DEFAULT_OBS }; // the REAL observer — "home" travels back here
     const game = gameRef.current; // null in 'quiet' mode
@@ -478,9 +484,9 @@ export default function SkyField({ mode }: SkyFieldProps) {
         publishSky(bodies, moonPhase);
         const figureT = game?.playing ? 0 : scrollP.t;
         const byName = bodyIndex(bodies); // built once, shared by figureAt and drawFull
-        hoverIndex = nearestBody(bodies, mouse.x, mouse.y);
+        hoverIndex = coarse ? -1 : nearestBody(bodies, mouse.x, mouse.y);
         // star hover wins over a constellation hover when both are under the cursor
-        hoverFig = hoverIndex >= 0 ? null : figureAt(byName, figureT, mouse.x, mouse.y);
+        hoverFig = coarse || hoverIndex >= 0 ? null : figureAt(byName, figureT, mouse.x, mouse.y);
         drawFull(ctx, W, H, bodies, byName, faint, moonPhase, figureT, hoverIndex, hoverFig, mouse, colors,
                  planetSprite(colors.engraved, colors.planet),
                  readingRect());
@@ -528,7 +534,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
     const loop = () => {
       // One integration step per displayed frame — the only place physics
       // advances, so the sim runs on the frame clock and nothing else.
-      game?.tick(mouse.x, mouse.y);
+      if (!coarse || game?.playing) game?.tick(mouse.x, mouse.y);
       renderFrame();
       rafId = requestAnimationFrame(loop);
     };
@@ -774,13 +780,13 @@ export default function SkyField({ mode }: SkyFieldProps) {
           geo lookup 404s, and says so rather than implying a real fix. */}
       {mode === 'full' && !machine && (
         <div
-          className="pointer-events-none fixed left-1/2 top-[1.9rem] -z-[1] flex -translate-x-1/2
-            gap-2 font-mono text-xs text-muted-foreground"
+          className="pointer-events-none fixed left-1/2 top-[1.9rem] -z-[1] hidden -translate-x-1/2
+            gap-2 font-mono text-xs whitespace-nowrap text-muted-foreground sm:flex"
           aria-hidden="true"
         >
-          <span className="rounded-md border px-2 py-1">ALT {ALT_RANGE}</span>
-          <span className="rounded-md border px-2 py-1">STARS {STAR_COUNT}</span>
-          <span className="rounded-md border px-2 py-1">JD {jd}</span>
+          <span className="whitespace-nowrap rounded-md border px-2 py-1">ALT {ALT_RANGE}</span>
+          <span className="whitespace-nowrap rounded-md border px-2 py-1">STARS {STAR_COUNT}</span>
+          <span className="whitespace-nowrap rounded-md border px-2 py-1">JD {jd}</span>
         </div>
       )}
 

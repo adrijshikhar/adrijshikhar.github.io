@@ -817,8 +817,10 @@ body.spinning * {
 @layer components {
   .skip-link {
     position: fixed;
-    top: 0;
-    left: 0;
+    /* Not top: 0 — on a phone that puts it under the translucent status bar, which
+       is what made it look like a stray box over the clock. */
+    top: env(safe-area-inset-top, 0px);
+    left: env(safe-area-inset-left, 0px);
     z-index: 2000;
     transform: translateY(-120%);
     padding: 0.75rem 1rem;
