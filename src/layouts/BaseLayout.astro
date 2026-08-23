@@ -1,7 +1,6 @@
 ---
 import '../styles/globals.css';
 import '../styles/machine.css';
-import ModeToggle from '../components/ModeToggle.tsx';
 import SkyField from '../components/SkyField.tsx';
 
 interface Props {
@@ -38,40 +37,24 @@ const cfBeaconToken =
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- No-FOUC: apply light/dark mode before first paint.
+    <!-- No-FOUC. The site is dark only (see design/README.md), so mode is stamped
+         unconditionally; ?mode= and the stored preference are gone with light mode.
          MUST stay first in <head>, before any stylesheet <link> — a stylesheet placed
-         before an inline script delays the script, which lets a default-dark frame paint. -->
+         before an inline script delays the script, which lets an unstyled frame paint. -->
     <script is:inline>
-      (function () {
-        try {
-          var urlMode = new URLSearchParams(location.search).get('mode');
-          var stored = localStorage.getItem('mode');
-          var mode;
-          if (urlMode === 'light' || urlMode === 'dark') {
-            mode = urlMode;
-          } else if (stored === 'light' || stored === 'dark') {
-            mode = stored;
-          } else {
-            // No explicit choice yet — follow the OS/browser preference.
-            mode = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-          }
-          document.documentElement.dataset.mode = mode;
-        } catch (e) {
-          document.documentElement.dataset.mode = 'dark';
+      document.documentElement.dataset.mode = 'dark';
+      try {
+        // A direct ?machine=true load must not flash the human view before the
+        // ViewToggle island hydrates. machine.css hides .human-view and reveals
+        // .machine-view under .machine-boot; the island clears it on mount.
+        if (new URLSearchParams(location.search).get('machine') === 'true') {
+          document.documentElement.classList.add('machine-boot', 'machine-mode');
         }
-        try {
-          // No-FOUC: a direct ?machine=true load must not flash the human view before the
-          // ViewToggle island hydrates. Mark the document now; machine.css hides .human-view
-          // and reveals .machine-view under .machine-boot, and the island clears it on mount.
-          if (new URLSearchParams(location.search).get('machine') === 'true') {
-            document.documentElement.classList.add('machine-boot', 'machine-mode');
-          }
-        } catch (e) {}
-      })();
+      } catch (e) {}
     </script>
     <title>{title}</title>
     {canonical && <link rel="canonical" href={canonical} />}
@@ -82,9 +65,8 @@ const cfBeaconToken =
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="manifest" href="/site.webmanifest" />
-    <!-- Matches the painted ground: --bg resolved to sRGB, not the old neutral. -->
-    <meta name="theme-color" content="#f5f7fa" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#070a0e" media="(prefers-color-scheme: dark)" />
+    <!-- Matches the painted ground: shadcn --background oklch(0.145 0 0) in sRGB. -->
+    <meta name="theme-color" content="#0A0A0A" />
 
     <meta name="description" content={description} />
     <meta property="og:type" content={ogType} />
@@ -113,8 +95,14 @@ const cfBeaconToken =
       )
     }
   </head>
-  <body class="antialiased text-text">
-    <SkyField client:visible mode={skyMode} />
+  <body class="antialiased text-foreground">
+    <!-- Skip link, first focusable thing on the page. index.astro already carries
+         <main id="content">; without this, keyboard users tab the whole rail and
+         the sky easter egg before reaching any content. -->
+    <a href="#content" class="skip-link">Skip to content</a>
+    <aside aria-label="Sky instrument">
+      <SkyField client:visible mode={skyMode} />
+    </aside>
 
     <!-- Viewfinder: corner brackets plus the top-edge measurement scale, ported
          from the prototype's `.frame`. Decoration only — the sky carries the
@@ -139,12 +127,5 @@ const cfBeaconToken =
         mark();
       })();
     </script>
-
-    <!-- Light/dark mode toggle, docked top-right -->
-    <div class="fixed top-5 right-5 z-[1090] md:top-6 md:right-6">
-      <div class="chrome-panel px-2.5 py-2">
-        <ModeToggle client:load />
-      </div>
-    </div>
   </body>
 </html>

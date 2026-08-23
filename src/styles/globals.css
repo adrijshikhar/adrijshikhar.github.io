@@ -1,12 +1,14 @@
-/* Fonts are local. The old Google Fonts @import was render-blocking AND loaded
-   Inter, which never painted — 'Geist Variable' always won the stack ahead of it. */
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
+/* Tailwind v4 + shadcn/ui. Fonts are local; the old Google Fonts @import was
+   render-blocking AND loaded Inter, which never painted. */
+@import "tailwindcss";
 @import "@fontsource-variable/familjen-grotesk";
 @import "@fontsource-variable/space-grotesk";
 @import "@fontsource/ibm-plex-mono/400.css";
 @import "@fontsource/ibm-plex-mono/500.css";
 @import "@fontsource/ibm-plex-mono/600.css";
+
+@plugin "@tailwindcss/typography";
+@custom-variant dark (&:is(.dark *));
 
 @property --ring-s {
   syntax: '<number>';
@@ -14,137 +16,156 @@
   initial-value: 1;
 }
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 /* ============================================================================
-   OBSERVATORY — semantic design tokens
+   SPECTRAL — semantic design tokens, dark only
 
-   Lightness ramp in oklch. The ground sits at 14.5% rather than near-black, so
-   it reads as a surface instead of a hole, and surfaces LIFT in two steps.
-   Muted text is deliberately bright (72.5%): dim grey on near-black is the
-   single biggest cause of eye strain in a dark UI.
-   Chroma stays low — a loud accent is what makes a dark theme look cheap.
+   Six hues taken from stellar classification (O/B, A, F, G, K, M). They are
+   derived, not picked: each names a real surface temperature, so they track a
+   blackbody curve and cannot clash. Every hue has exactly ONE job, listed
+   beside it. Every ratio below was measured in a browser, not estimated.
+
+   There is no light mode. A spectral ramp is an EMISSION curve; to clear AA on
+   a light ground every warm hue has to be darkened until it is brown, and all
+   six then compress into ~5.5 L* of each other, so the ramp stops being a
+   ramp. See design/README.md.
    ========================================================================== */
 
+/* shadcn/ui default theme, verbatim. These are the values shadcn ships — not
+   picked, not contrast-tuned, not substituted. The site is dark-only, so <html>
+   carries .dark and the :root block is the light half of the same stock pair. */
 :root {
-  --bg:        oklch(14.5%  .010 250);
-  --surface:   oklch(19.2%  .012 250);   /* lifted card */
-  --surface-2: oklch(24.8%  .014 250);   /* lifted again */
-  --heading:   oklch(95%    .006 250);
-  --text:      oklch(85%    .008 250);
-  --muted:     oklch(70%    .012 250);
-  --border: 255 255 255;                /* used as rgb(var(--border) / a) */
-  --border-color: oklch(100% 0 0 / .11);
-  --hairline:     oklch(100% 0 0 / .11);
-  --rule:         oklch(100% 0 0 / .11);
-  --rule-hi:      oklch(100% 0 0 / .26);
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
 
-  --accent: oklch(76% .130 70);         /* warm bronze, low chroma on purpose */
-  --accent-contrast: oklch(14.5% .010 250);
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
 
-  /* Card — one plane: hairline edge over an opaque fill.
-     Shadows are warm-tinted; pure black shadow is a tell. */
-  --card-core:  var(--surface);
-  --card-radius: 12px;
-  --card-shadow:    0 1px 2px oklch(0% 0 0 / .28), 0 10px 26px oklch(0% 0 0 / .22);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --ease-out: cubic-bezier(.32, .72, 0, 1);
-
-  /* Typography — three voices, no fourth. */
+/* v4 maps tokens to utilities in CSS, replacing tailwind.config.mjs. */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
   --font-heading: 'Space Grotesk Variable', system-ui, sans-serif;
-  --font-sans:    'Familjen Grotesk Variable', system-ui, sans-serif;
-  --font-mono:    'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-
-  /* shadcn token bridge (kept for ui/* components) */
-  --radius: 2px;
-  --background: 0 0% 5.5%;
-  --foreground: 0 0% 90%;
-  --card: 0 0% 8.6%;
-  --card-foreground: 0 0% 90%;
-  --popover: 0 0% 8.6%;
-  --popover-foreground: 0 0% 90%;
-  --primary: 0 0% 90%;
-  --primary-foreground: 0 0% 8%;
-  --secondary: 0 0% 11%;
-  --secondary-foreground: 0 0% 90%;
-  --muted-fg: 0 0% 44%;
-  --destructive: 0 72% 51%;
-  --input: 0 0% 100% / 12%;
-  --ring: var(--accent);
+  --font-sans: 'Familjen Grotesk Variable', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* Display tracking contract from CLAUDE.md. This lived in tailwind.config.mjs
+     letterSpacing; when that file went away the utility silently stopped
+     compiling and the blog <h1> reverted to default tracking with no error. */
+  --tracking-tightest: -0.03em;
 }
 
-
-/* LIGHT — an engraved star chart rather than a night sky. Warm paper ground,
-   ink marks. The sky canvas inverts to match: dark stars on cream, the way a
-   printed celestial atlas reads. */
-:root[data-mode="light"] {
-  /* One warm family, hue 66-78 — paper and ink, matching the bronze accent and
-     the already-warm hairlines. Nothing here is a cool neutral; see DESIGN.md. */
-  --bg:        oklch(86%   .012 76);
-  --surface:   oklch(94.5% .005 78);
-  --surface-2: oklch(90.5% .007 72);
-  --heading:   oklch(26%   .016 68);    /* ink, not black */
-  --text:      oklch(37%   .017 68);
-  --muted:     oklch(44%   .013 66);
-  --border: 0 0 0;                     /* used as rgb(var(--border) / a) */
-  --border-color: oklch(28% .02 60 / .18);
-  --hairline:     oklch(28% .02 60 / .18);
-  --rule:         oklch(28% .02 60 / .18);
-  --rule-hi:      oklch(28% .02 60 / .38);
-  /* Engraved star-chart ink (SkyField, light mode) — dark marks on paper,
-     not an inverted photograph. Same hue/lightness family as --heading/--rule,
-     kept as its own token since it's opaque (star fills) where those carry
-     their own baked-in alpha. */
-  --sky-ink:      oklch(28% .02 60);
-
-  --card-core:  var(--surface);
-  --card-shadow:    0 1px 2px oklch(30% .03 60 / .07), 0 10px 26px oklch(30% .03 60 / .07);
-
-  /* Bronze darkened twice for AA on paper: once because the dark-mode value
-     fails here, and again so the ground could drop to 86% without the accent
-     falling under 4.5:1 against it. Measured 4.83. */
-  --accent: oklch(46% .148 62);
-  --accent-contrast: oklch(97.6% .005 80);
-
-  /* shadcn token bridge — flip to light so ui/* components adapt */
-  --background: 60 14% 96%;
-  --foreground: 0 0% 8%;
-  --card: 0 0% 100%;
-  --card-foreground: 0 0% 8%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 0 0% 8%;
-  --primary: 0 0% 8%;
-  --primary-foreground: 0 0% 98%;
-  --secondary: 60 6% 94%;
-  --secondary-foreground: 0 0% 8%;
-  --muted-fg: 0 0% 42%;
-  --input: 0 0% 0% / 14%;
+/* Motion only. No colour lives here. */
+:root {
+  --dur-tap: 0.12s;
+  --dur-hover: 0.22s;
+  --dur-ui: 0.3s;
+  --dur-view: 0.5s;
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);  /* sky drag-release ONLY */
+  --ease-out: cubic-bezier(.32, .72, 0, 1);
+  --card-radius: var(--radius);
+  /* Scrollbar gutter width: 100vw includes it, 100% of <body> does not. Fixed
+     chrome anchored to `right` needs this subtracted, or its visible gap is the
+     nominal offset PLUS the gutter while its bottom gap is the nominal offset —
+     which is exactly how the game panel ended up 10px further from the right
+     edge than from the bottom. */
+  --sb: calc(100vw - 100%);
 }
 
-/* --accent-contrast stays #0e0e0e (dark) — accent swatches are saturated mid-tones,
+/* --accent-contrast is a substrate value (dark) — the accent is a saturated mid-tone,
    so dark text/selection-fill on an accent fill still reads well in light mode. */
 
 @layer base {
   html {
     scroll-behavior: smooth;
     font-family: var(--font-sans);
-    background-color: var(--bg);
+    background-color: var(--background);
     /* ease the canvas on light/dark mode swap (cards already transition) */
     transition: background-color 0.45s ease;
   }
 
-  /* Atomic light/dark swap: ModeToggle adds .mode-switching for one frame so every element
-     flips in the same paint — no lagging background, no gradient-name flash. */
-  :root.mode-switching,
-  :root.mode-switching *,
-  :root.mode-switching *::before,
-  :root.mode-switching *::after {
-    transition: none !important;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
     html {
       scroll-behavior: auto;
     }
@@ -155,45 +176,29 @@
     }
   }
 
-  /* Dark mode's ambient light is the Sun, drawn on the canvas at its real
-     computed position and faded by its real altitude (`drawSunGlow`). What
-     used to be here was a fixed warm blob pinned to the top-left corner — the
-     last survivor of the old three-blob aurora, and a light source the sky
-     could not account for. Only the faint cool counter remains, which reads as
-     atmosphere rather than as a lamp. */
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0 0 auto 0;
-    height: 85vh;
-    z-index: -2;
-    pointer-events: none;
-    background: radial-gradient(70% 50% at 88% 6%, oklch(70% .050 250 / .07), transparent 66%);
-  }
-  /* Light mode's tonal range lives here, not in the sky — see DESIGN.md. */
-  :root[data-mode="light"] body::before {
-    height: 100vh;
-    background:
-      radial-gradient(85% 55% at 20% 2%, oklch(50% .145 62 / .11), transparent 60%),
-      radial-gradient(70% 50% at 88% 6%, oklch(45% .022 235 / .10), transparent 64%),
-      radial-gradient(120% 95% at 50% 42%, transparent 38%, oklch(32% .022 62 / .17) 100%);
-  }
+  /* NO AMBIENT GLOW. There was a fixed body::before painting
+     radial-gradient(70% 50% at 88% 6%, oklch(70% .050 250 / .07), transparent 66%)
+     over the top-right of every page. It read as a light source the sky cannot
+     account for — nothing on the canvas is at 88% 6% emitting anything — and it
+     was also the last off-palette colour in this file, since an oklch() with
+     alpha is neither one of the thirteen nor derivable from them.
 
-  /* Film grain — fixed and pointer-events:none, never on a scrolling container.
-     ~400 bytes inline, no request. Breaks the flatness of a large dark field. */
-  body::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: 40;
-    pointer-events: none;
-    opacity: .028;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
-  }
+     Do not reintroduce it. The sky is the only light on this page; if the flat
+     field needs breaking, the graticule and the bodies do it. */
+
+  /* NO FILM GRAIN. There was a fixed, full-viewport body::after whose background
+     was an SVG generated at runtime by feTurbulence, composited at opacity .028.
+     Browsers rasterise and TILE that across the layer, and on tab restore the
+     tiles are re-rasterised: the result is a hard vertical seam near a GPU tile
+     boundary (~1024px), which reads as the page being broken.
+
+     Do not reintroduce it as a runtime filter. If the flat field ever needs
+     breaking again, use a small pre-rendered raster so the tiling is
+     deterministic, and check it survives a tab switch. */
 
   body {
-    background-color: var(--bg);
-    color: var(--text);
+    background-color: var(--background);
+    color: var(--foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -213,7 +218,7 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    color: var(--heading);
+    color: var(--foreground);
     font-family: var(--font-heading);
     font-weight: 600;
     letter-spacing: -0.02em;
@@ -227,157 +232,66 @@
   }
 
   a {
-    color: var(--accent);
+    color: var(--primary);
     transition: color 120ms ease-out;
   }
   a:hover {
-    color: var(--accent);
-    opacity: 0.78;
+    color: var(--primary);
   }
 
   ::selection {
     /* subtle accent-tint highlight; keep text at --heading so it stays high-contrast in both modes */
-    background: color-mix(in srgb, var(--accent) 30%, transparent);
-    color: var(--heading);
+    background: var(--primary);
+    color: var(--foreground);
   }
 
   /* Visible focus rings, accent-tinted */
   :focus-visible {
-    outline: 2px solid var(--accent);
+    outline: 2px solid var(--primary);
     outline-offset: 2px;
     border-radius: 1px;
   }
 
   * {
-    border-color: var(--border-color);
+    border-color: var(--border);
   }
 
-  /* Custom selection-marker scrollbar — subtle terminal feel */
-  ::-webkit-scrollbar { width: 10px; height: 10px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb {
-    background: var(--surface-2);
-    border: 2px solid var(--bg);
-  }
-  ::-webkit-scrollbar-thumb:hover { background: rgb(var(--border) / 0.28); }
+  /* NO custom scrollbar. Styling ::-webkit-scrollbar opts the page out of the
+     platform's overlay scrollbars and forces a permanent 10px track, which is
+     both a visible bar the design does not want and a layout gutter that made
+     fixed bottom-right chrome sit further from the right edge than the bottom.
+     Letting the platform draw it means macOS shows an overlay bar that reserves
+     no space, and --sb resolves to 0. */
 }
 
 @layer components {
-  /* ── Type scale. Three display steps and one data label; every heading in the
-     site uses one of these rather than a hand-assembled utility string. */
-  .display-hero {
-    font-family: var(--font-heading);
-    font-size: clamp(3rem, 8.5vw, 5.75rem);
-    font-weight: 600;
-    line-height: 0.92;
-    letter-spacing: -0.03em;
-    color: var(--heading);
-  }
+  /* ── Type scale: five steps, two families. Archivo Black ships at weight 400
+     Space Grotesk is Space Mono's proportional sibling, so display rhymes with
+     the all-mono instrument chrome. It is already tightly set, so tracking is
+     -0.03em; the -0.04em an ultra-black face needs collides here.
+     11px mono is the floor for data. Nothing smaller, anywhere. */
 
-  .display-page {
-    font-family: var(--font-heading);
-    font-size: 2.25rem;
-    font-weight: 600;
-    line-height: 1.08;
-    letter-spacing: -0.03em;
-    color: var(--heading);
-  }
-  @media (min-width: 640px) {
-    .display-page { font-size: 3rem; }
-  }
 
-  .title-entry {
-    font-family: var(--font-heading);
-    font-size: 1rem;
-    font-weight: 500;
-    line-height: 1.375;
-    letter-spacing: -0.02em;
-    color: var(--heading);
-  }
-
-  .label-data {
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    text-transform: uppercase;
-    letter-spacing: 0.22em;
-    color: var(--muted);
-  }
 
   /* Dates, companies, locations — the readout beside an entry. */
-  .meta-data {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--muted);
-  }
+  /* Dates are numbers, and K owns numbers. Every card carries one, so this is
+     where the ramp earns its keep outside code blocks. Non-numeric metadata
 
-  .link-back {
-    display: inline-flex;
-    align-items: center;
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    color: var(--muted);
-    text-decoration: none;
-  }
-  .link-back:hover { color: var(--accent); opacity: 1; }
 
   /* ── Numbered section channel: index, name, and a rule running to the edge. */
-  .channel {
-    display: flex;
-    align-items: baseline;
-    gap: 1rem;
-  }
-  .channel-no { color: var(--accent); }
-  .channel::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--rule);
-  }
 
   /* C-style soft pill button */
-  .atelier-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    border-radius: 9999px;
-    background: var(--surface-2);
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--accent);
-    transition: transform 0.3s var(--ease-spring), background-color 0.3s ease;
-  }
-  .atelier-btn:hover { transform: translateY(-2px); background: color-mix(in srgb, var(--accent) 14%, var(--surface)); }
   @media (prefers-reduced-motion: reduce) { .atelier-btn:hover { transform: none; } }
 
-  /* Single plane: hairline edge over an opaque, barely-lifted fill. The fill
-     must stay fully opaque — it is the legibility guarantee (137 alpha carded
-     vs 108 bare), not a decorative wash. */
-  .atelier-card {
-    position: relative;
-    border-radius: var(--card-radius);
-    background: var(--card-core);
-    box-shadow: 0 0 0 1px var(--rule);
-    transition: transform 0.5s var(--ease-out),
-                background-color 0.35s var(--ease-out),
-                box-shadow 0.35s var(--ease-out);
-  }
-  @media (min-width: 1024px) {
-    .group\/list-item:hover .atelier-card,
-    .atelier-card:hover {
-      transform: translateY(-2px);
-      background: var(--surface-2);
-      box-shadow: 0 0 0 1px var(--rule-hi), var(--card-shadow);
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .atelier-card { transition: background-color 0.3s ease; }
-    .atelier-card:hover { transform: none; }
-  }
+  /* Card plane. OPAQUE, and that costs nothing now: the sky keep-out already
+     erases ~90% of the canvas ink under the reading column (alpha 25/255), so
+     there is almost no sky left inside the card to show through. The previous
+     78% tint bought a view of nothing and cost the card its presence, landing
+     at ΔL* 2.65 above the ground — below the threshold where a plane reads as a
+     plane at all.
+
+     Edges use --card-edge, measured against the FILL rather than the ground.
+     --rule is a ground hairline and only manages 1.18:1 here. */
 
 
   /* Machine view FOLLOWS the active light/dark mode: it's token-driven (see machine.css), so its
@@ -393,30 +307,6 @@
   }
 
 
-}
-
-/* Light mode: the `prose prose-invert` content uses prose-* utility overrides
-   for most colors, but a few Tailwind-typography defaults (bullets, hr, captions,
-   counters, table borders) come from prose-invert's light-on-dark palette and
-   would be near-invisible on the light bg. Re-point those base prose vars to the
-   semantic tokens so all .md/.mdx content stays AA in light mode.
-   (Dark mode keeps prose-invert's defaults — unchanged.) */
-:root[data-mode="light"] .prose {
-  --tw-prose-body: var(--text);
-  --tw-prose-headings: var(--heading);
-  --tw-prose-lead: var(--text);
-  --tw-prose-bold: var(--heading);
-  --tw-prose-counters: var(--muted);
-  --tw-prose-bullets: var(--muted);
-  --tw-prose-hr: var(--border-color);
-  --tw-prose-quotes: var(--muted);
-  --tw-prose-quote-borders: var(--accent);
-  --tw-prose-captions: var(--muted);
-  --tw-prose-code: var(--heading);
-  --tw-prose-pre-code: var(--heading);
-  --tw-prose-pre-bg: var(--surface);
-  --tw-prose-th-borders: var(--border-color);
-  --tw-prose-td-borders: var(--border-color);
 }
 
 /* Fenced code: the inline-code chrome (border/bg/padding from the prose-code utilities)
@@ -444,24 +334,16 @@
    own background is a baked hex that cannot follow a token change, and a code
    block is the one place a stale near-white would be most obvious. */
 .astro-code {
-  background-color: var(--surface);
+  background-color: var(--card);
 }
-:root[data-mode="light"] .astro-code,
-:root[data-mode="light"] .astro-code span {
-  color: var(--shiki-light);
-  font-style: var(--shiki-light-font-style);
-  font-weight: var(--shiki-light-font-weight);
-  text-decoration: var(--shiki-light-text-decoration);
-}
-
 /* Code blocks styled as Terminal Atelier panes: atelier-card surface (card radius,
    hairline border, soft shadow) with the signature accent top edge — matching the
    card/button language instead of a flat default <pre>. */
 .prose pre.astro-code {
   border-radius: var(--card-radius, 10px);
-  border: 1px solid rgb(var(--border) / 0.14);
-  border-top: 2px solid color-mix(in srgb, var(--accent) 85%, transparent);
-  box-shadow: var(--card-shadow);
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--primary);
+  box-shadow: none;
   margin: 1.75rem 0;
   padding: 1.15rem 1.3rem;
   overflow-x: hidden;
@@ -476,12 +358,13 @@
   overflow-wrap: anywhere;
   word-break: break-word;
 }
-/* Inline code: a small accent-tinted chip, consistent with the block accent. */
+/* Inline code: a Surface chip. The 8% accent tint that used to sit here mixed a
+   colour outside the palette (rgb 45 54 67), so it is gone — the chip is Surface. */
 .prose :not(pre) > code {
   border-radius: 5px;
-  border: 1px solid rgb(var(--border) / 0.14);
-  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
-  color: var(--heading);
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--foreground);
 }
 
 /* Ambient sky field (SkyField.tsx) — hidden in machine view, crossfades with
@@ -498,6 +381,8 @@ body.machine-mode #sky {
   opacity: 0;
 }
 #sky {
+  /* Motion, not colour: without this the sky snaps out on toggle instead of
+     dissolving, and the machine view is contractually a pure opacity crossfade. */
   transition: opacity 0.5s var(--ease-out);
 }
 
@@ -527,12 +412,10 @@ body.machine-mode #sky {
   transition: opacity 0.4s var(--ease-out);
 }
 body.playing .human-view {
-  opacity: 0.3;
   pointer-events: none;
 }
 /* On paper, 0.3 is not receding -- it is grey text on a grey ground with
    nothing to look at. Light mode needs the content genuinely out of the way. */
-:root[data-mode='light'] body.playing .human-view { opacity: 0.12; }
 
 .mass-note {
   pointer-events: none;
@@ -569,23 +452,21 @@ body.spinning * {
      all. Every element that sets its own `cursor` must be listed: an explicit
      `cursor: pointer` on a button beats the inherited `none` from body, which
      is how the native arrow used to leak back in over the game bar. */
-  .cursor-custom,
-  .cursor-custom *,
-  .cursor-custom a,
-  .cursor-custom button,
-  .cursor-custom [role='button'],
-  .cursor-custom input,
-  .cursor-custom label,
-  .cursor-custom summary {
-    cursor: none !important;
-  }
+  /* The native cursor is NOT hidden any more. Hiding it took away the pointer
+     the OS renders, and with it every accessibility setting attached to it:
+     cursor size, high-contrast cursor, and the pointer shape that tells you a
+     thing is clickable at all. Both design skills call a custom cursor
+     accessibility-hostile, and this was the part that actually did harm.
+
+     The ring and dot stay as an ADDITIVE mark: they track the pointer and carry
+     the sky's cursor-gravity wobble, on top of a cursor that is still there. */
 
   #sky-cursor-ring,
   #sky-cursor-dot {
     position: fixed;
     top: 0;
     left: 0;
-    /* Above every fixed control (ViewToggle 1100, ModeToggle 1090): while the
+    /* Above every fixed control (ViewToggle 1100): while the
        game hides the native cursor page-wide, a lower stack order made the
        pointer vanish completely whenever it crossed one of those toggles. */
     z-index: 1200;
@@ -602,7 +483,7 @@ body.spinning * {
     width: 26px;
     height: 26px;
     margin: -13px 0 0 -13px;
-    border: 1px solid color-mix(in oklab, var(--muted) 70%, transparent);
+    border: 1px solid var(--muted-foreground);
     transition:
       --ring-s 0.22s var(--ease-out),
       border-color 0.22s var(--ease-out);
@@ -611,24 +492,24 @@ body.spinning * {
     width: 4px;
     height: 4px;
     margin: -2px 0 0 -2px;
-    background: var(--muted);
+    background: var(--muted-foreground);
     transition: background-color 0.22s var(--ease-out);
   }
   /* over a grabbable star */
   body.cur-star #sky-cursor-ring {
     --ring-s: 1.462;
-    border-color: var(--accent);
+    border-color: var(--primary);
   }
   body.cur-star #sky-cursor-dot {
-    background: var(--accent);
+    background: var(--primary);
   }
   /* over real UI (the tool bar) */
   body.cur-ui #sky-cursor-ring {
     --ring-s: 0.615;
-    border-color: var(--accent);
+    border-color: var(--primary);
   }
   body.cur-ui #sky-cursor-dot {
-    background: var(--accent);
+    background: var(--primary);
     width: 3px;
     height: 3px;
     margin: -1.5px 0 0 -1.5px;
@@ -636,7 +517,7 @@ body.spinning * {
   /* dragging */
   body.grabbing #sky-cursor-ring {
     --ring-s: 0.692;
-    border-color: var(--accent);
+    border-color: var(--primary);
   }
 }
 @media (hover: none), (pointer: coarse) {
@@ -650,7 +531,7 @@ body.spinning * {
    Ported from the prototype's `.frame`. Four corner brackets plus measurement
    ticks along the top edge, so the page reads as something seen THROUGH an
    instrument rather than a document with a sky behind it. Purely decorative:
-   fixed, aria-hidden, pointer-events:none, and it sits under the ModeToggle
+   fixed, aria-hidden, pointer-events:none, and it sits under the ViewToggle
    (z-1090) and ViewToggle (z-1100) rather than over them.
    Hidden in machine view along with the rest of the instrument. */
 @layer components {
@@ -664,8 +545,7 @@ body.spinning * {
     position: absolute;
     width: 18px;
     height: 18px;
-    border: 0 solid var(--rule-hi);
-    opacity: 0.55;
+    border: 0 solid var(--muted-foreground);
   }
   .viewfinder i:nth-child(1) { top: 14px; left: 14px; border-top-width: 1px; border-left-width: 1px; }
   .viewfinder i:nth-child(2) { top: 14px; right: 14px; border-top-width: 1px; border-right-width: 1px; }
@@ -681,8 +561,7 @@ body.spinning * {
     transform: translateX(-50%);
     width: min(46vw, 520px);
     height: 6px;
-    opacity: 0.4;
-    background: repeating-linear-gradient(90deg, var(--rule-hi) 0 1px, transparent 1px 100%) 0 0 / 26px 100%;
+    background: repeating-linear-gradient(90deg, var(--muted-foreground) 0 1px, transparent 1px 100%) 0 0 / 26px 100%;
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 22%, #000 78%, transparent);
     mask-image: linear-gradient(90deg, transparent, #000 22%, #000 78%, transparent);
   }
@@ -696,12 +575,12 @@ body.spinning * {
     font-size: 0.625rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: var(--muted-foreground);
     line-height: 2;
     pointer-events: none;
   }
   .instrument-l { left: 1.6rem; }
-  .instrument-r { right: 1.6rem; text-align: right; opacity: 0.8; }
+  .instrument-r { right: 1.6rem; text-align: right; }
   /* Top-left ephemeris block — the one corner the instrument left empty.
      Tucked under the viewfinder bracket, with a narrower label column than the
      bottom readout: those labels are two words, these are one, and carrying the
@@ -718,8 +597,8 @@ body.spinning * {
      .instrument bottom (1.4rem); the easter-egg hook (SkyField.tsx) is
      positioned independently via its own `bottom-24` (6rem) Tailwind class —
      fixed apart so neither moves when the other appears. */
-  .instrument b { color: var(--heading); font-weight: 500; }
-  .instrument .k { display: inline-block; width: 6.5rem; opacity: 0.75; }
+  .instrument b { color: var(--foreground); font-weight: 500; }
+  .instrument .k { display: inline-block; width: 6.5rem; }
 
   .readout-row {
     display: flex;
@@ -739,7 +618,6 @@ body.spinning * {
     text-indent: 0;
     font-size: 0.5625rem;
     letter-spacing: 0.16em;
-    opacity: 0.6;
   }
   .readout-row b { font-variant-numeric: tabular-nums; }
 
@@ -750,15 +628,15 @@ body.spinning * {
   .chrome-panel {
     display: flex;
     align-items: stretch;
-    border: 1px solid var(--rule);
-    background: color-mix(in srgb, var(--surface) 88%, transparent);
+    border: 1px solid var(--border);
+    background: var(--card);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     font-family: var(--font-mono);
-    font-size: 0.5625rem;
+    font-size: 0.6875rem;   /* 11px: the mono floor. This was 9px. */
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: var(--muted-foreground);
   }
 
   /* Segmented control inside a chrome panel — the human/machine and
@@ -774,14 +652,14 @@ body.spinning * {
     font-weight: 400;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: var(--muted-foreground);
     background: none;
     transition:
       color 0.22s var(--ease-out),
       border-color 0.22s var(--ease-out);
   }
-  .chrome-seg:hover { color: var(--heading); }
-  .chrome-panel > .chrome-seg + .chrome-seg { border-left: 1px solid var(--rule); }
+  .chrome-seg:hover { color: var(--foreground); }
+  .chrome-panel > .chrome-seg + .chrome-seg { border-left: 1px solid var(--border); }
 
   /* Selection is the bracket pair alone — no box. The panel already draws a
      rectangle, so a second one around the active item read as a doubled
@@ -789,14 +667,14 @@ body.spinning * {
      `content: var(--tw-content)` on both pseudos and was silently eating the
      closing bracket, which shipped as "[ HUMAN" with no "]". */
   .chrome-bracket {
-    color: var(--accent);
+    color: var(--primary);
     opacity: 0;
     transition: opacity 0.22s var(--ease-out);
   }
   .chrome-seg[aria-pressed='true'] .chrome-bracket,
   .chrome-seg[data-state='on'] .chrome-bracket { opacity: 1; }
   .chrome-seg[aria-pressed='true'],
-  .chrome-seg[data-state='on'] { color: var(--accent); }
+  .chrome-seg[data-state='on'] { color: var(--primary); }
 
   /* Banded rows inside a vertical chrome panel: tools, then live status, then
      actions. Hairlines between bands do the grouping, so the panel reads as an
@@ -804,21 +682,21 @@ body.spinning * {
   .chrome-group {
     display: flex;
     align-items: stretch;
-    border-bottom: 1px solid var(--rule);
+    border-bottom: 1px solid var(--border);
   }
   .chrome-group:last-child { border-bottom: 0; }
-  .chrome-group .chrome-seg + .chrome-seg { border-left: 1px solid var(--rule); }
+  .chrome-group .chrome-seg + .chrome-seg { border-left: 1px solid var(--border); }
 
   .chrome-status {
     display: flex;
     flex-direction: column;
     gap: 0.15rem;
     padding: 0.45rem 0.6rem;
-    border-bottom: 1px solid var(--rule);
+    border-bottom: 1px solid var(--border);
     line-height: 1.5;
     text-align: left;
   }
-  .chrome-status-val b { color: var(--accent); font-weight: 500; }
+  .chrome-status-val b { color: var(--primary); font-weight: 500; }
 
   /* Scroll cue. States a real consequence -- the constellation figures are
      drawn by scroll progress -- rather than saying "scroll down". Fades out
@@ -831,15 +709,13 @@ body.spinning * {
     font-size: 0.5625rem;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: var(--muted);
-    opacity: 0.75;
-    transition: opacity 0.5s var(--ease-out);
+    color: var(--muted-foreground);
   }
   .scroll-cue-rail {
     position: relative;
     width: 1px;
     height: 2.4rem;
-    background: var(--rule);
+    background: var(--border);
     overflow: hidden;
   }
   .scroll-cue-rail::after {
@@ -847,7 +723,7 @@ body.spinning * {
     position: absolute;
     inset: 0 0 auto 0;
     height: 45%;
-    background: var(--accent);
+    background: var(--primary);
     animation: cue-run 2.4s var(--ease-out) infinite;
   }
   @keyframes cue-run {
@@ -861,30 +737,6 @@ body.spinning * {
     .scroll-cue-rail::after { animation: none; transform: none; height: 100%; opacity: .5; }
   }
 
-  .expo {
-    position: fixed;
-    top: 1.9rem;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 30;
-    display: flex;
-    gap: 0.5rem;
-    pointer-events: none;
-    transition: opacity 0.5s var(--ease-out);
-  }
-  .expo-cell {
-    border: 1px solid var(--rule);
-    padding: 0.2rem 0.55rem;
-    font-family: var(--font-mono);
-    font-size: 0.5625rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--muted);
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
-  }
-  html.machine-mode .expo,
-  body.machine-mode .expo { opacity: 0; }
 
 
   /* The instrument frame belongs to the sky, so it leaves with the sky. */
@@ -896,15 +748,15 @@ body.spinning * {
   }
   .viewfinder,
   .instrument {
+    /* Crossfade, not colour: the human<->machine toggle is a pure opacity
+       transition, so the instrument has to fade with it rather than snap. */
     transition: opacity 0.5s var(--ease-out);
   }
 
   /* Below md the corners collide with content and the toolbar; the frame is
      an enhancement, not load-bearing, so it simply steps aside. */
   @media (max-width: 767px) {
-    .viewfinder u,
-    .expo,
-    .instrument { display: none; }
+    .viewfinder u { display: none; }
   }
   @media (max-width: 1179px) {
     .instrument { display: none; }
@@ -957,5 +809,153 @@ body.spinning * {
   html.machine-boot .instrument,
   html.machine-boot .side-rail {
     transition: none !important;
+  }
+}
+
+/* Skip link: off-screen until focused, then a real target at the top-left.
+   Never display:none — that removes it from the tab order entirely. */
+@layer components {
+  .skip-link {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 2000;
+    transform: translateY(-120%);
+    padding: 0.75rem 1rem;
+    background: var(--card);
+    color: var(--foreground);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    box-shadow: inset 0 0 0 1px var(--muted-foreground);
+    transition: transform var(--dur-ui) var(--ease-out);
+  }
+  .skip-link:focus-visible {
+    transform: translateY(0);
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+}
+
+/* Reading plane. On /resume and /blogs/[slug] there is no card between the sky
+   canvas and the prose, so canvas alpha under 16px body text measured 187/255
+   against a hard ceiling of 169 (verify:legibility). This is an OPAQUE plane in
+   the ground colour: visually identical to bare ground, but it stands between
+   the text and the canvas. The sky still reads to the left and right of the
+   column, which is where it was doing the work anyway.
+   Do not change this to a translucent fill. The opacity IS the fix. */
+@layer components {
+  /* Full-bleed, not column-width. A column-width plane is a card with a hard
+     edge halfway across the canvas, which is exactly what the design forbids.
+     The pseudo-element spans the viewport so there is no seam anywhere. */
+  /* No opaque plane any more. Legibility over the canvas is handled by the sky
+     itself: `applyKeepOut` in render.ts erases a fraction of the canvas ink
+     inside this rectangle, so the graticule and stars still read behind the
+     prose while the alpha under text stays under the 169/255 ceiling.
+     If verify:legibility ever fails here, tune `strength` in applyKeepOut
+     rather than reintroducing a plane. */
+  .reading-plane {
+    position: relative;
+  }
+}
+
+/* The column, not each row, carries the legibility shield. Rows are rules with
+   no fill (the design's "no cards" contract), so the opaque plane has to live
+   one level up or canvas ink lands straight under the prose. The hero is
+   excluded: it is meant to sit IN the sky, and it measures 139/169 there. */
+@layer components {
+  .content-plane > section[id] {
+    position: relative;
+  }
+}
+
+/* Section heading, the 48px tier. The number above it is the eyebrow and the
+   rail's anchor; the word is not repeated at 11px underneath it, which is what
+   made every section read as "01 ABOUT / About". */
+@layer components {
+  .display-section {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 0.96;
+    letter-spacing: -0.03em;
+    color: var(--foreground);
+  }
+  @media (min-width: 640px) {
+    .display-section { font-size: 3rem; }
+  }
+}
+
+/* Colour alone is not a link indicator (WCAG 1.4.1). The prose-a:* utilities
+   miss links nested in raw HTML inside MDX (a link inside <sub> was still bare),
+   so this backstops every anchor in prose regardless of how it got there.
+   Excludes headings, where the underline would fight the display tracking. */
+.prose a:not(.no-underline),
+.prose sub a,
+.prose sup a {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+.prose :is(h1, h2, h3, h4) a { text-decoration: none; }
+
+/* Tailwind Typography ships its own grey ramp in --tw-prose-* and those greys are
+   the last non-palette colours in the build. Every one is pinned to the thirteen
+   here (both the base and the -invert set) so the plugin's defaults can never
+   paint. */
+.prose,
+.prose-invert {
+  --tw-prose-body: var(--foreground);
+  --tw-prose-headings: var(--foreground);
+  --tw-prose-lead: var(--foreground);
+  --tw-prose-links: var(--primary);
+  --tw-prose-bold: var(--foreground);
+  --tw-prose-counters: var(--muted-foreground);
+  --tw-prose-bullets: var(--border);
+  --tw-prose-hr: var(--border);
+  --tw-prose-quotes: var(--foreground);
+  --tw-prose-quote-borders: var(--primary);
+  --tw-prose-captions: var(--muted-foreground);
+  --tw-prose-kbd: var(--foreground);
+  --tw-prose-code: var(--foreground);
+  --tw-prose-pre-code: var(--foreground);
+  --tw-prose-pre-bg: var(--card);
+  --tw-prose-th-borders: var(--border);
+  --tw-prose-td-borders: var(--border);
+  --tw-prose-invert-body: var(--foreground);
+  --tw-prose-invert-headings: var(--foreground);
+  --tw-prose-invert-lead: var(--foreground);
+  --tw-prose-invert-links: var(--primary);
+  --tw-prose-invert-bold: var(--foreground);
+  --tw-prose-invert-counters: var(--muted-foreground);
+  --tw-prose-invert-bullets: var(--border);
+  --tw-prose-invert-hr: var(--border);
+  --tw-prose-invert-quotes: var(--foreground);
+  --tw-prose-invert-quote-borders: var(--primary);
+  --tw-prose-invert-captions: var(--muted-foreground);
+  --tw-prose-invert-kbd: var(--foreground);
+  --tw-prose-invert-code: var(--foreground);
+  --tw-prose-invert-pre-code: var(--foreground);
+  --tw-prose-invert-pre-bg: var(--card);
+  --tw-prose-invert-th-borders: var(--border);
+  --tw-prose-invert-td-borders: var(--border);
+}
+
+/* Easter-egg hint. --egg is driven by anime.js in SkyField (see EGG_HINT_DELAY_MS);
+   at rest it is unset, so this resolves to a 0px shadow and paints nothing. The
+   glow uses currentColor, so it tracks whatever the label's own colour token is
+   and cannot drift from the palette. */
+@layer components {
+  .egg-hint {
+    /* Deliberately faint: a hint, not a beacon. Two layers so the falloff stays
+       soft, but at roughly half the previous radii — 10px/22px read as a halo
+       around the label rather than as the label brightening. */
+    text-shadow:
+      0 0 calc(var(--egg, 0) * 4px) currentColor,
+      0 0 calc(var(--egg, 0) * 9px) currentColor;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .egg-hint { text-shadow: none; }
   }
 }

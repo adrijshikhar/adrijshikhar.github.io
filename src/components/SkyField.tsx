@@ -15,7 +15,7 @@ import { FLOOR } from '../lib/sky/projection';
 import { STARS } from '../lib/sky/catalogue';
 import { SkyGame, drawGame, type Tool } from '../lib/sky/game';
 import { loadPlanetSprite, planetSprite } from '../lib/sky/planet-sprite';
-import { animate, createTimer, onScroll } from '../lib/motion';
+import { animate, onScroll } from '../lib/motion';
 
 const ALT_RANGE = `+90…−${Math.abs(FLOOR)}°`;
 const STAR_COUNT = STARS.length;
@@ -74,11 +74,16 @@ interface GameControls {
   home: () => void;
 }
 
+/** Grace period before the easter-egg hint starts pulsing. Long enough that it
+ *  reads as the page settling rather than as something demanding attention. */
+const EGG_HINT_DELAY_MS = 10_000;
+
 export default function SkyField({ mode }: SkyFieldProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const cursorRingRef = useRef<HTMLDivElement>(null);
   const cursorDotRef = useRef<HTMLDivElement>(null);
   const controlsRef = useRef<GameControls | null>(null);
+  const eggRef = useRef<HTMLButtonElement>(null);
 
   // The orbital-mechanics easter egg only exists on the full-instrument page.
   // Lazily created once per mount so both the effect's rAF loop and the JSX
@@ -146,6 +151,48 @@ export default function SkyField({ mode }: SkyFieldProps) {
   useEffect(() => {
     setReplay(TIME_OFFSET_MS !== 0);
   }, []);
+
+  // The easter egg is deliberately quiet, which also means nobody finds it. After
+  // a grace period it pulses a soft glow — the same claim the .live indicator
+  // makes, that this readout is alive rather than printed.
+  //
+  // anime.js drives a CSS variable rather than a colour: the glow is expressed in
+  // globals.css as a text-shadow scaled by --egg, so the motion engine never
+  // needs to know the palette, and the shadow inherits currentColor. Stops for
+  // good the moment the visitor shows any awareness of it — hover, focus, or
+  // entering the game — because a hint that keeps pulsing after discovery is
+  // just noise.
+  useEffect(() => {
+    const el = eggRef.current;
+    if (!el || mode !== 'full' || playing) return;
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    let pulse: ReturnType<typeof animate> | null = null;
+    const stop = () => {
+      pulse?.revert();
+      pulse = null;
+      el.style.removeProperty('--egg');
+    };
+
+    const start = window.setTimeout(() => {
+      pulse = animate(el, {
+        '--egg': [0, 0.7],   // peak below 1: the hint should never fully bloom
+        duration: 1900,
+        alternate: true,
+        loop: true,
+        ease: 'inOutSine',
+      });
+    }, EGG_HINT_DELAY_MS);
+
+    el.addEventListener('pointerenter', stop, { once: true });
+    el.addEventListener('focus', stop, { once: true });
+    return () => {
+      window.clearTimeout(start);
+      el.removeEventListener('pointerenter', stop);
+      el.removeEventListener('focus', stop);
+      stop();
+    };
+  }, [mode, playing]);
 
   useEffect(() => {
     if (struck !== 1) return;
@@ -310,7 +357,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
         brightest: [...above].sort((a, b) => a.mag - b.mag).slice(0, 3).map((b) => b.name),
         sunAlt: sun ? sun.alt : null,
         // The standard bands, so the label is a definition rather than a mood.
-        // This is also the number driving the twilight glow, which makes the
+        // Reported for its own sake now that the glow is gone; it makes the
         // readout an explanation of what is on screen rather than a decoration.
         twilight: !sun ? '—'
           : sun.alt > 0 ? 'day'
@@ -329,7 +376,6 @@ export default function SkyField({ mode }: SkyFieldProps) {
     // Reduced motion: constellations render fully formed (no scroll-driven reveal).
     const scrollP = { t: reduced ? 1 : 0 };
     let scrollAnim: ReturnType<typeof animate> | null = null;
-    let rippleTimer: ReturnType<typeof createTimer> | null = null;
 
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -356,8 +402,24 @@ export default function SkyField({ mode }: SkyFieldProps) {
     // real duration to ease against. Reduced motion simply never starts it, and
     // `ripple.p` stays 0 — one frame of static rings, which is the same chart
     // convention standing still.
-    const SUN_PULSE_MS = 6000;
-    const ripple = { p: 0 };
+
+    // The rectangle where prose lives, in canvas pixels. render.ts stays
+    // DOM-blind, so the measuring happens here and only numbers cross over.
+    // Returns null while the hero owns the screen: the hero is MEANT to sit in
+    // the sky and measures 137/169 there, so thinning it would cost the one
+    // place the sky is the point.
+    const readingRect = (): { x: number; y: number; w: number; h: number } | null => {
+      const col = document.querySelector('main');
+      if (!col) return null;
+      const r = col.getBoundingClientRect();
+      if (r.width === 0 || r.bottom < 0 || r.top > window.innerHeight) return null;
+      const firstSection = col.querySelector('section[id]');
+      const top = firstSection ? firstSection.getBoundingClientRect().top : r.top;
+      const y = Math.max(0, top);
+      const h = Math.min(window.innerHeight, r.bottom) - y;
+      if (h <= 0) return null;
+      return { x: r.left, y, w: r.width, h };
+    };
     const renderFrame = () => {
       const cs = getComputedStyle(document.documentElement);
       // Read mode fresh every frame (and on the MutationObserver's forced
@@ -367,17 +429,24 @@ export default function SkyField({ mode }: SkyFieldProps) {
       const light = document.documentElement.dataset.mode === 'light';
       const ink = cs.getPropertyValue('--sky-ink').trim(); // only defined under [data-mode="light"]
       const colors: SkyColors = {
-        accent: cs.getPropertyValue('--accent').trim(),
-        muted: cs.getPropertyValue('--muted').trim(),
-        bright: light ? ink : '#fff',
-        moonLit: light ? ink : '#fff8ec',
-        moonGlow: light ? fade(ink, 0.1) : 'rgba(255,246,232,0.10)',
-        planet: light ? ink : '#ffe9c4',
+        // shadcn's --accent and --muted are SURFACE tokens, not ink: in the dark
+        // theme both are oklch(0.269), i.e. near-black. Feeding them to the
+        // canvas painted the hover readout and every muted mark in near-black on
+        // a near-black sky, which is why the readout was invisible at full alpha.
+        // The ink equivalents are --primary and --muted-foreground.
+        accent: cs.getPropertyValue('--primary').trim(),
+        muted: cs.getPropertyValue('--muted-foreground').trim(),
+        bright: light ? ink : '#F1F5F9',   // F · Primary Text
+        moonLit: light ? ink : '#CBD5E1',  // Secondary: the Moon is grey, not warm
+        planet: light ? ink : '#CBD5E1',   // Secondary Text. Cyan reads as teal at label
+                                          // size, so the planets stay neutral like the Moon.
+        sun: light ? ink : '#FCD34D',      // G · the Sun's real spectral class, so this is
+                                          // the one body whose colour is a physical claim
         // Faint field is dimmer still in light mode: dark marks compete with
         // dark text far more than light marks compete with a dark page, so
         // the base colour itself carries a low alpha on top of the per-star
         // magnitude alpha already applied where this is used.
-        faint: light ? fade(ink, 0.85) : cs.getPropertyValue('--muted').trim(),
+        faint: light ? fade(ink, 0.85) : cs.getPropertyValue('--muted-foreground').trim(),
         // Light mode isn't dark mode with the colours swapped — a filled disc
         // that reads as a glowing star on black reads as a dirt speck on cream.
         // This tells the renderer to switch glyph shape, not just palette.
@@ -414,7 +483,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
         hoverFig = hoverIndex >= 0 ? null : figureAt(byName, figureT, mouse.x, mouse.y);
         drawFull(ctx, W, H, bodies, byName, faint, moonPhase, figureT, hoverIndex, hoverFig, mouse, colors,
                  planetSprite(colors.engraved, colors.planet),
-                 ripple.p);
+                 readingRect());
         if (game && game.playing && gameCanvas && gameCtx) {
           // Ambient sky stays a direct draw (above); only the game overlay
           // goes through the offscreen buffer + single capped-alpha blit.
@@ -439,7 +508,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
         }
         drawQuiet(ctx, W, H, bodies, faint, moonPhase, colors,
                   planetSprite(colors.engraved, colors.planet),
-                  ripple.p);
+                  readingRect());
       }
     };
 
@@ -473,7 +542,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
     };
     window.addEventListener('resize', onResize);
 
-    // ModeToggle flips data-mode live (no reload). renderFrame already
+    // data-mode is stamped once and never changes now. renderFrame already
     // re-reads dataset.mode + getComputedStyle on every call, so the rAF loop
     // picks the swap up on its own next frame — but under reduced motion
     // there's no loop, so the toggle would otherwise sit stale until some
@@ -632,19 +701,6 @@ export default function SkyField({ mode }: SkyFieldProps) {
     // eased toward the scroll position (sync: 0.14) rather than tracking the
     // scrollbar 1:1, which is what makes the reveal feel fluid rather than
     // jerky. Skipped entirely under reduced motion.
-    if (!reduced) {
-      // LINEAR on purpose. Easing the loop's own progress makes the wave
-      // decelerate toward the end of each iteration and then snap back to full
-      // speed at the wrap — a visible reset every cycle — and it bunches the
-      // staggered wave offsets, since they are spaced on an already-eased
-      // value. The easing is applied per wave, to the radius, in `drawSunGlow`.
-      rippleTimer = createTimer({
-        duration: SUN_PULSE_MS,
-        loop: true,
-        onUpdate: (t) => { ripple.p = t.iterationProgress; },
-      });
-    }
-
     if (mode === 'full' && !reduced) {
       scrollAnim = animate(scrollP, {
         t: [0, 1],
@@ -696,7 +752,6 @@ export default function SkyField({ mode }: SkyFieldProps) {
         window.removeEventListener('pointerenter', onWindowPointerEnter);
         controlsRef.current = null;
       }
-      rippleTimer?.revert();
       scrollAnim?.revert(); // tears down the linked anime.js ScrollObserver too
       window.clearTimeout(timeoutId);
       controller.abort();
@@ -718,33 +773,38 @@ export default function SkyField({ mode }: SkyFieldProps) {
           you what it is showing you. Falls back to Bengaluru silently when the
           geo lookup 404s, and says so rather than implying a real fix. */}
       {mode === 'full' && !machine && (
-        <div className="expo" aria-hidden="true">
-          <span className="expo-cell">ALT {ALT_RANGE}</span>
-          <span className="expo-cell">STARS {STAR_COUNT}</span>
-          <span className="expo-cell">JD {jd}</span>
+        <div
+          className="pointer-events-none fixed left-1/2 top-[1.9rem] -z-[1] flex -translate-x-1/2
+            gap-2 font-mono text-xs text-muted-foreground"
+          aria-hidden="true"
+        >
+          <span className="rounded-md border px-2 py-1">ALT {ALT_RANGE}</span>
+          <span className="rounded-md border px-2 py-1">STARS {STAR_COUNT}</span>
+          <span className="rounded-md border px-2 py-1">JD {jd}</span>
         </div>
       )}
 
       {/* Top-left: the three numbers that explain what is on screen. SUN is the
-          altitude driving the twilight glow, with the standard band it falls in
-          — so the warmth on the page has a stated cause. MOON is the phase the
-          terminator is drawn from. PLANETS is a count of what is actually up.
+          real altitude and the standard twilight band it falls in. It no longer
+          claims to drive any warmth on the page: the Sun glow was removed, so
+          saying so would be a false statement about the render. MOON is the
+          phase the terminator is drawn from. PLANETS is a count of what is up.
           All three are read off the same frame the canvas just painted, so none
           of them can drift from it. */}
       {mode === 'full' && !machine && sky && (
-        <div className="instrument instrument-tl readout-row">
+        <div className="instrument instrument-tl readout-row" aria-hidden="true">
           <div className="readout-cell">
             <span className="k">Sun</span>
             <b>
               {sky.sunAlt === null ? '—' : `${sky.sunAlt > 0 ? '+' : '−'}${Math.abs(sky.sunAlt).toFixed(1)}°`}
-              <span className="opacity-60">{' · '}{sky.twilight}</span>
+              <span className="text-muted-foreground">{' · '}{sky.twilight}</span>
             </b>
           </div>
           <div className="readout-cell">
             <span className="k">Moon</span>
             <b>
               {Math.round(sky.moonIllum * 100)}%
-              <span className="opacity-60">{' · '}{sky.moonWaxing ? 'waxing' : 'waning'}</span>
+              <span className="text-muted-foreground">{' · '}{sky.moonWaxing ? 'waxing' : 'waning'}</span>
             </b>
           </div>
           <div className="readout-cell">
@@ -755,7 +815,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
       )}
 
       {mode === 'full' && !machine && (
-        <div className="instrument instrument-l readout-row">
+        <div className="instrument instrument-l readout-row" aria-hidden="true">
           <div className="readout-cell">
             <span className="k">Observer</span>
             <b>
@@ -776,7 +836,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
           {replay && (
             <div className="readout-cell">
               <span className="k">Epoch</span>
-              <b className="text-accent">
+              <b className="text-primary">
                 {skyNow().toISOString().slice(0, 16).replace('T', ' ')}Z
               </b>
             </div>
@@ -801,7 +861,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
           sky is interactive at all. Sits above the easter-egg hook rather than
           replacing it: two instruments, one corner, stacked. */}
       {mode === 'full' && !machine && !playing && (
-        <div className="instrument instrument-r">
+        <div className="instrument instrument-r" aria-hidden="true">
           move &middot; stars bend
           <br />
           hover &middot; name it
@@ -814,12 +874,13 @@ export default function SkyField({ mode }: SkyFieldProps) {
               until hovered; no label hints at what it opens. */}
           <button
             type="button"
+            ref={eggRef}
             title="something else lives here"
             onClick={() => controlsRef.current?.enter()}
             aria-hidden={playing}
             tabIndex={playing ? -1 : 0}
-            className={`tap-44 fixed right-6 bottom-24 z-[45] hidden font-mono text-[0.625rem] tracking-[0.18em] uppercase text-muted transition-opacity duration-500 hover:text-accent md:block ${
-              playing ? 'pointer-events-none opacity-0' : 'opacity-30 hover:opacity-100'
+            className={`egg-hint tap-44 fixed right-[calc(1.4rem-var(--sb))] bottom-24 z-[45] hidden font-mono text-[0.6875rem] tracking-[0.14em] uppercase text-muted-foreground transition-colors duration-[var(--dur-ui)] hover:text-primary focus-visible:text-primary md:block ${
+              playing ? 'pointer-events-none opacity-0' : ''
             }`}
           >
             ✦ orbital mechanics
@@ -829,29 +890,29 @@ export default function SkyField({ mode }: SkyFieldProps) {
               owns fixed bottom-6 left-1/2, z-[1100] — sharing that spot would
               have it permanently paint over half the tool bar. */}
           {playing && figure && (
-            <p className="mass-note fixed right-6 bottom-6 z-[45] max-w-[15rem] text-right font-mono text-[0.625rem] leading-relaxed tracking-[0.14em] uppercase text-muted">
+            <p className="mass-note fixed right-6 bottom-6 z-[45] max-w-[15rem] text-right font-mono text-[0.625rem] leading-relaxed tracking-[0.14em] uppercase text-muted-foreground">
               {figure.drawn === figure.total ? (
                 <>
-                  <b className="font-medium text-accent">{figure.name}</b> complete &mdash; all {figure.total} segments
+                  <b className="font-medium text-primary">{figure.name}</b> complete &mdash; all {figure.total} segments
                 </>
               ) : (
                 <>
-                  that is a real segment of <b className="font-medium text-accent">{figure.name}</b>
-                  <span className="opacity-60"> · {figure.drawn}/{figure.total}</span>
+                  that is a real segment of <b className="font-medium text-primary">{figure.name}</b>
+                  <span className="text-muted-foreground"> · {figure.drawn}/{figure.total}</span>
                 </>
               )}
             </p>
           )}
 
           {playing && !figure && massNote && (
-            <p className="mass-note fixed right-6 bottom-6 z-[45] max-w-[15rem] text-right font-mono text-[0.625rem] leading-relaxed tracking-[0.14em] uppercase text-muted">
-              same pull, less mass &mdash; <b className="font-medium text-accent">faint stars fly faster</b>
-              <span className="opacity-60"> · v &prop; 1/&radic;m</span>
+            <p className="mass-note fixed right-6 bottom-6 z-[45] max-w-[15rem] text-right font-mono text-[0.625rem] leading-relaxed tracking-[0.14em] uppercase text-muted-foreground">
+              same pull, less mass &mdash; <b className="font-medium text-primary">faint stars fly faster</b>
+              <span className="text-muted-foreground"> · v &prop; 1/&radic;m</span>
             </p>
           )}
 
           {playing && (
-            <div className="chrome-panel fixed right-6 bottom-24 z-[45] w-[13rem] flex-col items-stretch gap-0 p-0">
+            <div className="chrome-panel fixed right-[calc(1.4rem-var(--sb))] bottom-[1.4rem] z-[45] w-[13rem] flex-col items-stretch gap-0 p-0">
               <div className="chrome-group">
                 <button
                   type="button"

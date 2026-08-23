@@ -1,1 +1,0 @@
-[-1788240ms] [WARNING] [useContextMutator] No domain available from OpenFeature context; are you using <OpenFeatureProvider/>? setContext will mutate the default context, as if `defaultContext: true` were set. This may result in a thrown error in the future. @ https://logfire-eu.pydantic.dev/vendor-openfeature-C39vyd7o.js:0

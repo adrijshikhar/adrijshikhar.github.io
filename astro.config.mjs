@@ -1,7 +1,7 @@
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import react from '@astrojs/react';
-import tailwind from '@astrojs/tailwind';
+import tailwindcss from '@tailwindcss/vite';
 import sitemap from '@astrojs/sitemap';
 import { codeThemeLight, codeThemeDark } from './src/lib/code-theme.mjs';
 
@@ -20,10 +20,10 @@ export default defineConfig({
       defaultColor: false,
     },
   },
+  vite: { plugins: [tailwindcss()] },
   integrations: [
     mdx(),
     react(),
-    tailwind({ applyBaseStyles: false }),
     sitemap(),
   ],
 });

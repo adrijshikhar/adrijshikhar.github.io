@@ -33,34 +33,36 @@ html.machine-boot .machine-view {
 }
 
 .machine-pre {
-  font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 13px;
   line-height: 1.23;
   /* Token-driven so the terminal follows the active light/dark mode (canvas never changes
      across the human↔machine toggle → always-smooth crossfade). */
-  color: var(--muted);
+  color: var(--muted-foreground);
   white-space: pre-wrap;
   word-wrap: break-word;
   letter-spacing: -0.01em;
 }
 
 .machine-pre a {
-  color: var(--accent);
+  color: var(--primary);
   text-decoration: none;
 }
 
 .machine-pre a:hover {
   text-decoration: underline;
-  opacity: 0.82;
 }
 
 .machine-pre strong {
-  color: var(--text);
+  color: var(--foreground);
   font-weight: 500;
 }
 
-.machine-pre h1,
-.machine-pre h2,
-.machine-pre h3 {
-  color: var(--heading);
-}
+/* Markdown syntax, coloured by the spectral ramp (see buildMachineHtml). The old
+   h1/h2/h3 rules here were dead code: the raw markdown renders as literal text
+   inside a <pre>, so there were never any heading elements to match. */
+.machine-pre .mk-h1 { color: var(--foreground); font-weight: 500; }
+.machine-pre .mk-h2 { color: var(--primary); }
+.machine-pre .mk-h3 { color: var(--primary); }
+.machine-pre .mk-mark { color: var(--primary); }
+.machine-pre .mk-rule { color: var(--muted-foreground); }

@@ -63,7 +63,9 @@ const SOCIAL_ICON_PATHS = {
 ---
 
 <BaseLayout title="adrijshikhar.dev" skyMode="full">
-  <ViewToggle client:load />
+  <aside aria-label="View mode">
+    <ViewToggle client:load />
+  </aside>
   <div class="machine-view" />
 
   <div class="human-view min-h-screen px-5 md:px-8">
@@ -76,23 +78,23 @@ const SOCIAL_ICON_PATHS = {
          corner instruments sit, instead of the sky and the content fighting
          over the same band. -->
     <div class="mx-auto max-w-[46rem]">
-      <main id="content" class="pb-8">
+      <main id="content" class="content-plane pb-8">
 
         <!-- Landing view: the hero owns the first screen, vertically centred,
              exactly as the prototype does it (min-height:100dvh, flex, centre).
              100dvh not 100vh so the iOS address bar cannot cause a jump. Content
              below is revealed by scrolling. -->
         <header class="flex min-h-[100dvh] flex-col justify-center pb-24 pt-32">
-          <p class="mb-6 flex items-center gap-3 label-data">
-            <span class="live inline-block h-[5px] w-[5px] rounded-full bg-accent"></span>
+          <p class="mb-6 flex items-center gap-3 font-mono text-xs uppercase tracking-wider text-muted-foreground">
+            <span class="live inline-block h-[5px] w-[5px] rounded-full bg-primary"></span>
             Bengaluru
           </p>
-          <h1 class="display-hero">
+          <h1 class="text-6xl font-bold tracking-tight sm:text-7xl">
             <a href="/" class="no-underline">Adrij<br />Shikhar</a>
           </h1>
-          <p class="mt-8 max-w-[36rem] text-[1.15rem] leading-relaxed text-text">
+          <p class="mt-8 max-w-[36rem] text-[1.15rem] leading-relaxed text-foreground">
             Senior software engineer at Hevo Data. I move data between systems that were
-            never designed to agree, and <em class="not-italic text-heading">write down what
+            never designed to agree, and <em class="not-italic text-foreground">write down what
             breaks on the way</em>.
           </p>
           <div class="mt-10 flex items-center gap-6">
@@ -105,7 +107,7 @@ const SOCIAL_ICON_PATHS = {
                 { href: 'https://www.reddit.com/user/adrijshikhar', label: 'Reddit', path: SOCIAL_ICON_PATHS.reddit },
               ].map((sLink) => (
                 <li class="shrink-0 text-xs">
-                  <a class="tap-44 block text-muted no-underline transition-colors duration-[120ms] hover:text-accent"
+                  <a class="tap-44 block text-muted-foreground no-underline transition-colors duration-[120ms] hover:text-primary"
                      href={sLink.href} target="_blank" rel="noreferrer noopener"
                      aria-label={`${sLink.label} (opens in a new tab)`}>
                     {sLink.path ? (
@@ -122,7 +124,7 @@ const SOCIAL_ICON_PATHS = {
                 </li>
               ))}
             </ul>
-            <a class="tap-44 flex items-center gap-2 text-muted no-underline transition-colors duration-[120ms] hover:text-accent"
+            <a class="tap-44 flex items-center gap-2 text-muted-foreground no-underline transition-colors duration-[120ms] hover:text-primary"
                href="/resume/">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5" aria-hidden="true">
                 <path d="M12 3v12m0 0l-4-4m4 4l4-4" />
@@ -140,26 +142,25 @@ const SOCIAL_ICON_PATHS = {
 
         <!-- About -->
         <section id="about" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="channel mb-8"><span class="label-data channel-no">01</span><span class="label-data">about</span></div>
+          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground">01</span></div>
+          <h2 class="display-section mb-8">About</h2>
           <div
-            class="prose prose-invert max-w-[35rem] leading-relaxed text-text prose-p:text-text prose-p:leading-relaxed prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-strong:text-heading prose-strong:font-medium"
+            class="prose prose-invert max-w-[35rem] leading-relaxed text-foreground prose-p:text-foreground prose-p:leading-relaxed prose-a:text-primary prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-foreground prose-strong:font-medium"
             set:html={marked.parse(about.content)}
           />
         </section>
 
         <!-- Experience -->
         <section id="experience" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="sticky top-0 z-20 -mx-5 mb-6 w-screen border-b border-border bg-[color-mix(in_srgb,var(--bg)_80%,transparent)] px-5 py-5 backdrop-blur md:-mx-8 md:px-8 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
-            <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Experience</h2>
-          </div>
-          <div class="channel mb-8"><span class="label-data channel-no">02</span><span class="label-data">experience</span></div>
-          <ul class="group/list border-b-0">
+          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground">02</span></div>
+          <h2 class="display-section mb-8">Experience</h2>
+          <ul class="group/list flex flex-col gap-5">
             {experience.meta.entries.slice(0, 2).map((exp: any) => (
-              <ExpCard {...exp} />
+              <li><ExpCard {...exp} /></li>
             ))}
           </ul>
           <div class="mt-10">
-            <a class="group atelier-btn" href="/experience/">
+            <a class="group inline-flex items-center justify-center rounded-md border bg-card px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground" href="/experience/">
               <span>View full work experience</span><span class="transition-transform group-hover:translate-x-1">&rarr;</span>
             </a>
           </div>
@@ -167,17 +168,15 @@ const SOCIAL_ICON_PATHS = {
 
         <!-- Projects -->
         <section id="projects" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="sticky top-0 z-20 -mx-5 mb-6 w-screen border-b border-border bg-[color-mix(in_srgb,var(--bg)_80%,transparent)] px-5 py-5 backdrop-blur md:-mx-8 md:px-8 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
-            <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Projects</h2>
-          </div>
-          <div class="channel mb-8"><span class="label-data channel-no">03</span><span class="label-data">projects</span></div>
-          <ul class="group/list">
+          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground">03</span></div>
+          <h2 class="display-section mb-8">Projects</h2>
+          <ul class="group/list flex flex-col gap-5">
             {projects.meta.entries.slice(0, 2).map((proj: any) => (
-              <ProjectCard {...proj} contentHtml={marked.parse(projSections[proj.slug] || '') as string} />
+              <li><ProjectCard {...proj} contentHtml={marked.parse(projSections[proj.slug] || '') as string} /></li>
             ))}
           </ul>
           <div class="mt-10">
-            <a class="group atelier-btn" href="/archive/">
+            <a class="group inline-flex items-center justify-center rounded-md border bg-card px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground" href="/archive/">
               <span>View full project archive</span><span class="transition-transform group-hover:translate-x-1">&rarr;</span>
             </a>
           </div>
@@ -185,23 +184,21 @@ const SOCIAL_ICON_PATHS = {
 
         <!-- Writing -->
         <section id="writing" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="sticky top-0 z-20 -mx-5 mb-6 w-screen border-b border-border bg-[color-mix(in_srgb,var(--bg)_80%,transparent)] px-5 py-5 backdrop-blur md:-mx-8 md:px-8 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
-            <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Writing</h2>
-          </div>
-          <div class="channel mb-8"><span class="label-data channel-no">04</span><span class="label-data">writing</span></div>
+          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground">04</span></div>
+          <h2 class="display-section mb-8">Writing</h2>
           {latestPosts.length === 0 ? (
-            <p class="border border-border px-5 py-6 font-mono text-sm text-muted">
-              <span class="text-accent">$</span> ls ./posts — <span class="text-text">no entries yet.</span>
+            <p class="border border-border px-5 py-6 font-mono text-sm text-muted-foreground">
+              <span class="text-primary">$</span> ls ./posts — <span class="text-foreground">no entries yet.</span>
             </p>
           ) : (
-            <ul class="group/list">
+            <ul class="group/list flex flex-col gap-5">
               {latestPosts.map((post) => (
-                <BlogCard title={post.data.title} date={fmtPostDate(post.data.date)} href={`/blogs/${post.id}/`} />
+                <li><BlogCard title={post.data.title} date={fmtPostDate(post.data.date)} href={`/blogs/${post.id}/`} /></li>
               ))}
             </ul>
           )}
           <div class="mt-10">
-            <a class="group atelier-btn" href="/blogs/">
+            <a class="group inline-flex items-center justify-center rounded-md border bg-card px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground" href="/blogs/">
               <span>View all posts</span><span class="transition-transform group-hover:translate-x-1">&rarr;</span>
             </a>
           </div>
@@ -209,17 +206,15 @@ const SOCIAL_ICON_PATHS = {
 
         <!-- Education -->
         <section id="education" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="sticky top-0 z-20 -mx-5 mb-6 w-screen border-b border-border bg-[color-mix(in_srgb,var(--bg)_80%,transparent)] px-5 py-5 backdrop-blur md:-mx-8 md:px-8 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
-            <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Education</h2>
-          </div>
-          <div class="channel mb-8"><span class="label-data channel-no">05</span><span class="label-data">education</span></div>
+          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground">05</span></div>
+          <h2 class="display-section mb-8">Education</h2>
           <ul class="grid gap-4 sm:grid-cols-2">
             {education.meta.entries.map((edu: any, i: number) => (
-              <li class={`atelier-card group/list-item px-5 py-6 lg:px-6 lg:py-7`}>
-                <span class="meta-data">{edu.startDate} — {edu.endDate}</span>
-                <h3 class="mt-2 title-entry">{edu.institution}</h3>
-                <div class="mt-1 text-sm text-text">
-                  {edu.degree}{edu.field && <span class="text-muted"> — {edu.field}</span>}
+              <li class={`rounded-xl border bg-card text-card-foreground shadow-sm group/list-item px-5 py-6 lg:px-6 lg:py-7`}>
+                <span class="font-mono text-xs uppercase tracking-wider text-muted-foreground">{edu.startDate} — {edu.endDate}</span>
+                <h3 class="mt-2 text-xl font-semibold leading-snug">{edu.institution}</h3>
+                <div class="mt-1 text-sm text-foreground">
+                  {edu.degree}{edu.field && <span class="text-muted-foreground"> — {edu.field}</span>}
                 </div>
               </li>
             ))}
@@ -228,21 +223,20 @@ const SOCIAL_ICON_PATHS = {
 
         <!-- Achievements -->
         <section id="achievements" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="sticky top-0 z-20 -mx-5 mb-6 w-screen border-b border-border bg-[color-mix(in_srgb,var(--bg)_80%,transparent)] px-5 py-5 backdrop-blur md:-mx-8 md:px-8 lg:sr-only lg:relative lg:top-auto lg:mx-auto lg:w-full lg:border-0 lg:bg-transparent lg:px-0 lg:py-0">
-            <h2 class="text-sm font-medium uppercase tracking-widest text-heading lg:sr-only">Achievements</h2>
-          </div>
-          <div class="channel mb-8"><span class="label-data channel-no">06</span><span class="label-data">achievements</span></div>
+          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground">06</span></div>
+          <h2 class="display-section mb-8">Achievements</h2>
           <div
-            class="prose prose-invert max-w-[35rem] text-text prose-p:text-text prose-li:text-text marker:text-accent prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-strong:text-heading"
+            class="prose prose-invert max-w-[35rem] text-foreground prose-p:text-foreground prose-li:text-foreground marker:text-muted-foreground prose-a:text-primary prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-foreground"
             set:html={marked.parse(achievements.content)}
           />
         </section>
 
         <!-- Interests -->
         <section id="interests" class="mb-12 scroll-mt-16 md:mb-16 lg:scroll-mt-24">
-          <div class="channel mb-8"><span class="label-data channel-no">07</span><span class="label-data">interests</span></div>
+          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground">07</span></div>
+          <h2 class="display-section mb-8">Interests</h2>
           <div
-            class="prose prose-invert max-w-[35rem] text-text prose-p:text-text prose-li:text-text marker:text-accent prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-strong:text-heading"
+            class="prose prose-invert max-w-[35rem] text-foreground prose-p:text-foreground prose-li:text-foreground marker:text-muted-foreground prose-a:text-primary prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-foreground"
             set:html={marked.parse(interests.content)}
           />
         </section>
@@ -254,11 +248,11 @@ const SOCIAL_ICON_PATHS = {
             the footer: past the last line there is nothing left to look at, so
             the same space there just reads as the page failing to end. */}
         <footer class="mt-[29vh] border-t border-border pt-12 pb-20 md:mt-[33vh] md:pb-24">
-          <p class="meta-data">
-            <span class="text-accent">&#9656;</span> {STAR_COUNT} named stars at true J2000 positions
-            for your location · faint field is representative
+          <p class="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+            <span class="text-primary">&#9656;</span> {STAR_COUNT} named stars at true J2000 positions
+            for your location. Every mark on the canvas is a catalogued object.
           </p>
-          <p class="meta-data mt-2 opacity-70">Built with Astro.</p>
+          <p class="font-mono text-xs uppercase tracking-wider text-muted-foreground mt-2">Built with Astro.</p>
         </footer>
 
 
@@ -268,37 +262,5 @@ const SOCIAL_ICON_PATHS = {
 
   <script define:vars={{ rawMarkdown }}>
     window.__RAW_MARKDOWN__ = rawMarkdown;
-  </script>
-  <script>
-    // Section fade-in on scroll (progressive enhancement — visible by default if observer unsupported)
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if ('IntersectionObserver' in window && !prefersReduced) {
-      const sections = document.querySelectorAll('section[id]');
-      // Map each section to its index so reveals can stagger in DOM order.
-      const sectionIndex = new WeakMap<Element, number>();
-      sections.forEach((s, i) => {
-        sectionIndex.set(s, i);
-        (s as HTMLElement).style.opacity = '0';
-        (s as HTMLElement).style.transform = 'translateY(24px)';
-        (s as HTMLElement).style.transition =
-          'opacity 0.6s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
-      });
-      const fadeObserver = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              const el = entry.target as HTMLElement;
-              const i = sectionIndex.get(el) ?? 0;
-              el.style.transitionDelay = `${Math.min(i, 4) * 60}ms`;
-              el.style.opacity = '1';
-              el.style.transform = 'translateY(0)';
-              fadeObserver.unobserve(el);
-            }
-          });
-        },
-        { threshold: 0.1 }
-      );
-      sections.forEach((s) => fadeObserver.observe(s));
-    }
   </script>
 </BaseLayout>

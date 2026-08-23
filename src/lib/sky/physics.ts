@@ -71,7 +71,16 @@ export interface HitResult {
 
 const RADIUS = 150; // gravity well influence radius
 const MAX_PULL = 6; // max px a star is ever displaced from home
-const K = 0.14; // spring stiffness toward target
+/** Wobble amplitude scale. Applied to the whole displacement term rather than to
+ *  MAX_PULL alone: for a star close to the cursor the `d * 0.9` branch is under
+ *  the cap, so lowering only MAX_PULL would leave those stars moving exactly as
+ *  far as before and the reduction would not be uniform. */
+const WOBBLE_SCALE = 0.75;
+/** Spring stiffness toward the target. Lowering this does not shrink the
+ *  displacement — the star still converges on the same target — it slows the
+ *  approach, so the sky lags further behind the cursor and the bend reads softer.
+ *  Amplitude is WOBBLE_SCALE's job; this is the feel. */
+const K = 0.105;
 const DAMP = 0.78; // velocity retained per frame
 /** Near-frictionless space, sling mode. Coast distance is v0 * DRAG/(1-DRAG),
  *  so this — not LAUNCH_SPEED — is the travel knob: 0.994 gave ~165x the launch
@@ -103,7 +112,7 @@ export function gravityWell(stars: GameStar[], mouseX: number, mouseY: number): 
     const d = Math.hypot(dx, dy);
     if (d < RADIUS && d > 0.001) {
       const f = 1 - d / RADIUS;
-      const amt = Math.min(MAX_PULL, d * 0.9) * f * f; // bounded, can't overshoot
+      const amt = Math.min(MAX_PULL, d * 0.9) * f * f * WOBBLE_SCALE; // bounded, can't overshoot
       tx += (dx / d) * amt;
       ty += (dy / d) * amt;
     }

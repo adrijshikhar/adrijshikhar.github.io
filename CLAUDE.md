@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-Personal portfolio + blog. Astro 6 static site with React 19 interactive islands, Tailwind 3 (CSS-variable design tokens) + shadcn/ui, MDX. Design is **"Terminal Atelier"** — dark-default with a light mode, an accent-tinted card system, and a warm-gold ambient aurora.
+Personal portfolio + blog. Astro 6 static site with React 19 interactive islands, Tailwind 3 (**stock palette only** — `tailwind.config.mjs` declares no `colors` key), MDX. shadcn/ui was removed: four of its five components had zero imports, and its semantic token layer (`--background`, `--primary`, `--destructive`) is exactly the custom-palette indirection this design no longer has. `ViewToggle` uses the `@base-ui/react` Toggle primitive directly. Design is **"Terminal Atelier"** — dark-default with a light mode, an accent-tinted card system, and a warm-gold ambient aurora.
 
 ## Toolchain & commands
 
@@ -17,7 +17,47 @@ bun run preview             # serve the production build
 bun x astro sync            # regenerate content-collection types after schema changes
 ```
 
-No test or lint scripts exist. Prettier is a dependency but is not wired to a script. The
+### Verification
+
+```bash
+bun run verify:sky          # 16 physical astronomy invariants — pure Node, runs in CI
+bun run verify:code         # dual-theme code-block contrast — runs in CI
+bun run verify:legibility   # 169/255 canvas-alpha ceiling — needs a browser, NOT in CI
+```
+
+`verify:legibility` enforces the ceiling DESIGN.md calls a hard contract. It cannot be pure
+Node like `verify:sky`, because legibility depends on what the browser actually rasterised —
+so it attaches over CDP to a Chrome you start yourself and runs its sampling **inside** the
+page (only numbers cross the wire, so nothing has to decode an image). Deliberately not
+wired into CI: adding a browser would make every build and deploy install one, and the check
+only means something when you are changing the palette or the sky.
+
+```bash
+bun run dev                                          # terminal 1
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+  --remote-debugging-port=9222 --user-data-dir=/tmp/legibility-profile   # terminal 2
+bun run verify:legibility                            # terminal 3 (--all, --json available)
+```
+
+It reports `exposed/sampled` per route: text with an **opaque** ancestor between it and the
+canvas cannot be harmed, so only unshielded text can fail. That split is diagnostic in its
+own right. Every route except `/` now reports `0/n exposed`, because the Spectral work moved
+the legibility shield up from the individual rows to the reading column (`.reading-plane` /
+`.content-plane` in `globals.css`) — rows are rules with no fill, so the plane has to live
+one level up or canvas ink lands under the prose. `/` stays intentionally exposed at
+`45/45`: the hero is meant to sit *in* the sky, and it measures 139/169 there. Readings
+drift ±1 between runs because the sky is live.
+
+Two traps when verifying in a headless browser, both hit in anger:
+
+1. **Playwright reports `prefers-reduced-motion: reduce` by default.** Emulate
+   `no-preference` or you exercise the static path.
+2. **Never resize the viewport to the full page height to capture a tall page.** It inflates
+   every `min-h-screen`/`100dvh` box (a 900px hero became 4464px) and the result looks like
+   a broken layout that is not broken. Use CDP `captureBeyondViewport` with the viewport
+   left at 1440x900.
+
+No lint script exists. Prettier is a dependency but is not wired to a script. The
 `deploy` npm script (`gh-pages`) is legacy/unused — deployment is via GitHub Actions (below).
 
 If a dev-server React island fails to hydrate with `jsxDEV is not a function` after editing
@@ -94,9 +134,17 @@ The top-centre `.expo` cluster shows `ALT +90…−35°` (the projection's real 
 `FLOOR` in `projection.ts`), `STARS 96` (`STARS.length`), and a live Julian Date — which is the
 actual input to every position on screen.
 
-`STARS n` is a **count, not a limiting magnitude.** The catalogue bottoms out at mag 3.35 but
-the renderer also draws a procedural faint field below that, so any `MAG n` label would be
-false. Don't "improve" it into one.
+`STARS n` is a **count**, and since the procedural faint field was removed it is now the
+whole truth: every dot on the canvas is a catalogued object, so there is nothing drawn below
+the catalogue's mag 3.35 floor. That makes a `MAG 3.35` label defensible for the first time —
+but it is still a different claim from a count, so if you add one, add it alongside, and
+re-check it against `STARS.length` rather than replacing the count with it.
+
+The faint field (`FAINT_FIELD` in `render.ts`) is an intentionally empty export, not dead
+code: the draw loops and `computeSky` signature still handle it, so dropping a real faint
+catalogue in there works with no other change. What it must not go back to is 420 procedural
+dots that cannot be hovered or named — on an instrument arguing every mark is a true
+statement, those were the one decorative element, and at 1px they read as dust on the display.
 
 The corner readouts are the same contract. Top-left carries `SUN` (the altitude
 driving the twilight glow, plus its standard band), `MOON` (the illuminated

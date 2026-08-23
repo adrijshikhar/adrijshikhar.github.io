@@ -2,7 +2,6 @@
 name: "Adrij Shikhar"
 title: "Senior Software Engineer"
 tagline: "I build scalable data platforms and craft software that pushes boundaries."
-phone: "+91 (821) 805 8928"
 email: "ashikhar@ee.iitr.ac.in"
 socials:
   - platform: github

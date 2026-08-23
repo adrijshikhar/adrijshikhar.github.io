@@ -70,8 +70,8 @@ const sections = [
   .rail-progress {
     position: relative;
     width: 1px;
-    height: 9rem;
-    background: var(--rule);
+    height: calc(2.3rem * 6);
+    background: var(--border);
     flex: none;
   }
   .rail-progress-fill {
@@ -79,8 +79,7 @@ const sections = [
     inset: 0 0 auto 0;
     width: 100%;
     height: 100%;
-    background: var(--accent);
-    opacity: 0.9;
+    background: var(--primary);
     transform-origin: top;
     transform: scaleY(0);
     animation: rail-progress-fill linear;
@@ -93,14 +92,12 @@ const sections = [
     .rail-progress { display: none; }
   }
 
-  /* ── Windowed readout: three graduations tall, so the active label centres
-     in the window with one dimmed neighbour above and below — the same
-     silhouette as a focal-length dial's visible run. */
+  /* ── Wayfinding, not a dial. Every destination is visible: the previous
+     three-tall window hid 4 of 6 links and allowed keyboard focus to land
+     outside the visible run. The active item is marked in place by colour. */
   .rail-window {
     position: relative;
-    overflow: hidden;
     --item-h: 2.3rem;
-    height: calc(var(--item-h) * 3);
   }
 
   .rail-stack {
@@ -108,11 +105,6 @@ const sections = [
     padding: 0;
     list-style: none;
     --i: 0;
-    /* Centres the active (index --i) item in the window: shift the whole
-       stack up by one item-height per step, then re-add one item-height so
-       index 0 sits centred rather than flush with the window's top edge. */
-    transform: translateY(calc(var(--item-h) * (1 - var(--i))));
-    transition: transform 0.6s cubic-bezier(0.32, 0.72, 0, 1);
   }
   .rail-stack li {
     height: var(--item-h);
@@ -124,46 +116,45 @@ const sections = [
     align-items: center;
     gap: 0.5rem;
     text-decoration: none;
-    opacity: 0.4;
-    transition: opacity 0.6s cubic-bezier(0.32, 0.72, 0, 1);
+    color: var(--muted-foreground);
+    transition: color var(--dur-ui) var(--ease-out);
   }
   .nav-link:hover,
-  .nav-link:focus-visible { opacity: 0.75; }
-  .nav-link.is-at { opacity: 1; }
+  .nav-link:focus-visible { color: var(--foreground); }
+  .nav-link.is-at { color: var(--foreground); }
 
   .rail-bracket {
     font-family: var(--font-mono);
-    font-size: 0.625rem;
+    font-size: 0.6875rem;
     font-weight: 500;
-    color: var(--accent);
+    color: var(--primary);
     opacity: 0;
-    transition: opacity 0.45s cubic-bezier(0.32, 0.72, 0, 1);
+    transition: opacity var(--dur-ui) var(--ease-out);
   }
   .nav-link.is-at .rail-bracket { opacity: 1; }
 
   .rail-no {
     font-family: var(--font-mono);
-    font-size: 0.5rem;
-    letter-spacing: 0.08em;
-    color: var(--muted);
-    opacity: 0.5;
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    color: var(--muted-foreground);
     width: 1.1rem;
-    transition: color 0.6s cubic-bezier(0.32, 0.72, 0, 1);
+    transition: color var(--dur-ui) var(--ease-out);
   }
-  .nav-link.is-at .rail-no { color: var(--accent); opacity: 1; }
+  .nav-link.is-at .rail-no { color: var(--primary); }
 
   .nav-text {
     font-family: var(--font-mono);
-    font-size: 0.625rem;
+    font-size: 0.6875rem;
     font-weight: 500;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--muted);
-    transition: color 0.6s cubic-bezier(0.32, 0.72, 0, 1);
+    color: var(--muted-foreground);
+    transition: color var(--dur-ui) var(--ease-out);
   }
   .nav-link:hover .nav-text,
   .nav-link:focus-visible .nav-text,
-  .nav-link.is-at .nav-text { color: var(--heading); }
+  .nav-link.is-at .nav-text { color: var(--foreground); }
 
   /* The rail belongs to the instrument, so it leaves with the instrument. */
   :global(html.machine-mode) .side-rail,
@@ -175,7 +166,7 @@ const sections = [
      all six, all visible at once. */
   @media (prefers-reduced-motion: reduce) {
     .rail-progress { display: none; }
-    .rail-window { overflow: visible; height: auto; }
+
     .rail-stack { transform: none; transition: none; }
     .nav-link,
     .rail-no,

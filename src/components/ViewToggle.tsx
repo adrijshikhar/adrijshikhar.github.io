@@ -31,7 +31,35 @@ const buildMachineHtml = (): string => {
         : match,
   );
   const withBold = withLinks.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  return `<div class="machine-content-wrapper"><pre class="machine-pre">${withBold}</pre></div>`;
+
+  // Colour the markdown by its own syntax, so the machine view uses the same
+  // spectral ramp as the rest of the site instead of one flat grey. The design
+  // frame (11 - MACHINE VIEW) assigns: # to F, ## to G, ### to A, list markers
+  // to muted, everything else to ink.
+  //
+  // This runs LINE-WISE on already-escaped text, after links and bold, so the
+  // spans it adds cannot be re-escaped and cannot swallow an <a> or <strong>.
+  // Matching is anchored to the start of a line, so a '#' inside prose is not a
+  // heading. KNOWN LIMITATION: there is no fence tracking here, so a '#' comment
+  // on its own line inside a fenced block IS styled as a heading. Harmless in
+  // the current posts; if it starts mattering, track fences rather than widening
+  // this regex.
+  const coloured = withBold
+    .split('\n')
+    .map((line: string) => {
+      const h = /^(#{1,6})(\s+)(.*)$/.exec(line);
+      if (h) {
+        const cls = h[1].length === 1 ? 'mk-h1' : h[1].length === 2 ? 'mk-h2' : 'mk-h3';
+        return `<span class="${cls}">${h[1]}${h[2]}${h[3]}</span>`;
+      }
+      const li = /^(\s*)([-*+]|\d+\.)(\s+)(.*)$/.exec(line);
+      if (li) return `${li[1]}<span class="mk-mark">${li[2]}</span>${li[3]}${li[4]}`;
+      if (/^\s*(---+|===+)\s*$/.test(line)) return `<span class="mk-rule">${line}</span>`;
+      return line;
+    })
+    .join('\n');
+
+  return `<div class="machine-content-wrapper"><pre class="machine-pre">${coloured}</pre></div>`;
 };
 
 export default function ViewToggle() {
@@ -193,7 +221,7 @@ export default function ViewToggle() {
         <Toggle
           pressed={mode === 'human'}
           onPressedChange={(pressed) => { if (pressed && mode !== 'human') toggle(); }}
-          className="chrome-seg tap-44 !h-auto !min-w-0 !rounded-none !text-[0.5625rem] !font-normal !px-3 !py-1.5 flex items-center gap-1 !bg-transparent hover:!bg-transparent data-[state=on]:!bg-transparent"
+          className="chrome-seg tap-44 flex h-auto min-w-0 items-center gap-1 rounded-none bg-transparent px-3 py-1.5 text-[0.5625rem] font-normal hover:bg-transparent aria-pressed:bg-transparent data-[state=on]:bg-transparent"
         >
           <span className="chrome-bracket" aria-hidden="true">[</span>
           <span>Human</span>
@@ -202,7 +230,7 @@ export default function ViewToggle() {
         <Toggle
           pressed={mode === 'machine'}
           onPressedChange={(pressed) => { if (pressed && mode !== 'machine') toggle(); }}
-          className="chrome-seg tap-44 !h-auto !min-w-0 !rounded-none !text-[0.5625rem] !font-normal !px-3 !py-1.5 flex items-center gap-1 !bg-transparent hover:!bg-transparent data-[state=on]:!bg-transparent"
+          className="chrome-seg tap-44 flex h-auto min-w-0 items-center gap-1 rounded-none bg-transparent px-3 py-1.5 text-[0.5625rem] font-normal hover:bg-transparent aria-pressed:bg-transparent data-[state=on]:bg-transparent"
         >
           <span className="chrome-bracket" aria-hidden="true">[</span>
           <span>Machine</span>

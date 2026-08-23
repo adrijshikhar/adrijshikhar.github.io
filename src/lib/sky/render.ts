@@ -60,18 +60,16 @@ export function rnd(seed: number): () => number {
 
 const R2D = 180 / Math.PI;
 
-/** Faint field: 420 anonymous stars spread UNIFORMLY over the celestial sphere
- *  — dec = asin(uniform), NOT uniform-in-dec, which would clump them at the
- *  poles. They are not catalogued objects; they exist so the sky has real
- *  density, and they rise/set with the true sky because they live in RA/Dec too. */
-export const FAINT_FIELD: Array<{ ra: number; dec: number; mag: number }> = (() => {
-  const r = rnd(20260801);
-  const out: Array<{ ra: number; dec: number; mag: number }> = [];
-  for (let i = 0; i < 420; i++) {
-    out.push({ ra: r() * 24, dec: Math.asin(r() * 2 - 1) * R2D, mag: 3.6 + r() * 2.6 });
-  }
-  return out;
-})();
+/** Faint field: deliberately EMPTY. There were 420 anonymous procedural stars
+ *  here. They could not be hovered, named, or looked up, so on an instrument
+ *  whose whole argument is that every mark is a true statement they were the one
+ *  purely decorative element — and at 1px they read as dust on the display
+ *  rather than as sky. Every dot on the canvas is now a catalogued object.
+ *
+ *  Kept as an empty export rather than deleted so the draw loops and the
+ *  computeSky signature stay intact for whoever wants a real faint catalogue
+ *  here later. Populate it and the renderer picks it up with no other change. */
+export const FAINT_FIELD: Array<{ ra: number; dec: number; mag: number }> = [];
 
 const vrFor = (mag: number): number => 1.4 + Math.max(0, 3.0 - mag) * 1.15;
 
@@ -110,10 +108,13 @@ export interface SkyColors {
   bright: string;
   /** Moon's lit-limb fill + terminator-ring stroke. */
   moonLit: string;
-  /** Moon's earthshine disc — a low-alpha wash behind the lit limb. */
-  moonGlow: string;
-  /** Planet disc/ring/persistent-label colour. */
+  /** Planet disc/ring/persistent-label colour. slate-300 (#CBD5E1, neutral like the Moon —
+   *  Vega): planets shine by reflected sunlight, so they read cool, and A is
+   *  visibly distinct from the near-white F the bright stars take. */
   planet: string;
+  /** The Sun only. amber-300 (#FCD34D) — the Sun is a G-class star, so warm here is a
+   *  same hue the chrome uses for Sun values, so the readout and the disc agree. */
+  sun: string;
   /** Faint background field colour — already faded, since the faint field's
    *  per-star magnitude alpha still multiplies on top of it. */
   faint: string;
@@ -168,183 +169,6 @@ export function fade(base: string, alpha: number): string {
   return `color-mix(in srgb, ${base} ${(alpha * 100).toFixed(2)}%, transparent)`;
 }
 
-/** Twilight. The one ambient light in the scene, anchored to the Sun's real
- *  computed position and driven by its real altitude — so the page is warm
- *  where the light actually comes from, and dark when the Sun is genuinely
- *  down. It replaced a fixed warm blob in the top-left corner, which was a
- *  glow from nowhere on a sky that claims to be true.
- *
- *  The ramp is the standard definition, not a taste curve: full strength with
- *  the Sun up, fading through civil/nautical/astronomical twilight, and out
- *  entirely at -18 degrees, which is where astronomical night begins and no
- *  sunlight reaches the sky. Below that the page is black because it should be.
- *
- *  The two modes state it differently, for the same reason the stars do. Dark
- *  mode EMITS: a soft bloom, because that is what light on black looks like.
- *  Light mode ENGRAVES: concentric rings spreading from the disc and fading as
- *  they go, which is how a printed chart draws radiance it cannot glow. A warm
- *  bloom on paper is a stain; a ring is a mark.
- *
- *  Geometry measured off the sprite, not guessed. The sheet blits into a 2r box,
- *  so in units of the painted radius the glyph is: orange disc to 0.53, then
- *  three dashed rings at 0.58 / 0.77 / 0.96, outermost ink at 1.01, ink about
- *  three quarters of each step. The ripple starts just past that and keeps the
- *  same 0.19 spacing, so it continues the glyph rather than orbiting it —
- *  getting these in the wrong units is what left a dead band around the Sun. */
-const TWILIGHT_FLOOR = -18;
-const GLOW_MAX_ALPHA = 0.115;
-/** Engraved radiance: concentric dashed circles leaving the disc and fading as
- *  they spread — the Sun glyph's own language, continued outward. Measured off
- *  the icon rather than guessed: its dashes are arc segments with a SMALL gap
- *  (dash roughly 3x the gap), in two staggered rings sitting at 1.4-1.7x the
- *  disc radius. So the ripple starts outside that and reaches only ~4 radii,
- *  in Sun radii rather than viewport diagonal — at diagonal scale this was
- *  just the old corner wash wearing a different shape. */
-const RING_COUNT = 3;
-const RING_START = 1.12;
-const RING_REACH = 1.55;
-/** Arc segments per ring, and how much of each step is ink rather than gap. */
-const RING_DASHES = 16;
-const RING_INK = 0.74;
-
-export function drawSunGlow(
-  ctx: CanvasRenderingContext2D,
-  W: number,
-  H: number,
-  bodies: BodyPos[],
-  colors: SkyColors,
-  /** 0–1, advanced by the caller's frame clock. Rings expand with it; at a
-   *  fixed value (reduced motion draws one frame) they read as static rings,
-   *  which is the same chart convention standing still. */
-  phase = 0,
-): void {
-  const sun = bodies.find((b) => b.isSun);
-  if (!sun || sun.alt <= TWILIGHT_FLOOR) return;
-
-  // 0 at astronomical night, 1 once the Sun is on the horizon or above.
-  const t = Math.min(1, (sun.alt - TWILIGHT_FLOOR) / -TWILIGHT_FLOOR);
-  const a = GLOW_MAX_ALPHA * t * t; // eased: twilight ramps, it does not switch
-
-  // Dark mode. A steady halo and core hold the light, and a third layer makes
-  // it move: a bloom that grows outward from the disc, fading in as it leaves
-  // and out as it goes.
-  //
-  // It is a centre-bright DISC, not an annulus. Rings — soft bands or dashed
-  // hairlines either way — are what failed here repeatedly: the glow already
-  // fills the space they cross, so every ring lands as an edge inside it and
-  // the whole thing reads as a bullseye. A disc has no edge to read, so the
-  // same outward motion registers as light spreading instead.
-  if (!colors.engraved) {
-    // Kept tight on purpose: a wide wash is indistinguishable from the corner
-    // blob this replaced. A contained bloom reads as light coming off a body.
-    // Deliberately tighter than the expanding glow below. When the halo was
-    // the wider of the two it simply covered the expansion — measured, the
-    // lit extent sat at a fixed 212px through every phase of the cycle.
-    const R = Math.hypot(W, H) * 0.105;
-    const halo = ctx.createRadialGradient(sun.x, sun.y, 0, sun.x, sun.y, R);
-    halo.addColorStop(0, fade(colors.moonLit, a));
-    halo.addColorStop(0.22, fade(colors.planet, a * 0.5));
-    halo.addColorStop(0.55, fade(colors.planet, a * 0.16));
-    halo.addColorStop(1, 'transparent');
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = halo;
-    ctx.beginPath();
-    ctx.arc(sun.x, sun.y, R, 0, Math.PI * 2);
-    ctx.fill();
-
-    const CR = sun.vr * 40;
-    const core = ctx.createRadialGradient(sun.x, sun.y, 0, sun.x, sun.y, CR);
-    // 1.15, not 1.6: with the Sun high it lands squarely on the hero prose,
-    // and the core — not the travelling wave — was the pixel breaching the
-    // 169 ceiling. Measured worst case sits 6px from the disc.
-    // Radius is 5x what it was, so the alpha comes down to match: a wide
-    // core sits over far more prose, and at noon the Sun lands squarely on
-    // the hero paragraph. Measured 177/169 before this.
-    core.addColorStop(0, fade(colors.moonLit, a * 0.42));
-    core.addColorStop(0.45, fade(colors.planet, a * 0.2));
-    core.addColorStop(1, 'transparent');
-    ctx.fillStyle = core;
-    ctx.beginPath();
-    ctx.arc(sun.x, sun.y, CR, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Expanding glow. Starts at the centre, grows, and its border fades out —
-    // and it must never appear to contract on the way.
-    //
-    // Two constraints that look contradictory but are not:
-    //
-    // 1. NO RING. Every gradient here is monotonic — brightest at the centre,
-    //    falling to nothing. A `transparent -> colour -> transparent` profile is
-    //    an annulus by construction, however long its inner ramp, and the eye
-    //    reads any off-centre maximum as a ring. That is what kept coming back.
-    //
-    // 2. NO CONTRACTION. The visible edge sits where the falling alpha crosses
-    //    the eye's threshold, so a single fading disc ALWAYS collapses inward at
-    //    the end of its life, no matter how fast its radius grows.
-    //
-    // Both hold because the sum of monotonic-decreasing functions is itself
-    // monotonic-decreasing: overlapping discs cannot make a ring. So several
-    // are in flight at once, staggered, and a new one is already expanding
-    // before the previous has faded — the composite edge only ever travels
-    // outward. (The earlier "one wave only" rule came from stacking annuli,
-    // where it was correct, and does not apply to discs.)
-    const PUFFS = 3;
-    for (let k = 0; k < PUFFS; k++) {
-      const p = (phase + k / PUFFS) % 1;
-      // sin SQUARED, and this exponent is load-bearing. Summed over N evenly
-      // spaced offsets, sin^2 is exactly constant (N/2) — an identity, not a
-      // tuning. So the combined brightness never dips no matter where in the
-      // cycle you look, while each puff still fades in from nothing and out to
-      // nothing. With sin^0.5 the same three puffs summed 1.86 -> 2.41, a 30%
-      // swing arriving every ~2s: the glow visibly fading and coming back.
-      const alpha = a * 0.7 * Math.sin(p * Math.PI) ** 2;
-      if (alpha <= 0.002) continue;
-      const outer = CR * (0.3 + 2.4 * Math.pow(p, 1.2));
-      const wave = ctx.createRadialGradient(sun.x, sun.y, 0, sun.x, sun.y, outer);
-      wave.addColorStop(0, fade(colors.moonLit, alpha));
-      wave.addColorStop(0.42, fade(colors.planet, alpha * 0.4));
-      wave.addColorStop(1, 'transparent');
-      ctx.fillStyle = wave;
-      ctx.beginPath();
-      ctx.arc(sun.x, sun.y, outer, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    return;
-  }
-
-  // Engraved only. Dashed rings continuing the glyph's own, across bare paper —
-  // which is the one context where rings work, because there is no glow behind
-  // them for the edges to sit inside.
-  const r0 = sun.vr * RING_START;   // starts outside the glyph's own dashes
-  const reach = sun.vr * RING_REACH;
-  ctx.strokeStyle = colors.planet;
-  ctx.lineWidth = 1;
-  ctx.lineCap = 'butt';             // square ends, like the glyph's segments
-  const punch = 1.5;
-  for (let k = 0; k < RING_COUNT; k++) {
-    const p = (phase + k / RING_COUNT) % 1; // evenly spaced along one cycle
-    // A ripple, not a decay: sin() takes each ring from nothing at the limb,
-    // up to full mid-travel, back to nothing at the edge. Fading only outward
-    // makes rings appear from thin air at the disc, which reads as a glitch.
-    const alpha = a * punch * Math.sin(p * Math.PI);
-    if (alpha <= 0.004) continue;
-    const rad = r0 + p * reach;
-    // Dash length is derived from the circumference so every ring carries the
-    // same segment COUNT — a fixed pixel dash would multiply the segments as
-    // the ring grows and the pattern would visibly churn.
-    const step = (2 * Math.PI * rad) / RING_DASHES;
-    ctx.globalAlpha = Math.min(1, alpha);
-    ctx.setLineDash([step * RING_INK, step * (1 - RING_INK)]);
-    ctx.lineDashOffset = k % 2 ? step * 0.5 : 0; // stagger, as the glyph does
-    ctx.beginPath();
-    ctx.arc(sun.x, sun.y, rad, 0, Math.PI * 2);
-    ctx.stroke();
-  }
-  ctx.setLineDash([]);
-  ctx.lineDashOffset = 0;
-  ctx.globalAlpha = 1;
-}
-
 /** Quiet-mode draw: the faint field, the named stars, and the planets, Moon
  *  and Sun — the bodies that make it a sky on a given night rather than a
  *  generic starfield. What quiet still withholds is the *instrument*: no
@@ -352,6 +176,64 @@ export function drawSunGlow(
  *
  *  Stars below the horizon (down to FLOOR) are drawn dimmer rather than
  *  hidden, matching the wider-than-horizon disc. */
+/** A rectangle, in canvas pixels, where the sky must give way to reading.
+ *
+ *  Kept as a plain object on purpose: `render.ts` has to stay DOM-blind so
+ *  `scripts/verify-sky.mjs` can import it under Node. The caller measures the
+ *  reading column and passes numbers. */
+export type KeepOut = { x: number; y: number; w: number; h: number; strength?: number };
+
+/** Erase canvas ink under the reading column so text keeps its contrast.
+ *
+ *  `destination-out`, not a translucent wash on top: a wash ADDS a layer and
+ *  leaves canvas alpha untouched, so it cannot lower what verify:legibility
+ *  measures. Erasing actually removes ink.
+ *
+ *  Scoped to the column, not the viewport. It used to be full width, which
+ *  erased 45% of every mark on the canvas — including the planet labels and the
+ *  hover readout out in the empty margins, where there is no text to protect. */
+function applyKeepOut(ctx: CanvasRenderingContext2D, k: KeepOut, W: number): void {
+  const strength = k.strength ?? 0.45;
+  const feather = 140;
+  const side = 72;
+  const prev = ctx.globalCompositeOperation;
+  ctx.globalCompositeOperation = 'destination-out';
+
+  // Horizontal extent is the READING COLUMN, not the viewport. This used to be
+  // fillRect(0, …, W, …), which erased 45% of every mark on the canvas —
+  // including the planet labels and the hover readout out in the empty margins,
+  // where there is no text to protect. Those labels are the instrument's own
+  // voice; dimming them by half bought no legibility, it just made the sky
+  // unreadable. Text only ever sits inside the column, so that is all the
+  // keep-out needs to cover.
+  const x0 = Math.max(0, k.x - side);
+  const x1 = Math.min(W, k.x + k.w + side);
+
+  // Feathered on all four sides now: a hard vertical edge in open sky reads as a
+  // seam, which is exactly the failure the top edge was already feathered to
+  // avoid.
+  const band = (y: number, h: number, alpha: number) => {
+    const g = ctx.createLinearGradient(x0, 0, x1, 0);
+    g.addColorStop(0, 'rgba(0,0,0,0)');
+    g.addColorStop(Math.min(0.49, side / Math.max(1, x1 - x0)), `rgba(0,0,0,${alpha})`);
+    g.addColorStop(Math.max(0.51, 1 - side / Math.max(1, x1 - x0)), `rgba(0,0,0,${alpha})`);
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(x0, y, x1 - x0, h);
+  };
+
+  // Vertical feather at the top edge: that boundary is where the hero hands over
+  // to the content, so a gradient there reads as the sky receding, not a seam.
+  const steps = 12;
+  for (let i = 0; i < steps; i++) {
+    const t = (i + 1) / steps;
+    band(k.y - feather + (feather * i) / steps, feather / steps + 1, strength * t);
+  }
+  band(k.y, k.h, strength);
+
+  ctx.globalCompositeOperation = prev;
+}
+
 export function drawQuiet(
   ctx: CanvasRenderingContext2D,
   W: number,
@@ -361,10 +243,9 @@ export function drawQuiet(
   moonPhase: MoonPhase,
   colors: SkyColors,
   sprite?: PlanetSpriteRef | null,
-  sunPhase = 0,
+  keepOut?: KeepOut | null,
 ): void {
   ctx.clearRect(0, 0, W, H);
-  drawSunGlow(ctx, W, H, bodies, colors, sunPhase); // behind everything, like real sky glow
 
   for (const f of faint) {
     if (f.alt < FLOOR) continue;
@@ -388,6 +269,8 @@ export function drawQuiet(
   drawBodies(ctx, bodies, moonPhase, -1, colors, sprite);
 
   ctx.globalAlpha = 1;
+  // Last: erase, so everything drawn above is thinned inside the reading column.
+  if (keepOut) applyKeepOut(ctx, keepOut, W);
 }
 
 /* ===========================================================================
@@ -489,8 +372,8 @@ const SUN_MAG = -26.7;
  *
  *  Picked by measurement (see task-7-report.md's fix addendum), driving the
  *  clock across a day and several dates and sampling `getImageData` over
- *  every `main p`/`main li`/`.atelier-card` on the home page: 0.5 keeps the
- *  Moon/Venus/Jupiter worst case (disc + earthshine + bloom, the most
+ *  every `main p`/`main li`/card on the home page: 0.5 keeps the
+ *  Moon/Venus/Jupiter worst case (disc only now; earthshine and bloom are gone,
  *  layered case) at alpha ~137–153/255 in the worst positions found, under
  *  the ≤169 every other sampled element sits under. Left out of `starAlpha`
  *  itself (used by `drawQuiet` too) — quiet mode has no planets or Moon, and
@@ -716,7 +599,7 @@ export function drawBodies(
   colors: SkyColors,
   sprite?: PlanetSpriteRef | null,
 ): void {
-  const { accent, muted, bright, moonLit, moonGlow, planet } = colors;
+  const { accent, muted, bright, moonLit, planet } = colors;
 
   for (let i = 0; i < bodies.length; i++) {
     const s = bodies[i];
@@ -731,10 +614,8 @@ export function drawBodies(
       // which side waxing/waning tells us.
       const k = moonPhase.illum;
       ctx.globalAlpha = a;
-      ctx.fillStyle = moonGlow; // faint earthshine disc behind the lit portion
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
-      ctx.fill();
+      // No earthshine disc: glow is gone from every body, so the Moon is the
+      // terminator and nothing else. The unlit side is simply not drawn.
       const side = moonPhase.waxing ? 1 : -1; // lit limb on the right if waxing
       ctx.fillStyle = i === hoverIndex ? accent : moonLit;
       ctx.beginPath();
@@ -751,7 +632,7 @@ export function drawBodies(
       ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
       ctx.stroke();
     } else {
-      const colour = i === hoverIndex ? accent : s.isPlanet || s.isSun ? planet : s.mag < 1.0 ? bright : muted;
+      const colour = i === hoverIndex ? accent : s.isSun ? colors.sun : s.isPlanet ? planet : s.mag < 1.0 ? bright : muted;
       let drawn = false;
 
       // Glyph sheet first. Six bodies draw from it; the Moon never does, its
@@ -893,20 +774,8 @@ export function drawBodies(
       ctx.textAlign = 'start';
     }
 
-    // Bloom on the brightest stars. MUST be a radial gradient — a flat-alpha
-    // disc has a hard edge and reads as a grey ring around the star, not a glow.
-    if (s.mag < 0.6 && s.alt > 0 && !colors.engraved) {
-      const R = r * 4.2;
-      const g = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, R);
-      g.addColorStop(0, fade(bright, a * 0.3));
-      g.addColorStop(0.35, fade(bright, a * 0.1));
-      g.addColorStop(1, 'transparent');
-      ctx.globalAlpha = 1;
-      ctx.fillStyle = g;
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, R, 0, Math.PI * 2);
-      ctx.fill();
-    }
+    // No bloom. Bright bodies are discs at their real magnitude-scaled radius;
+    // a radial halo was the last glow in the renderer and it is gone too.
   }
   ctx.globalAlpha = 1;
 }
@@ -925,10 +794,9 @@ export function drawFull(
   mouse: { x: number; y: number },
   colors: SkyColors,
   sprite?: PlanetSpriteRef | null,
-  sunPhase = 0,
+  keepOut?: KeepOut | null,
 ): void {
   ctx.clearRect(0, 0, W, H);
-  drawSunGlow(ctx, W, H, bodies, colors, sunPhase); // behind everything, like real sky glow
   const { accent } = colors;
 
   // Constellations join progressively with scroll — every segment starts at
@@ -985,4 +853,5 @@ export function drawFull(
     ctx.fillText(hoverFig.toUpperCase(), mouse.x + 14, mouse.y - 10);
   }
   ctx.globalAlpha = 1;
+  if (keepOut) applyKeepOut(ctx, keepOut, W);
 }
