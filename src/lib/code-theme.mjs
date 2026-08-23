@@ -6,15 +6,15 @@
  * system has to earn its keep. Each role takes exactly the hue that role owns
  * everywhere else on the site:
  *
- *   keyword   O/B  #7fa8f5   7.27:1   also links and active nav
- *   type      A    #bfd2f2  11.30:1   also infra tags
- *   string    G    #f0ce72  11.35:1   also Sun values
- *   number    K    #eda05b   8.06:1   also language tags
- *   error     M    #e8776a   6.00:1   errors ONLY, nowhere else
- *   ink       -    #bfc6d0  10.05:1   identifiers, punctuation, operators
- *   comment   -    #848e9c   5.21:1   italic
+ *   keyword   O/B  #61AFEF   6.75:1   also links and active nav
+ *   type      A    #56B6C2   6.73:1   also infra tags and planets
+ *   literal   G    #E5C07B   9.23:1   strings and numerics; also Sun values
+ *   number    K    #E59779   6.86:1   also language tags
+ *   error     M    #E06C75   4.99:1   errors ONLY, nowhere else
+ *   ink       -    #ABB2BF   7.48:1   identifiers, punctuation, operators
+ *   comment   -    #939BA9   5.69:1   italic
  *
- * Ratios are measured against the pane (--surface-2 #161b22), not the page
+ * Ratios are measured against the pane (--surface-2 #1E222A), not the page
  * ground, because that is what code actually sits on. All clear AA.
  *
  * Two things this replaces, both flagged in the design review: bronze was
@@ -32,18 +32,19 @@
  */
 
 const SPECTRAL = {
-  bg: '#21252B',
+  bg: '#1E222A',
   fg: '#ABB2BF',
   ink: '#ABB2BF',
-  keyword: '#E6EAF0',
-  type: '#ABB2BF',
-  string: '#ABB2BF',
-  number: '#ABB2BF',
-  error: '#E6EAF0',
-  muted: '#ABB2BF',
-  // kept so existing scope maps keep resolving
-  bronze: '#E6EAF0',
-  literal: '#ABB2BF',
+  keyword: '#61AFEF',
+  type: '#56B6C2',
+  string: '#E5C07B',
+  number: '#E59779',
+  error: '#E06C75',
+  muted: '#939BA9',
+  // Only bronze, literal, ink and muted are reached by SCOPES below; the rest
+  // are the role names the ramp is documented by. bronze IS the keyword hue.
+  bronze: '#61AFEF',
+  literal: '#E5C07B',
 };
 
 const LIGHT = SPECTRAL;

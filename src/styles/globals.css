@@ -33,70 +33,69 @@
    ========================================================================== */
 
 :root {
-  /* Substrate. Rules carry structure, so the ground stays dark enough for a
-     3.00:1 major rule to read. */
-  --bg:        #282C34;              /* ground   L*  2.5 */
-  --surface:   #21252B;              /* panel    L*  7.5, dL* +5.0 */
-  --surface-2: #2C323C;              /* pane     L*  9.8, code only */
+  /* SUBSTRATE — One Dark Vivid, re-indexed one step down so the sky has a ground.
+     One Dark's own Background (#1E222A) is L* 13.2; the canvas draws light marks
+     on this, and at that lightness a graticule stroke only reaches 2.59:1. The
+     page ground is therefore deepened along One Dark's own hue line to L* 4.6
+     (3.10:1), and every supplied value slides down one role. Nothing is invented
+     except the ground. */
+  --bg:        #0E1014;              /* ground   L*  4.6  — new, on the One Dark hue line */
+  --surface:   #1E222A;              /* panel    L* 13.2, dL* +8.5  (their Background) */
+  --surface-2: #1E222A;              /* code pane — deepest step the ramp still clears AA on */
 
-  /* One temperature. Every substrate token is cool, so the UI neutrals are cool
-     too. --heading was #edebe6, which is WARM: warm cream text on a cool
-     blue-grey ground neutralises both and is the main reason the palette read as
-     dull rather than as a deliberate choice. Chroma is also lifted a little, so
-     these are a cool family instead of near-greyscale (heading was 3% sat).
-     Every ratio IMPROVED in the swap. */
-  --heading:   #E6EAF0;              /* 18.23:1 on ground */
-  --heading-hi:#E6EAF0;                 /* emphasis above heading */
-  --text:      #ABB2BF;              /* ink    13.32:1 */
-  --muted:     #9DA4B1;              /* label text. Supplied Muted #6B7280 is 2.67 on the
-                                           elevated surface, so it cannot carry text; this is the
-                                           first value on the Muted->Secondary line that clears
-                                           4.5 on all four surfaces (worst 4.57). */
+  /* One temperature: every substrate token is cool, so the neutrals are cool too. */
+  --heading:   #E6E6E6;              /* Primary Text    10.33:1 worst of four surfaces */
+  --heading-hi:#E6E6E6;              /* emphasis above heading */
+  --text:      #ABB2BF;              /* Secondary Text   6.05:1 worst */
+  --muted:     #939BA9;              /* label TEXT. The supplied Muted #636D7E is 2.47:1 on the
+                                        lightest surface, so it cannot carry text; this is the
+                                        first value on the Muted->Secondary line that clears 4.5
+                                        on all four surfaces (worst 4.61). #636D7E is kept
+                                        verbatim below, as a rule, where 4.5 does not apply. */
 
   --border: 255 255 255;                /* used as rgb(var(--border) / a) */
   --border-color: #3E4451;
   --hairline:     #3E4451;
-  --rule:         #3E4451;              /* minor hairline on the ground  1.44:1 */
-  --rule-hi:      #6B7280;              /* supplied Muted, used where it belongs: 2.90 on the
-                                           background, a major-rule value. Non-text, so 4.5 does
-                                           not apply. */
+  --rule:         #3E4451;              /* supplied Border. Minor hairline, 1.95:1 on the ground */
+  --rule-hi:      #636D7E;              /* supplied Muted, used where it belongs: 3.64:1 on the
+                                           ground, a major-rule value. Non-text, so 4.5 does not
+                                           apply to it. */
 
-  /* Card plane and its own edges. Measured against the card fill, not the ground:
-     --rule on a lifted card is 1.18:1 and invisible, which is the bug this fixes.
-       fill      #161c26   L* 10.1, ΔL* 6.5 above ground (>3 is where a plane
-                           becomes visible at all; the old value was 2.65)
-       fill-hi   #1c232f   +3.44 L* above rest — hover LIFTS. --surface-2 was
-                           0.55 L* darker than the rest fill, so hovering used
-                           to sink the card; a ground-scale token is not a
-                           hover scale.
-       edge      #3e4855   1.84:1 on the fill  — present but quiet at rest
-       edge-hi   #555f6c   2.64:1 on the fill  — the hover promotion
-     Text on the fill: heading 14.35:1, ink 9.94:1, muted 5.15:1. All AA. */
-  --card-fill:    #2C323C;              /* L* 13.3, dL* +10.8 above ground */
-  --card-fill-hi: #333A45;              /* L* 21.4, +8.1 above rest — hover LIFTS */
-  --card-edge:    #3E4451;              /* 1.69:1 on the fill */
-  --card-edge-hi: #6B7280;              /* 2.67:1 on the card fill — hover border */
+  /* Card plane and its own edges, measured against the card fill rather than the
+     ground — --rule is 1.43:1 on a lifted card, which is why the card carries an
+     edge token of its own. Hover LIFTS: L* 17.9 -> 20.6. */
+  --card-fill:    #282C34;              /* their Surface   L* 17.9, dL* +4.8 above the panel */
+  --card-fill-hi: #2C323C;              /* their Elevated  L* 20.6, dL* +2.7 above rest */
+  --card-edge:    #3E4451;              /* 1.43:1 on the fill — present but quiet at rest */
+  --card-edge-hi: #636D7E;              /* 2.55:1 on the fill — the hover promotion */
 
-  /* Spectral ramp — one hue, one job. Do not reuse a hue for a second job. */
-  --spectral-ob: #E6EAF0;              /* links, active nav      8.31:1 */
-  --spectral-a:  #ABB2BF;              /* types, infra, planets 12.76:1 */
-  /* F is the one hue shared by UI headings and bright stars on the canvas. In the
-     violet world they finally agree: both are a near-white tinted from the same
-     hue, so nothing fights the substrate. */
-  --spectral-f:  #E6EAF0;              /* headings, bright stars 18.53:1 */
-  --spectral-g:  #ABB2BF;              /* strings, Sun values   13.87:1 */
-  --spectral-k:  #ABB2BF;              /* numbers, dates        10.30:1 */
-  --spectral-m:  #E6EAF0;              /* errors ONLY            8.19:1 */
+  /* Spectral ramp — one hue, one job. Do not reuse a hue for a second job.
+     These tokens also colour the canvas, so the ramp has to stay astronomically
+     true: SkyField reads them for star and body colour, and a green K-class star
+     would be a false statement about the render. That constraint is what fixes
+     the mapping below — O/B blue, A blue-white, F white, G yellow (the Sun's
+     class), K orange, M red — and it is why One Dark's green and purple are NOT
+     deployed: neither corresponds to a stellar class, and there is no second job
+     for them. Worst ratio is across all four surfaces. */
+  --spectral-ob: #61AFEF;              /* links, active nav, keywords   5.46:1 */
+  --spectral-a:  #56B6C2;              /* types, infra tags, planets    5.44:1 */
+  --spectral-f:  #E6E6E6;              /* headings, bright stars       10.33:1 */
+  --spectral-g:  #E5C07B;              /* strings, Sun values           7.47:1 */
+  --spectral-k:  #E59779;              /* numbers, dates                5.55:1 — K sits between
+                                          G and M on the sequence, so it is their oklab midpoint
+                                          rather than an invented hue. */
+  --spectral-m:  #E06C75;              /* errors ONLY                   4.99:1 on the code pane,
+                                          4.04 on a hovered card fill (large text only there). */
 
   /* The accent IS O/B. One hue for links and active nav, never more. */
   --accent: var(--spectral-ob);
-  --accent-contrast: #282C34;
+  --accent-contrast: #0E1014;           /* 8.06:1 against the accent fill */
 
   /* One shape system: --radius 2px, shared by cards, inputs and buttons. Shadows
      stay off; a card is defined by its border and its fill, not by floating. */
   --card-core:  var(--surface);
   --card-radius: 2px;
-  --card-shadow: 0 1px 2px rgb(16 18 22 / .5), 0 12px 32px -10px rgb(16 18 22 / .6);
+  --card-shadow: 0 1px 2px rgb(6 7 9 / .5), 0 12px 32px -10px rgb(6 7 9 / .6);
 
   /* Motion: four durations, one per interaction class. ONE element gets ONE
      duration across all its animated properties; a second duration on the same
@@ -119,18 +118,18 @@
 
   /* shadcn token bridge (kept for ui/* components) */
   --radius: 0px;
-  --background: 220 22% 6%;
-  --foreground: 213 17% 79%;
-  --card: 218 23% 9%;
-  --card-foreground: 213 17% 79%;
-  --popover: 218 23% 9%;
-  --popover-foreground: 213 17% 79%;
-  --primary: 213 17% 79%;
-  --primary-foreground: 220 22% 6%;
-  --secondary: 217 20% 11%;
-  --secondary-foreground: 213 17% 79%;
-  --muted-fg: 217 10% 56%;
-  --destructive: 6 71% 66%;
+  --background: 220 18% 7%;
+  --foreground: 219 14% 71%;
+  --card: 220 13% 18%;
+  --card-foreground: 219 14% 71%;
+  --popover: 220 13% 18%;
+  --popover-foreground: 219 14% 71%;
+  --primary: 219 14% 71%;
+  --primary-foreground: 220 18% 7%;
+  --secondary: 220 17% 14%;
+  --secondary-foreground: 219 14% 71%;
+  --muted-fg: 218 11% 62%;
+  --destructive: 355 65% 65%;
   --input: 0 0% 100% / 12%;
   --ring: var(--accent);
 }
