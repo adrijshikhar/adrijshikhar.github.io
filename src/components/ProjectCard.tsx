@@ -43,7 +43,7 @@ export default function ProjectCard({ title, company, date, link, builtWith = []
           {builtWith.map((tech) => (
             <li
               key={tech}
-              className={`font-mono text-[11px] uppercase tracking-[0.1em] text-muted before:mr-1.5 before:text-rule-hi before:content-['+']`}
+              className={`font-mono text-[11px] uppercase tracking-[0.1em] text-muted before:mr-1.5 before:text-muted before:content-['+']`}
             >
               {tech}
             </li>

@@ -62,8 +62,8 @@ html.machine-boot .machine-view {
 /* Markdown syntax, coloured by the spectral ramp (see buildMachineHtml). The old
    h1/h2/h3 rules here were dead code: the raw markdown renders as literal text
    inside a <pre>, so there were never any heading elements to match. */
-.machine-pre .mk-h1 { color: var(--spectral-f); font-weight: 500; }
-.machine-pre .mk-h2 { color: var(--spectral-g); }
-.machine-pre .mk-h3 { color: var(--spectral-a); }
-.machine-pre .mk-mark { color: var(--spectral-g); }
-.machine-pre .mk-rule { color: var(--rule-hi); }
+.machine-pre .mk-h1 { color: var(--heading); font-weight: 500; }
+.machine-pre .mk-h2 { color: var(--orange); }
+.machine-pre .mk-h3 { color: var(--cyan); }
+.machine-pre .mk-mark { color: var(--orange); }
+.machine-pre .mk-rule { color: var(--muted); }

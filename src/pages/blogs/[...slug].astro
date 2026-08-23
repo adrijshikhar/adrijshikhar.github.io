@@ -31,7 +31,7 @@ const canonical = post.data.canonicalUrl ?? new URL(`/blogs/${post.id}/`, Astro.
       <img
         src={post.data.cover}
         alt={post.data.title}
-        class="mt-8 aspect-[2/1] w-full rounded-[10px] border border-border object-cover shadow-[var(--card-shadow)]"
+        class="mt-8 aspect-[2/1] w-full rounded-[10px] border border-border object-cover shadow-[none]"
         loading="eager"
       />
     )}

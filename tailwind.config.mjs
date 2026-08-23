@@ -6,32 +6,23 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Semantic Swiss Terminal tokens (mapped to CSS vars)
-        bg: 'var(--bg)',
-        surface: 'var(--surface)',
-        'surface-2': 'var(--surface-2)',
-        text: 'var(--text)',
-        heading: 'var(--heading)',
-        muted: 'var(--muted)',
-        accent: 'var(--accent)',
-        'accent-contrast': 'var(--accent-contrast)',
-        border: 'var(--border-color)',
-        ring: 'var(--accent)',
-        'heading-hi': 'var(--heading-hi)',
-        rule: 'var(--rule)',
-        'rule-hi': 'var(--rule-hi)',
-        'card-fill': 'var(--card-fill)',
-        'card-edge': 'var(--card-edge)',
-        'card-edge-hi': 'var(--card-edge-hi)',
-        /* Spectral ramp. One hue, one job — see globals.css. Reach for the
-           semantic name (accent, heading) first; these are for the jobs that
-           have no semantic token: syntax, tags, metrics. */
-        'spectral-ob': 'var(--spectral-ob)',
-        'spectral-a': 'var(--spectral-a)',
-        'spectral-f': 'var(--spectral-f)',
-        'spectral-g': 'var(--spectral-g)',
-        'spectral-k': 'var(--spectral-k)',
-        'spectral-m': 'var(--spectral-m)',
+        /* One Dark Vivid, literal. Thirteen values, no var() indirection and no
+           derived shades — the same thirteen globals.css declares. If a colour is
+           not on this list it does not belong in the UI. */
+        bg: '#1E222A',
+        surface: '#282C34',
+        elevated: '#2C323C',
+        border: '#3E4451',
+        heading: '#E6E6E6',
+        text: '#ABB2BF',
+        muted: '#636D7E',
+        accent: '#61AFEF',
+        cyan: '#56B6C2',
+        green: '#98C379',
+        purple: '#C678DD',
+        orange: '#E5C07B',
+        red: '#E06C75',
+        ring: '#61AFEF',
       },
       transitionDuration: {
         tap: '120ms',

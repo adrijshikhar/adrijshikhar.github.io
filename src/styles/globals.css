@@ -33,120 +33,40 @@
    ========================================================================== */
 
 :root {
-  /* SUBSTRATE — One Dark Vivid, used exactly as supplied. Three values, three
-     planes, no fourth invented:
-       Background #1E222A  the page ground
-       Surface    #282C34  panels, cards and the code pane  (+4.8 L*)
-       Elevated   #2C323C  card hover only                  (+2.7 L*)
-     KNOWN COST, accepted deliberately: the canvas draws light marks on the page
-     ground, and at L* 13.2 a graticule stroke only reaches 2.59:1 against it, so
-     the sky reads flatter than it does on a near-black substrate (3.10:1 at
-     L* 4.6). Deepening the ground was tried and rejected — it lifted the
-     card-to-ground step from the supplied +4.8 L* to +13.3, which made cards pop
-     about three times harder than the palette intends. Palette fidelity won.
-     Do not "fix" the sky by darkening --bg without raising that decision again. */
-  --bg:        #1E222A;              /* their Background  L* 13.2 */
-  --surface:   #282C34;              /* their Surface     L* 17.9, dL* +4.8 */
-  --surface-2: #282C34;              /* their Surface — the code pane sits here */
+  /* ==========================================================================
+     ONE DARK VIVID — the thirteen values, flat. Nothing derived, nothing mixed.
+     Every colour in this file is one of these vars; there is no second layer of
+     aliases and no color-mix() anywhere. Tailwind reads the same thirteen from
+     tailwind.config.mjs, so a utility class and a hand-written rule cannot drift.
+     ========================================================================== */
+  --bg:        #1E222A;   /* Background      page ground                        */
+  --surface:   #282C34;   /* Surface         panels, cards, code pane           */
+  --elevated:  #2C323C;   /* Elevated        card hover                         */
+  --border:    #3E4451;   /* Border          rules, hairlines, card edges       */
+  --heading:   #E6E6E6;   /* Primary Text    headings, bright stars             */
+  --text:      #ABB2BF;   /* Secondary Text  body copy, code ink                */
+  --muted:     #636D7E;   /* Muted Text      labels, tags, comments             */
+  --accent:    #61AFEF;   /* Blue            links, active nav, code functions  */
+  --cyan:      #56B6C2;   /* Cyan            code types                         */
+  --green:     #98C379;   /* Green           code strings                       */
+  --purple:    #C678DD;   /* Purple          code keywords                      */
+  --orange:    #E5C07B;   /* Orange          dates, metrics, the Sun, numerics  */
+  --red:       #E06C75;   /* Red             errors, M-class stars              */
 
-  /* One temperature: every substrate token is cool, so the neutrals are cool too. */
-  --heading:   #E6E6E6;              /* Primary Text    10.33:1 worst of four surfaces */
-  --heading-hi:#E6E6E6;              /* emphasis above heading */
-  --text:      #ABB2BF;              /* Secondary Text   6.05:1 worst */
-  --muted:     #636D7E;              /* their Muted Text, verbatim. KNOWN: 3.05:1 on the ground and
-                                        2.47:1 on the lightest surface, so it is BELOW WCAG AA for
-                                        text. That is a property of the palette — One Dark sets
-                                        de-emphasised text and comments under the bar by design —
-                                        and it is used as given at the palette owner's direction.
-                                        Do not "fix" it by lifting the value. */
-
-  --border: 62 68 81;                   /* their Border #3E4451 as channels, for
-                                           rgb(var(--border) / a) hairlines */
-  --border-color: #3E4451;
-  --hairline:     #3E4451;
-  --rule:         #3E4451;              /* supplied Border. Minor hairline, 1.63:1 on the ground */
-  --rule-hi:      #636D7E;              /* supplied Muted, used where it belongs: 3.05:1 on the
-                                           ground, a major-rule value. Non-text, so 4.5 does not
-                                           apply to it. */
-
-  /* Card plane and its own edges, measured against the card fill rather than the
-     ground — --rule is 1.43:1 on a lifted card, which is why the card carries an
-     edge token of its own. Hover LIFTS: L* 17.9 -> 20.6. */
-  --card-fill:    #282C34;              /* their Surface   L* 17.9, dL* +4.8 above the ground */
-  --card-fill-hi: #2C323C;              /* their Elevated  L* 20.6, dL* +2.7 above rest */
-  --card-edge:    #3E4451;              /* 1.43:1 on the fill — present but quiet at rest */
-  --card-edge-hi: #636D7E;              /* 2.55:1 on the fill — the hover promotion */
-
-  /* Spectral ramp — one hue, one job. Do not reuse a hue for a second job.
-     These tokens also colour the canvas, so the ramp has to stay astronomically
-     true: SkyField reads them for star and body colour, and a green K-class star
-     would be a false statement about the render. That constraint is what fixes
-     the mapping below — O/B blue, A blue-white, F white, G yellow (the Sun's
-     class), K orange, M red — and it is why One Dark's green and purple are NOT
-     deployed: neither corresponds to a stellar class, and there is no second job
-     for them. Worst ratio is across all four surfaces. */
-  --spectral-ob: #61AFEF;              /* links, active nav, keywords   5.46:1 */
-  --spectral-a:  #56B6C2;              /* types in the code pane ONLY. Cyan is a green-leaning
-                                          teal (hue 187) and reads as green at small mono caps, so
-                                          like Green it is kept off the UI surfaces. */
-  --spectral-f:  #E6E6E6;              /* headings, bright stars       10.33:1 */
-  --spectral-g:  #E5C07B;              /* data tags, dates and metrics, the Sun. Their Orange. */
-  --spectral-k:  #98C379;              /* strings in the code pane ONLY. Kept out of the UI: it is
-                                          the loudest hue here against a cool grey ground, and any UI
-                                          role repeats per card, which reads as a green cast. NOTE: no
-                                          star reads this token — the canvas uses A for planets, G
-                                          for the Sun and F for bright stars — so unlike those
-                                          three, K carries no astronomical claim and green here
-                                          says nothing false about the sky. */
-  --spectral-m:  #E06C75;              /* errors ONLY, and M-class stars on the canvas. Verbatim:
-                                          4.38:1 on the code pane, which is under AA for text. Same
-                                          call as --muted — the palette's value wins. */
-
-  /* The accent IS O/B. One hue for links and active nav, never more. */
-  --accent: var(--spectral-ob);
-  --accent-contrast: #1E222A;           /* 6.75:1 against the accent fill */
-
-  /* One shape system: --radius 2px, shared by cards, inputs and buttons. Shadows
-     stay off; a card is defined by its border and its fill, not by floating. */
-  --card-core:  var(--surface);
+  /* Shape and motion. Flat: One Dark has no elevation shadows, so a card is its
+     fill plus its border, nothing more. */
   --card-radius: 2px;
-  --card-shadow: 0 1px 2px rgb(12 14 17 / .5), 0 12px 32px -10px rgb(12 14 17 / .6);
-
-  /* Motion: four durations, one per interaction class. ONE element gets ONE
-     duration across all its animated properties; a second duration on the same
-     element makes it resolve in two visible stages. */
-  --dur-tap:   0.12s;                   /* colour-only feedback */
-  --dur-hover: 0.22s;                   /* hover, cursor ring */
-  --dur-ui:    0.3s;                    /* toggles, discrete state */
-  --dur-view:  0.5s;                    /* full-view crossfades only */
+  --radius: 0px;
+  --dur-tap:   0.12s;
+  --dur-hover: 0.22s;
+  --dur-ui:    0.3s;
+  --dur-view:  0.5s;
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);  /* sky drag-release ONLY */
   --ease-out: cubic-bezier(.32, .72, 0, 1);
 
-  /* Typography — three voices, no fourth. Space Grotesk display, Familjen
-     Grotesk prose, IBM Plex Mono for every piece of data (11px is the floor).
-     Space Grotesk stays OUT of body copy: its straight-tailed single-storey y
-     reads as noise at paragraph length. Familjen ships wght 400-700, so never
-     reach for font-light or font-thin; they silently render at 400. */
   --font-heading: 'Space Grotesk Variable', system-ui, sans-serif;
   --font-sans:    'Familjen Grotesk Variable', system-ui, sans-serif;
   --font-mono:    'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-
-  /* shadcn token bridge (kept for ui/* components) */
-  --radius: 0px;
-  --background: 220 17% 14%;
-  --foreground: 219 14% 71%;
-  --card: 220 13% 18%;
-  --card-foreground: 219 14% 71%;
-  --popover: 220 13% 18%;
-  --popover-foreground: 219 14% 71%;
-  --primary: 219 14% 71%;
-  --primary-foreground: 220 17% 14%;
-  --secondary: 220 13% 18%;
-  --secondary-foreground: 219 14% 71%;
-  --muted-fg: 218 11% 62%;
-  --destructive: 355 65% 65%;
-  --input: 0 0% 100% / 12%;
-  --ring: var(--accent);
 }
 
 /* --accent-contrast is a substrate value (dark) — the accent is a saturated mid-tone,
@@ -242,7 +162,7 @@
 
   ::selection {
     /* subtle accent-tint highlight; keep text at --heading so it stays high-contrast in both modes */
-    background: color-mix(in srgb, var(--accent) 30%, transparent);
+    background: var(--accent);
     color: var(--heading);
   }
 
@@ -254,17 +174,17 @@
   }
 
   * {
-    border-color: var(--border-color);
+    border-color: var(--border);
   }
 
   /* Custom selection-marker scrollbar — subtle terminal feel */
   ::-webkit-scrollbar { width: 10px; height: 10px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb {
-    background: var(--surface-2);
+    background: var(--surface);
     border: 2px solid var(--bg);
   }
-  ::-webkit-scrollbar-thumb:hover { background: rgb(var(--border) / 0.28); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
 }
 
 @layer components {
@@ -303,7 +223,7 @@
     font-weight: 600;
     line-height: 1.3;
     letter-spacing: -0.015em;
-    color: var(--heading-hi);
+    color: var(--heading);
   }
 
   .label-data {
@@ -328,7 +248,7 @@
        the way down a list, so whatever hue it takes becomes the page's cast.
        A date is a numeric datum, which is the job the ramp gives G/Orange;
        Green stays on the language tags and on strings in the code pane. */
-    color: var(--spectral-g);
+    color: var(--orange);
     font-variant-numeric: tabular-nums;
   }
   .meta-data--muted { color: var(--muted); }
@@ -344,7 +264,7 @@
     text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 0.25em;
-    text-decoration-color: var(--rule-hi);
+    text-decoration-color: var(--muted);
   }
   .link-back:hover { color: var(--accent); opacity: 1; }
 
@@ -359,7 +279,7 @@
     content: '';
     flex: 1;
     height: 1px;
-    background: var(--rule);
+    background: var(--border);
   }
 
   /* C-style soft pill button */
@@ -369,7 +289,7 @@
     gap: 0.5rem;
     border-radius: 0;
     background: transparent;
-    box-shadow: inset 0 0 0 1px var(--rule-hi);
+    box-shadow: inset 0 0 0 1px var(--muted);
     padding: 0.5rem 1rem;
     font-family: var(--font-mono);
     font-size: 0.6875rem;
@@ -380,7 +300,7 @@
     transition: background-color var(--dur-hover) var(--ease-out),
                 box-shadow var(--dur-hover) var(--ease-out);
   }
-  .atelier-btn:hover { background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule-hi); }
+  .atelier-btn:hover { background: var(--surface); box-shadow: inset 0 0 0 1px var(--muted); }
   @media (prefers-reduced-motion: reduce) { .atelier-btn:hover { transform: none; } }
 
   /* Card plane. OPAQUE, and that costs nothing now: the sky keep-out already
@@ -395,16 +315,16 @@
   .atelier-card {
     position: relative;
     border-radius: var(--radius);
-    background: var(--card-fill);
-    box-shadow: inset 0 0 0 1px var(--card-edge), var(--card-shadow);
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--border), none;
     transition: background-color var(--dur-hover) var(--ease-out),
                 box-shadow var(--dur-hover) var(--ease-out);
   }
   @media (min-width: 1024px) {
     .group\/list-item:hover .atelier-card,
     .atelier-card:hover {
-      background: var(--card-fill-hi);
-      box-shadow: inset 0 0 0 1px var(--card-edge-hi), var(--card-shadow);
+      background: var(--elevated);
+      box-shadow: inset 0 0 0 1px var(--muted), none;
     }
   }
   @media (prefers-reduced-motion: reduce) {
@@ -460,9 +380,9 @@
    card/button language instead of a flat default <pre>. */
 .prose pre.astro-code {
   border-radius: var(--card-radius, 10px);
-  border: 1px solid rgb(var(--border) / 0.14);
-  border-top: 2px solid color-mix(in srgb, var(--accent) 85%, transparent);
-  box-shadow: var(--card-shadow);
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--accent);
+  box-shadow: none;
   margin: 1.75rem 0;
   padding: 1.15rem 1.3rem;
   overflow-x: hidden;
@@ -481,7 +401,7 @@
    colour outside the palette (rgb 45 54 67), so it is gone — the chip is Surface. */
 .prose :not(pre) > code {
   border-radius: 5px;
-  border: 1px solid rgb(var(--border) / 0.14);
+  border: 1px solid var(--border);
   background: var(--surface);
   color: var(--heading);
 }
@@ -602,7 +522,7 @@ body.spinning * {
     width: 26px;
     height: 26px;
     margin: -13px 0 0 -13px;
-    border: 1px solid color-mix(in oklab, var(--muted) 70%, transparent);
+    border: 1px solid var(--muted);
     transition:
       --ring-s 0.22s var(--ease-out),
       border-color 0.22s var(--ease-out);
@@ -664,7 +584,7 @@ body.spinning * {
     position: absolute;
     width: 18px;
     height: 18px;
-    border: 0 solid var(--rule-hi);
+    border: 0 solid var(--muted);
     opacity: 0.55;
   }
   .viewfinder i:nth-child(1) { top: 14px; left: 14px; border-top-width: 1px; border-left-width: 1px; }
@@ -682,7 +602,7 @@ body.spinning * {
     width: min(46vw, 520px);
     height: 6px;
     opacity: 0.4;
-    background: repeating-linear-gradient(90deg, var(--rule-hi) 0 1px, transparent 1px 100%) 0 0 / 26px 100%;
+    background: repeating-linear-gradient(90deg, var(--muted) 0 1px, transparent 1px 100%) 0 0 / 26px 100%;
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 22%, #000 78%, transparent);
     mask-image: linear-gradient(90deg, transparent, #000 22%, #000 78%, transparent);
   }
@@ -750,8 +670,8 @@ body.spinning * {
   .chrome-panel {
     display: flex;
     align-items: stretch;
-    border: 1px solid var(--rule);
-    background: color-mix(in srgb, var(--surface) 88%, transparent);
+    border: 1px solid var(--border);
+    background: var(--surface);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     font-family: var(--font-mono);
@@ -781,7 +701,7 @@ body.spinning * {
       border-color 0.22s var(--ease-out);
   }
   .chrome-seg:hover { color: var(--heading); }
-  .chrome-panel > .chrome-seg + .chrome-seg { border-left: 1px solid var(--rule); }
+  .chrome-panel > .chrome-seg + .chrome-seg { border-left: 1px solid var(--border); }
 
   /* Selection is the bracket pair alone — no box. The panel already draws a
      rectangle, so a second one around the active item read as a doubled
@@ -804,17 +724,17 @@ body.spinning * {
   .chrome-group {
     display: flex;
     align-items: stretch;
-    border-bottom: 1px solid var(--rule);
+    border-bottom: 1px solid var(--border);
   }
   .chrome-group:last-child { border-bottom: 0; }
-  .chrome-group .chrome-seg + .chrome-seg { border-left: 1px solid var(--rule); }
+  .chrome-group .chrome-seg + .chrome-seg { border-left: 1px solid var(--border); }
 
   .chrome-status {
     display: flex;
     flex-direction: column;
     gap: 0.15rem;
     padding: 0.45rem 0.6rem;
-    border-bottom: 1px solid var(--rule);
+    border-bottom: 1px solid var(--border);
     line-height: 1.5;
     text-align: left;
   }
@@ -839,7 +759,7 @@ body.spinning * {
     position: relative;
     width: 1px;
     height: 2.4rem;
-    background: var(--rule);
+    background: var(--border);
     overflow: hidden;
   }
   .scroll-cue-rail::after {
@@ -878,7 +798,7 @@ body.spinning * {
     transition: opacity 0.5s var(--ease-out);
   }
   .expo-cell {
-    border: 1px solid var(--rule);
+    border: 1px solid var(--border);
     padding: 0.2rem 0.55rem;
     font-family: var(--font-mono);
     font-size: 0.6875rem;            /* 11px: the mono floor. Was 9px. */
@@ -976,12 +896,12 @@ body.spinning * {
     transform: translateY(-120%);
     padding: 0.75rem 1rem;
     background: var(--surface);
-    color: var(--heading-hi);
+    color: var(--heading);
     font-family: var(--font-mono);
     font-size: 0.6875rem;
     text-transform: uppercase;
     letter-spacing: 0.14em;
-    box-shadow: inset 0 0 0 1px var(--rule-hi);
+    box-shadow: inset 0 0 0 1px var(--muted);
     transition: transform var(--dur-ui) var(--ease-out);
   }
   .skip-link:focus-visible {
@@ -1052,3 +972,45 @@ body.spinning * {
   text-underline-offset: 0.2em;
 }
 .prose :is(h1, h2, h3, h4) a { text-decoration: none; }
+
+/* Tailwind Typography ships its own grey ramp in --tw-prose-* and those greys are
+   the last non-palette colours in the build. Every one is pinned to the thirteen
+   here (both the base and the -invert set) so the plugin's defaults can never
+   paint. */
+.prose,
+.prose-invert {
+  --tw-prose-body: var(--text);
+  --tw-prose-headings: var(--heading);
+  --tw-prose-lead: var(--text);
+  --tw-prose-links: var(--accent);
+  --tw-prose-bold: var(--heading);
+  --tw-prose-counters: var(--muted);
+  --tw-prose-bullets: var(--border);
+  --tw-prose-hr: var(--border);
+  --tw-prose-quotes: var(--text);
+  --tw-prose-quote-borders: var(--accent);
+  --tw-prose-captions: var(--muted);
+  --tw-prose-kbd: var(--heading);
+  --tw-prose-code: var(--heading);
+  --tw-prose-pre-code: var(--text);
+  --tw-prose-pre-bg: var(--surface);
+  --tw-prose-th-borders: var(--border);
+  --tw-prose-td-borders: var(--border);
+  --tw-prose-invert-body: var(--text);
+  --tw-prose-invert-headings: var(--heading);
+  --tw-prose-invert-lead: var(--text);
+  --tw-prose-invert-links: var(--accent);
+  --tw-prose-invert-bold: var(--heading);
+  --tw-prose-invert-counters: var(--muted);
+  --tw-prose-invert-bullets: var(--border);
+  --tw-prose-invert-hr: var(--border);
+  --tw-prose-invert-quotes: var(--text);
+  --tw-prose-invert-quote-borders: var(--accent);
+  --tw-prose-invert-captions: var(--muted);
+  --tw-prose-invert-kbd: var(--heading);
+  --tw-prose-invert-code: var(--heading);
+  --tw-prose-invert-pre-code: var(--text);
+  --tw-prose-invert-pre-bg: var(--surface);
+  --tw-prose-invert-th-borders: var(--border);
+  --tw-prose-invert-td-borders: var(--border);
+}
