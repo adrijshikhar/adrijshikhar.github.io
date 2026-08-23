@@ -65,5 +65,5 @@ html.machine-boot .machine-view {
 .machine-pre .mk-h1 { color: var(--spectral-f); font-weight: 500; }
 .machine-pre .mk-h2 { color: var(--spectral-g); }
 .machine-pre .mk-h3 { color: var(--spectral-a); }
-.machine-pre .mk-mark { color: var(--spectral-k); }
+.machine-pre .mk-mark { color: var(--spectral-g); }
 .machine-pre .mk-rule { color: var(--rule-hi); }

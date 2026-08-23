@@ -390,7 +390,8 @@ export default function SkyField({ mode }: SkyFieldProps) {
         bright: light ? ink : '#E6E6E6',   // F · Primary Text
         moonLit: light ? ink : '#ABB2BF',  // Secondary: the Moon is grey, not warm
         moonGlow: light ? fade(ink, 0.1) : 'rgba(230,230,230,0.10)',
-        planet: light ? ink : '#56B6C2',   // A · the hue that owns planets and infra tags
+        planet: light ? ink : '#ABB2BF',   // Secondary Text. Cyan reads as teal at label
+                                          // size, so the planets stay neutral like the Moon.
         sun: light ? ink : '#E5C07B',      // G · the Sun's real spectral class, so this is
                                           // the one body whose colour is a physical claim
         // Faint field is dimmer still in light mode: dark marks compete with

@@ -86,10 +86,14 @@
      deployed: neither corresponds to a stellar class, and there is no second job
      for them. Worst ratio is across all four surfaces. */
   --spectral-ob: #61AFEF;              /* links, active nav, keywords   5.46:1 */
-  --spectral-a:  #56B6C2;              /* types, infra tags, planets    5.44:1 */
+  --spectral-a:  #56B6C2;              /* types in the code pane ONLY. Cyan is a green-leaning
+                                          teal (hue 187) and reads as green at small mono caps, so
+                                          like Green it is kept off the UI surfaces. */
   --spectral-f:  #E6E6E6;              /* headings, bright stars       10.33:1 */
   --spectral-g:  #E5C07B;              /* data tags, dates and metrics, the Sun. Their Orange. */
-  --spectral-k:  #98C379;              /* language tags only, plus strings in the code pane. NOTE: no
+  --spectral-k:  #98C379;              /* strings in the code pane ONLY. Kept out of the UI: it is
+                                          the loudest hue here against a cool grey ground, and any UI
+                                          role repeats per card, which reads as a green cast. NOTE: no
                                           star reads this token — the canvas uses A for planets, G
                                           for the Sun and F for bright stars — so unlike those
                                           three, K carries no astronomical claim and green here
