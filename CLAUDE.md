@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-Personal portfolio + blog. Astro 6 static site with React 19 interactive islands, Tailwind 3 (**stock palette only** — `tailwind.config.mjs` declares no `colors` key), MDX. shadcn/ui was removed: four of its five components had zero imports, and its semantic token layer (`--background`, `--primary`, `--destructive`) is exactly the custom-palette indirection this design no longer has. `ViewToggle` uses the `@base-ui/react` Toggle primitive directly. Design is **"Terminal Atelier"** — dark-default with a light mode, an accent-tinted card system, and a warm-gold ambient aurora.
+Personal portfolio + blog. Astro 6 static site with React 19 interactive islands, Tailwind 4 (CSS-first: the theme lives in `globals.css` under `@theme inline`, there is no `tailwind.config.mjs`) and shadcn/ui. MDX for posts. Colour is shadcn's default theme, `neutral` base, dark only — the full `:root`/`.dark` oklch token pair, unmodified. Design is an **observatory instrument**: a near-black ground with real computed astronomy behind the content.
 
 ## Toolchain & commands
 
@@ -41,7 +41,7 @@ bun run verify:legibility                            # terminal 3 (--all, --json
 
 It reports `exposed/sampled` per route: text with an **opaque** ancestor between it and the
 canvas cannot be harmed, so only unshielded text can fail. That split is diagnostic in its
-own right. Every route except `/` now reports `0/n exposed`, because the Spectral work moved
+own right. Every route except `/` now reports `0/n exposed`, because the redesign moved
 the legibility shield up from the individual rows to the reading column (`.reading-plane` /
 `.content-plane` in `globals.css`) — rows are rules with no fill, so the plane has to live
 one level up or canvas ink lands under the prose. `/` stays intentionally exposed at
@@ -82,22 +82,30 @@ The site reads content two different ways — keep them separate:
 
 Don't migrate the resume `.md` files into the collection — the isolation is intentional.
 
-## Theming (CSS-variable tokens)
+## Theming
 
-`src/styles/globals.css` defines all design tokens as CSS variables on `:root`.
-`:root[data-mode="light"]` overrides the foundation (+ accent, + aurora) tokens for light
-mode, re-tuned to hold AA contrast. There is a single accent — no per-theme token sets.
+Dark only. `<html>` carries `.dark`, and `src/styles/globals.css` holds shadcn's default
+token pair — `:root` for light, `.dark` for dark — verbatim from ui.shadcn.com. `@theme
+inline` maps those tokens to Tailwind utilities, which is what replaced
+`tailwind.config.mjs` in v4.
 
-Light/dark **defaults to the system preference** (`prefers-color-scheme`) until the user makes
-an explicit choice; `ModeToggle.tsx` persists `mode` to `localStorage` (explicit choice wins)
-and follows live OS changes while unset. A **no-FOUC inline head script** in `BaseLayout.astro`
-sets `data-mode` before first paint; `?mode=light|dark` is a URL override. Mode
-swaps are made atomic via a one-frame `.mode-switching { transition: none }` class to avoid
-gradient/heading flicker. Tailwind color utilities map to these vars in `tailwind.config.mjs`,
-so prefer token classes (`bg-surface`, `text-muted`, `border-border`) over raw colors.
+**Do not invent colours.** Every colour is a shadcn token: `background`, `card`, `popover`,
+`primary`, `secondary`, `muted`, `accent`, `destructive`, `border`, `input`, `ring`, plus
+their `-foreground` pairs. Use the token classes (`bg-card`, `text-muted-foreground`,
+`border-border`), not raw values.
 
-Gotcha: Tailwind's `/opacity` modifier does **not** compile against CSS-var colors
-(`bg-foo/70` renders invisible) — use solid token colors.
+**The trap that has cost real time here:** in shadcn, a token WITHOUT `-foreground` is a
+SURFACE. `--accent` and `--muted` are backgrounds — both `oklch(0.269 0 0)` in dark, near
+black. Their ink counterparts are `--primary` and `--muted-foreground`. Feeding `--accent`
+to the canvas painted the sky readout near-black on near-black; using `bg-accent` for a
+button hover painted near-white on near-white text. If a colour looks invisible, check
+whether a surface token is being used as ink.
+
+No `color-mix()`, no fractional `opacity` for dimming, and no derived shades: reach for a
+dimmer token instead. `opacity: 0` / `1` for show-hide is fine.
+
+Gotcha: Tailwind's `/opacity` modifier does **not** compile against CSS-var colours
+(`bg-foo/70` renders invisible) — use solid token colours.
 
 ## Typography (component classes, not utility strings)
 
@@ -130,28 +138,50 @@ The sky is real computed astronomy, and that is the design's entire argument. Ev
 the chrome therefore has to be a true statement about the render, not camera-flavoured
 decoration. The reference mock's `[ISO 200] [f/3.5] [1/160]` were deliberately **not** built.
 
-The top-centre `.expo` cluster shows `ALT +90…−35°` (the projection's real altitude span, from
-`FLOOR` in `projection.ts`), `STARS 96` (`STARS.length`), and a live Julian Date — which is the
-actual input to every position on screen.
+The top-centre `.expo` strip shows `ALT +90…−35°` (the projection's real altitude span, from
+`FLOOR` in `projection.ts`), a live star count, a live Julian Date (the actual input to every
+position on screen) and local sidereal time. Below `sm` only `ALT` is shown — three cells do
+not fit a phone, and a bare Julian Date is the least self-explanatory value in the chrome.
 
-`STARS n` is a **count**, and since the procedural faint field was removed it is now the
-whole truth: every dot on the canvas is a catalogued object, so there is nothing drawn below
-the catalogue's mag 3.35 floor. That makes a `MAG 3.35` label defensible for the first time —
-but it is still a different claim from a count, so if you add one, add it alongside, and
-re-check it against `STARS.length` rather than replacing the count with it.
+`STARS n` is a **count of what is drawn, not of the catalogue**, and it has to stay that way.
+The ambient sky draws constellation members only — 59 of 96 — and the `[dark sky]` toggle
+inside orbital mechanics reveals the other 37. The readout switches 59 ↔ 96 with it. Anything
+that changes which stars are painted must update this number in the same commit.
 
-The faint field (`FAINT_FIELD` in `render.ts`) is an intentionally empty export, not dead
-code: the draw loops and `computeSky` signature still handle it, so dropping a real faint
-catalogue in there works with no other change. What it must not go back to is 420 procedural
-dots that cannot be hovered or named — on an instrument arguing every mark is a true
-statement, those were the one decorative element, and at 1px they read as dust on the display.
+Suppressed stars are **flagged** (`BodyPos.suppressed`), never filtered out of the array.
+`game.sync()` pairs `bodies[i]` with `game.stars[i]` positionally and `hoverIndex` is an index
+into the same array, so removing entries misaligns both silently. `nearestBody()` returns −1
+for a suppressed star, or the hover readout would name something that is not on screen.
 
-The corner readouts are the same contract. Top-left carries `SUN` (the altitude
-driving the twilight glow, plus its standard band), `MOON` (the illuminated
-fraction the terminator is drawn from) and `PLANETS` (a live count) — all read
-off the frame the canvas just painted, so they cannot drift from it. Bottom-left
-carries the observer. **Animation runs on anime.js** (`src/lib/motion.ts`
-re-exports it) — not hand-rolled `performance.now()` loops.
+Star size and alpha come from `vrFor` and `starAlpha` in `render.ts`. Two things learned the
+hard way: the alpha ramp reaching zero before the catalogue's faint end (3.35) is what made
+46% of the field invisible; and widening that ramp rather than just lifting its floor is what
+made the field look crowded — it doubled the pixels above alpha 110. Lift the floor, leave the
+slope.
+
+`FAINT_FIELD` in `render.ts` is an intentionally empty export, not dead code: the draw loops
+and `computeSky` signature still handle it, so dropping a real faint catalogue in there works
+with no other change. What it must not go back to is procedural dots that cannot be hovered or
+named.
+
+The corner readouts are the same contract. Top-left carries `SUN` (its altitude plus the
+standard twilight band), `MOON` (the illuminated fraction the terminator is drawn from) and
+`PLANETS` (a live count) — all read off the frame the canvas just painted, so they cannot
+drift from it. Bottom-left carries the observer, sidereal time and the source of the
+coordinates. Note the twilight glow itself no longer exists; `SUN` reports the altitude for
+its own sake.
+
+`design/exports-spectral/05-chrome-inventory.png` is the design's own audit of all fourteen
+readouts, with a KEEP / MOVE / CUT verdict and a reason for each. Consult it before adding or
+removing chrome — several of the CUT verdicts are still unactioned, deliberately.
+
+**Animation runs on anime.js** (`src/lib/motion.ts` re-exports it) — not hand-rolled
+`performance.now()` loops.
+
+**Pointer affordances are gated on the input device**, not the viewport: the cursor-gravity
+wobble and the hover-to-name readout are skipped when
+`(hover: none), (pointer: coarse)` matches. On a touchscreen the wobble bends the sky toward a
+stale coordinate and the readout labels wherever the last tap landed.
 
 Only `index.astro` passes `skyMode="full"`; every other route gets `quiet`,
 which since the `drawBodies` extraction shares the *same* body renderer — so
@@ -164,6 +194,13 @@ continuous, the horizon is a heavier solid rule carrying 10°/30° ticks. Only t
 spokes stay dashed and faint** — they are the one element with no honest label, because a fixed
 frame cannot claim a bearing once travel has turned the sky. That is also why there is no
 N/E/S/W.
+
+The legibility keep-out (`applyKeepOut` in `render.ts`) erases canvas ink under the READING
+COLUMN, feathered on all four sides — not full width. It used to span the viewport, which
+erased 45% of every mark including the planet labels and the hover readout out in the empty
+margins, where there is no text to protect. `SkyField` measures the column each frame and
+passes only numbers, so `render.ts` stays DOM-blind and `scripts/verify-sky.mjs` can import it
+under Node.
 
 ## Human / Machine view toggle (a hard contract)
 
@@ -179,13 +216,29 @@ the machine view (with a no-FOUC head script), and toggling keeps the URL param 
 
 ## Layout & components
 
-`BaseLayout.astro` wraps every page: `<head>` no-FOUC scripts, the `.aurora-stage` blobs
-(warm-gold, mode-aware, behind a central readability veil), a fixed top-right `ModeToggle`, and
-the slot. Home (`index.astro`) is a two-column layout — sticky `SideNav.astro` (identity +
-scroll-spy in-page nav) on the left, scrolling `<main>` on the right. List cards (`ExpCard`,
-`ProjectCard`, `BlogCard`) share the `HoverCard.tsx` shell — the accent-tinted, soft-shadowed
-"atelier-card" with a springy hover lift (the `.atelier-card` / `.atelier-btn` classes live in
-`globals.css`).
+`BaseLayout.astro` wraps every page: the no-FOUC head script and the slot. There is no
+ambient glow and no mode toggle — the site is dark only, and a `body::before` radial
+gradient was removed because it read as a light source the sky could not account for.
+
+Home (`index.astro`) is two columns — sticky `SideRail.astro` (identity + scroll-spy nav,
+one entry per section, currently 7) on the left, scrolling `<main>` on the right.
+
+Cards are **shadcn `Card`** (`src/components/ui/`, added via the CLI — they are the upstream
+files, don't hand-edit them). `ExpCard`, `ProjectCard` and `BlogCard` compose
+`Card`/`CardHeader`/`CardTitle`/`CardDescription`/`CardContent`, with tags as `Badge`. Hover
+is a 2px lift plus a border to `--ring`.
+
+Two card details that are easy to break:
+- `CardTitle` ships `leading-none`, which collides the moment a title wraps. Every use here
+  passes `leading-snug`.
+- Preview cards (no body prose) stretch their link over the whole card with
+  `after:absolute after:inset-0`, so clicking anywhere opens it. Cards WITH prose deliberately
+  do not — an overlay would swallow links inside the body. On `ExpCard` the company link sits
+  at `z-10` to stay clickable above the overlay.
+
+Lists that hold cards use `flex flex-col gap-5` (or `grid gap-5 sm:grid-cols-2`), and cards
+must be wrapped in `<li>`. CSS columns split a shadcn `Card` across the column break, because
+`Card` is a flex container and `break-inside-avoid` does not hold on it.
 
 Pages: `/` (home preview of each section), `/experience` (full), `/archive` (2-col masonry),
 `/blogs` (list), `/blogs/[...slug]` (post), `/resume`.

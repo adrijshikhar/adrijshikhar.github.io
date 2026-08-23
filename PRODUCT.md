@@ -72,11 +72,11 @@ Two claims a neighbouring portfolio could not truthfully copy:
 - Name: **Adrij Shikhar**. Title: Senior Software Engineer.
 - Existing tagline in content: "I build scalable data platforms and craft
   software that pushes boundaries."
-- **Retained from the incumbent design, binding through any redesign:**
+- **Binding through any redesign:**
   - the background **sky** concept — a real-astronomy sky the page sits inside;
   - the **planet glyph icon set**;
-  - **light and dark mode** as a first-class pair;
-  - the **Sun's glow in dark mode**.
+  - **dark only** — there is no light mode;
+  - **no glows** — nothing on the page emits light the sky cannot account for.
 - **The rest of the incumbent visual world is explicitly open** — palette,
   typography, layout, card system, chrome treatment, and overall branding may
   be replaced. Treat the current look outside the four retained elements as
