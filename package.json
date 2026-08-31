@@ -10,7 +10,8 @@
     "verify:sky": "bun scripts/verify-sky.mjs",
     "deploy": "gh-pages -d dist -b master",
     "verify:code": "bun scripts/verify-code-theme.mjs",
-    "verify:legibility": "bun scripts/verify-legibility.mjs"
+    "verify:legibility": "bun scripts/verify-legibility.mjs",
+    "gen:resume": "node scripts/make-resume-pdf.mjs"
   },
   "devDependencies": {
     "@radix-ui/colors": "^3.0.0",

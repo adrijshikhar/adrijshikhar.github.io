@@ -41,6 +41,7 @@ export async function buildRawMarkdown(): Promise<string> {
   const about = readContent('about.md');
   const experience = readContent('experience.md');
   const projects = readContent('projects.md');
+  const skills = readContent('skills.md');
   const education = readContent('education.md');
   const achievements = readContent('achievements.md');
   const interests = readContent('interests.md');
@@ -59,6 +60,9 @@ export async function buildRawMarkdown(): Promise<string> {
     `\n---\n\n## Experience\n\n${experience.meta.entries.map((e: any) => formatExpEntry(e, expSections[e.slug] || '')).join('\n\n---\n\n')}`,
     `\n---\n\n## Projects\n\n${projects.meta.entries.map((p: any) => formatProjEntry(p, projSections[p.slug] || '')).join('\n\n---\n\n')}`,
     `\n---\n\n## Writing\n\n${latestPosts.map((post) => `- [${post.data.title}](/blogs/${post.id}/)`).join('\n') || '_No posts yet._'}`,
+    // skills.md carries its own `##` headings; demote them so they nest under
+    // this one instead of becoming siblings of the top-level sections.
+    `\n---\n\n## Skills\n\n${skills.content.trim().replace(/^## /gm, '### ')}`,
     `\n---\n\n## Education\n\n${education.meta.entries.map((e: any) => `### ${e.institution}\n\n${e.degree}${e.field ? ` — ${e.field}` : ''}`).join('\n\n')}`,
     `\n---\n\n## Achievements\n\n${achievements.content}`,
     `\n---\n\n## Interests\n\n${interests.content}`,

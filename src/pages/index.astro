@@ -1,4 +1,5 @@
 ---
+import { HERO_LEAD } from '../lib/site';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { getCollection } from 'astro:content';
@@ -93,9 +94,7 @@ const SOCIAL_ICON_PATHS = {
             <a href="/" class="no-underline">Adrij<br />Shikhar</a>
           </h1>
           <p class="mt-8 max-w-[36rem] text-[1.15rem] leading-relaxed text-foreground">
-            Senior software engineer at Hevo Data. I move data between systems that were
-            never designed to agree, and <em class="not-italic text-foreground">write down what
-            breaks on the way</em>.
+            {HERO_LEAD.body}<em class="not-italic text-foreground">{HERO_LEAD.emphasis}</em>.
           </p>
           <div class="mt-10 flex items-center gap-6">
             <ul class="flex items-center gap-6" aria-label="Social media">
