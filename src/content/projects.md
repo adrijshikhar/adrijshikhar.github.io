@@ -1,5 +1,12 @@
 ---
 entries:
+  - slug: binsight
+    title: "BinSight"
+    company: "Open Source"
+    date: "Aug 2026 - Present"
+    year: 2026
+    link: "https://github.com/adrijshikhar/binsight"
+    builtWith: ["Golang", "React", "SQLite", "MySQL", "MariaDB", "Docker"]
   - slug: scraperql
     title: "ScraperQL"
     company: "Dgraph Labs"
@@ -97,6 +104,16 @@ entries:
     year: 2018
     builtWith: ["HTML", "CSS", "JavaScript", "PHP"]
 ---
+
+<!-- binsight -->
+
+A local, read-only MySQL & MariaDB binlog viewer, analyzer, and inspector for developers.
+
+- Point it at a directory of binlog files and it produces a filterable virtualized event stream, transaction grouping, row-image diffs, hex forensics, and anomaly detection backed by a zero-config SQLite index.
+- Pluggable decode adapters (go-mysql workhorse + mysqlbinlog oracle) version-tested across MySQL 5.5–8.4 and MariaDB 10.6/11.4.
+- Anomaly detection engine flagging huge transactions, long-running transactions, bulk row events, rolled-back transactions, schema churn, and >4 GiB position wraps.
+- Live tail (fsnotify + SSE) and remote replication streaming directly from a running server as a replica.
+- Distributed as a single binary with zero runtime dependencies (pure Go, CGO_ENABLED=0), via Homebrew, Docker (GHCR), curl-sh one-liner, and `go install`.
 
 <!-- scraperql -->
 
