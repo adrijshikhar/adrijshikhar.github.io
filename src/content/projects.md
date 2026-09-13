@@ -1,12 +1,12 @@
 ---
 entries:
   - slug: binsight
-    title: "BinSight"
+    title: "Binsight"
     company: "Open Source"
     date: "Aug 2026 - Present"
     year: 2026
-    link: "https://github.com/adrijshikhar/binsight"
-    builtWith: ["Golang", "React", "SQLite", "MySQL", "MariaDB", "Docker"]
+    link: "https://binsight.adrijshikhar.dev"
+    builtWith: ["Golang", "React", "Astro", "Tailwind CSS", "SQLite", "MySQL", "MariaDB"]
   - slug: aim
     title: "aim"
     company: "Open Source"
@@ -114,7 +114,7 @@ entries:
 
 <!-- binsight -->
 
-A local, read-only MySQL & MariaDB binlog viewer, analyzer, and inspector for developers.
+A local, read-only MySQL & MariaDB binlog viewer, analyzer, and forensic inspector for developers. [Website](https://binsight.adrijshikhar.dev) · [GitHub](https://github.com/adrijshikhar/binsight).
 
 - Point it at a directory of binlog files and it produces a filterable virtualized event stream, transaction grouping, row-image diffs, hex forensics, and anomaly detection backed by a zero-config SQLite index.
 - Pluggable decode adapters (go-mysql workhorse + mysqlbinlog oracle) version-tested across MySQL 5.5–8.4 and MariaDB 10.6/11.4.
