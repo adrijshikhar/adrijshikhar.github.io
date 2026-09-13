@@ -76,45 +76,50 @@ entries:
 
 <!-- hevo-senior -->
 
-### Scalability and Performance
+### Agent-native connector development
 
-- Architected for Scale: Led key initiatives that enabled the platform to support a **2500% increase** in object handling, from 1,000 to 25,000 objects.
-- Optimized Data Ingestion: Achieved a **5x increase** in data ingestion speed within the MySQL connector, significantly boosting system efficiency and throughput.
-- Database Interaction at Scale: Engineered a metadata system that scaled the ETL platform by **15x**, allowing for massive improvements in core database interactions.
-- Source Object Generation: Optimized the source object generation flow, resulting in a **10x improvement** in pipeline performance and enabling support for larger datasets.
-- Reduced Catalog Document Size: Drove efforts to reduce the catalog document size, leading to **improved performance and scalability** across the platform.
+- Built the surface that lets LLMs generate and operate connectors: a construct library, a connector generator, an installable CLI, a skill library, and an MCP server exposing platform APIs to agents.
+- Started the internal agent-tooling platform the team now builds on — repo structure, skill conventions, CI auto-release, marketplace distribution. Other engineers extend it rather than fork it.
 
-### CDC Framework Project
+### Streamlining connector development
 
-- Ownership and Execution: Led the complete implementation of real-time CDC framework using Debezium Engine (open source) which significantly enhanced data synchronization and ensured seamless real-time updates.
-- Schema Catalog Service:
-  - Designed and built a generic schema service from scratch to manage and validate data schemas in ETL pipelines, with seamless integration and testing using Debezium connectors.
-  - Supported source-specific features, including handling unchanged toast datum from PostgreSQL and diverse data types from various data sources, ensuring flexibility across different ETL environments.
-  - Implemented schema versioning, metadata management, and compatibility checks to maintain data quality, streamline data processing, and accommodate schema evolution.
+- Made connector authentication declarative. A provider used to be its own processor inside the platform — a code change, a database migration, and coordination across three services. It is now a config file, with no platform change at all.
+- Moved runtime configuration and config templates into the connector, behind a compatibility kit that gates correctness at build time instead of in review.
+- Standardised how connector repos are created, versioned and released, behind a central BOM carrying a named release policy. Before this every connector carried its own build config and drifted.
+- Decoupled the connector fleet from the shared platform SDK, so a connector no longer inherits a runtime it does not control.
 
-### System Optimization and Security Enhancements
+### Connection reliability
 
-- Standardized Error Handling: Spearheaded the initiative to create a unified standard for HTTP and gRPC request failures across the control plane, which improved user experience and **reduced support overhead**.
-- Enhanced Security and Governance: Implemented source/destination whitelisting and played a key role in the Connectors Flag GA for Hevo 1.0.
-- REST API Security Enhancements: Enhanced the REST API connector by implementing OAuth 2.0 authorization, improving security and user management.
+- Owned the test-connection contract end to end and took its false-negative rate from **over 30% to nil in validation** — a failing check now means an actual connection problem rather than a flaky one.
+- Delivered configuration validation across every source and destination — Postgres, MySQL, Oracle, SQL Server, Snowflake, BigQuery, Redshift — so a misconfiguration surfaces at connect time rather than at first sync.
+- Brought p95 test-connection latency **under 10 seconds**, and shipped an end-to-end suite alongside each framework rather than leaving the contract unit-tested.
 
-### Feature Development and Integrations
+### Failure visibility
 
-- Led the implementation of several new features including Session Logs, YML template support, advanced scheduler with Cron support, and Terraform integration.
-- Spearheaded the development and launch of the SurveyMonkey connector, contributing to the expansion of Hevo's connector ecosystem.
+- Replaced static error classification with a dynamic system. A classification change used to wait on a connector's full release cycle; it now takes **minutes instead of 3–7 days**.
+- Root-caused a class of production hangs to the regex engine rather than the queries being run, and migrated classification to RE2J — which bounds worst-case evaluation to **under five seconds** and took a load run from a multi-minute stall to **1m19s**.
+- Built metrics and dashboards for connection health, and put HTTP client metrics into the connector construct library so teams see a rate-limiting API before it becomes a sync failure.
 
-### Critical Customer Issue Resolution
+### Data correctness at scale
 
-- Managed and resolved several complex customer issues for key clients, **significantly improving customer satisfaction**.
+- Delivered SCD Type 2 history mode across Snowflake, BigQuery and Redshift, handling the per-destination SQL differences — Redshift has no `MERGE` and needs a four-statement path.
+- Built parent-child object handling with inferred deletes, giving full-load objects the delete support they previously lacked.
+- Implemented real-time CDC on the Debezium engine, and built the schema catalog service behind it from scratch — schema versioning, metadata management and compatibility checks, so a pipeline survives schema evolution.
+- Scaled object handling from **1,000 to 25,000 objects**, with a **5x** gain in MySQL ingestion throughput.
+- Moved every source and destination onto negotiated TLS 1.2 and 1.3, and proved it safe across providers with a dedicated SSL test suite.
 
-### Innovative System Enhancements
+### Engineering velocity
 
-- Real-time Logs Implementation: Implemented data governance tool to handle PII redaction in near real-time using AWS S3 and AWS Comprehend, ensuring data privacy and enhancing user experience.
-- Microservices and Task Execution: Worked on integrating a microservices architecture on AWS Fargate and implemented a Temporal-based task execution system, improving reliability and streamlining hierarchical DAG processes.
+- Cut build and CI runtime with measured before and after: `mvn clean verify` **31:43 → 10:33** and CI **43:32 → 21:24** on the first service, then **11:07 → 5:15** and **5:14 → 2:01** as the approach was adopted elsewhere.
+- Ran controlled configuration sweeps against a 90-day baseline rather than tuning by feel, and published the before/after pipelines including the configurations that regressed.
+- Built the unified CLI and local development platform — one command, three modes, profiling, a metrics pipeline — so the team runs the stack locally instead of queueing for shared environments.
 
-### Team Contribution and Documentation
+### Earlier platform work
 
-- Regularly contributed to improving documentation quality and conducted knowledge transfer sessions, fostering team collaboration.
+- Implemented near-real-time PII redaction for data governance, on S3 and AWS Comprehend.
+- Integrated a microservices architecture on AWS Fargate and a Temporal-based task execution system for hierarchical DAG processing.
+- Shipped session logs, YAML pipeline templates, a Cron-based scheduler and Terraform support, and launched the SurveyMonkey connector.
+- Unified how HTTP and gRPC failures are reported across the control plane, cutting support overhead.
 
 <!-- hevo-intern -->
 

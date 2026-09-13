@@ -1,5 +1,12 @@
 ---
 entries:
+  - slug: catalyst
+    title: "Catalyst"
+    company: "Open source"
+    date: "May 2026"
+    year: 2026
+    link: "https://github.com/adrijshikhar/catalyst"
+    builtWith: ["Claude Code", "Agent Skills", "Shell"]
   - slug: binsight
     title: "Binsight"
     company: "Open Source"
@@ -14,6 +21,26 @@ entries:
     year: 2026
     link: "https://github.com/adrijshikhar/aim"
     builtWith: ["Golang", "Bubble Tea", "CLI", "TUI", "Homebrew"]
+  - slug: resume-ops
+    title: "resume-ops"
+    company: "Personal"
+    date: "May 2026"
+    year: 2026
+    builtWith: ["Claude Code", "Agent Skills", "GitHub API", "Jira API"]
+  - slug: retry-thread-pool
+    title: "Retry Thread Pool"
+    company: "Maven Central"
+    date: "Jun 2026"
+    year: 2026
+    link: "https://central.sonatype.com/artifact/io.github.adrijshikhar/retry-thread-pool"
+    builtWith: ["Java 17", "Concurrency", "Maven Central"]
+  - slug: observatory
+    title: "adrijshikhar.dev"
+    company: "Personal"
+    date: "Aug 2026 - Present"
+    year: 2026
+    link: "https://github.com/adrijshikhar/adrijshikhar.github.io"
+    builtWith: ["Astro", "React", "Canvas", "Tailwind"]
   - slug: scraperql
     title: "ScraperQL"
     company: "Dgraph Labs"
@@ -112,6 +139,13 @@ entries:
     builtWith: ["HTML", "CSS", "JavaScript", "PHP"]
 ---
 
+<!-- catalyst -->
+
+Harness engineering for Claude Code — skills that turn the model into a long-running, reliable system. Named after the chemistry: a catalyst makes a reaction faster and more reliable without being consumed by it.
+
+- Skills for handoffs between sessions, so work survives a context window ending.
+- Shipped with CI, versioned releases and a documented deep dive on the harness itself.
+
 <!-- binsight -->
 
 A local, read-only MySQL & MariaDB binlog viewer, analyzer, and forensic inspector for developers. [Website](https://binsight.adrijshikhar.dev) · [GitHub](https://github.com/adrijshikhar/binsight).
@@ -130,6 +164,28 @@ A lightweight CLI and interactive TUI for multiplexing multiple AI coding assist
 - Real-time quota telemetry and interactive Bubble Tea TUI dashboard displaying capacity gauges, reset countdowns, and instant multi-agent switching.
 - Browser-based OAuth PKCE login isolation, system keychain filtering, and diagnostic doctor subcommands.
 - Single-binary pure Go architecture distributed via Homebrew (`brew install adrijshikhar/tap/aim`) and curl installer.
+
+<!-- resume-ops -->
+
+A Claude Code skill that reads four years of engineering history and writes it back as evidence.
+
+- Pulls from GitHub, Jira, Confluence and Slack, reconciles the sources against each other, then synthesises the result.
+- Every claim traces to a link, and the counting traps are recorded alongside the numbers — a batch job that closes tickets in blocks will happily hand you a flattering statistic.
+
+<!-- retry-thread-pool -->
+
+A retrying task executor for Java 17+. Wrap any `ExecutorService` and get retries without rewriting the task.
+
+- Backoff, retry predicates, per-attempt timeouts, listeners and stats.
+- Zero runtime dependencies. Published to Maven Central; the source is not public.
+
+<!-- observatory -->
+
+This site. An observatory instrument rather than a page — the background is real computed astronomy, not a texture.
+
+- Star positions, the planets, the Moon's terminator and the Sun are computed from the observer's coordinates and the current Julian date. It asks for your location and falls back to Bengaluru when the lookup is blocked or slow, because a wrong sky is worse than a stated one.
+- Every mark is a catalogued object rather than a procedural dot, and on the home page with a mouse you can hover any of them to have it named. The instrument readouts report the frame that was actually painted.
+- Text legibility is a hard contract, verified against the rasterised page rather than asserted.
 
 <!-- scraperql -->
 
