@@ -7,6 +7,13 @@ entries:
     year: 2026
     link: "https://github.com/adrijshikhar/binsight"
     builtWith: ["Golang", "React", "SQLite", "MySQL", "MariaDB", "Docker"]
+  - slug: aim
+    title: "aim"
+    company: "Open Source"
+    date: "Sep 2026 - Present"
+    year: 2026
+    link: "https://github.com/adrijshikhar/aim"
+    builtWith: ["Golang", "Bubble Tea", "CLI", "TUI", "Homebrew"]
   - slug: scraperql
     title: "ScraperQL"
     company: "Dgraph Labs"
@@ -114,6 +121,15 @@ A local, read-only MySQL & MariaDB binlog viewer, analyzer, and inspector for de
 - Anomaly detection engine flagging huge transactions, long-running transactions, bulk row events, rolled-back transactions, schema churn, and >4 GiB position wraps.
 - Live tail (fsnotify + SSE) and remote replication streaming directly from a running server as a replica.
 - Distributed as a single binary with zero runtime dependencies (pure Go, CGO_ENABLED=0), via Homebrew, Docker (GHCR), curl-sh one-liner, and `go install`.
+
+<!-- aim -->
+
+A lightweight CLI and interactive TUI for multiplexing multiple AI coding assistants (Antigravity, Gemini, Claude Code, Codex) under fully isolated profiles.
+
+- Full virtual-home sandbox per profile with isolated credentials, configurations, shell environments, and token states to eliminate cross-profile pollution.
+- Real-time quota telemetry and interactive Bubble Tea TUI dashboard displaying capacity gauges, reset countdowns, and instant multi-agent switching.
+- Browser-based OAuth PKCE login isolation, system keychain filtering, and diagnostic doctor subcommands.
+- Single-binary pure Go architecture distributed via Homebrew (`brew install adrijshikhar/tap/aim`) and curl installer.
 
 <!-- scraperql -->
 
