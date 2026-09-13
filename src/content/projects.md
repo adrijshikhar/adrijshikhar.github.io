@@ -8,12 +8,19 @@ entries:
     link: "https://github.com/adrijshikhar/catalyst"
     builtWith: ["Claude Code", "Agent Skills", "Shell"]
   - slug: binsight
-    title: "binsight"
-    company: "Open source"
-    date: "Jul 2026 - Present"
+    title: "Binsight"
+    company: "Open Source"
+    date: "Aug 2026 - Present"
     year: 2026
-    link: "https://github.com/adrijshikhar/binsight"
-    builtWith: ["Go", "MySQL", "SQLite", "Docker"]
+    link: "https://binsight.adrijshikhar.dev"
+    builtWith: ["Golang", "React", "Astro", "Tailwind CSS", "SQLite", "MySQL", "MariaDB"]
+  - slug: aim
+    title: "aim"
+    company: "Open Source"
+    date: "Sep 2026 - Present"
+    year: 2026
+    link: "https://github.com/adrijshikhar/aim"
+    builtWith: ["Golang", "Bubble Tea", "CLI", "TUI", "Homebrew"]
   - slug: resume-ops
     title: "resume-ops"
     company: "Personal"
@@ -141,12 +148,22 @@ Harness engineering for Claude Code — skills that turn the model into a long-r
 
 <!-- binsight -->
 
-A local, read-only MySQL and MariaDB binlog viewer and analyzer. Point it at a directory of binlog files and it gives you the events as something you can actually read.
+A local, read-only MySQL & MariaDB binlog viewer, analyzer, and forensic inspector for developers. [Website](https://binsight.adrijshikhar.dev) · [GitHub](https://github.com/adrijshikhar/binsight).
 
-- Filterable event stream, transaction grouping, row-image diffs, hex forensics, anomaly detection and a schema timeline, in a browser UI.
-- Backed by a zero-config SQLite index, so decoding never blocks the UI — everything the browser reads comes from the index.
-- Streams live from a running server as a replica, standing in for `mysqlbinlog` with a visual front end.
-- Distributed as a Homebrew tap and a container image.
+- Point it at a directory of binlog files and it produces a filterable virtualized event stream, transaction grouping, row-image diffs, hex forensics, and anomaly detection backed by a zero-config SQLite index.
+- Pluggable decode adapters (go-mysql workhorse + mysqlbinlog oracle) version-tested across MySQL 5.5–8.4 and MariaDB 10.6/11.4.
+- Anomaly detection engine flagging huge transactions, long-running transactions, bulk row events, rolled-back transactions, schema churn, and >4 GiB position wraps.
+- Live tail (fsnotify + SSE) and remote replication streaming directly from a running server as a replica.
+- Distributed as a single binary with zero runtime dependencies (pure Go, CGO_ENABLED=0), via Homebrew, Docker (GHCR), curl-sh one-liner, and `go install`.
+
+<!-- aim -->
+
+A lightweight CLI and interactive TUI for multiplexing multiple AI coding assistants (Antigravity, Gemini, Claude Code, Codex) under fully isolated profiles.
+
+- Full virtual-home sandbox per profile with isolated credentials, configurations, shell environments, and token states to eliminate cross-profile pollution.
+- Real-time quota telemetry and interactive Bubble Tea TUI dashboard displaying capacity gauges, reset countdowns, and instant multi-agent switching.
+- Browser-based OAuth PKCE login isolation, system keychain filtering, and diagnostic doctor subcommands.
+- Single-binary pure Go architecture distributed via Homebrew (`brew install adrijshikhar/tap/aim`) and curl installer.
 
 <!-- resume-ops -->
 

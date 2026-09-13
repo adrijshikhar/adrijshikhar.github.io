@@ -1,8 +1,8 @@
 ---
 title: "A MySQL binlog file can exceed 4 GiB — and then every position in it lies"
-date: 2026-08-01
+date: 2026-09-11
 description: "max_binlog_size caps at 1 GiB, so a 5.7 GB binlog shouldn't exist. One big transaction produces one anyway — and because end_log_pos is a uint32, every event past the 4 GiB mark reports a wrapped position. Decode stays clean. The positions are garbage."
-draft: true
+draft: false
 canonicalUrl: "https://adrijshikhar.dev/blogs/mysql-binlog-4gib-position-wrap"
 ---
 
