@@ -163,23 +163,25 @@ How do you guarantee that a Go parser decodes an obscure `DECIMAL(18, 4)` or com
 BinSight implements a **Dual-Engine Architecture**:
 
 ```text
-                  ┌────────────────────────┐
-                  │    Binlog Raw Event    │
-                  └───────────┬────────────┘
-                              │
-             ┌────────────────┴────────────────┐
-             ▼                                 ▼
-   ┌───────────────────┐             ┌───────────────────┐
-   │  go-mysql Workhorse│             │ mysqlbinlog Oracle│
-   │  (Pure Go Ingest) │             │ (Official Binary) │
-   └─────────┬─────────┘             └─────────┬─────────┘
-             │                                 │
-             └────────────────┬────────────────┘
-                              ▼
-                   ┌──────────────────────┐
-                   │ Visual Diff Drawer   │
-                   │ (Divergence Highlight│
-                   └──────────────────────┘
+                  +------------------------+
+                  |    Binlog Raw Event    |
+                  +-----------+------------+
+                              |
+             +----------------+----------------+
+             |                                 |
+             v                                 v
+   +--------------------+            +--------------------+
+   | go-mysql Workhorse |            | mysqlbinlog Oracle |
+   |  (Pure Go Ingest)  |            | (Official Binary)  |
+   +----------+---------+            +----------+---------+
+              |                                 |
+              +---------------+-----------------+
+                              |
+                              v
+                  +------------------------+
+                  |   Visual Diff Drawer   |
+                  | (Divergence Highlight) |
+                  +------------------------+
 ```
 
 1. **`go-mysql` Adapter**: Our primary, ultra-fast pure-Go parser. It processes thousands of events per second with zero external dependencies.
