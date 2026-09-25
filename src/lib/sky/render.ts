@@ -777,14 +777,20 @@ function drawSun(
 ): void {
   const scale = r / 18;
 
-  // 1. Outer Chromosphere boundary ring (matching Mars & Mercury's outer ring)
+  // 1. Outer Chromosphere boundary ring: smooth continuous circular motion
+  const now = typeof performance !== 'undefined' ? performance.now() : 0;
+  // Circular rotation around Sun center (~18s per revolution)
+  const rotAngle = (now * 0.00036) % (Math.PI * 2);
+
   ctx.save();
+  ctx.translate(s.x, s.y);
+  ctx.rotate(rotAngle);
   ctx.globalAlpha = a * 0.45;
   ctx.strokeStyle = sunColor;
   ctx.lineWidth = 0.8;
   ctx.setLineDash([2.5 * scale, 3 * scale]);
   ctx.beginPath();
-  ctx.arc(s.x, s.y, r * 1.28, 0, Math.PI * 2);
+  ctx.arc(0, 0, r * 1.28, 0, Math.PI * 2);
   ctx.stroke();
   ctx.restore();
 

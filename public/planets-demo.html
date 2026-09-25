@@ -1006,8 +1006,10 @@
           <clipPath id="sunClip4A"><circle cx="0" cy="0" r="17.4"/></clipPath>
         </defs>
         <g transform="translate(47.5,47.5)">
-          <!-- Outer Chromosphere guide ring (matching Mars & Mercury's outer ring) -->
-          <circle cx="0" cy="0" r="23" fill="none" stroke="#e5c07b" stroke-width="0.8" stroke-dasharray="2.5 3" opacity="0.45"/>
+          <!-- Outer Chromosphere guide ring (continuous circular rotation) -->
+          <circle cx="0" cy="0" r="23" fill="none" stroke="#e5c07b" stroke-width="0.8" stroke-dasharray="2.5 3" opacity="0.45">
+            <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0" dur="18s" repeatCount="indefinite"/>
+          </circle>
           
           <!-- Eastern Limb Prominence Loop Arch (breaching into space) -->
           <path d="M 12.5 -12.5 C 18 -19, 23 -13.5, 16.5 -7" fill="none" stroke="#e5c07b" stroke-width="1.2" stroke-linecap="round"/>
@@ -1056,8 +1058,10 @@
           <clipPath id="sunClip4B"><circle cx="0" cy="0" r="17.4"/></clipPath>
         </defs>
         <g transform="translate(47.5,47.5)">
-          <!-- Outer guide ring -->
-          <circle cx="0" cy="0" r="23" fill="none" stroke="#e5c07b" stroke-width="0.8" stroke-dasharray="2 3" opacity="0.45"/>
+          <!-- Outer guide ring (continuous circular rotation) -->
+          <circle cx="0" cy="0" r="23" fill="none" stroke="#e5c07b" stroke-width="0.8" stroke-dasharray="2 3" opacity="0.45">
+            <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0" dur="18s" repeatCount="indefinite"/>
+          </circle>
           
           <!-- Mini limb prominence arch at 1 o'clock -->
           <path d="M 12 -12 C 16 -17 21 -13 16 -8" fill="none" stroke="#e5c07b" stroke-width="1.1" stroke-linecap="round"/>
@@ -1089,7 +1093,9 @@
         </defs>
         <g transform="translate(47.5,47.5)">
           <!-- Outer guide ring with 4 cardinal tick marks -->
-          <circle cx="0" cy="0" r="23" fill="none" stroke="#e5c07b" stroke-width="0.8" stroke-dasharray="2 3" opacity="0.45"/>
+          <circle cx="0" cy="0" r="23" fill="none" stroke="#e5c07b" stroke-width="0.8" stroke-dasharray="2 3" opacity="0.45">
+            <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0" dur="18s" repeatCount="indefinite"/>
+          </circle>
           <line x1="0" y1="-23" x2="0" y2="-26" stroke="#e5c07b" stroke-width="1" stroke-linecap="round"/>
           <line x1="0" y1="23" x2="0" y2="26" stroke="#e5c07b" stroke-width="1" stroke-linecap="round"/>
           <line x1="-23" y1="0" x2="-26" y2="0" stroke="#e5c07b" stroke-width="1" stroke-linecap="round"/>
@@ -1127,8 +1133,10 @@
           <path d="M -11 -13 C -17 -22, -24 -15, -16 -6" fill="none" stroke="#e5c07b" stroke-width="1.3" stroke-linecap="round"/>
           <path d="M -10 -11 C -15 -18, -20 -13, -15 -7" fill="none" stroke="#eda05b" stroke-width="0.7" opacity="0.6"/>
 
-          <!-- Outer chromosphere guide ring -->
-          <circle cx="0" cy="0" r="23" fill="none" stroke="#e5c07b" stroke-width="0.8" stroke-dasharray="2 3" opacity="0.45"/>
+          <!-- Outer chromosphere guide ring (continuous circular rotation) -->
+          <circle cx="0" cy="0" r="23" fill="none" stroke="#e5c07b" stroke-width="0.8" stroke-dasharray="2 3" opacity="0.45">
+            <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0" dur="18s" repeatCount="indefinite"/>
+          </circle>
 
           <!-- Photosphere globe -->
           <circle cx="0" cy="0" r="18" fill="#121820" stroke="#e5c07b" stroke-width="1.4"/>
