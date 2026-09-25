@@ -36,8 +36,8 @@ const proseClass =
 
 <BaseLayout title="Resume | adrijshikhar.dev">
   <main id="content" class="reading-plane mx-auto min-h-screen max-w-3xl px-6 py-16 md:px-12 md:py-24">
-    <a href="/" class="group text-sm text-foreground hover:text-primary focus-visible:text-primary hover:underline">
-      <span class="mr-2 transition-transform duration-[120ms] group-hover:-translate-x-1">&larr;</span>
+    <a class="link-back" href="/">
+      <span class="arrow">&larr;</span>
       <span>adrij_shikhar</span>
     </a>
 
@@ -65,7 +65,7 @@ const proseClass =
               <h2 class="font-heading text-base font-medium tracking-tighter text-foreground">
                 {exp.position} <span class="mx-1 text-foreground">/</span> {exp.company}
               </h2>
-              <span class="shrink-0 font-mono text-xs uppercase tracking-wider text-foreground">{exp.startDate} — {exp.endDate}</span>
+              <span class="shrink-0 font-mono text-xs uppercase tracking-wider text-number-ink">{exp.startDate} &ndash; {exp.endDate}</span>
             </div>
             {exp.location && <p class="mt-0.5 font-mono text-xs uppercase tracking-wider text-foreground">{exp.location}</p>}
             {expSections[exp.slug] && (
@@ -84,9 +84,9 @@ const proseClass =
           <li class="flex flex-col gap-1 border-b border-border py-5 md:flex-row md:items-baseline md:justify-between">
             <div>
               <h3 class="font-heading text-base font-medium tracking-tighter text-foreground">{edu.institution}</h3>
-              <p class="mt-0.5 text-sm text-foreground">{edu.degree}{edu.field && <span class="text-foreground"> — {edu.field}</span>}</p>
+              <p class="mt-0.5 text-sm text-foreground">{edu.degree}{edu.field && <span class="text-foreground"> &ndash; {edu.field}</span>}</p>
             </div>
-            <span class="shrink-0 font-mono text-xs uppercase tracking-wider text-foreground">{edu.startDate} — {edu.endDate}</span>
+            <span class="shrink-0 font-mono text-xs uppercase tracking-wider text-number-ink">{edu.startDate} &ndash; {edu.endDate}</span>
           </li>
         ))}
       </ul>

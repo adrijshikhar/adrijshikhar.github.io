@@ -44,7 +44,7 @@ export default function ExpCard({
           {isPreview ? (
             <a
               href={`/experience/#${slug}`}
-              className="text-heading no-underline after:absolute after:inset-0 after:rounded-xl after:content-[''] hover:text-heading hover:no-underline"
+              className="text-heading no-underline transition-colors after:absolute after:inset-0 after:rounded-xl after:content-[''] group-hover:text-primary hover:text-primary hover:no-underline"
             >
               {position}
             </a>
@@ -59,9 +59,10 @@ export default function ExpCard({
               href={companyLink}
               target="_blank"
               rel="noreferrer noopener"
-              className="relative z-10 text-heading hover:text-heading hover:underline"
+              aria-label={`${company} (opens in a new tab)`}
+              className="group/link relative z-10 text-heading transition-colors hover:text-primary hover:underline"
             >
-              {company} <span className="text-primary" aria-hidden="true">&#8599;</span>
+              {company} <span className="inline-block text-primary transition-transform group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5" aria-hidden="true">&#8599;</span>
             </a>
           ) : (
             company

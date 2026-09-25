@@ -894,6 +894,36 @@ body.spinning * {
   @media (min-width: 640px) {
     .display-section { font-size: 3rem; }
   }
+
+  /* Back-link to home / parent route */
+  .link-back {
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: 2.5rem;
+    font-size: 0.875rem;
+    color: var(--foreground);
+    text-decoration: none;
+    transition: color 120ms ease-out;
+  }
+  .link-back:hover,
+  .link-back:focus-visible {
+    color: var(--primary);
+    text-decoration: underline;
+  }
+  .link-back .arrow {
+    display: inline-block;
+    margin-right: 0.5rem;
+    transition: transform 120ms ease-out;
+  }
+  .link-back:hover .arrow {
+    transform: translateX(-4px);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .link-back .arrow {
+      transition: none;
+      transform: none !important;
+    }
+  }
 }
 
 /* Colour alone is not a link indicator (WCAG 1.4.1). The prose-a:* utilities

@@ -29,8 +29,15 @@ export default function ProjectCard({
         </div>
         <CardTitle className="text-heading text-xl leading-snug">
           {link ? (
-            <a href={link} target="_blank" rel="noreferrer noopener" className="text-heading no-underline hover:text-heading hover:no-underline">
-              {title} <span className="text-primary" aria-hidden="true">&#8599;</span>
+            <a
+              href={link}
+              target="_blank"
+              rel="noreferrer noopener"
+              aria-label={`${title} (opens in a new tab)`}
+              className="group/link text-heading no-underline transition-colors hover:text-primary hover:no-underline"
+            >
+              {title}{' '}
+              <span className="inline-block text-primary transition-transform group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5" aria-hidden="true">&#8599;</span>
             </a>
           ) : (
             title
