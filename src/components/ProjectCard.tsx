@@ -33,31 +33,16 @@ export default function ProjectCard({
       className="group transition-all duration-200 hover:-translate-y-0.5 hover:border-input hover:shadow-none motion-reduce:translate-none motion-reduce:transition-none"
     >
       <CardHeader>
-        <div className="flex items-baseline justify-between gap-4 text-xs font-mono uppercase tracking-wider">
-          <span className="text-number-ink">{date}</span>
-          {company && <span className="text-muted-foreground">{company}</span>}
-        </div>
-
-        <div className="flex items-start justify-between gap-4 pt-1">
-          <CardTitle role="heading" aria-level={3} className="text-heading text-xl leading-snug">
-            {primaryUrl ? (
-              <a
-                href={primaryUrl}
-                target="_blank"
-                rel="noreferrer noopener"
-                aria-label={`${title} (opens in a new tab)`}
-                className="group/link text-heading no-underline transition-colors hover:text-primary hover:no-underline"
-              >
-                {title}{' '}
-                <span className="inline-block text-primary transition-transform group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5" aria-hidden="true">&#8599;</span>
-              </a>
-            ) : (
-              title
+        <div className="flex items-center justify-between gap-4 text-xs font-mono uppercase tracking-wider">
+          <div className="flex items-center gap-2">
+            <span className="text-number-ink">{date}</span>
+            {company && company !== 'Open Source' && (
+              <span className="text-muted-foreground">· {company}</span>
             )}
-          </CardTitle>
+          </div>
 
-          {/* Quick link action icons: Website / Package / GitHub */}
-          <div className="flex items-center gap-2 shrink-0 pt-0.5 text-muted-foreground">
+          {/* Action icon links in top-right */}
+          <div className="flex items-center gap-2.5 text-muted-foreground">
             {websiteUrl && (
               <a
                 href={websiteUrl}
@@ -108,8 +93,30 @@ export default function ProjectCard({
           </div>
         </div>
 
-        {builtWith.length > 0 && (
+        <CardTitle role="heading" aria-level={3} className="text-heading text-xl leading-snug">
+          {primaryUrl ? (
+            <a
+              href={primaryUrl}
+              target="_blank"
+              rel="noreferrer noopener"
+              aria-label={`${title} (opens in a new tab)`}
+              className="group/link text-heading no-underline transition-colors hover:text-primary hover:no-underline"
+            >
+              {title}{' '}
+              <span className="inline-block text-primary transition-transform group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5" aria-hidden="true">&#8599;</span>
+            </a>
+          ) : (
+            title
+          )}
+        </CardTitle>
+
+        {(builtWith.length > 0 || company === 'Open Source') && (
           <div className="flex flex-wrap gap-2 pt-1">
+            {company === 'Open Source' && (
+              <Badge variant="outline" className="border-border text-muted-foreground">
+                Open Source
+              </Badge>
+            )}
             {builtWith.map((tech) => (
               <Badge key={tech} variant="secondary" className="text-tag-ink">
                 {tech}
