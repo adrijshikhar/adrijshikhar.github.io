@@ -277,7 +277,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
         ry = y;
         document.documentElement.classList.add('cursor-custom');
       }
-      dot.style.transform = `translate3d(${Math.round(x)}px, ${Math.round(y)}px, 0)`;
+      dot.style.transform = `translate3d(${x}px, ${y}px, 0)`;
       const t = e.target as Element | null;
       document.body.classList.toggle('cur-ui', !!t?.closest?.(INTERACTIVE));
     };
@@ -289,7 +289,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
     const follow = () => {
       rx += (x - rx) * 0.22;
       ry += (y - ry) * 0.22;
-      ring.style.transform = `translate3d(${Math.round(rx)}px, ${Math.round(ry)}px, 0) scale(var(--ring-s))`;
+      ring.style.transform = `translate3d(${rx.toFixed(2)}px, ${ry.toFixed(2)}px, 0) scale(var(--ring-s))`;
       id = requestAnimationFrame(follow);
     };
     id = requestAnimationFrame(follow);

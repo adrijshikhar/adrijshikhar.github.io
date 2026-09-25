@@ -163,8 +163,6 @@ function markStar(
   alpha: number,
   engraved: boolean,
 ): void {
-  const cx = Math.round(x);
-  const cy = Math.round(y);
   if (engraved && vr >= ENGRAVED_RING_MIN_VR) {
     // Open ring: ink on the circumference only. Keeps the star's size legible
     // without laying down a solid dark blob over cream.
@@ -172,14 +170,14 @@ function markStar(
     ctx.strokeStyle = colour;
     ctx.lineWidth = Math.min(1.1, 0.45 + vr * 0.12);
     ctx.beginPath();
-    ctx.arc(cx, cy, vr * 0.92, 0, Math.PI * 2);
+    ctx.arc(x, y, vr * 0.92, 0, Math.PI * 2);
     ctx.stroke();
     return;
   }
   ctx.globalAlpha = alpha;
   ctx.fillStyle = colour;
   ctx.beginPath();
-  ctx.arc(cx, cy, vr, 0, Math.PI * 2);
+  ctx.arc(x, y, vr, 0, Math.PI * 2);
   ctx.fill();
 }
 
@@ -436,7 +434,7 @@ const SUN_MAG = -26.7;
  *  multiple SEGMENTS strokes compositing at a shared vertex, a different
  *  mechanism this task wasn't asked to touch. Moon/Venus/Jupiter can never
  *  hit it — they aren't named in any FIGURES segment. */
-const BODY_ALPHA_CAP = 0.85;
+const BODY_ALPHA_CAP = 0.5;
 
 /** Build once per frame and thread through — every SEGMENTS lookup by name
  *  otherwise rebuilds the same map. */
@@ -692,54 +690,43 @@ export function drawBodies(
       // Saturn's rings, Jupiter's atmospheric bands, and real Galileo crescent
       // terminators for inner planets. Vector paths scale natively to any DPR
       // without raster downsampling blur in Safari or other WebKit engines.
-      const cx = Math.round(s.x);
-      const cy = Math.round(s.y);
-
       if (s.isSun) {
-        ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.95);
+        ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.92);
         ctx.strokeStyle = colour;
-        ctx.lineWidth = 1.5;
+        ctx.lineWidth = Math.max(0.75, r * 0.085);
         ctx.lineCap = 'round';
         ctx.beginPath();
-        ctx.arc(cx, cy, Math.round(r * 0.65), 0, Math.PI * 2);
+        ctx.arc(s.x, s.y, r * 0.62, 0, Math.PI * 2);
         ctx.stroke();
         const rays = 12;
-        const rayIn = Math.round(r * 0.85);
-        const rayOut = Math.round(r * 1.35);
         for (let k = 0; k < rays; k++) {
           const ang = (k / rays) * Math.PI * 2;
           ctx.beginPath();
-          ctx.moveTo(
-            Math.round(cx + Math.cos(ang) * rayIn),
-            Math.round(cy + Math.sin(ang) * rayIn),
-          );
-          ctx.lineTo(
-            Math.round(cx + Math.cos(ang) * rayOut),
-            Math.round(cy + Math.sin(ang) * rayOut),
-          );
+          ctx.moveTo(s.x + Math.cos(ang) * r * 0.8, s.y + Math.sin(ang) * r * 0.8);
+          ctx.lineTo(s.x + Math.cos(ang) * r * 1.05, s.y + Math.sin(ang) * r * 1.05);
           ctx.stroke();
         }
       } else if (s.name === 'Saturn') {
-        ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.95);
+        ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.92);
         ctx.strokeStyle = colour;
-        ctx.lineWidth = 1.4;
+        ctx.lineWidth = Math.max(0.7, r * 0.085);
         // Back half of the ring, then the globe, then the front half. Drawing it
         // in three passes is what makes the ring read as passing BEHIND Saturn
         // rather than as a flat ellipse laid over it.
-        const ringX = Math.round(r);
-        const ringY = Math.round(r * 0.32);
+        const ringX = r;
+        const ringY = r * 0.3;
         ctx.save();
-        ctx.translate(cx, cy);
+        ctx.translate(s.x, s.y);
         ctx.rotate(-0.38);
         ctx.beginPath();
         ctx.ellipse(0, 0, ringX, ringY, 0, Math.PI, Math.PI * 2);
         ctx.stroke();
         ctx.restore();
         ctx.beginPath();
-        ctx.arc(cx, cy, Math.round(r * SATURN_BODY_FRAC), 0, Math.PI * 2);
+        ctx.arc(s.x, s.y, r * SATURN_BODY_FRAC, 0, Math.PI * 2);
         ctx.stroke();
         ctx.save();
-        ctx.translate(cx, cy);
+        ctx.translate(s.x, s.y);
         ctx.rotate(-0.38);
         ctx.beginPath();
         ctx.ellipse(0, 0, ringX, ringY, 0, 0, Math.PI);
@@ -751,58 +738,57 @@ export function drawBodies(
         // so they fall through to a full disc without being special-cased.
         // This is Galileo's observation of Venus, drawn from live geometry.
         const k = s.illum;
-        const br = Math.round(r * 0.9);
-        ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.95);
+        const br = r * 0.9;
+        ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.92);
         ctx.strokeStyle = colour;
-        ctx.lineWidth = 1.4;
+        ctx.lineWidth = Math.max(0.7, r * 0.085);
         ctx.beginPath();
-        ctx.arc(cx, cy, br, 0, Math.PI * 2);
+        ctx.arc(s.x, s.y, br, 0, Math.PI * 2);
         ctx.stroke();
         ctx.fillStyle = colour;
         ctx.beginPath();
-        ctx.arc(cx, cy, br, -Math.PI / 2, Math.PI / 2);
-        ctx.ellipse(cx, cy, br * Math.abs(1 - 2 * k), br, 0, Math.PI / 2, -Math.PI / 2, k > 0.5);
+        ctx.arc(s.x, s.y, br, -Math.PI / 2, Math.PI / 2);
+        ctx.ellipse(s.x, s.y, br * Math.abs(1 - 2 * k), br, 0, Math.PI / 2, -Math.PI / 2, k > 0.5);
         ctx.fill();
       } else if (s.name === 'Jupiter') {
-        ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.95);
+        ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.92);
         ctx.strokeStyle = colour;
-        ctx.lineWidth = 1.4;
-        const jr = Math.round(r * 0.9);
+        ctx.lineWidth = Math.max(0.7, r * 0.085);
         ctx.beginPath();
-        ctx.arc(cx, cy, jr, 0, Math.PI * 2);
+        ctx.arc(s.x, s.y, r * 0.9, 0, Math.PI * 2);
         ctx.stroke();
         ctx.save();
         ctx.beginPath();
-        ctx.arc(cx, cy, jr, 0, Math.PI * 2);
+        ctx.arc(s.x, s.y, r * 0.9, 0, Math.PI * 2);
         ctx.clip(); // bands stop at the limb, which is what keeps them crisp
         for (const off of [-0.34, 0.06, 0.42]) {
           ctx.beginPath();
-          ctx.moveTo(cx - jr, Math.round(cy + jr * off));
-          ctx.lineTo(cx + jr, Math.round(cy + jr * off));
+          ctx.moveTo(s.x - r, s.y + r * off);
+          ctx.lineTo(s.x + r, s.y + r * off);
           ctx.stroke();
         }
         ctx.restore();
       } else {
-        // Planets keep their solid disc even when engraved — a filled disc against
-        // ringed stars is exactly how a print chart distinguishes a planet from a
-        // star, so here the shape difference is signal rather than noise.
-        if (colors.engraved && !s.isPlanet) {
-          markStar(ctx, cx, cy, r, colour, a * (i === hoverIndex ? 1 : 0.95), true);
-        } else {
-          ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.95);
-          ctx.fillStyle = colour;
-          ctx.beginPath();
-          ctx.arc(cx, cy, r, 0, Math.PI * 2);
-          ctx.fill();
-        }
-        if (s.isPlanet) {
-          ctx.globalAlpha = a * 0.45;
-          ctx.strokeStyle = planet;
-          ctx.lineWidth = 1.2;
-          ctx.beginPath();
-          ctx.arc(cx, cy, Math.round(r + 3.5), 0, Math.PI * 2);
-          ctx.stroke();
-        }
+      // Planets keep their solid disc even when engraved — a filled disc against
+      // ringed stars is exactly how a print chart distinguishes a planet from a
+      // star, so here the shape difference is signal rather than noise.
+      if (colors.engraved && !s.isPlanet) {
+        markStar(ctx, s.x, s.y, r, colour, a * (i === hoverIndex ? 1 : 0.92), true);
+      } else {
+        ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.92);
+        ctx.fillStyle = colour;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      if (s.isPlanet) {
+        ctx.globalAlpha = a * 0.3;
+        ctx.strokeStyle = planet;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, r + 3.5, 0, Math.PI * 2);
+        ctx.stroke();
+      }
       }
     }
 
@@ -810,11 +796,11 @@ export function drawBodies(
     // Same cap as the disc: near the zenith this formula alone reaches 0.67,
     // which is exactly the kind of "bright body over prose" the cap exists for.
     if ((s.isPlanet || s.isMoon || s.isSun) && s.alt > 0 && i !== hoverIndex) {
-      ctx.globalAlpha = Math.min(BODY_ALPHA_CAP, 0.55 + 0.3 * (s.alt / 90));
+      ctx.globalAlpha = Math.min(BODY_ALPHA_CAP, 0.42 + 0.25 * (s.alt / 90));
       ctx.fillStyle = colors.label ?? planet;
-      ctx.font = '500 10px ui-monospace,Menlo,monospace';
+      ctx.font = '500 9px ui-monospace,Menlo,monospace';
       ctx.textAlign = 'center';
-      ctx.fillText(s.name.toUpperCase(), Math.round(s.x), Math.round(s.y + r + 12));
+      ctx.fillText(s.name.toUpperCase(), Math.round(s.x), Math.round(s.y + r + 11));
       ctx.textAlign = 'start';
     }
 
