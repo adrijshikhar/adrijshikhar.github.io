@@ -15,7 +15,6 @@ import { gmstDeg, julianDay } from '../lib/sky/astronomy';
 import { FLOOR } from '../lib/sky/projection';
 import { STARS } from '../lib/sky/catalogue';
 import { SkyGame, drawGame, type Tool } from '../lib/sky/game';
-import { loadPlanetSprite, planetSprite } from '../lib/sky/planet-sprite';
 import { animate, onScroll } from '../lib/motion';
 
 const ALT_RANGE = `+90…−${Math.abs(FLOOR)}°`;
@@ -409,12 +408,16 @@ export default function SkyField({ mode }: SkyFieldProps) {
       canvas.style.width = `${W}px`;
       canvas.style.height = `${H}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
       if (gameCanvas && gameCtx) {
         // Same backing-store size and DPR transform as the main canvas, so
         // the single blit in renderFrame() is pixel-for-pixel, not a scale.
         gameCanvas.width = W * dpr;
         gameCanvas.height = H * dpr;
         gameCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        gameCtx.imageSmoothingEnabled = true;
+        gameCtx.imageSmoothingQuality = 'high';
       }
     };
 
@@ -521,7 +524,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
         // star hover wins over a constellation hover when both are under the cursor
         hoverFig = coarse || hoverIndex >= 0 ? null : figureAt(byName, figureT, mouse.x, mouse.y);
         drawFull(ctx, W, H, bodies, byName, faint, moonPhase, figureT, hoverIndex, hoverFig, mouse, colors,
-                 planetSprite(colors.engraved, colors.planet),
+                 null,
                  readingRect());
         if (game && game.playing && gameCanvas && gameCtx) {
           // Ambient sky stays a direct draw (above); only the game overlay
@@ -546,7 +549,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
           }
         }
         drawQuiet(ctx, W, H, bodies, faint, moonPhase, colors,
-                  planetSprite(colors.engraved, colors.planet),
+                  null,
                   readingRect());
       }
     };
@@ -554,11 +557,6 @@ export default function SkyField({ mode }: SkyFieldProps) {
 
     resize();
     renderFrame();
-
-    // The glyph sheet arrives after first paint. Repaint when it lands —
-    // essential under reduced motion, where there is no loop to pick it up and
-    // the planets would stay as computed discs until the next resize.
-    loadPlanetSprite(() => renderFrame());
 
     // Respect prefers-reduced-motion: one static frame, no rAF loop — unless
     // the visitor explicitly opts in by clicking the egg (see `enter` below),

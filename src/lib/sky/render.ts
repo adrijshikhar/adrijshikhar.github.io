@@ -685,34 +685,12 @@ export function drawBodies(
       ctx.stroke();
     } else {
       const colour = i === hoverIndex ? accent : s.isSun ? colors.sun : s.isPlanet ? planet : s.mag < 1.0 ? bright : muted;
-      let drawn = false;
 
-      // Glyph sheet first. Six bodies draw from it; the Moon never does, its
-      // identity being a live terminator a raster cannot carry. Falls through
-      // to the computed silhouettes below while the sheet is still loading, or
-      // if the fetch failed -- so the sky is never blank waiting on an image.
-      const spriteCol = sprite && !s.isMoon ? sprite.column(s.name) : undefined;
-      if (sprite && spriteCol !== undefined) {
-        const d = r * 2;
-        ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.92);
-        ctx.drawImage(
-          sprite.image,
-          spriteCol * SPRITE_CELL, sprite.row * SPRITE_CELL, SPRITE_CELL, SPRITE_CELL,
-          s.x - r, s.y - r, d, d,
-        );
-        drawn = true;
-      }
-
-      // Silhouette glyphs. Only three bodies get one, and only because each has
-      // a real feature that survives ~10px: the Sun's rays and Saturn's ring
-      // both extend BEYOND the disc (so they read at any size), and Jupiter's
-      // bands terminate on the disc edge rather than fading (so they stay
-      // crisp instead of blurring to grey). Mercury, Venus and Mars have no
-      // such feature, so they stay plain discs -- inventing surface texture for
-      // them would be decoration dressed as data.
-      if (drawn) {
-        // already painted from the sheet
-      } else if (s.isSun) {
+      // Silhouette glyphs. Drawn as pure vector canvas paths: the Sun's rays,
+      // Saturn's rings, Jupiter's atmospheric bands, and real Galileo crescent
+      // terminators for inner planets. Vector paths scale natively to any DPR
+      // without raster downsampling blur in Safari or other WebKit engines.
+      if (s.isSun) {
         ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.92);
         ctx.strokeStyle = colour;
         ctx.lineWidth = Math.max(0.75, r * 0.085);
@@ -822,7 +800,7 @@ export function drawBodies(
       ctx.fillStyle = colors.label ?? planet;
       ctx.font = '500 9px ui-monospace,Menlo,monospace';
       ctx.textAlign = 'center';
-      ctx.fillText(s.name.toUpperCase(), s.x, s.y + r + 11);
+      ctx.fillText(s.name.toUpperCase(), Math.round(s.x), Math.round(s.y + r + 11));
       ctx.textAlign = 'start';
     }
 
