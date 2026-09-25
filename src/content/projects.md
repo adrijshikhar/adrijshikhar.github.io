@@ -1,26 +1,40 @@
 ---
 entries:
-  - slug: catalyst
-    title: "Catalyst"
-    company: "Open source"
-    date: "May 2026"
-    year: 2026
-    link: "https://github.com/adrijshikhar/catalyst"
-    builtWith: ["Claude Code", "Agent Skills", "Shell"]
   - slug: binsight
     title: "Binsight"
     company: "Open Source"
     date: "Aug 2026 - Present"
     year: 2026
     link: "https://binsight.adrijshikhar.dev"
-    builtWith: ["Golang", "React", "Astro", "Tailwind CSS", "SQLite", "MySQL", "MariaDB"]
+    builtWith: ["Go", "React", "Astro", "Tailwind CSS", "SQLite", "MySQL", "MariaDB"]
   - slug: aim
     title: "aim"
     company: "Open Source"
     date: "Sep 2026 - Present"
     year: 2026
     link: "https://github.com/adrijshikhar/aim"
-    builtWith: ["Golang", "Bubble Tea", "CLI", "TUI", "Homebrew"]
+    builtWith: ["Go", "Bubble Tea", "CLI", "TUI"]
+  - slug: catalyst
+    title: "Catalyst"
+    company: "Open Source"
+    date: "May 2026"
+    year: 2026
+    link: "https://github.com/adrijshikhar/catalyst"
+    builtWith: ["Agent Skills", "Python", "Shell", "JSON Schema"]
+  - slug: sshdiag
+    title: "sshdiag"
+    company: "Open Source"
+    date: "Aug 2026 - Present"
+    year: 2026
+    link: "https://github.com/adrijshikhar/sshdiag"
+    builtWith: ["Go", "Bubble Tea", "Linux", "Homebrew"]
+  - slug: cxstatusline
+    title: "cxstatusline"
+    company: "Open Source"
+    date: "Sep 2026 - Present"
+    year: 2026
+    link: "https://github.com/adrijshikhar/cxstatusline"
+    builtWith: ["TypeScript", "Bun", "Ink", "Rust"]
   - slug: resume-ops
     title: "resume-ops"
     company: "Personal"
@@ -48,13 +62,12 @@ entries:
     year: 2020
     link: "https://github.com/adrijshikhar/scraper-ql"
     builtWith: ["GraphQL", "Slash GraphQL", "Node.js"]
-  - slug: kill-zee
-    title: "Kill-Zee"
-    company: "Global Game Jam 2020"
-    date: "Jan 2020"
-    year: 2020
-    link: "https://github.com/adrijshikhar/kill-zee"
-    builtWith: ["Lua", "LÖVE"]
+  - slug: slackbot
+    title: "Slackbot"
+    company: "SDSLabs"
+    date: "July 2021 - Dec 2021"
+    year: 2021
+    builtWith: ["Golang", "Slack API", "WebSockets"]
   - slug: issue-labeler
     title: "Issue Labeler Bot"
     company: "SDSLabs"
@@ -62,12 +75,6 @@ entries:
     year: 2020
     link: "https://github.com/sdslabs/SDSLabs-Issue-Labeler"
     builtWith: ["Python", "BERT", "GitHub API"]
-  - slug: slackbot
-    title: "Slackbot"
-    company: "SDSLabs"
-    date: "July 2021 - Dec 2021"
-    year: 2021
-    builtWith: ["Golang", "Slack API", "WebSockets"]
   - slug: accounts
     title: "Accounts"
     company: "SDSLabs"
@@ -101,6 +108,13 @@ entries:
     date: "Apr 2020 - May 2020"
     year: 2020
     builtWith: ["Flutter", "Dart", "Maps SDK"]
+  - slug: kill-zee
+    title: "Kill-Zee"
+    company: "Global Game Jam 2020"
+    date: "Jan 2020"
+    year: 2020
+    link: "https://github.com/adrijshikhar/kill-zee"
+    builtWith: ["Lua", "LÖVE"]
   - slug: coderunner
     title: "Coderunner 2.0"
     company: "SDSLabs"
@@ -139,38 +153,52 @@ entries:
     builtWith: ["HTML", "CSS", "JavaScript", "PHP"]
 ---
 
-<!-- catalyst -->
-
-Harness engineering for Claude Code — skills that turn the model into a long-running, reliable system. Named after the chemistry: a catalyst makes a reaction faster and more reliable without being consumed by it.
-
-- Skills for handoffs between sessions, so work survives a context window ending.
-- Shipped with CI, versioned releases and a documented deep dive on the harness itself.
-
 <!-- binsight -->
 
-A local, read-only MySQL & MariaDB binlog viewer, analyzer, and forensic inspector for developers. [Website](https://binsight.adrijshikhar.dev) · [GitHub](https://github.com/adrijshikhar/binsight).
+A local, read-only MySQL and MariaDB binlog viewer, decoder, and transaction analyser. [Website](https://binsight.adrijshikhar.dev) · [GitHub](https://github.com/adrijshikhar/binsight).
 
-- Point it at a directory of binlog files and it produces a filterable virtualized event stream, transaction grouping, row-image diffs, hex forensics, and anomaly detection backed by a zero-config SQLite index.
-- Pluggable decode adapters (go-mysql workhorse + mysqlbinlog oracle) version-tested across MySQL 5.5–8.4 and MariaDB 10.6/11.4.
-- Anomaly detection engine flagging huge transactions, long-running transactions, bulk row events, rolled-back transactions, schema churn, and >4 GiB position wraps.
-- Live tail (fsnotify + SSE) and remote replication streaming directly from a running server as a replica.
-- Distributed as a single binary with zero runtime dependencies (pure Go, CGO_ENABLED=0), via Homebrew, Docker (GHCR), curl-sh one-liner, and `go install`.
+- Indexes decoded binlogs in SQLite and presents a filterable, virtualized event stream with transaction grouping and row-image inspection.
+- Compares `go-mysql` decoding with native `mysqlbinlog` output, and reports six documented transaction and position anomalies.
+- Supports local file watching and optional replication streaming; releases are available through Homebrew, Docker, a shell installer, and `go install`.
 
 <!-- aim -->
 
-A lightweight CLI and interactive TUI for multiplexing multiple AI coding assistants (Antigravity, Gemini, Claude Code, Codex) under fully isolated profiles.
+A CLI and interactive TUI for running AI coding assistants in isolated profiles. [GitHub](https://github.com/adrijshikhar/aim).
 
-- Full virtual-home sandbox per profile with isolated credentials, configurations, shell environments, and token states to eliminate cross-profile pollution.
-- Real-time quota telemetry and interactive Bubble Tea TUI dashboard displaying capacity gauges, reset countdowns, and instant multi-agent switching.
-- Browser-based OAuth PKCE login isolation, system keychain filtering, and diagnostic doctor subcommands.
-- Single-binary pure Go architecture distributed via Homebrew (`brew install adrijshikhar/tap/aim`) and curl installer.
+- Gives each profile a separate virtual home, configuration, token state, and history.
+- Supports Antigravity CLI, Gemini CLI, Claude Code, and OpenAI Codex, with agent-aware profile selection and quota telemetry.
+- Includes browser OAuth PKCE login, session browsing and resumption, diagnostics, and Bubble Tea controls.
+
+<!-- catalyst -->
+
+A cross-agent coding-session handoff harness. [GitHub](https://github.com/adrijshikhar/catalyst).
+
+- Stores typed, schema-validated handoff briefs in the repository so work can resume across sessions and agents.
+- Documents verified handoff and hook behavior for Claude Code and Codex CLI, plus verified Antigravity CLI support with its documented registration step.
+- Uses a shared brief format for checkpointing, scoped subagent work, and drift checks.
+
+<!-- sshdiag -->
+
+SSH tunnel diagnostics for Linux hosts, with a separate capture analyser. [GitHub](https://github.com/adrijshikhar/sshdiag).
+
+- `sshdiag` records host and tunnel measurements; `sshanalyse` reads a capture and reports a verdict with explicit missing checks.
+- Requires no root for ordinary collection and records unavailable measurements as `null` rather than fabricating a zero.
+- Ships static Linux collectors, a host-native analyser, Homebrew distribution, and checksum-verified release installation.
+
+<!-- cxstatusline -->
+
+A configurable one-to-three-row statusline for OpenAI Codex CLI. [Website](https://cxstatusline.adrijshikhar.dev) · [GitHub](https://github.com/adrijshikhar/cxstatusline).
+
+- Shows documented session telemetry including model, context, Git state, usage, and reset timers.
+- Provides an interactive terminal configuration UI and a browser playground for layouts, widgets, and ANSI themes.
+- Adds telemetry through a versioned Rust patch and renders the statusline locally with Node/TypeScript; supported Codex releases are listed explicitly in the project’s compatibility matrix.
 
 <!-- resume-ops -->
 
 A Claude Code skill that reads four years of engineering history and writes it back as evidence.
 
 - Pulls from GitHub, Jira, Confluence and Slack, reconciles the sources against each other, then synthesises the result.
-- Every claim traces to a link, and the counting traps are recorded alongside the numbers — a batch job that closes tickets in blocks will happily hand you a flattering statistic.
+- Every claim traces to a link, and the counting traps are recorded alongside the numbers.
 
 <!-- retry-thread-pool -->
 
@@ -181,117 +209,110 @@ A retrying task executor for Java 17+. Wrap any `ExecutorService` and get retrie
 
 <!-- observatory -->
 
-This site. An observatory instrument rather than a page — the background is real computed astronomy, not a texture.
+This site: an observatory instrument rather than a page, with computed astronomy behind the content.
 
-- Star positions, the planets, the Moon's terminator and the Sun are computed from the observer's coordinates and the current Julian date. It asks for your location and falls back to Bengaluru when the lookup is blocked or slow, because a wrong sky is worse than a stated one.
-- Every mark is a catalogued object rather than a procedural dot, and on the home page with a mouse you can hover any of them to have it named. The instrument readouts report the frame that was actually painted.
-- Text legibility is a hard contract, verified against the rasterised page rather than asserted.
+- Star positions, planets, the Moon’s terminator, and the Sun are computed from observer coordinates and the current Julian date.
+- Every star is a catalogued object; on the home page with a mouse, it can be identified by hovering.
+- Text legibility is checked against the rasterised page.
 
 <!-- scraperql -->
 
-Dgraph Labs hosted the 'Hack and Slash GraphQL' hackathon to showcase the power of Slash GraphQL.
+Dgraph Labs hosted the Hack and Slash GraphQL hackathon to showcase Slash GraphQL.
 
-- Developed a web scraper using GraphQL to leverage the nesting power of it.
-- You have a single query resolver called scrape that takes in a URL as a parameter and returns a generic defined entity such as an HtmlNode
+- Developed a GraphQL web scraper that uses a `scrape` query resolver taking a URL and returning a generic HTML-node entity.
 
 <!-- kill-zee -->
 
-A small tactical game in Lua to kill zombies and protect your tower before its too late.
+A small tactical Lua game about protecting a tower from zombies.
 
-Spearheaded and implemented the underlying core features and worked on performance optimization.
+- Spearheaded core features and performance optimisation.
 
 <!-- issue-labeler -->
 
-It is a github bot which uses machine learning to automate the labelling of issues on Github by critical analysis of its content.
+A GitHub bot that uses machine learning to automate issue labelling from issue content.
 
-- Generated training dataset by scraping around 20,000 issues on Github.
-- Fine-Tuned the Google Bert Model on the dataset. Exported the trained model to integrate it with the Github bot.
+- Generated a training dataset by scraping about 20,000 GitHub issues.
+- Fine-tuned Google BERT and integrated the model with the bot.
 
 <!-- coderunner -->
 
-Program code compiler is written in Golang.
+A program compiler written in Go.
 
-- Implemented core functionality CLI and exposed as API.
-- Designed central agent to govern micro services, optimise cost & increase reliability
-- Added GRPC server to spawn runners in docker environment with custom log factory.
+- Implemented the CLI and exposed it as an API.
+- Designed a central agent to govern microservices and added a gRPC server to spawn Docker runners with a custom log factory.
 
 <!-- accounts -->
 
-It is an indigenous multi-provider authentication framework based on OAuth-2. It comprises of two standalone authentication and resource server.
+A multi-provider OAuth 2.0 authentication framework with separate authentication and resource servers.
 
-- Worked on improving the OAuth flow and containerising the applications for better stability and scaling.
-- Setup containerised infrastructure for developement as well as production environment.
-- Worked on additional features such as server-side redis caching.
+- Improved the OAuth flow and containerised the applications.
+- Set up containerised development and production infrastructure, plus server-side Redis caching.
 
 <!-- cerebro -->
 
-Cerebro, a platform for hosting data hackathons exclusively in IITR developed by SDSLabs. It's challenges and competitions are maintained by members of SDSLabs and Data Science Group.
+Cerebro is a platform for hosting data hackathons at IIT Roorkee, developed by SDSLabs.
 
-- Implemented Admin Panel to host and manage machine learning competitions with submissions and managing posts.
-- Worked on additional features such as edit post and lazy loading of news feed.
-- Built on Open source PHP framework, Laravel with frontend SPA client in ReactJS and Redux.
+- Implemented an admin panel for competitions, submissions, and posts.
+- Added post editing and lazy loading for the news feed.
+- Built with Laravel and a React/Redux single-page client.
 
-For more details, check out the [blog post](https://blog.sdslabs.co/2018/12/cerebro) on Cerebro.
+For more details, see the [SDSLabs blog post](https://blog.sdslabs.co/2018/12/cerebro).
 
 <!-- slackbot -->
 
-A simple yet extensive bot written in Golang, which uses Sockets to communicate to Slack API.
+A Go bot using sockets to communicate with the Slack API.
 
-- Developed core features with plugin layer for attaching different bots onto one single point.
-- Integrated with Google APIs for real-time chat features.
+- Developed core features with a plugin layer for attaching bots to one entry point.
+- Integrated Google APIs for real-time chat features.
 
 <!-- cra-webpack -->
 
-An initial set up for react and webpack using a single command
+An initial React and Webpack setup created with a single command.
 
-It is light and minilistic with bare minimum configuration needed to spawn a react app.
+- Kept configuration intentionally minimal for starting a React application.
 
 <!-- vega-vscode -->
 
-MLH and Microsoft joined forces to host a hackathon for building new and improving existing coding tools.
+MLH and Microsoft hosted a hackathon for coding tools.
 
-- Integrated Vega charting library to VSCode, to generate charts and diagrams on the go.
-- It reads the config from the JSON schema and shows the output in the Web View of VSCode
+- Integrated Vega with VS Code to generate charts and diagrams from JSON-schema configuration in a WebView.
 
 <!-- darkdev -->
 
-A self crafted VS Code Theme, for those who like it in dark mode.
+A hand-crafted VS Code theme for dark-mode users.
 
 <!-- esummit -->
 
-E-Summit is an event held to exhibit the entrepreneurial talent and creativity through many competitions like business ventures, product design competition, etc.
+E-Summit is an event showcasing entrepreneurial talent through competitions including business ventures and product design.
 
-- Developed core pipeline and worked on optimizing user experience.
-- Spearheaded the development of user interface and the flow of login & registration forms
+- Developed core pipeline work and user-experience improvements.
+- Led the user interface and login and registration flows.
 
 <!-- cognizance -->
 
-Cognizance is the Tech Fest organized by IIT Roorkee. It is a progressive web app with conceptualized the ER Diagram and implemented the relational database in PSQL.
+Cognizance is IIT Roorkee’s technical festival. Its progressive web app includes a relational PostgreSQL database.
 
-- Worked on designing the architecture and implementing core features of the progressive web app
-- Ported the legacy code from webpack v2 to webpack v4 and restructured the dependencies.
-- Worked alongside design team for faster and better development cycle for user interface.
-- Built on Django with frontend SPA client in ReactJS and Redux.
+- Helped design the architecture and implement core features.
+- Ported legacy dependencies from Webpack v2 to v4 and worked with the design team on the interface.
+- Built with Django and a React/Redux single-page client.
 
 <!-- covid-tracker -->
 
-A cross platform application to track Covid-19 activities, based on Flutter framework.
+A cross-platform Flutter application for tracking COVID-19 activity.
 
-- Integrated maps sdk to pinpoint data for convenient visual understanding across India.
-- Lead the effort to introduce Government Protocols to be followed to prevent spreading of the same.
+- Integrated a maps SDK to present data across India.
+- Led work to introduce government protocols for prevention.
 
 <!-- hidden-stone -->
 
-The trust is working to train the village as well as urban downtrodden people of the society.
+A project for Utthan Foundation Trust, which trains rural and urban communities.
 
-- Lead a team of four, from design to development cycle.
-- Established using ReactJS and Redux for state management.
-- Worked on wrappers to extend the functionalities of libraries used, such as material ui.
-- Integrated Google Sheets API for newsletter and donation information.
+- Led a team of four from design through development.
+- Built with React and Redux, extending libraries such as Material UI and integrating Google Sheets for newsletter and donation information.
 
 <!-- evem -->
 
-A website that provides information regarding the bookings of the venues of IIT Roorkee. and gives you a centralized system to book the venue for certain events.
+A centralised venue-booking site for IIT Roorkee events.
 
-- Implemented personalized calender, feedback portal and search feature.
-- Pure HTML/CSS, JS usage with PHP as backend.
+- Implemented a personalised calendar, feedback portal, and search.
+- Built with HTML, CSS, JavaScript, and PHP.
