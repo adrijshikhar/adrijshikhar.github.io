@@ -123,6 +123,33 @@ export function gravityWell(stars: GameStar[], mouseX: number, mouseY: number): 
   }
 }
 
+/** Damped spring return for displaced stars back to their true astronomical
+ *  home positions (hx, hy). Returns true while any star is still in motion,
+ *  false once every displaced star has settled into place. */
+export function springReturn(stars: GameStar[]): boolean {
+  let inMotion = false;
+  for (const s of stars) {
+    if (!s.playable) continue;
+    const dx = s.hx - s.x;
+    const dy = s.hy - s.y;
+    const dist = Math.hypot(dx, dy);
+    const speed = Math.hypot(s.vx, s.vy);
+    if (dist > 0.05 || speed > 0.01) {
+      s.vx = (s.vx + dx * K) * DAMP;
+      s.vy = (s.vy + dy * K) * DAMP;
+      s.x += s.vx;
+      s.y += s.vy;
+      inMotion = true;
+    } else {
+      s.x = s.hx;
+      s.y = s.hy;
+      s.vx = 0;
+      s.vy = 0;
+    }
+  }
+  return inMotion;
+}
+
 /** Free bodies. Stars sit still at v=0 until something hits them.
  *  Impulse-based elastic collision, mass scaled by brightness, so slinging a
  *  bright star into a faint one sends the faint one flying and barely

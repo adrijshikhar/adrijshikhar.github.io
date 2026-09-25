@@ -1,5 +1,13 @@
 ---
 entries:
+  - slug: cxstatusline
+    title: "cxstatusline"
+    company: "Open Source"
+    date: "Sep 2026 - Present"
+    year: 2026
+    link: "https://cxstatusline.adrijshikhar.dev"
+    github: "https://github.com/adrijshikhar/cxstatusline"
+    builtWith: ["TypeScript", "Bun", "Ink", "Rust"]
   - slug: binsight
     title: "Binsight"
     company: "Open Source"
@@ -24,22 +32,15 @@ entries:
     link: "https://github.com/adrijshikhar/catalyst"
     github: "https://github.com/adrijshikhar/catalyst"
     builtWith: ["Agent Skills", "Python", "Shell", "JSON Schema"]
-  - slug: sshdiag
-    title: "sshdiag"
-    company: "Open Source"
-    date: "Aug 2026 - Present"
-    year: 2026
-    link: "https://github.com/adrijshikhar/sshdiag"
-    github: "https://github.com/adrijshikhar/sshdiag"
-    builtWith: ["Go", "Bubble Tea", "Linux", "Homebrew"]
-  - slug: cxstatusline
-    title: "cxstatusline"
-    company: "Open Source"
-    date: "Sep 2026 - Present"
-    year: 2026
-    link: "https://cxstatusline.adrijshikhar.dev"
-    github: "https://github.com/adrijshikhar/cxstatusline"
-    builtWith: ["TypeScript", "Bun", "Ink", "Rust"]
+  # Hidden until open sourced:
+  # - slug: sshdiag
+  #   title: "sshdiag"
+  #   company: "Open Source"
+  #   date: "Aug 2026 - Present"
+  #   year: 2026
+  #   link: "https://github.com/adrijshikhar/sshdiag"
+  #   github: "https://github.com/adrijshikhar/sshdiag"
+  #   builtWith: ["Go", "Bubble Tea", "Linux", "Homebrew"]
   - slug: resume-ops
     title: "resume-ops"
     company: "Personal"
