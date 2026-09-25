@@ -199,6 +199,10 @@ export class SkyGame {
     this.dragFrom = null;
     this.links = [];
     this.bursts = [];
+    for (const s of this.stars) {
+      s.vx = 0;
+      s.vy = 0;
+    }
     this.resetting = true;
   }
 

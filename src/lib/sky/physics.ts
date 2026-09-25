@@ -123,9 +123,9 @@ export function gravityWell(stars: GameStar[], mouseX: number, mouseY: number): 
   }
 }
 
-/** Damped spring return for displaced stars back to their true astronomical
- *  home positions (hx, hy). Returns true while any star is still in motion,
- *  false once every displaced star has settled into place. */
+/** Calm, critically damped return of displaced stars to their true astronomical
+ *  home positions (hx, hy). Smoothly glides stars back without wild oscillation
+ *  or overshoot, settling cleanly into place. */
 export function springReturn(stars: GameStar[]): boolean {
   let inMotion = false;
   for (const s of stars) {
@@ -133,12 +133,14 @@ export function springReturn(stars: GameStar[]): boolean {
     const dx = s.hx - s.x;
     const dy = s.hy - s.y;
     const dist = Math.hypot(dx, dy);
-    const speed = Math.hypot(s.vx, s.vy);
-    if (dist > 0.05 || speed > 0.01) {
-      s.vx = (s.vx + dx * K) * DAMP;
-      s.vy = (s.vy + dy * K) * DAMP;
-      s.x += s.vx;
-      s.y += s.vy;
+    if (dist > 0.5) {
+      // Smooth critically damped approach: 18% of remaining distance per frame,
+      // speed-capped so distant stars glide calmly rather than rocketing.
+      const step = Math.min(18, dist * 0.18);
+      s.x += (dx / dist) * step;
+      s.y += (dy / dist) * step;
+      s.vx = 0;
+      s.vy = 0;
       inMotion = true;
     } else {
       s.x = s.hx;
