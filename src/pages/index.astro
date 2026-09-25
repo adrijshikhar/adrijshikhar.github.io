@@ -154,7 +154,7 @@ const SOCIAL_ICON_PATHS = {
         <section id="experience" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
           <div class="mb-4 text-sm"><span class="font-mono text-xs uppercase tracking-wider text-foreground">02</span></div>
           <h2 class="display-section mb-8">Experience</h2>
-          <ul class="group/list flex flex-col gap-5">
+          <ul class="group/list flex flex-col border-t border-border">
             {experience.meta.entries.slice(0, 2).map((exp: any) => (
               <li><ExpCard {...exp} /></li>
             ))}
@@ -170,7 +170,7 @@ const SOCIAL_ICON_PATHS = {
         <section id="projects" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
           <div class="mb-4 text-sm"><span class="font-mono text-xs uppercase tracking-wider text-foreground">03</span></div>
           <h2 class="display-section mb-8">Projects</h2>
-          <ul class="group/list flex flex-col gap-5">
+          <ul class="group/list flex flex-col border-t border-border">
             {projects.meta.entries.slice(0, 5).map((proj: any) => (
               <li><ProjectCard {...proj} contentHtml={marked.parse(projSections[proj.slug] || '') as string} /></li>
             ))}
@@ -191,7 +191,7 @@ const SOCIAL_ICON_PATHS = {
               <span class="text-primary">$</span> ls ./posts — <span class="text-foreground">no entries yet.</span>
             </p>
           ) : (
-            <ul class="group/list flex flex-col gap-5">
+            <ul class="group/list flex flex-col border-t border-border">
               {latestPosts.map((post) => (
                 <li><BlogCard title={post.data.title} date={fmtPostDate(post.data.date)} href={`/blogs/${post.id}/`} /></li>
               ))}
@@ -208,13 +208,13 @@ const SOCIAL_ICON_PATHS = {
         <section id="education" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
           <div class="mb-4 text-sm"><span class="font-mono text-xs uppercase tracking-wider text-foreground">05</span></div>
           <h2 class="display-section mb-8">Education</h2>
-          <ul class="grid gap-4 sm:grid-cols-2">
+          <ul class="border-t border-border">
             {education.meta.entries.map((edu: any, i: number) => (
-              <li class={`rounded-xl border bg-card text-card-foreground shadow-sm group/list-item px-5 py-6 lg:px-6 lg:py-7`}>
-                <span class="font-mono text-xs uppercase tracking-wider text-foreground">{edu.startDate} — {edu.endDate}</span>
-                <h3 class="mt-2 text-xl font-semibold leading-snug">{edu.institution}</h3>
-                <div class="mt-1 text-sm text-foreground">
-                  {edu.degree}{edu.field && <span class="text-foreground"> — {edu.field}</span>}
+              <li class="group/list-item border-b border-border py-5 transition-colors duration-200 hover:border-input">
+                <span class="font-mono text-xs uppercase tracking-wider text-number-ink">{edu.startDate} &mdash; {edu.endDate}</span>
+                <h3 class="mt-1 text-xl font-semibold leading-snug text-heading">{edu.institution}</h3>
+                <div class="mt-1 text-base text-foreground">
+                  {edu.degree}{edu.field && <span class="text-foreground"> &mdash; {edu.field}</span>}
                 </div>
               </li>
             ))}

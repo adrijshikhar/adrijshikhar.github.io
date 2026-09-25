@@ -10,9 +10,9 @@ interface Props {
 const { entries, sections } = Astro.props;
 ---
 
-<ul class="columns-1 gap-5 sm:columns-2">
+<ul class="columns-1 gap-10 sm:columns-2">
   {entries.map((project) => (
-    <li class="mb-5 inline-block w-full align-top break-inside-avoid">
+    <li class="mb-2 inline-block w-full align-top break-inside-avoid">
       <ProjectCard {...project} contentHtml={marked.parse(sections[project.slug] || '') as string} />
     </li>
   ))}

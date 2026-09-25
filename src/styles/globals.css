@@ -137,7 +137,7 @@
   --dur-hover: 0.22s;
   --dur-ui: 0.3s;
   --dur-view: 0.5s;
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);  /* sky drag-release ONLY */
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);  /* sky drag-release ONLY */
   --ease-out: cubic-bezier(.32, .72, 0, 1);
   --card-radius: var(--radius);
 }
@@ -631,9 +631,8 @@ body.spinning * {
      .instrument bottom (1.4rem); the easter-egg hook (SkyField.tsx) is
      positioned independently via its own `bottom-24` (6rem) Tailwind class —
      fixed apart so neither moves when the other appears. */
-  .instrument b,
-  .instrument .k { color: var(--muted-foreground); font-weight: 500; }
-  .instrument .k { display: inline-block; width: 6.5rem; }
+  .instrument b { color: var(--foreground); font-weight: 500; }
+  .instrument .k { color: var(--secondary-foreground); font-weight: 500; display: inline-block; width: 6.5rem; }
 
   .readout-row {
     display: flex;
