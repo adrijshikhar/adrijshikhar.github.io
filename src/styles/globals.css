@@ -17,23 +17,8 @@
 }
 
 
-/* ============================================================================
-   SPECTRAL — semantic design tokens, dark only
-
-   Six hues taken from stellar classification (O/B, A, F, G, K, M). They are
-   derived, not picked: each names a real surface temperature, so they track a
-   blackbody curve and cannot clash. Every hue has exactly ONE job, listed
-   beside it. Every ratio below was measured in a browser, not estimated.
-
-   There is no light mode. A spectral ramp is an EMISSION curve; to clear AA on
-   a light ground every warm hue has to be darkened until it is brown, and all
-   six then compress into ~5.5 L* of each other, so the ramp stops being a
-   ramp. See design/README.md.
-   ========================================================================== */
-
-/* shadcn/ui default theme, verbatim. These are the values shadcn ships — not
-   picked, not contrast-tuned, not substituted. The site is dark-only, so <html>
-   carries .dark and the :root block is the light half of the same stock pair. */
+/* The shipped palette is Spectral dark; the upstream light token set remains
+   available for compatibility. */
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
@@ -70,37 +55,42 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --background: #0A0D12;
+  --foreground: #FFFFFF;
+  --card: #12161D;
+  --card-foreground: #FFFFFF;
+  --popover: #12161D;
+  --popover-foreground: #E8ECF1;
+  --primary: #7FA8F5;
+  --primary-foreground: #0A0D12;
+  --secondary: #161B22;
+  --secondary-foreground: #F0CE72;
+  --muted: #161B22;
+  --muted-foreground: #848E9C;
+  --accent: #161B22;
+  --accent-foreground: #E8ECF1;
+  --destructive: #E8776A;
+  --border: #242A33;
+  --input: #555F6C;
+  --ring: #7FA8F5;
+  --heading: #FFFFFF;
+  --tag-ink: #BFD2F2;
+  --number-ink: #EDA05B;
+  --sky-ink: #BFC6D0;
+  --sky-label: #848E9C;
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar: var(--card);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: var(--accent);
+  --sidebar-accent-foreground: var(--accent-foreground);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
 }
 
 /* v4 maps tokens to utilities in CSS, replacing tailwind.config.mjs. */
@@ -134,6 +124,11 @@
      letterSpacing; when that file went away the utility silently stopped
      compiling and the blog <h1> reverted to default tracking with no error. */
   --tracking-tightest: -0.03em;
+  --color-heading: var(--heading, var(--foreground));
+  --color-tag-ink: var(--tag-ink, var(--foreground));
+  --color-number-ink: var(--number-ink, var(--muted-foreground));
+  --color-sky-ink: var(--sky-ink, var(--muted-foreground));
+  --color-sky-label: var(--sky-label, var(--muted-foreground));
 }
 
 /* Motion only. No colour lives here. */
@@ -373,6 +368,8 @@
 /* Inline code: a Surface chip. The 8% accent tint that used to sit here mixed a
    colour outside the palette (rgb 45 54 67), so it is gone — the chip is Surface. */
 .prose :not(pre) > code {
+  overflow-wrap: anywhere;
+  white-space: normal;
   border-radius: 5px;
   border: 1px solid var(--border);
   background: var(--card);
@@ -500,7 +497,7 @@ body.spinning * {
     /* Above every fixed control (ViewToggle 1100): while the
        game hides the native cursor page-wide, a lower stack order made the
        pointer vanish completely whenever it crossed one of those toggles. */
-    z-index: 1200;
+    z-index: 2100;
     pointer-events: none;
     border-radius: 50%;
     will-change: transform;
@@ -511,19 +508,19 @@ body.spinning * {
      registered below so it interpolates; JS composes it into the transform. */
   #sky-cursor-ring {
     --ring-s: 1;
-    width: 26px;
-    height: 26px;
-    margin: -13px 0 0 -13px;
-    border: 1px solid var(--muted-foreground);
+    width: 34px;
+    height: 34px;
+    margin: -17px 0 0 -17px;
+    border: 1.5px solid var(--foreground);
     transition:
       --ring-s 0.22s var(--ease-out),
       border-color 0.22s var(--ease-out);
   }
   #sky-cursor-dot {
-    width: 4px;
-    height: 4px;
-    margin: -2px 0 0 -2px;
-    background: var(--muted-foreground);
+    width: 5px;
+    height: 5px;
+    margin: -2.5px 0 0 -2.5px;
+    background: var(--foreground);
     transition: background-color 0.22s var(--ease-out);
   }
   /* over a grabbable star */
@@ -534,16 +531,17 @@ body.spinning * {
   body.cur-star #sky-cursor-dot {
     background: var(--primary);
   }
-  /* over real UI (the tool bar) */
+  /* Over links and controls, the ring squeezes without covering their labels. */
   body.cur-ui #sky-cursor-ring {
-    --ring-s: 0.615;
+    --ring-s: 0.65;
     border-color: var(--primary);
+    border-width: 2.5px;
   }
   body.cur-ui #sky-cursor-dot {
     background: var(--primary);
-    width: 3px;
-    height: 3px;
-    margin: -1.5px 0 0 -1.5px;
+    width: 5px;
+    height: 5px;
+    margin: -2.5px 0 0 -2.5px;
   }
   /* dragging */
   body.grabbing #sky-cursor-ring {
@@ -633,7 +631,8 @@ body.spinning * {
      .instrument bottom (1.4rem); the easter-egg hook (SkyField.tsx) is
      positioned independently via its own `bottom-24` (6rem) Tailwind class —
      fixed apart so neither moves when the other appears. */
-  .instrument b { color: var(--foreground); font-weight: 500; }
+  .instrument b,
+  .instrument .k { color: var(--muted-foreground); font-weight: 500; }
   .instrument .k { display: inline-block; width: 6.5rem; }
 
   .readout-row {
@@ -732,7 +731,7 @@ body.spinning * {
     line-height: 1.5;
     text-align: left;
   }
-  .chrome-status-val b { color: var(--primary); font-weight: 500; }
+  .chrome-status-val b { color: var(--muted-foreground); font-weight: 500; }
 
   /* Scroll cue. States a real consequence -- the constellation figures are
      drawn by scroll progress -- rather than saying "scroll down". Fades out

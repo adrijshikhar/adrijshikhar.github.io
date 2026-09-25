@@ -120,6 +120,10 @@ const starAlpha = (mag: number): number => Math.max(0.30, Math.min(1, (2.8 - mag
  *  chart" purely from which strings it's given. */
 export interface SkyColors {
   accent: string;
+  /** Neutral ink for idle figures; omitted by legacy/light palettes. */
+  idleConstellation?: string;
+  /** Persistent body-name ink, independent of the body geometry. */
+  label?: string;
   muted: string;
   /** Full-brightness star/bloom colour — white in dark mode, full ink in light mode. */
   bright: string;
@@ -815,7 +819,7 @@ export function drawBodies(
     // which is exactly the kind of "bright body over prose" the cap exists for.
     if ((s.isPlanet || s.isMoon || s.isSun) && s.alt > 0 && i !== hoverIndex) {
       ctx.globalAlpha = Math.min(BODY_ALPHA_CAP, 0.42 + 0.25 * (s.alt / 90));
-      ctx.fillStyle = planet;
+      ctx.fillStyle = colors.label ?? planet;
       ctx.font = '500 9px ui-monospace,Menlo,monospace';
       ctx.textAlign = 'center';
       ctx.fillText(s.name.toUpperCase(), s.x, s.y + r + 11);
@@ -856,7 +860,7 @@ export function drawFull(
       const a = byName.get(seg.a), b = byName.get(seg.b);
       if (!a || !b) continue;
       const lit = hoverFig === seg.name;
-      ctx.strokeStyle = accent;
+      ctx.strokeStyle = lit ? accent : (colors.idleConstellation ?? accent);
       ctx.globalAlpha = (lit ? 0.95 : 0.3) * Math.min(1, scrollT * 6); // fade in over the first sixth
       ctx.lineWidth = lit ? 1.6 : 1;
       ctx.beginPath();

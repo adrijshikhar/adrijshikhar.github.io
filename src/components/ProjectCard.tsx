@@ -20,17 +20,17 @@ export default function ProjectCard({
 }: ProjectCardProps) {
   return (
     <Card
-      className="group transition-all duration-200 hover:-translate-y-0.5 hover:border-ring hover:shadow-lg motion-reduce:translate-none motion-reduce:transition-none"
+      className="group transition-all duration-200 hover:-translate-y-0.5 hover:border-input hover:shadow-none motion-reduce:translate-none motion-reduce:transition-none"
     >
       <CardHeader>
-        <div className="flex items-baseline justify-between gap-4 text-xs text-muted-foreground">
-          <span>{date}</span>
+        <div className="flex items-baseline justify-between gap-4 text-xs text-foreground">
+          <span className="text-foreground">{date}</span>
           {company && <span>{company}</span>}
         </div>
-        <CardTitle className="text-xl leading-snug">
+        <CardTitle className="text-heading text-xl leading-snug">
           {link ? (
-            <a href={link} target="_blank" rel="noreferrer noopener" className="hover:underline">
-              {title} <span aria-hidden="true">&#8599;</span>
+            <a href={link} target="_blank" rel="noreferrer noopener" className="text-heading no-underline hover:text-heading hover:no-underline">
+              {title} <span className="text-primary" aria-hidden="true">&#8599;</span>
             </a>
           ) : (
             title
@@ -39,7 +39,7 @@ export default function ProjectCard({
         {builtWith.length > 0 && (
           <div className="flex flex-wrap gap-2 pt-1">
             {builtWith.map((tech) => (
-              <Badge key={tech} variant="secondary">
+              <Badge key={tech} variant="secondary" className="text-tag-ink">
                 {tech}
               </Badge>
             ))}
@@ -49,7 +49,7 @@ export default function ProjectCard({
       {contentHtml && (
         <CardContent>
           <div
-            className="prose prose-sm prose-invert max-w-none"
+            className="prose prose-sm prose-invert max-w-none text-base leading-[1.65]"
             dangerouslySetInnerHTML={{ __html: contentHtml }}
           />
         </CardContent>

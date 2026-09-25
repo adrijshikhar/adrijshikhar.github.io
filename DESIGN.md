@@ -14,19 +14,21 @@ rectangular panels. Nothing glows, nothing bounces, nothing is decorative.
 
 ## 2. Colour
 
-**shadcn's default theme, `neutral` base, verbatim.** The full `:root` / `.dark`
-oklch token pair from ui.shadcn.com, unmodified. `<html>` carries `.dark`.
+The approved Spectral palette ships in `.dark`: near-black surfaces, white reading
+ink, blue interactions, warm data accents and subdued sky labels. Upstream `:root`
+light tokens remain intact for compatibility. `<html>` carries `.dark`.
 
 `@theme inline` in `globals.css` maps those tokens to Tailwind utilities. There is
 no `tailwind.config.mjs` — v4 is CSS-first.
 
 **Rules:**
 
-- Only shadcn tokens. No invented colours, no derived shades, no `color-mix()`.
+- Use the semantic tokens and named heading, tag, number and sky roles. No derived
+  shades or `color-mix()`.
 - No fractional `opacity` for dimming — reach for a dimmer token. `opacity: 0` / `1`
   for show/hide is fine.
 - A token **without** `-foreground` is a **SURFACE**. `--accent` and `--muted` are
-  backgrounds, both `oklch(0.269 0 0)` in dark. Their ink counterparts are
+  backgrounds, both near-black in dark. Their ink counterparts are
   `--primary` and `--muted-foreground`. Using a surface token as ink is the single
   most expensive mistake made in this codebase: it painted the sky readout
   near-black on near-black, and a button hover near-white on near-white text.
@@ -57,15 +59,15 @@ CLI — they are upstream, don't hand-edit them.
 
 - `ExpCard`, `ProjectCard`, `BlogCard` compose `Card` / `CardHeader` / `CardTitle` /
   `CardDescription` / `CardContent`; tags are `Badge`.
-- Hover: 2px lift, border to `--ring`, larger shadow, 200ms. Guarded with
+- Hover: 2px lift, neutral input border, no shadow, 200ms. Keyboard focus uses the
+  blue ring. Guarded with
   `motion-reduce:translate-none` — v4's `-translate-y-*` sets the `translate`
   property, so `transform-none` would not disable it.
 - Preview cards (no body prose) stretch their link across the whole card with
   `after:absolute after:inset-0`, keeping exactly one link in the accessibility tree.
   Cards **with** prose do not — an overlay would swallow links in the body.
-- Lists holding cards use `flex flex-col gap-5` or `grid gap-5 sm:grid-cols-2`, with
-  each card in an `<li>`. **CSS columns split a shadcn `Card`** across the break,
-  because `Card` is a flex container and `break-inside-avoid` does not hold on it.
+- The project archive uses two CSS columns above 640px and one below, with cards in
+  indivisible `<li>` wrappers to keep each card intact.
 
 ## 5. Layout
 
@@ -86,10 +88,13 @@ distinction is the mechanism: a translucent wash *adds* a layer and leaves canva
 alpha untouched, so text over it still fails; erasing genuinely lowers the sampled
 alpha while leaving the graticule and stars readable behind the prose.
 
-The keep-out covers the **reading column plus 72px**, feathered on all four sides —
+The keep-out covers the reading column, feathered on all four sides —
 not the viewport. Full width erased 45% of every mark on the canvas, including the
 planet labels and hover readout out in the empty margins where there is no text to
 protect.
+
+The hero title and introduction also receive a measured keep-out at strength 0.55,
+ending at the introduction without added padding.
 
 `render.ts` must stay **DOM-blind** so `scripts/verify-sky.mjs` can import it under
 Node. `KeepOut` is a plain `{x,y,w,h}` object, measured in `SkyField.tsx` and passed
@@ -107,6 +112,8 @@ before adding or removing chrome.
 **Pointer affordances are gated on the input device**, not the viewport: the
 cursor-gravity wobble and hover-to-name are skipped when
 `(hover: none), (pointer: coarse)` matches.
+On fine pointers, the 34px white ring squeezes to 65% over links and controls, with
+a blue outline and dot.
 
 ## 7. Shipped artefacts that carry copy
 

@@ -428,14 +428,21 @@ export default function SkyField({ mode }: SkyFieldProps) {
 
     // The rectangle where prose lives, in canvas pixels. render.ts stays
     // DOM-blind, so the measuring happens here and only numbers cross over.
-    // Returns null while the hero owns the screen: the hero is MEANT to sit in
-    // the sky and measures 137/169 there, so thinning it would cost the one
-    // place the sky is the point.
-    const readingRect = (): { x: number; y: number; w: number; h: number } | null => {
+    const readingRect = (): { x: number; y: number; w: number; h: number; strength?: number } | null => {
       const col = document.querySelector('main');
       if (!col) return null;
       const r = col.getBoundingClientRect();
       if (r.width === 0 || r.bottom < 0 || r.top > window.innerHeight) return null;
+      const hero = col.querySelector(':scope > header');
+      const title = hero?.querySelector('h1');
+      const intro = title?.nextElementSibling;
+      if (title && intro) {
+        const a = title.getBoundingClientRect();
+        const b = intro.getBoundingClientRect();
+        if (b.bottom > 0 && a.top < window.innerHeight) {
+          return { x: a.left, y: a.top, w: Math.max(a.width, b.width), h: b.bottom - a.top, strength: 0.55 };
+        }
+      }
       const firstSection = col.querySelector('section[id]');
       const top = firstSection ? firstSection.getBoundingClientRect().top : r.top;
       const y = Math.max(0, top);
@@ -458,7 +465,9 @@ export default function SkyField({ mode }: SkyFieldProps) {
         // a near-black sky, which is why the readout was invisible at full alpha.
         // The ink equivalents are --primary and --muted-foreground.
         accent: cs.getPropertyValue('--primary').trim(),
-        muted: cs.getPropertyValue('--muted-foreground').trim(),
+        idleConstellation: cs.getPropertyValue('--sky-ink').trim() || undefined,
+        label: cs.getPropertyValue('--sky-label').trim() || undefined,
+        muted: cs.getPropertyValue('--sky-ink').trim() || cs.getPropertyValue('--muted-foreground').trim(),
         bright: light ? ink : '#F1F5F9',   // F · Primary Text
         moonLit: light ? ink : '#CBD5E1',  // Secondary: the Moon is grey, not warm
         planet: light ? ink : '#CBD5E1',   // Secondary Text. Cyan reads as teal at label
@@ -469,7 +478,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
         // dark text far more than light marks compete with a dark page, so
         // the base colour itself carries a low alpha on top of the per-star
         // magnitude alpha already applied where this is used.
-        faint: light ? fade(ink, 0.85) : cs.getPropertyValue('--muted-foreground').trim(),
+        faint: light ? fade(ink, 0.85) : (cs.getPropertyValue('--sky-ink').trim() || cs.getPropertyValue('--muted-foreground').trim()),
         // Light mode isn't dark mode with the colours swapped — a filled disc
         // that reads as a glowing star on black reads as a dirt speck on cream.
         // This tells the renderer to switch glyph shape, not just palette.
