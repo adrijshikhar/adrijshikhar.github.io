@@ -519,9 +519,9 @@ body.spinning * {
       border-color 0.22s var(--ease-out);
   }
   #sky-cursor-dot {
-    width: 5px;
-    height: 5px;
-    margin: -2.5px 0 0 -2.5px;
+    width: 6px;
+    height: 6px;
+    margin: -3px 0 0 -3px;
     background: var(--foreground);
     transition: background-color 0.22s var(--ease-out);
   }
@@ -541,9 +541,9 @@ body.spinning * {
   }
   body.cur-ui #sky-cursor-dot {
     background: var(--primary);
-    width: 5px;
-    height: 5px;
-    margin: -2.5px 0 0 -2.5px;
+    width: 6px;
+    height: 6px;
+    margin: -3px 0 0 -3px;
   }
   /* dragging */
   body.grabbing #sky-cursor-ring {
