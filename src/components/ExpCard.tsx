@@ -32,11 +32,11 @@ export default function ExpCard({
   return (
     <Card
       id={isPreview ? undefined : slug}
-      className={`group h-full scroll-mt-24 transition-colors duration-200 rounded-none border-0 border-b border-border bg-transparent p-0 py-6 shadow-none gap-2 hover:border-input focus-within:border-ring motion-reduce:transition-none${
+      className={`group h-full scroll-mt-24 transition-all duration-200 hover:-translate-y-0.5 hover:border-input hover:shadow-none focus-within:border-ring motion-reduce:translate-none motion-reduce:transition-none${
         isPreview ? ' relative' : ''
       }`}
     >
-      <CardHeader className="p-0 gap-2">
+      <CardHeader>
         <div className="font-mono text-xs uppercase tracking-wider text-number-ink">
           {startDate} &ndash; {endDate}
         </div>
@@ -44,7 +44,7 @@ export default function ExpCard({
           {isPreview ? (
             <a
               href={`/experience/#${slug}`}
-              className="text-heading no-underline after:absolute after:inset-0 after:rounded-none after:content-[''] hover:text-heading hover:no-underline"
+              className="text-heading no-underline after:absolute after:inset-0 after:rounded-xl after:content-[''] hover:text-heading hover:no-underline"
             >
               {position}
             </a>
@@ -70,7 +70,7 @@ export default function ExpCard({
         {(tagline || location) && <CardDescription className="text-foreground text-base leading-[1.65]">{tagline || location}</CardDescription>}
       </CardHeader>
       {contentHtml && (
-        <CardContent className="p-0 pt-3">
+        <CardContent>
           <div
             className="prose prose-sm prose-invert max-w-none text-base leading-[1.65]"
             dangerouslySetInnerHTML={{ __html: contentHtml }}
