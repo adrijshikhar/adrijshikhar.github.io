@@ -32,26 +32,26 @@ export default function ExpCard({
   return (
     <Card
       id={isPreview ? undefined : slug}
-      className={`group h-full scroll-mt-24 transition-all duration-200 hover:-translate-y-0.5 hover:border-ring hover:shadow-lg focus-within:border-ring motion-reduce:translate-none motion-reduce:transition-none${
+      className={`group h-full scroll-mt-24 transition-all duration-200 hover:-translate-y-0.5 hover:border-input hover:shadow-none focus-within:border-ring motion-reduce:translate-none motion-reduce:transition-none${
         isPreview ? ' relative' : ''
       }`}
     >
       <CardHeader>
-        <div className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+        <div className="font-mono text-xs uppercase tracking-wider text-number-ink">
           {startDate} &ndash; {endDate}
         </div>
-        <CardTitle className="text-xl leading-snug">
+        <CardTitle role="heading" aria-level={3} className="text-heading text-xl leading-snug">
           {isPreview ? (
             <a
               href={`/experience/#${slug}`}
-              className="after:absolute after:inset-0 after:rounded-xl after:content-[''] group-hover:underline"
+              className="text-heading no-underline transition-colors after:absolute after:inset-0 after:rounded-xl after:content-[''] group-hover:text-primary hover:text-primary hover:no-underline"
             >
               {position}
             </a>
           ) : (
             position
           )}
-          <span className="text-muted-foreground"> / </span>
+          <span className="text-foreground"> / </span>
           {companyLink ? (
             // Sits ABOVE the stretched overlay so the company link stays its own
             // target; without the z-index the overlay would swallow it.
@@ -59,20 +59,21 @@ export default function ExpCard({
               href={companyLink}
               target="_blank"
               rel="noreferrer noopener"
-              className="relative z-10 hover:underline"
+              aria-label={`${company} (opens in a new tab)`}
+              className="group/link relative z-10 text-heading transition-colors hover:text-primary hover:underline"
             >
-              {company} <span aria-hidden="true">&#8599;</span>
+              {company} <span className="inline-block text-primary transition-transform group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5" aria-hidden="true">&#8599;</span>
             </a>
           ) : (
             company
           )}
         </CardTitle>
-        {(tagline || location) && <CardDescription>{tagline || location}</CardDescription>}
+        {(tagline || location) && <CardDescription className="text-foreground text-base leading-[1.65]">{tagline || location}</CardDescription>}
       </CardHeader>
       {contentHtml && (
         <CardContent>
           <div
-            className="prose prose-sm prose-invert max-w-none"
+            className="prose prose-sm prose-invert max-w-none text-base leading-[1.65]"
             dangerouslySetInnerHTML={{ __html: contentHtml }}
           />
         </CardContent>

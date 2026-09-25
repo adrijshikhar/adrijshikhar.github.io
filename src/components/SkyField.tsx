@@ -15,7 +15,6 @@ import { gmstDeg, julianDay } from '../lib/sky/astronomy';
 import { FLOOR } from '../lib/sky/projection';
 import { STARS } from '../lib/sky/catalogue';
 import { SkyGame, drawGame, type Tool } from '../lib/sky/game';
-import { loadPlanetSprite, planetSprite } from '../lib/sky/planet-sprite';
 import { animate, onScroll } from '../lib/motion';
 
 const ALT_RANGE = `+90…−${Math.abs(FLOOR)}°`;
@@ -409,12 +408,16 @@ export default function SkyField({ mode }: SkyFieldProps) {
       canvas.style.width = `${W}px`;
       canvas.style.height = `${H}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
       if (gameCanvas && gameCtx) {
         // Same backing-store size and DPR transform as the main canvas, so
         // the single blit in renderFrame() is pixel-for-pixel, not a scale.
         gameCanvas.width = W * dpr;
         gameCanvas.height = H * dpr;
         gameCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        gameCtx.imageSmoothingEnabled = true;
+        gameCtx.imageSmoothingQuality = 'high';
       }
     };
 
@@ -428,14 +431,21 @@ export default function SkyField({ mode }: SkyFieldProps) {
 
     // The rectangle where prose lives, in canvas pixels. render.ts stays
     // DOM-blind, so the measuring happens here and only numbers cross over.
-    // Returns null while the hero owns the screen: the hero is MEANT to sit in
-    // the sky and measures 137/169 there, so thinning it would cost the one
-    // place the sky is the point.
-    const readingRect = (): { x: number; y: number; w: number; h: number } | null => {
+    const readingRect = (): { x: number; y: number; w: number; h: number; strength?: number } | null => {
       const col = document.querySelector('main');
       if (!col) return null;
       const r = col.getBoundingClientRect();
       if (r.width === 0 || r.bottom < 0 || r.top > window.innerHeight) return null;
+      const hero = col.querySelector(':scope > header');
+      const title = hero?.querySelector('h1');
+      const intro = title?.nextElementSibling;
+      if (title && intro) {
+        const a = title.getBoundingClientRect();
+        const b = intro.getBoundingClientRect();
+        if (b.bottom > 0 && a.top < window.innerHeight) {
+          return { x: a.left, y: a.top, w: Math.max(a.width, b.width), h: b.bottom - a.top, strength: 0.55 };
+        }
+      }
       const firstSection = col.querySelector('section[id]');
       const top = firstSection ? firstSection.getBoundingClientRect().top : r.top;
       const y = Math.max(0, top);
@@ -458,7 +468,9 @@ export default function SkyField({ mode }: SkyFieldProps) {
         // a near-black sky, which is why the readout was invisible at full alpha.
         // The ink equivalents are --primary and --muted-foreground.
         accent: cs.getPropertyValue('--primary').trim(),
-        muted: cs.getPropertyValue('--muted-foreground').trim(),
+        idleConstellation: cs.getPropertyValue('--sky-ink').trim() || undefined,
+        label: cs.getPropertyValue('--sky-label').trim() || undefined,
+        muted: cs.getPropertyValue('--sky-ink').trim() || cs.getPropertyValue('--muted-foreground').trim(),
         bright: light ? ink : '#F1F5F9',   // F · Primary Text
         moonLit: light ? ink : '#CBD5E1',  // Secondary: the Moon is grey, not warm
         planet: light ? ink : '#CBD5E1',   // Secondary Text. Cyan reads as teal at label
@@ -469,7 +481,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
         // dark text far more than light marks compete with a dark page, so
         // the base colour itself carries a low alpha on top of the per-star
         // magnitude alpha already applied where this is used.
-        faint: light ? fade(ink, 0.85) : cs.getPropertyValue('--muted-foreground').trim(),
+        faint: light ? fade(ink, 0.85) : (cs.getPropertyValue('--sky-ink').trim() || cs.getPropertyValue('--muted-foreground').trim()),
         // Light mode isn't dark mode with the colours swapped — a filled disc
         // that reads as a glowing star on black reads as a dirt speck on cream.
         // This tells the renderer to switch glyph shape, not just palette.
@@ -512,7 +524,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
         // star hover wins over a constellation hover when both are under the cursor
         hoverFig = coarse || hoverIndex >= 0 ? null : figureAt(byName, figureT, mouse.x, mouse.y);
         drawFull(ctx, W, H, bodies, byName, faint, moonPhase, figureT, hoverIndex, hoverFig, mouse, colors,
-                 planetSprite(colors.engraved, colors.planet),
+                 null,
                  readingRect());
         if (game && game.playing && gameCanvas && gameCtx) {
           // Ambient sky stays a direct draw (above); only the game overlay
@@ -537,7 +549,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
           }
         }
         drawQuiet(ctx, W, H, bodies, faint, moonPhase, colors,
-                  planetSprite(colors.engraved, colors.planet),
+                  null,
                   readingRect());
       }
     };
@@ -545,11 +557,6 @@ export default function SkyField({ mode }: SkyFieldProps) {
 
     resize();
     renderFrame();
-
-    // The glyph sheet arrives after first paint. Repaint when it lands —
-    // essential under reduced motion, where there is no loop to pick it up and
-    // the planets would stay as computed discs until the next resize.
-    loadPlanetSprite(() => renderFrame());
 
     // Respect prefers-reduced-motion: one static frame, no rAF loop — unless
     // the visitor explicitly opts in by clicking the egg (see `enter` below),
@@ -795,7 +802,9 @@ export default function SkyField({ mode }: SkyFieldProps) {
 
   return (
     <>
-      <canvas ref={canvasRef} id="sky" aria-hidden="true" className="fixed inset-0 -z-[1] pointer-events-none" />
+      <div className="fixed inset-0 -z-[1] pointer-events-none overflow-hidden" aria-hidden="true">
+        <canvas ref={canvasRef} id="sky" className="block" />
+      </div>
 
       {/* Bottom-left instrument readout — the observer this sky is actually
           computed for. Not an atmospheric locale strip: the coordinates ARE
@@ -929,7 +938,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
               owns fixed bottom-6 left-1/2, z-[1100] — sharing that spot would
               have it permanently paint over half the tool bar. */}
           {playing && figure && (
-            <p className="mass-note fixed right-6 bottom-6 z-[45] max-w-[15rem] text-right font-mono text-[0.625rem] leading-relaxed tracking-[0.14em] uppercase text-muted-foreground">
+            <p className="mass-note fixed right-6 bottom-6 z-[45] max-w-[15rem] text-right font-mono text-[0.6875rem] leading-relaxed tracking-[0.14em] uppercase text-muted-foreground">
               {figure.drawn === figure.total ? (
                 <>
                   <b className="font-medium text-primary">{figure.name}</b> complete &mdash; all {figure.total} segments
@@ -944,7 +953,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
           )}
 
           {playing && !figure && massNote && (
-            <p className="mass-note fixed right-6 bottom-6 z-[45] max-w-[15rem] text-right font-mono text-[0.625rem] leading-relaxed tracking-[0.14em] uppercase text-muted-foreground">
+            <p className="mass-note fixed right-6 bottom-6 z-[45] max-w-[15rem] text-right font-mono text-[0.6875rem] leading-relaxed tracking-[0.14em] uppercase text-muted-foreground">
               same pull, less mass &mdash; <b className="font-medium text-primary">faint stars fly faster</b>
               <span className="text-muted-foreground"> · v &prop; 1/&radic;m</span>
             </p>

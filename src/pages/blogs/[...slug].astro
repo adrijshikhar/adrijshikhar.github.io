@@ -22,8 +22,8 @@ const canonical = post.data.canonicalUrl ?? new URL(`/blogs/${post.id}/`, Astro.
 >
   <main id="content" class="mx-auto min-h-screen max-w-5xl px-6 py-16 md:px-12 md:py-24">
    <div class="reading-plane mx-auto max-w-3xl px-6 py-10 md:px-10">
-    <a href="/blogs/" class="group text-sm text-muted-foreground hover:underline">
-      <span class="mr-2 transition-transform duration-[120ms] group-hover:-translate-x-1">&larr;</span>
+    <a href="/blogs/" class="link-back">
+      <span class="arrow">&larr;</span>
       <span>all posts</span>
     </a>
 
@@ -39,20 +39,20 @@ const canonical = post.data.canonicalUrl ?? new URL(`/blogs/${post.id}/`, Astro.
     <header class={`border-b border-border pb-8 ${post.data.cover ? 'mt-8' : 'mt-10'}`}>
       <h1 class="font-heading text-3xl font-semibold leading-[1.08] tracking-tightest text-foreground sm:text-4xl">{post.data.title}</h1>
       {post.data.description && (
-        <p class="mt-4 text-lg leading-relaxed text-muted-foreground">{post.data.description}</p>
+        <p class="mt-4 text-[1.125rem] leading-relaxed text-foreground">{post.data.description}</p>
       )}
-      <p class="font-mono text-xs uppercase tracking-wider text-muted-foreground mt-5">{fmt(post.data.date)}</p>
+      <p class="mt-5 font-mono text-xs uppercase tracking-wider text-number-ink">{fmt(post.data.date)}</p>
     </header>
 
     <article
-      class="prose prose-invert mt-10 max-w-none text-foreground
+      class="prose prose-invert mt-10 max-w-none text-[1.0625rem] leading-[1.7] text-foreground
         prose-headings:font-heading prose-headings:tracking-tighter prose-headings:text-foreground
         prose-p:text-foreground prose-p:leading-relaxed prose-li:text-foreground marker:text-primary
         prose-a:text-primary prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em]
         prose-strong:text-foreground prose-strong:font-medium
         prose-code:rounded-none prose-code:border prose-code:border-border prose-code:bg-card prose-code:px-1.5 prose-code:py-0.5 prose-code:font-mono prose-code:text-[0.85em] prose-code:text-foreground prose-code:before:content-none prose-code:after:content-none
         prose-pre:rounded-none prose-pre:border prose-pre:border-border prose-pre:bg-card
-        prose-blockquote:border-l-2 prose-blockquote:border-primary prose-blockquote:text-muted-foreground prose-blockquote:not-italic
+        prose-blockquote:border-l-2 prose-blockquote:border-primary prose-blockquote:text-foreground prose-blockquote:not-italic
         prose-hr:border-border prose-img:rounded-none prose-img:border prose-img:border-border"
     >
       <Content />

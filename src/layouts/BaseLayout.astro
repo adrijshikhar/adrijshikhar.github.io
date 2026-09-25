@@ -66,8 +66,7 @@ const cfBeaconToken =
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="manifest" href="/site.webmanifest" />
-    <!-- Matches the painted ground: shadcn --background oklch(0.145 0 0) in sRGB. -->
-    <meta name="theme-color" content="#0A0A0A" />
+    <meta name="theme-color" content="#0A0D12" />
 
     <meta name="description" content={description} />
     <meta property="og:type" content={ogType} />
@@ -100,6 +99,12 @@ const cfBeaconToken =
     <!-- Skip link, first focusable thing on the page. index.astro already carries
          <main id="content">; without this, keyboard users tab the whole rail and
          the sky easter egg before reaching any content. -->
+    <a
+      href="#content"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:rounded-md focus:border focus:border-border focus:bg-background focus:px-4 focus:py-2 focus:font-mono focus:text-xs focus:text-primary focus:shadow-md"
+    >
+      Skip to content
+    </a>
     <aside aria-label="Sky instrument">
       <SkyField client:visible mode={skyMode} />
     </aside>

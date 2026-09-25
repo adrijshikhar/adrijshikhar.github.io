@@ -123,6 +123,35 @@ export function gravityWell(stars: GameStar[], mouseX: number, mouseY: number): 
   }
 }
 
+/** Calm, critically damped return of displaced stars to their true astronomical
+ *  home positions (hx, hy). Smoothly glides stars back without wild oscillation
+ *  or overshoot, settling cleanly into place. */
+export function springReturn(stars: GameStar[]): boolean {
+  let inMotion = false;
+  for (const s of stars) {
+    if (!s.playable) continue;
+    const dx = s.hx - s.x;
+    const dy = s.hy - s.y;
+    const dist = Math.hypot(dx, dy);
+    if (dist > 0.5) {
+      // Smooth critically damped approach: 18% of remaining distance per frame,
+      // speed-capped so distant stars glide calmly rather than rocketing.
+      const step = Math.min(18, dist * 0.18);
+      s.x += (dx / dist) * step;
+      s.y += (dy / dist) * step;
+      s.vx = 0;
+      s.vy = 0;
+      inMotion = true;
+    } else {
+      s.x = s.hx;
+      s.y = s.hy;
+      s.vx = 0;
+      s.vy = 0;
+    }
+  }
+  return inMotion;
+}
+
 /** Free bodies. Stars sit still at v=0 until something hits them.
  *  Impulse-based elastic collision, mass scaled by brightness, so slinging a
  *  bright star into a faint one sends the faint one flying and barely

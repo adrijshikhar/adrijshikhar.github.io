@@ -161,49 +161,49 @@ BinSight implements a **Dual-Engine Architecture**:
   <svg viewBox="0 0 680 320" class="w-full max-w-2xl h-auto font-mono text-xs select-none" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-        <path d="M 0 1 L 8 5 L 0 9 z" fill="#38bdf8" />
+        <path d="M 0 1 L 8 5 L 0 9 z" fill="var(--primary)" />
       </marker>
       <marker id="arrow-amber" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-        <path d="M 0 1 L 8 5 L 0 9 z" fill="#fbbf24" />
+        <path d="M 0 1 L 8 5 L 0 9 z" fill="#FCD34D" />
       </marker>
       <marker id="arrow-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-        <path d="M 0 1 L 8 5 L 0 9 z" fill="#34d399" />
+        <path d="M 0 1 L 8 5 L 0 9 z" fill="#7EE787" />
       </marker>
     </defs>
 
     {/* Top Node: Binlog Raw Event */}
-    <rect x="220" y="16" width="240" height="52" rx="8" fill="#171717" stroke="#333333" stroke-width="1.5"/>
-    <text x="340" y="38" text-anchor="middle" fill="#fafafa" font-weight="600" font-size="13">Binlog Raw Event</text>
-    <text x="340" y="54" text-anchor="middle" fill="#a3a3a3" font-size="11">Binary Stream / Replication Feed</text>
+    <rect x="220" y="16" width="240" height="52" rx="8" fill="var(--card)" stroke="var(--border)" stroke-width="1.5"/>
+    <text x="340" y="38" text-anchor="middle" fill="var(--foreground)" font-weight="600" font-size="13">Binlog Raw Event</text>
+    <text x="340" y="54" text-anchor="middle" fill="var(--muted-foreground)" font-size="11">Binary Stream / Replication Feed</text>
 
     {/* Fork Line */}
-    <path d="M 340 68 L 340 100" stroke="#525252" stroke-width="1.5" />
-    <path d="M 170 100 L 510 100" stroke="#525252" stroke-width="1.5" />
-    <path d="M 170 100 L 170 128" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arrow)" />
-    <path d="M 510 100 L 510 128" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#arrow-amber)" />
+    <path d="M 340 68 L 340 100" stroke="var(--border)" stroke-width="1.5" />
+    <path d="M 170 100 L 510 100" stroke="var(--border)" stroke-width="1.5" />
+    <path d="M 170 100 L 170 128" stroke="var(--primary)" stroke-width="1.5" marker-end="url(#arrow)" />
+    <path d="M 510 100 L 510 128" stroke="#FCD34D" stroke-width="1.5" marker-end="url(#arrow-amber)" />
 
     {/* Left Engine: go-mysql Workhorse */}
-    <rect x="60" y="132" width="220" height="66" rx="8" fill="#171717" stroke="#38bdf8" stroke-width="1.5"/>
-    <text x="170" y="156" text-anchor="middle" fill="#38bdf8" font-weight="600" font-size="13">go-mysql Workhorse</text>
-    <text x="170" y="174" text-anchor="middle" fill="#fafafa" font-size="11">Pure Go Ingest &amp; Indexer</text>
-    <text x="170" y="190" text-anchor="middle" fill="#737373" font-size="10">Primary Engine · Zero Deps</text>
+    <rect x="60" y="132" width="220" height="66" rx="8" fill="var(--card)" stroke="var(--primary)" stroke-width="1.5"/>
+    <text x="170" y="156" text-anchor="middle" fill="var(--primary)" font-weight="600" font-size="13">go-mysql Workhorse</text>
+    <text x="170" y="174" text-anchor="middle" fill="var(--foreground)" font-size="11">Pure Go Ingest &amp; Indexer</text>
+    <text x="170" y="190" text-anchor="middle" fill="var(--muted-foreground)" font-size="11">Primary Engine · Zero Deps</text>
 
     {/* Right Engine: mysqlbinlog Oracle */}
-    <rect x="400" y="132" width="220" height="66" rx="8" fill="#171717" stroke="#fbbf24" stroke-width="1.5"/>
-    <text x="510" y="156" text-anchor="middle" fill="#fbbf24" font-weight="600" font-size="13">mysqlbinlog Oracle</text>
-    <text x="510" y="174" text-anchor="middle" fill="#fafafa" font-size="11">Official Server Utility</text>
-    <text x="510" y="190" text-anchor="middle" fill="#737373" font-size="10">Ground Truth · Secondary</text>
+    <rect x="400" y="132" width="220" height="66" rx="8" fill="var(--card)" stroke="#FCD34D" stroke-width="1.5"/>
+    <text x="510" y="156" text-anchor="middle" fill="#FCD34D" font-weight="600" font-size="13">mysqlbinlog Oracle</text>
+    <text x="510" y="174" text-anchor="middle" fill="var(--foreground)" font-size="11">Official Server Utility</text>
+    <text x="510" y="190" text-anchor="middle" fill="var(--muted-foreground)" font-size="11">Ground Truth · Secondary</text>
 
     {/* Merge Line to Diff Drawer */}
-    <path d="M 170 198 L 170 230" stroke="#38bdf8" stroke-width="1.5" />
-    <path d="M 510 198 L 510 230" stroke="#fbbf24" stroke-width="1.5" />
-    <path d="M 170 230 L 510 230" stroke="#525252" stroke-width="1.5" />
-    <path d="M 340 230 L 340 250" stroke="#34d399" stroke-width="1.5" marker-end="url(#arrow-green)" />
+    <path d="M 170 198 L 170 230" stroke="var(--primary)" stroke-width="1.5" />
+    <path d="M 510 198 L 510 230" stroke="#FCD34D" stroke-width="1.5" />
+    <path d="M 170 230 L 510 230" stroke="var(--border)" stroke-width="1.5" />
+    <path d="M 340 230 L 340 250" stroke="#7EE787" stroke-width="1.5" marker-end="url(#arrow-green)" />
 
     {/* Bottom Node: Visual Diff Drawer */}
-    <rect x="200" y="254" width="280" height="54" rx="8" fill="#171717" stroke="#34d399" stroke-width="1.5"/>
-    <text x="340" y="276" text-anchor="middle" fill="#34d399" font-weight="600" font-size="13">Visual Diff Drawer</text>
-    <text x="340" y="294" text-anchor="middle" fill="#fafafa" font-size="11">Field-by-Field Divergence Highlighting</text>
+    <rect x="200" y="254" width="280" height="54" rx="8" fill="var(--card)" stroke="#7EE787" stroke-width="1.5"/>
+    <text x="340" y="276" text-anchor="middle" fill="#7EE787" font-weight="600" font-size="13">Visual Diff Drawer</text>
+    <text x="340" y="294" text-anchor="middle" fill="var(--foreground)" font-size="11">Field-by-Field Divergence Highlighting</text>
   </svg>
 </div>
 

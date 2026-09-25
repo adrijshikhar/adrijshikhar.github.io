@@ -120,6 +120,10 @@ const starAlpha = (mag: number): number => Math.max(0.30, Math.min(1, (2.8 - mag
  *  chart" purely from which strings it's given. */
 export interface SkyColors {
   accent: string;
+  /** Neutral ink for idle figures; omitted by legacy/light palettes. */
+  idleConstellation?: string;
+  /** Persistent body-name ink, independent of the body geometry. */
+  label?: string;
   muted: string;
   /** Full-brightness star/bloom colour — white in dark mode, full ink in light mode. */
   bright: string;
@@ -209,45 +213,69 @@ export type KeepOut = { x: number; y: number; w: number; h: number; strength?: n
  *  Scoped to the column, not the viewport. It used to be full width, which
  *  erased 45% of every mark on the canvas — including the planet labels and the
  *  hover readout out in the empty margins, where there is no text to protect. */
+let keepOutCanvas: HTMLCanvasElement | null = null;
+let keepOutCtx: CanvasRenderingContext2D | null = null;
+
+/** Erase canvas ink under the reading column so text keeps its contrast.
+ *
+ *  `destination-out`, rendered through a smooth 2D offscreen buffer in a single
+ *  composite blit so there are zero stepped bands, zero horizontal seams, and
+ *  zero artifacts crossing celestial landmarks outside the prose column. */
 function applyKeepOut(ctx: CanvasRenderingContext2D, k: KeepOut, W: number): void {
   const strength = k.strength ?? 0.45;
   const feather = 140;
-  const side = 72;
-  const prev = ctx.globalCompositeOperation;
-  ctx.globalCompositeOperation = 'destination-out';
-
-  // Horizontal extent is the READING COLUMN, not the viewport. This used to be
-  // fillRect(0, …, W, …), which erased 45% of every mark on the canvas —
-  // including the planet labels and the hover readout out in the empty margins,
-  // where there is no text to protect. Those labels are the instrument's own
-  // voice; dimming them by half bought no legibility, it just made the sky
-  // unreadable. Text only ever sits inside the column, so that is all the
-  // keep-out needs to cover.
+  const side = 40; // tightly bounds the column without spilling into empty sky
   const x0 = Math.max(0, k.x - side);
   const x1 = Math.min(W, k.x + k.w + side);
+  const kw = Math.round(x1 - x0);
+  const kh = Math.round(k.h + feather);
+  if (kw <= 0 || kh <= 0) return;
 
-  // Feathered on all four sides now: a hard vertical edge in open sky reads as a
-  // seam, which is exactly the failure the top edge was already feathered to
-  // avoid.
-  const band = (y: number, h: number, alpha: number) => {
-    const g = ctx.createLinearGradient(x0, 0, x1, 0);
-    g.addColorStop(0, 'rgba(0,0,0,0)');
-    g.addColorStop(Math.min(0.49, side / Math.max(1, x1 - x0)), `rgba(0,0,0,${alpha})`);
-    g.addColorStop(Math.max(0.51, 1 - side / Math.max(1, x1 - x0)), `rgba(0,0,0,${alpha})`);
-    g.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = g;
-    ctx.fillRect(x0, y, x1 - x0, h);
-  };
+  if (typeof document === 'undefined') return;
 
-  // Vertical feather at the top edge: that boundary is where the hero hands over
-  // to the content, so a gradient there reads as the sky receding, not a seam.
-  const steps = 12;
-  for (let i = 0; i < steps; i++) {
-    const t = (i + 1) / steps;
-    band(k.y - feather + (feather * i) / steps, feather / steps + 1, strength * t);
+  if (!keepOutCanvas) {
+    keepOutCanvas = document.createElement('canvas');
+    keepOutCtx = keepOutCanvas.getContext('2d');
   }
-  band(k.y, k.h, strength);
+  if (!keepOutCanvas || !keepOutCtx) return;
 
+  if (keepOutCanvas.width < kw || keepOutCanvas.height < kh) {
+    keepOutCanvas.width = Math.max(keepOutCanvas.width, kw);
+    keepOutCanvas.height = Math.max(keepOutCanvas.height, kh);
+  }
+
+  // Clear scratch region
+  keepOutCtx.clearRect(0, 0, kw, kh);
+
+  // 1. Horizontal gradient envelope: smooth fade along left and right flanks
+  const gHoriz = keepOutCtx.createLinearGradient(0, 0, kw, 0);
+  gHoriz.addColorStop(0, 'rgba(0,0,0,0)');
+  const sLeft = Math.min(0.48, side / kw);
+  const sRight = Math.max(0.52, 1 - side / kw);
+  gHoriz.addColorStop(sLeft, 'rgba(0,0,0,1)');
+  gHoriz.addColorStop(sRight, 'rgba(0,0,0,1)');
+  gHoriz.addColorStop(1, 'rgba(0,0,0,0)');
+  keepOutCtx.fillStyle = gHoriz;
+  keepOutCtx.fillRect(0, 0, kw, kh);
+
+  // 2. Vertical gradient: smooth top feather over `feather` pixels
+  keepOutCtx.globalCompositeOperation = 'source-in';
+  const gVert = keepOutCtx.createLinearGradient(0, 0, 0, kh);
+  const fStop = Math.min(0.99, feather / kh);
+  gVert.addColorStop(0, 'rgba(0,0,0,0)');
+  gVert.addColorStop(fStop, 'rgba(0,0,0,1)');
+  gVert.addColorStop(1, 'rgba(0,0,0,1)');
+  keepOutCtx.fillStyle = gVert;
+  keepOutCtx.fillRect(0, 0, kw, kh);
+  keepOutCtx.globalCompositeOperation = 'source-over';
+
+  // 3. Composite onto destination canvas in one single smooth blit
+  const prev = ctx.globalCompositeOperation;
+  const prevAlpha = ctx.globalAlpha;
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.globalAlpha = strength;
+  ctx.drawImage(keepOutCanvas, 0, 0, kw, kh, x0, k.y - feather, kw, kh);
+  ctx.globalAlpha = prevAlpha;
   ctx.globalCompositeOperation = prev;
 }
 
@@ -368,8 +396,8 @@ const MOON_MAG = -8;
 // produces an absurd disc — it's fixed at a plausible instrument radius instead.
 const MOON_VR = 13;
 /** Sun and Moon subtend almost the same angle from Earth (~0.5 deg), so they
- *  share a size. Rays then extend to ~1.05x beyond this. */
-const SUN_VR = 11;
+ *  share a size. */
+const SUN_VR = 13;
 /** Planets are sized by APPARENT ANGULAR EXTENT, not brightness. Magnitude sizing
  *  made Saturn near-smallest because it is dim, when in fact its rings are the
  *  widest planetary feature in the sky. sqrt compresses the ~9x spread between
@@ -605,9 +633,9 @@ export function drawGraticule(
     ctx.stroke();
   }
 
-  ctx.font = '500 8px ui-monospace,Menlo,monospace';
+  ctx.font = '600 11px ui-monospace,Menlo,monospace';
   ctx.textAlign = 'left';
-  ctx.globalAlpha = Math.min(1, 0.34 * K);
+  ctx.globalAlpha = Math.min(1, 0.55 * K);
   ctx.fillStyle = colors.muted;
   for (const a of [60, 30, 0]) {
     ctx.fillText(a === 0 ? 'HORIZON' : `${a}°`, cx + 6, cy - altR(a) + 11);
@@ -632,6 +660,706 @@ export function drawGraticule(
  *  constellation hover when both are under the cursor. Draw order matches the
  *  prototype: constellation lines sit UNDER the graticule and the bodies, so
  *  named stars always read clearly on top of the instrument. */
+// ---------------------------------------------------------------------------
+// High-Fidelity Celestial Vector Renderers (Planetary Globes & System)
+// ---------------------------------------------------------------------------
+
+function drawMoon(
+  ctx: CanvasRenderingContext2D,
+  s: BodyPos,
+  moonPhase: MoonPhase,
+  isHovered: boolean,
+  accent: string,
+  moonLit: string,
+  a: number,
+  r: number,
+): void {
+  const k = moonPhase.illum;
+  const side = moonPhase.waxing ? 1 : -1;
+  const bRad = r * Math.abs(1 - 2 * k);
+
+  // 1. Earthshine unlit disc: soft luminous unlit face as seen through binoculars
+  ctx.save();
+  ctx.globalAlpha = a * 0.14;
+  ctx.fillStyle = moonLit;
+  ctx.beginPath();
+  ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Faint outer rim stroke
+  ctx.globalAlpha = a * 0.28;
+  ctx.strokeStyle = isHovered ? accent : moonLit;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // 2. Lit phase with real Lunar Maria
+  ctx.beginPath();
+  ctx.arc(s.x, s.y, r, -Math.PI / 2, Math.PI / 2, side < 0);
+  ctx.ellipse(
+    s.x, s.y, bRad, r, 0,
+    Math.PI / 2, -Math.PI / 2, (k > 0.5) === (side > 0),
+  );
+  ctx.closePath();
+  ctx.clip(); // Clip to illuminated phase!
+
+  // Fill lit background
+  ctx.globalAlpha = a;
+  ctx.fillStyle = isHovered ? accent : moonLit;
+  ctx.beginPath();
+  ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Major Lunar Maria (dark basalt plains on the illuminated surface)
+  const mScale = r / 36;
+  ctx.globalAlpha = a * 0.38;
+  ctx.fillStyle = '#0b0f14';
+
+  // Oceanus Procellarum
+  ctx.save();
+  ctx.translate(s.x - 10 * mScale, s.y - 4 * mScale);
+  ctx.rotate(-0.26);
+  ctx.beginPath();
+  ctx.ellipse(0, 0, 12 * mScale, 16 * mScale, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  // Mare Imbrium
+  ctx.beginPath();
+  ctx.arc(s.x - 4 * mScale, s.y - 14 * mScale, 9 * mScale, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Mare Serenitatis
+  ctx.beginPath();
+  ctx.arc(s.x + 8 * mScale, s.y - 12 * mScale, 7 * mScale, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Mare Tranquillitatis
+  ctx.beginPath();
+  ctx.arc(s.x + 12 * mScale, s.y - 2 * mScale, 8 * mScale, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Mare Crisium
+  ctx.beginPath();
+  ctx.ellipse(s.x + 22 * mScale, s.y - 8 * mScale, 5 * mScale, 4 * mScale, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Mare Fecunditatis
+  ctx.beginPath();
+  ctx.ellipse(s.x + 14 * mScale, s.y + 8 * mScale, 7 * mScale, 5 * mScale, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Mare Nubium
+  ctx.beginPath();
+  ctx.arc(s.x - 5 * mScale, s.y + 12 * mScale, 7 * mScale, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore(); // end clip
+
+  // 3. Subtle terminator elliptical arc boundary rule
+  ctx.globalAlpha = a * 0.45;
+  ctx.strokeStyle = isHovered ? accent : '#61afef';
+  ctx.lineWidth = 0.8;
+  ctx.beginPath();
+  ctx.ellipse(s.x, s.y, bRad, r, 0, -Math.PI / 2, Math.PI / 2, (k > 0.5) === (side > 0));
+  ctx.stroke();
+}
+
+function drawSun(
+  ctx: CanvasRenderingContext2D,
+  s: BodyPos,
+  isHovered: boolean,
+  accent: string,
+  sunColor: string,
+  a: number,
+  r: number,
+): void {
+  const scale = r / 18;
+
+  // 1. Outer Chromosphere boundary ring: smooth continuous circular motion
+  const now = typeof performance !== 'undefined' ? performance.now() : 0;
+  // Circular rotation around Sun center (~18s per revolution)
+  const rotAngle = (now * 0.00036) % (Math.PI * 2);
+
+  ctx.save();
+  ctx.translate(s.x, s.y);
+  ctx.rotate(rotAngle);
+  ctx.globalAlpha = a * 0.45;
+  ctx.strokeStyle = sunColor;
+  ctx.lineWidth = 0.8;
+  ctx.setLineDash([2.5 * scale, 3 * scale]);
+  ctx.beginPath();
+  ctx.arc(0, 0, r * 1.28, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+
+  // 2. Eastern Limb Prominence Loop Arch (breaching into space)
+  ctx.save();
+  ctx.globalAlpha = a * 0.85;
+  ctx.strokeStyle = sunColor;
+  ctx.lineWidth = Math.max(1.1, 1.2 * scale);
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(s.x + 12.5 * scale, s.y - 12.5 * scale);
+  ctx.bezierCurveTo(
+    s.x + 18 * scale, s.y - 19 * scale,
+    s.x + 23 * scale, s.y - 13.5 * scale,
+    s.x + 16.5 * scale, s.y - 7 * scale,
+  );
+  ctx.stroke();
+
+  ctx.strokeStyle = '#eda05b'; // warm prominence filament
+  ctx.lineWidth = Math.max(0.6, 0.6 * scale);
+  ctx.globalAlpha = a * 0.6;
+  ctx.beginPath();
+  ctx.moveTo(s.x + 13.5 * scale, s.y - 11 * scale);
+  ctx.bezierCurveTo(
+    s.x + 17 * scale, s.y - 15.5 * scale,
+    s.x + 20.5 * scale, s.y - 12 * scale,
+    s.x + 16 * scale, s.y - 7.5 * scale,
+  );
+  ctx.stroke();
+  ctx.restore();
+
+  // 3. Photosphere Globe
+  ctx.save();
+  ctx.globalAlpha = a * (isHovered ? 1 : 0.95);
+  ctx.fillStyle = '#121820'; // obsidian ground matching other planets
+  ctx.beginPath();
+  ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.strokeStyle = isHovered ? accent : sunColor;
+  ctx.lineWidth = Math.max(1.15, r * 0.08);
+  ctx.stroke();
+
+  // Clip to disc for surface magnetic structures
+  ctx.beginPath();
+  ctx.arc(s.x, s.y, r - 0.5, 0, Math.PI * 2);
+  ctx.clip();
+
+  // Solar Equator Axis (7.25° tilt) in instrument slate
+  ctx.strokeStyle = '#8b949e';
+  ctx.globalAlpha = a * 0.3;
+  ctx.lineWidth = 0.6;
+  ctx.setLineDash([2 * scale, 2 * scale]);
+  ctx.beginPath();
+  ctx.moveTo(s.x - r, s.y - 2.3 * scale);
+  ctx.lineTo(s.x + r, s.y + 2.3 * scale);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Northern Filament Channel: Shaded plasma ribbon (like Jupiter's wave belts)
+  ctx.fillStyle = sunColor;
+  ctx.globalAlpha = a * 0.22;
+  ctx.beginPath();
+  ctx.moveTo(s.x - 14 * scale, s.y - 4 * scale);
+  ctx.quadraticCurveTo(s.x - 7 * scale, s.y - 11 * scale, s.x, s.y - 5 * scale);
+  ctx.quadraticCurveTo(s.x + 7 * scale, s.y + 1 * scale, s.x + 13 * scale, s.y - 3 * scale);
+  ctx.lineTo(s.x + 13 * scale, s.y - 6 * scale);
+  ctx.quadraticCurveTo(s.x + 7 * scale, s.y - 2 * scale, s.x, s.y - 8 * scale);
+  ctx.quadraticCurveTo(s.x - 7 * scale, s.y - 14 * scale, s.x - 14 * scale, s.y - 7 * scale);
+  ctx.closePath();
+  ctx.fill();
+
+  // Core dark absorption spine of the filament
+  ctx.strokeStyle = sunColor;
+  ctx.globalAlpha = a * 0.95;
+  ctx.lineWidth = Math.max(1.1, 1.3 * scale);
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(s.x - 13 * scale, s.y - 5.5 * scale);
+  ctx.quadraticCurveTo(s.x - 6.5 * scale, s.y - 11.5 * scale, s.x + 0.5 * scale, s.y - 5.5 * scale);
+  ctx.quadraticCurveTo(s.x + 7.5 * scale, s.y + 0.5 * scale, s.x + 13.5 * scale, s.y - 3.5 * scale);
+  ctx.stroke();
+
+  // Secondary fibril
+  ctx.lineWidth = Math.max(0.7, 0.75 * scale);
+  ctx.globalAlpha = a * 0.55;
+  ctx.beginPath();
+  ctx.moveTo(s.x - 8 * scale, s.y - 3.5 * scale);
+  ctx.quadraticCurveTo(s.x - 3 * scale, s.y - 7 * scale, s.x + 3 * scale, s.y - 2 * scale);
+  ctx.stroke();
+
+  // Southern Bipolar Active Region & Magnetic Coronal Arcade
+  ctx.strokeStyle = sunColor;
+  ctx.globalAlpha = a * 0.7;
+  ctx.lineWidth = Math.max(0.7, 0.85 * scale);
+  ctx.beginPath();
+  ctx.moveTo(s.x - 6 * scale, s.y + 8 * scale);
+  ctx.quadraticCurveTo(s.x - 1 * scale, s.y, s.x + 5 * scale, s.y + 10 * scale);
+  ctx.stroke();
+
+  ctx.globalAlpha = a * 0.45;
+  ctx.lineWidth = Math.max(0.5, 0.6 * scale);
+  ctx.setLineDash([1.5 * scale, 1.5 * scale]);
+  ctx.beginPath();
+  ctx.moveTo(s.x - 8 * scale, s.y + 9 * scale);
+  ctx.quadraticCurveTo(s.x - 1 * scale, s.y - 3 * scale, s.x + 7 * scale, s.y + 11 * scale);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Active Sunspot Cores (warm amber #eda05b with obsidian umbra)
+  ctx.globalAlpha = a * 0.95;
+  ctx.fillStyle = '#eda05b';
+  ctx.beginPath();
+  ctx.arc(s.x - 6 * scale, s.y + 8 * scale, 2.2 * scale, 0, Math.PI * 2);
+  ctx.arc(s.x + 5 * scale, s.y + 10 * scale, 1.8 * scale, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = '#0b0f14';
+  ctx.beginPath();
+  ctx.arc(s.x - 6 * scale, s.y + 8 * scale, 1.3 * scale, 0, Math.PI * 2);
+  ctx.arc(s.x + 5 * scale, s.y + 10 * scale, 1.0 * scale, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Brilliant White Micro-Flare Glint (#f5f4ef)
+  ctx.fillStyle = '#f5f4ef';
+  ctx.globalAlpha = a;
+  ctx.beginPath();
+  ctx.arc(s.x - 1 * scale, s.y + 5 * scale, 1.3 * scale, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#f5f4ef';
+  ctx.lineWidth = 0.6;
+  ctx.globalAlpha = a * 0.75;
+  ctx.beginPath();
+  ctx.moveTo(s.x - 1 * scale, s.y + 2.5 * scale);
+  ctx.lineTo(s.x - 1 * scale, s.y + 7.5 * scale);
+  ctx.moveTo(s.x - 3.5 * scale, s.y + 5 * scale);
+  ctx.lineTo(s.x + 1.5 * scale, s.y + 5 * scale);
+  ctx.stroke();
+
+  // Polar Plumes in instrument slate
+  ctx.strokeStyle = '#8b949e';
+  ctx.lineWidth = 0.6;
+  ctx.globalAlpha = a * 0.35;
+  ctx.beginPath();
+  ctx.moveTo(s.x - 9 * scale, s.y - 15 * scale);
+  ctx.quadraticCurveTo(s.x, s.y - 13 * scale, s.x + 9 * scale, s.y - 15 * scale);
+  ctx.moveTo(s.x - 9 * scale, s.y + 15 * scale);
+  ctx.quadraticCurveTo(s.x, s.y + 13 * scale, s.x + 9 * scale, s.y + 15 * scale);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+function drawSaturn(
+  ctx: CanvasRenderingContext2D,
+  s: BodyPos,
+  isHovered: boolean,
+  accent: string,
+  planetColor: string,
+  a: number,
+  r: number,
+): void {
+  const colour = isHovered ? accent : planetColor;
+  const ringX = r * 1.55;
+  const ringY = r * 0.47;
+  const bodyR = r * SATURN_BODY_FRAC;
+
+  ctx.save();
+  ctx.translate(s.x, s.y);
+  ctx.rotate(-0.38);
+
+  // 1. REAR RINGS (passing behind the globe)
+  // Outer A Ring
+  ctx.globalAlpha = a * 0.85;
+  ctx.strokeStyle = colour;
+  ctx.lineWidth = Math.max(1.2, r * 0.16);
+  ctx.beginPath();
+  ctx.ellipse(0, 0, ringX, ringY, 0, Math.PI, Math.PI * 2);
+  ctx.stroke();
+
+  // Inner B Ring (brighter)
+  ctx.globalAlpha = a * 0.95;
+  ctx.lineWidth = Math.max(1.5, r * 0.24);
+  ctx.beginPath();
+  ctx.ellipse(0, 0, ringX * 0.83, ringY * 0.83, 0, Math.PI, Math.PI * 2);
+  ctx.stroke();
+
+  // Crepe C Ring (faint)
+  ctx.globalAlpha = a * 0.35;
+  ctx.lineWidth = Math.max(0.8, r * 0.1);
+  ctx.beginPath();
+  ctx.ellipse(0, 0, ringX * 0.68, ringY * 0.68, 0, Math.PI, Math.PI * 2);
+  ctx.stroke();
+
+  // Globe Shadow cast onto rear ring
+  ctx.globalAlpha = a * 0.85;
+  ctx.fillStyle = '#0b0f14';
+  ctx.beginPath();
+  ctx.ellipse(-bodyR * 0.25, -bodyR * 0.2, bodyR * 0.9, bodyR * 0.9, 0, Math.PI, Math.PI * 2);
+  ctx.fill();
+
+  // 2. GLOBE
+  ctx.globalAlpha = a * (isHovered ? 1 : 0.95);
+  ctx.fillStyle = '#121820';
+  ctx.beginPath();
+  ctx.arc(0, 0, bodyR, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.strokeStyle = colour;
+  ctx.lineWidth = Math.max(1.15, r * 0.09);
+  ctx.stroke();
+
+  // Atmospheric cloud belts on globe
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(0, 0, bodyR - 0.5, 0, Math.PI * 2);
+  ctx.clip();
+  ctx.globalAlpha = a * 0.6;
+  ctx.lineWidth = Math.max(0.8, r * 0.06);
+  ctx.beginPath();
+  ctx.moveTo(-bodyR, bodyR * 0.12);
+  ctx.quadraticCurveTo(0, bodyR * 0.25, bodyR, bodyR * 0.12);
+  ctx.stroke();
+  ctx.globalAlpha = a * 0.4;
+  ctx.beginPath();
+  ctx.moveTo(-bodyR * 0.85, -bodyR * 0.25);
+  ctx.quadraticCurveTo(0, -bodyR * 0.12, bodyR * 0.85, -bodyR * 0.25);
+  ctx.stroke();
+  ctx.restore();
+
+  // 3. FRONT RINGS (passing in front of the globe)
+  ctx.globalAlpha = a * 0.85;
+  ctx.strokeStyle = colour;
+  ctx.lineWidth = Math.max(1.2, r * 0.16);
+  ctx.beginPath();
+  ctx.ellipse(0, 0, ringX, ringY, 0, 0, Math.PI);
+  ctx.stroke();
+
+  ctx.globalAlpha = a * 0.95;
+  ctx.lineWidth = Math.max(1.5, r * 0.24);
+  ctx.beginPath();
+  ctx.ellipse(0, 0, ringX * 0.83, ringY * 0.83, 0, 0, Math.PI);
+  ctx.stroke();
+
+  ctx.globalAlpha = a * 0.35;
+  ctx.lineWidth = Math.max(0.8, r * 0.1);
+  ctx.beginPath();
+  ctx.ellipse(0, 0, ringX * 0.68, ringY * 0.68, 0, 0, Math.PI);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+function drawJupiter(
+  ctx: CanvasRenderingContext2D,
+  s: BodyPos,
+  isHovered: boolean,
+  accent: string,
+  planetColor: string,
+  a: number,
+  r: number,
+): void {
+  const colour = isHovered ? accent : planetColor;
+  const globeR = r * 0.9;
+  const scale = globeR / 18;
+
+  // 1. Four Galilean Moons aligned along equator
+  ctx.save();
+  ctx.strokeStyle = colour;
+  ctx.lineWidth = 0.5;
+  ctx.setLineDash([2, 3]);
+  ctx.globalAlpha = a * 0.3;
+  ctx.beginPath();
+  ctx.moveTo(s.x - 58 * scale, s.y - 3.5 * scale);
+  ctx.lineTo(s.x + 52 * scale, s.y + 3 * scale);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Callisto
+  ctx.globalAlpha = a * 0.75;
+  ctx.fillStyle = colour;
+  ctx.beginPath();
+  ctx.arc(s.x - 54 * scale, s.y - 3 * scale, 1.5 * scale, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Ganymede
+  ctx.globalAlpha = a * 0.95;
+  ctx.beginPath();
+  ctx.arc(s.x - 34 * scale, s.y - 2 * scale, 2.2 * scale, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Io (warm sulfur gold)
+  ctx.fillStyle = '#e5c07b';
+  ctx.beginPath();
+  ctx.arc(s.x + 28 * scale, s.y + 1.5 * scale, 1.8 * scale, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Europa (brilliant ice silver)
+  ctx.fillStyle = '#e6edf3';
+  ctx.globalAlpha = a * 0.85;
+  ctx.beginPath();
+  ctx.arc(s.x + 48 * scale, s.y + 2.5 * scale, 1.6 * scale, 0, Math.PI * 2);
+  ctx.fill();
+
+  // 2. Jupiter Globe
+  ctx.globalAlpha = a * (isHovered ? 1 : 0.95);
+  ctx.fillStyle = '#121820';
+  ctx.beginPath();
+  ctx.arc(s.x, s.y, globeR, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.strokeStyle = colour;
+  ctx.lineWidth = Math.max(1.15, r * 0.09);
+  ctx.stroke();
+
+  // Clip inside globe for atmospheric wave belts & Great Red Spot
+  ctx.beginPath();
+  ctx.arc(s.x, s.y, globeR - 0.5, 0, Math.PI * 2);
+  ctx.clip();
+
+  // North Equatorial Belt (NEB) with wave
+  ctx.fillStyle = colour;
+  ctx.globalAlpha = a * 0.35;
+  ctx.beginPath();
+  ctx.moveTo(s.x - globeR, s.y - 4 * scale);
+  ctx.quadraticCurveTo(s.x - 8 * scale, s.y - 2 * scale, s.x, s.y - 5 * scale);
+  ctx.quadraticCurveTo(s.x + 8 * scale, s.y - 8 * scale, s.x + globeR, s.y - 4 * scale);
+  ctx.lineTo(s.x + globeR, s.y - 8 * scale);
+  ctx.lineTo(s.x - globeR, s.y - 8 * scale);
+  ctx.closePath();
+  ctx.fill();
+
+  // South Equatorial Belt (SEB) with Red Spot notch
+  ctx.beginPath();
+  ctx.moveTo(s.x - globeR, s.y + 3 * scale);
+  ctx.quadraticCurveTo(s.x - 6 * scale, s.y + 5 * scale, s.x + 2 * scale, s.y + 2 * scale);
+  ctx.quadraticCurveTo(s.x + 10 * scale, s.y + 5 * scale, s.x + globeR, s.y + 3 * scale);
+  ctx.lineTo(s.x + globeR, s.y + 8 * scale);
+  ctx.lineTo(s.x - globeR, s.y + 8 * scale);
+  ctx.closePath();
+  ctx.fill();
+
+  // Great Red Spot Storm Oval
+  ctx.fillStyle = '#e06c75';
+  ctx.strokeStyle = colour;
+  ctx.lineWidth = 0.8;
+  ctx.globalAlpha = a * 0.95;
+  ctx.beginPath();
+  ctx.ellipse(s.x + 6 * scale, s.y + 5 * scale, 3.5 * scale, 2.2 * scale, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  // Polar Shading
+  ctx.fillStyle = colour;
+  ctx.globalAlpha = a * 0.2;
+  ctx.beginPath();
+  ctx.arc(s.x, s.y - globeR, globeR * 0.5, 0, Math.PI * 2);
+  ctx.arc(s.x, s.y + globeR, globeR * 0.5, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+function drawMars(
+  ctx: CanvasRenderingContext2D,
+  s: BodyPos,
+  isHovered: boolean,
+  accent: string,
+  a: number,
+  r: number,
+): void {
+  const colour = isHovered ? accent : '#e06c75';
+  const scale = r / 12;
+
+  ctx.save();
+  // Outer guide reticle ring
+  ctx.strokeStyle = colour;
+  ctx.lineWidth = 0.75;
+  ctx.setLineDash([3 * scale, 4 * scale]);
+  ctx.globalAlpha = a * 0.45;
+  ctx.beginPath();
+  ctx.arc(s.x, s.y, r * 1.5, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Globe
+  ctx.globalAlpha = a * (isHovered ? 1 : 0.95);
+  ctx.fillStyle = '#181318';
+  ctx.beginPath();
+  ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.strokeStyle = colour;
+  ctx.lineWidth = Math.max(1.15, r * 0.1);
+  ctx.stroke();
+
+  // Clip inside globe for surface features
+  ctx.beginPath();
+  ctx.arc(s.x, s.y, r - 0.5, 0, Math.PI * 2);
+  ctx.clip();
+
+  // North Polar Ice Cap (brilliant white #f5f4ef)
+  ctx.fillStyle = '#f5f4ef';
+  ctx.globalAlpha = a * 0.95;
+  ctx.beginPath();
+  ctx.ellipse(s.x, s.y - r * 0.92, 5 * scale, 2.5 * scale, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Syrtis Major Planum (triangular dark albedo feature)
+  ctx.fillStyle = colour;
+  ctx.globalAlpha = a * 0.55;
+  ctx.beginPath();
+  ctx.moveTo(s.x, s.y - 2 * scale);
+  ctx.lineTo(s.x + 5 * scale, s.y + 4 * scale);
+  ctx.lineTo(s.x - 3 * scale, s.y + 5 * scale);
+  ctx.closePath();
+  ctx.fill();
+
+  // Southern terrain
+  ctx.globalAlpha = a * 0.3;
+  ctx.beginPath();
+  ctx.moveTo(s.x - r, s.y + 7 * scale);
+  ctx.quadraticCurveTo(s.x, s.y + 4 * scale, s.x + r, s.y + 8 * scale);
+  ctx.lineTo(s.x + r, s.y + r);
+  ctx.lineTo(s.x - r, s.y + r);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.restore();
+}
+
+function drawVenus(
+  ctx: CanvasRenderingContext2D,
+  s: BodyPos,
+  isHovered: boolean,
+  accent: string,
+  planetColor: string,
+  a: number,
+  r: number,
+): void {
+  const colour = isHovered ? accent : planetColor;
+  const k = s.illum ?? 0.7;
+  const br = r * 0.9;
+  const scale = br / 14;
+  const bRad = br * Math.abs(1 - 2 * k);
+
+  ctx.save();
+  // 1. Brilliant 4-Point Optical Diffraction Diamond Glint (The Morning Star)
+  ctx.strokeStyle = '#e6edf3';
+  ctx.lineWidth = 0.8;
+  ctx.globalAlpha = a * 0.6;
+  ctx.beginPath();
+  ctx.moveTo(s.x, s.y - 28 * scale);
+  ctx.lineTo(s.x, s.y + 28 * scale);
+  ctx.moveTo(s.x - 28 * scale, s.y);
+  ctx.lineTo(s.x + 28 * scale, s.y);
+  ctx.stroke();
+
+  // Diagonal glint hairlines
+  ctx.strokeStyle = colour;
+  ctx.lineWidth = 0.5;
+  ctx.globalAlpha = a * 0.35;
+  ctx.beginPath();
+  ctx.moveTo(s.x - 12 * scale, s.y - 12 * scale);
+  ctx.lineTo(s.x + 12 * scale, s.y + 12 * scale);
+  ctx.moveTo(s.x + 12 * scale, s.y - 12 * scale);
+  ctx.lineTo(s.x - 12 * scale, s.y + 12 * scale);
+  ctx.stroke();
+
+  // 2. Unlit Globe Outline
+  ctx.globalAlpha = a * 0.4;
+  ctx.fillStyle = 'rgba(240, 245, 255, 0.05)';
+  ctx.strokeStyle = colour;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.arc(s.x, s.y, br, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  // 3. Illuminated Cloud Deck with UV Chevron curves (Crescent Phase)
+  ctx.beginPath();
+  ctx.arc(s.x, s.y, br, -Math.PI / 2, Math.PI / 2);
+  ctx.ellipse(s.x, s.y, bRad, br, 0, Math.PI / 2, -Math.PI / 2, k > 0.5);
+  ctx.closePath();
+  ctx.clip(); // Clip to illuminated phase!
+
+  ctx.globalAlpha = a * (isHovered ? 1 : 0.95);
+  ctx.fillStyle = '#f0f4f8';
+  ctx.beginPath();
+  ctx.arc(s.x, s.y, br, 0, Math.PI * 2);
+  ctx.fill();
+
+  // UV chevron cloud curves
+  ctx.strokeStyle = '#cbd5e1';
+  ctx.lineWidth = Math.max(1, 1.2 * scale);
+  ctx.beginPath();
+  ctx.moveTo(s.x - 8 * scale, s.y - 6 * scale);
+  ctx.quadraticCurveTo(s.x, s.y - 3 * scale, s.x + 8 * scale, s.y - 6 * scale);
+  ctx.moveTo(s.x - 10 * scale, s.y);
+  ctx.quadraticCurveTo(s.x, s.y + 3 * scale, s.x + 10 * scale, s.y);
+  ctx.moveTo(s.x - 8 * scale, s.y + 6 * scale);
+  ctx.quadraticCurveTo(s.x, s.y + 9 * scale, s.x + 8 * scale, s.y + 6 * scale);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+function drawMercury(
+  ctx: CanvasRenderingContext2D,
+  s: BodyPos,
+  isHovered: boolean,
+  accent: string,
+  a: number,
+  r: number,
+): void {
+  const colour = isHovered ? accent : '#9aa5b1';
+  const scale = r / 8;
+
+  ctx.save();
+  // Outer guide ring
+  ctx.strokeStyle = colour;
+  ctx.lineWidth = 0.6;
+  ctx.setLineDash([2 * scale, 3 * scale]);
+  ctx.globalAlpha = a * 0.4;
+  ctx.beginPath();
+  ctx.arc(s.x, s.y, r * 1.5, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Globe
+  ctx.globalAlpha = a * (isHovered ? 1 : 0.95);
+  ctx.fillStyle = '#121820';
+  ctx.beginPath();
+  ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.strokeStyle = colour;
+  ctx.lineWidth = Math.max(1.15, r * 0.12);
+  ctx.stroke();
+
+  // Caloris Basin concentric impact shock rings
+  ctx.strokeStyle = colour;
+  ctx.lineWidth = 0.8;
+  ctx.globalAlpha = a * 0.8;
+  ctx.beginPath();
+  ctx.arc(s.x - 2 * scale, s.y - 1 * scale, 2 * scale, 0, Math.PI * 2);
+  ctx.stroke();
+
+  ctx.lineWidth = 0.6;
+  ctx.setLineDash([1.5 * scale, 1.5 * scale]);
+  ctx.globalAlpha = a * 0.6;
+  ctx.beginPath();
+  ctx.arc(s.x - 2 * scale, s.y - 1 * scale, 4.2 * scale, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Micro-cratered limb ticks
+  ctx.lineWidth = 0.8;
+  ctx.globalAlpha = a * 0.8;
+  ctx.beginPath();
+  ctx.moveTo(s.x + 6 * scale, s.y - 2 * scale);
+  ctx.lineTo(s.x + 8 * scale, s.y - 2 * scale);
+  ctx.moveTo(s.x + 5 * scale, s.y + 4 * scale);
+  ctx.lineTo(s.x + 7.5 * scale, s.y + 4 * scale);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
 /** Paints stars, planets, the Moon and the Sun — the one body renderer, shared
  *  by both views so a planet can never look like two different objects
  *  depending on which page you are on. Everything above it (graticule,
@@ -655,175 +1383,53 @@ export function drawBodies(
     const below = s.alt < 0 ? 0.3 : 1;
     const a = Math.min(BODY_ALPHA_CAP, starAlpha(s.mag)) * below;
     const r = s.vr; // single source of truth for the painted radius
+    const isHovered = i === hoverIndex;
 
     if (s.isMoon) {
-      // Real phase: the terminator is an ellipse whose semi-minor axis is
-      // r·|1−2k| for illuminated fraction k. The lit limb faces the Sun,
-      // which side waxing/waning tells us.
-      const k = moonPhase.illum;
-      ctx.globalAlpha = a;
-      // No earthshine disc: glow is gone from every body, so the Moon is the
-      // terminator and nothing else. The unlit side is simply not drawn.
-      const side = moonPhase.waxing ? 1 : -1; // lit limb on the right if waxing
-      ctx.fillStyle = i === hoverIndex ? accent : moonLit;
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, r, -Math.PI / 2, Math.PI / 2, side < 0); // the lit half
-      ctx.ellipse(
-        s.x, s.y, r * Math.abs(1 - 2 * k), r, 0,
-        Math.PI / 2, -Math.PI / 2, (k > 0.5) === (side > 0),
-      );
-      ctx.fill();
-      ctx.globalAlpha = a * 0.22;
-      ctx.strokeStyle = moonLit;
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
-      ctx.stroke();
+      drawMoon(ctx, s, moonPhase, isHovered, accent, moonLit, a, r);
+    } else if (s.isSun) {
+      drawSun(ctx, s, isHovered, accent, colors.sun, a, r);
+    } else if (s.name === 'Saturn') {
+      drawSaturn(ctx, s, isHovered, accent, planet, a, r);
+    } else if (s.name === 'Jupiter') {
+      drawJupiter(ctx, s, isHovered, accent, planet, a, r);
+    } else if (s.name === 'Mars') {
+      drawMars(ctx, s, isHovered, accent, a, r);
+    } else if (s.isPlanet && s.illum !== undefined && s.illum < 0.92 && r >= TERMINATOR_MIN_VR) {
+      drawVenus(ctx, s, isHovered, accent, planet, a, r);
+    } else if (s.name === 'Mercury') {
+      drawMercury(ctx, s, isHovered, accent, a, r);
     } else {
-      const colour = i === hoverIndex ? accent : s.isSun ? colors.sun : s.isPlanet ? planet : s.mag < 1.0 ? bright : muted;
-      let drawn = false;
-
-      // Glyph sheet first. Six bodies draw from it; the Moon never does, its
-      // identity being a live terminator a raster cannot carry. Falls through
-      // to the computed silhouettes below while the sheet is still loading, or
-      // if the fetch failed -- so the sky is never blank waiting on an image.
-      const spriteCol = sprite && !s.isMoon ? sprite.column(s.name) : undefined;
-      if (sprite && spriteCol !== undefined) {
-        const d = r * 2;
-        ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.92);
-        ctx.drawImage(
-          sprite.image,
-          spriteCol * SPRITE_CELL, sprite.row * SPRITE_CELL, SPRITE_CELL, SPRITE_CELL,
-          s.x - r, s.y - r, d, d,
-        );
-        drawn = true;
-      }
-
-      // Silhouette glyphs. Only three bodies get one, and only because each has
-      // a real feature that survives ~10px: the Sun's rays and Saturn's ring
-      // both extend BEYOND the disc (so they read at any size), and Jupiter's
-      // bands terminate on the disc edge rather than fading (so they stay
-      // crisp instead of blurring to grey). Mercury, Venus and Mars have no
-      // such feature, so they stay plain discs -- inventing surface texture for
-      // them would be decoration dressed as data.
-      if (drawn) {
-        // already painted from the sheet
-      } else if (s.isSun) {
-        ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.92);
-        ctx.strokeStyle = colour;
-        ctx.lineWidth = Math.max(0.75, r * 0.085);
-        ctx.lineCap = 'round';
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, r * 0.62, 0, Math.PI * 2);
-        ctx.stroke();
-        const rays = 12;
-        for (let k = 0; k < rays; k++) {
-          const ang = (k / rays) * Math.PI * 2;
-          ctx.beginPath();
-          ctx.moveTo(s.x + Math.cos(ang) * r * 0.8, s.y + Math.sin(ang) * r * 0.8);
-          ctx.lineTo(s.x + Math.cos(ang) * r * 1.05, s.y + Math.sin(ang) * r * 1.05);
-          ctx.stroke();
-        }
-      } else if (s.name === 'Saturn') {
-        ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.92);
-        ctx.strokeStyle = colour;
-        ctx.lineWidth = Math.max(0.7, r * 0.085);
-        // Back half of the ring, then the globe, then the front half. Drawing it
-        // in three passes is what makes the ring read as passing BEHIND Saturn
-        // rather than as a flat ellipse laid over it.
-        const ringX = r;
-        const ringY = r * 0.3;
-        ctx.save();
-        ctx.translate(s.x, s.y);
-        ctx.rotate(-0.38);
-        ctx.beginPath();
-        ctx.ellipse(0, 0, ringX, ringY, 0, Math.PI, Math.PI * 2);
-        ctx.stroke();
-        ctx.restore();
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, r * SATURN_BODY_FRAC, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.save();
-        ctx.translate(s.x, s.y);
-        ctx.rotate(-0.38);
-        ctx.beginPath();
-        ctx.ellipse(0, 0, ringX, ringY, 0, 0, Math.PI);
-        ctx.stroke();
-        ctx.restore();
-      } else if (s.isPlanet && s.illum !== undefined && s.illum < 0.92 && r >= TERMINATOR_MIN_VR) {
-        // A real terminator, same construction as the Moon's. Only the inner
-        // planets ever get here: Mars sits at ~0.94 and the outer ones at 1.0,
-        // so they fall through to a full disc without being special-cased.
-        // This is Galileo's observation of Venus, drawn from live geometry.
-        const k = s.illum;
-        const br = r * 0.9;
-        ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.92);
-        ctx.strokeStyle = colour;
-        ctx.lineWidth = Math.max(0.7, r * 0.085);
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, br, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.fillStyle = colour;
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, br, -Math.PI / 2, Math.PI / 2);
-        ctx.ellipse(s.x, s.y, br * Math.abs(1 - 2 * k), br, 0, Math.PI / 2, -Math.PI / 2, k > 0.5);
-        ctx.fill();
-      } else if (s.name === 'Jupiter') {
-        ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.92);
-        ctx.strokeStyle = colour;
-        ctx.lineWidth = Math.max(0.7, r * 0.085);
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, r * 0.9, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, r * 0.9, 0, Math.PI * 2);
-        ctx.clip(); // bands stop at the limb, which is what keeps them crisp
-        for (const off of [-0.34, 0.06, 0.42]) {
-          ctx.beginPath();
-          ctx.moveTo(s.x - r, s.y + r * off);
-          ctx.lineTo(s.x + r, s.y + r * off);
-          ctx.stroke();
-        }
-        ctx.restore();
-      } else {
-      // Planets keep their solid disc even when engraved — a filled disc against
-      // ringed stars is exactly how a print chart distinguishes a planet from a
-      // star, so here the shape difference is signal rather than noise.
+      // General catalogue stars and fallback
+      const colour = isHovered ? accent : s.mag < 1.0 ? bright : muted;
       if (colors.engraved && !s.isPlanet) {
-        markStar(ctx, s.x, s.y, r, colour, a * (i === hoverIndex ? 1 : 0.92), true);
+        markStar(ctx, s.x, s.y, r, colour, a * (isHovered ? 1 : 0.95), true);
       } else {
-        ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.92);
+        ctx.globalAlpha = a * (isHovered ? 1 : 0.95);
         ctx.fillStyle = colour;
         ctx.beginPath();
         ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
         ctx.fill();
       }
       if (s.isPlanet) {
-        ctx.globalAlpha = a * 0.3;
+        ctx.globalAlpha = Math.min(0.65, a * 0.65);
         ctx.strokeStyle = planet;
-        ctx.lineWidth = 1;
+        ctx.lineWidth = 1.1;
         ctx.beginPath();
         ctx.arc(s.x, s.y, r + 3.5, 0, Math.PI * 2);
         ctx.stroke();
       }
-      }
     }
 
-    // persistent label for planets and the Moon — they earn a name without hover.
-    // Same cap as the disc: near the zenith this formula alone reaches 0.67,
-    // which is exactly the kind of "bright body over prose" the cap exists for.
-    if ((s.isPlanet || s.isMoon || s.isSun) && s.alt > 0 && i !== hoverIndex) {
-      ctx.globalAlpha = Math.min(BODY_ALPHA_CAP, 0.42 + 0.25 * (s.alt / 90));
-      ctx.fillStyle = planet;
-      ctx.font = '500 9px ui-monospace,Menlo,monospace';
+    // persistent label for planets, the Moon, and the Sun — they earn a name without hover.
+    if ((s.isPlanet || s.isMoon || s.isSun) && s.alt > 0 && !isHovered) {
+      ctx.globalAlpha = Math.min(0.85, 0.65 + 0.2 * (s.alt / 90));
+      ctx.fillStyle = colors.label ?? planet;
+      ctx.font = '600 11px ui-monospace,Menlo,monospace';
       ctx.textAlign = 'center';
-      ctx.fillText(s.name.toUpperCase(), s.x, s.y + r + 11);
+      ctx.fillText(s.name.toUpperCase(), Math.round(s.x), Math.round(s.y + r + 11));
       ctx.textAlign = 'start';
     }
-
-    // No bloom. Bright bodies are discs at their real magnitude-scaled radius;
-    // a radial halo was the last glow in the renderer and it is gone too.
   }
   ctx.globalAlpha = 1;
 }
@@ -856,7 +1462,7 @@ export function drawFull(
       const a = byName.get(seg.a), b = byName.get(seg.b);
       if (!a || !b) continue;
       const lit = hoverFig === seg.name;
-      ctx.strokeStyle = accent;
+      ctx.strokeStyle = lit ? accent : (colors.idleConstellation ?? accent);
       ctx.globalAlpha = (lit ? 0.95 : 0.3) * Math.min(1, scrollT * 6); // fade in over the first sixth
       ctx.lineWidth = lit ? 1.6 : 1;
       ctx.beginPath();

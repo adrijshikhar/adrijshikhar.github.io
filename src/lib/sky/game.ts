@@ -14,6 +14,7 @@ import { FLOOR } from './projection';
 import { separationLabel } from './astronomy';
 import {
   gravityWell,
+  springReturn,
   gamePhysics,
   predictHit,
   launchMag,
@@ -68,6 +69,7 @@ export class SkyGame {
   links: Array<[number, number]> = [];
   bursts: Burst[] = [];
   stars: GameStar[] = [];
+  private resetting = false;
 
   private readonly onStrike: () => void;
   private readonly onFigure: (name: string, drawn: number, total: number) => void;
@@ -99,7 +101,8 @@ export class SkyGame {
     for (let i = 0; i < bodies.length; i++) {
       const b = bodies[i];
       const s = this.stars[i];
-      const wasInFlight = this.playing && this.tool === 'sling' && (s.vx !== 0 || s.vy !== 0);
+      const wasInFlight =
+        (this.playing && this.tool === 'sling' && (s.vx !== 0 || s.vy !== 0)) || this.resetting;
       s.playable = b.alt >= FLOOR;
       // A star coasting in flight is not integrated once its home body sets
       // below FLOOR (physics.ts skips non-playable stars). Left alone, its
@@ -160,11 +163,15 @@ export class SkyGame {
    *  solver; draw mode runs the cursor-gravity spring, so browsing/linking
    *  stars still feels alive. Ages out expired flares either way. */
   tick(mouseX: number, mouseY: number): void {
-    // Free-body physics belongs to the sling tool alone. Browsing the page and
-    // drawing both run the cursor-gravity spring, so the sky bends under the
-    // pointer on the default landing exactly as it does in the game — which is
-    // what the corner hint ("move — stars bend") has been promising.
-    if (this.playing && this.tool === 'sling') {
+    // If returning from reset, spring displaced stars back to their home positions
+    if (this.resetting) {
+      const inMotion = springReturn(this.stars);
+      if (!inMotion) this.resetting = false;
+    } else if (this.playing && this.tool === 'sling') {
+      // Free-body physics belongs to the sling tool alone. Browsing the page and
+      // drawing both run the cursor-gravity spring, so the sky bends under the
+      // pointer on the default landing exactly as it does in the game — which is
+      // what the corner hint ("move — stars bend") has been promising.
       // The strike count itself lives in React state — the callback is the
       // only channel, so there is no second copy here to drift out of sync.
       gamePhysics(this.stars, this.bursts, this.onStrike);
@@ -185,19 +192,18 @@ export class SkyGame {
     }
   }
 
-  /** Clears motion AND every drawing — a user-hit requirement, twice over,
-   *  in the prototype's session ("reset must clear the drawing too"). */
+  /** Clears drawings and engages the damped spring return to pull displaced
+   *  stars smoothly back into their astronomical home positions. */
   reset(): void {
     this.aim = null;
     this.dragFrom = null;
     this.links = [];
     this.bursts = [];
     for (const s of this.stars) {
-      s.x = s.hx;
-      s.y = s.hy;
       s.vx = 0;
       s.vy = 0;
     }
+    this.resetting = true;
   }
 
   /** Quit HIDES the game; it does not end it. Only the in-flight gestures are
@@ -211,6 +217,7 @@ export class SkyGame {
     this.aim = null;
     this.dragFrom = null;
     this.spin = null;
+    this.resetting = false;
     this.playing = false;
   }
 
@@ -219,6 +226,7 @@ export class SkyGame {
     this.aim = null;
     this.dragFrom = null;
     this.spin = null;
+    this.resetting = false;
   }
 
   /** Nearest star within `max` px — no `playable` gate, matching the
@@ -233,6 +241,7 @@ export class SkyGame {
    *  The caller must have already resolved `i >= 0` via `nearest()` — a miss
    *  is handled by the caller (either as a no-op or as `startSpin`). */
   grab(i: number, x: number, y: number): void {
+    this.resetting = false;
     if (this.tool === 'sling') {
       this.aim = { i, x, y };
     } else {

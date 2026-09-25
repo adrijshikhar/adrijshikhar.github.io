@@ -2,7 +2,7 @@
 
 This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
 
-Personal portfolio + blog. Astro 6 static site with React 19 interactive islands, Tailwind 4 (CSS-first: the theme lives in `globals.css` under `@theme inline`, there is no `tailwind.config.mjs`) and shadcn/ui. MDX for posts. Colour is shadcn's default theme, `neutral` base, dark only — the full `:root`/`.dark` oklch token pair, unmodified. Design is an **observatory instrument**: a near-black ground with real computed astronomy behind the content.
+Personal portfolio + blog. Astro 6 static site with React 19 interactive islands, Tailwind 4 (CSS-first: the theme lives in `globals.css` under `@theme inline`, there is no `tailwind.config.mjs`) and shadcn/ui. MDX for posts. The shipped palette is the approved Spectral theme: near-black surfaces, white reading ink, blue interactions, warm data accents, and subdued sky labels. The upstream `:root` light tokens remain for compatibility; `.dark` is the shipped palette. Design is an **observatory instrument**: a near-black ground with real computed astronomy behind the content.
 
 ## Toolchain & commands
 
@@ -84,19 +84,19 @@ Don't migrate the resume `.md` files into the collection — the isolation is in
 
 ## Theming
 
-Dark only. `<html>` carries `.dark`, and `src/styles/globals.css` holds shadcn's default
-token pair — `:root` for light, `.dark` for dark — verbatim from ui.shadcn.com. `@theme
-inline` maps those tokens to Tailwind utilities, which is what replaced
+Dark only. `<html>` carries `.dark`. The upstream `:root` light tokens remain intact;
+`.dark` in `src/styles/globals.css` holds the approved Spectral palette. `@theme
+inline` maps the semantic tokens to Tailwind utilities, which is what replaced
 `tailwind.config.mjs` in v4.
 
-**Do not invent colours.** Every colour is a shadcn token: `background`, `card`, `popover`,
-`primary`, `secondary`, `muted`, `accent`, `destructive`, `border`, `input`, `ring`, plus
-their `-foreground` pairs. Use the token classes (`bg-card`, `text-muted-foreground`,
-`border-border`), not raw values.
+Use the existing semantic tokens: `background`, `card`, `popover`, `primary`,
+`secondary`, `muted`, `accent`, `destructive`, `border`, `input`, `ring`, plus
+their `-foreground` pairs and named roles for heading, tag, number, and sky ink.
+Use token classes (`bg-card`, `text-muted-foreground`, `border-border`) in components.
 
 **The trap that has cost real time here:** in shadcn, a token WITHOUT `-foreground` is a
-SURFACE. `--accent` and `--muted` are backgrounds — both `oklch(0.269 0 0)` in dark, near
-black. Their ink counterparts are `--primary` and `--muted-foreground`. Feeding `--accent`
+SURFACE. `--accent` and `--muted` are surface colors (`#161B22`) in dark.
+Their ink counterparts are `--primary` and `--muted-foreground`. Feeding `--accent`
 to the canvas painted the sky readout near-black on near-black; using `bg-accent` for a
 button hover painted near-white on near-white text. If a colour looks invisible, check
 whether a surface token is being used as ink.
@@ -226,7 +226,7 @@ one entry per section, currently 7) on the left, scrolling `<main>` on the right
 Cards are **shadcn `Card`** (`src/components/ui/`, added via the CLI — they are the upstream
 files, don't hand-edit them). `ExpCard`, `ProjectCard` and `BlogCard` compose
 `Card`/`CardHeader`/`CardTitle`/`CardDescription`/`CardContent`, with tags as `Badge`. Hover
-is a 2px lift plus a border to `--ring`.
+is a 2px lift with a neutral input border; keyboard focus uses `--ring`.
 
 Two card details that are easy to break:
 - `CardTitle` ships `leading-none`, which collides the moment a title wraps. Every use here
@@ -236,9 +236,11 @@ Two card details that are easy to break:
   do not — an overlay would swallow links inside the body. On `ExpCard` the company link sits
   at `z-10` to stay clickable above the overlay.
 
-Lists that hold cards use `flex flex-col gap-5` (or `grid gap-5 sm:grid-cols-2`), and cards
-must be wrapped in `<li>`. CSS columns split a shadcn `Card` across the column break, because
-`Card` is a flex container and `break-inside-avoid` does not hold on it.
+Cards must be wrapped in `<li>`. `ProjectMasonry.astro` owns the archive: CSS columns
+with an `inline-block w-full break-inside-avoid align-top` list-item wrapper keep the
+upstream flex Card indivisible. It flows down two columns on desktop and one on mobile.
+Use shared components and token classes for presentation, with no inline presentation
+styles or page-specific override blocks. Existing runtime motion positioning is separate.
 
 Pages: `/` (home preview of each section), `/experience` (full), `/archive` (2-col masonry),
 `/blogs` (list), `/blogs/[...slug]` (post), `/resume`.

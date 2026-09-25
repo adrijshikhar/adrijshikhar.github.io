@@ -11,6 +11,7 @@ import ExpCard from '../components/ExpCard.tsx';
 import ProjectCard from '../components/ProjectCard.tsx';
 import BlogCard from '../components/BlogCard.tsx';
 import ViewToggle from '../components/ViewToggle.tsx';
+import ArchiveLink from '../components/ArchiveLink.astro';
 import { buildRawMarkdown } from '../lib/raw-markdown';
 import { STARS } from '../lib/sky/catalogue';
 
@@ -86,15 +87,15 @@ const SOCIAL_ICON_PATHS = {
              100dvh not 100vh so the iOS address bar cannot cause a jump. Content
              below is revealed by scrolling. -->
         <header class="flex min-h-[100dvh] flex-col justify-center pb-24 pt-32">
-          <p class="mb-6 flex items-center gap-3 font-mono text-xs uppercase tracking-wider text-muted-foreground">
-            <span class="live inline-block h-[5px] w-[5px] rounded-full bg-primary"></span>
+          <p class="mb-6 flex items-center gap-3 font-mono text-xs uppercase tracking-wider text-secondary-foreground">
+            <span class="live inline-block h-[5px] w-[5px] rounded-full bg-secondary-foreground"></span>
             Bengaluru
           </p>
           <h1 class="text-6xl font-bold tracking-tight sm:text-7xl">
-            <a href="/" class="no-underline">Adrij<br />Shikhar</a>
+            <a href="/" class="text-heading no-underline hover:text-heading">Adrij<br />Shikhar</a>
           </h1>
-          <p class="mt-8 max-w-[36rem] text-[1.15rem] leading-relaxed text-foreground">
-            {HERO_LEAD.body}<em class="not-italic text-foreground">{HERO_LEAD.emphasis}</em>.
+          <p class="mt-8 max-w-[36rem] text-[1.125rem] leading-[1.65] text-foreground">
+            {HERO_LEAD.body}<em class="not-italic text-card-foreground">{HERO_LEAD.emphasis}</em>.
           </p>
           <div class="mt-10 flex items-center gap-6">
             <ul class="flex items-center gap-6" aria-label="Social media">
@@ -106,7 +107,7 @@ const SOCIAL_ICON_PATHS = {
                 { href: 'https://www.reddit.com/user/adrijshikhar', label: 'Reddit', path: SOCIAL_ICON_PATHS.reddit },
               ].map((sLink) => (
                 <li class="shrink-0 text-xs">
-                  <a class="tap-44 block text-muted-foreground no-underline transition-colors duration-[120ms] hover:text-primary"
+                  <a class="tap-44 block text-foreground no-underline transition-colors duration-[120ms] hover:text-primary"
                      href={sLink.href} target="_blank" rel="noreferrer noopener"
                      aria-label={`${sLink.label} (opens in a new tab)`}>
                     {sLink.path ? (
@@ -123,7 +124,7 @@ const SOCIAL_ICON_PATHS = {
                 </li>
               ))}
             </ul>
-            <a class="tap-44 flex items-center gap-2 text-muted-foreground no-underline transition-colors duration-[120ms] hover:text-primary"
+            <a class="tap-44 flex items-center gap-2 text-foreground no-underline transition-colors duration-[120ms] hover:text-primary"
                href="/resume/">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5" aria-hidden="true">
                 <path d="M12 3v12m0 0l-4-4m4 4l4-4" />
@@ -133,7 +134,7 @@ const SOCIAL_ICON_PATHS = {
             </a>
           </div>
 
-          <p class="scroll-cue mt-16" aria-hidden="true">
+          <p class="scroll-cue mt-16 text-foreground" aria-hidden="true">
             <span class="scroll-cue-rail"></span>
             Scroll &mdash; the constellations draw themselves
           </p>
@@ -141,17 +142,17 @@ const SOCIAL_ICON_PATHS = {
 
         <!-- About -->
         <section id="about" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground">01</span></div>
+          <div class="mb-3 font-mono text-xs uppercase tracking-wider text-muted-foreground" aria-hidden="true">01</div>
           <h2 class="display-section mb-8">About</h2>
           <div
-            class="prose prose-invert max-w-[35rem] leading-relaxed text-foreground prose-p:text-foreground prose-p:leading-relaxed prose-a:text-primary prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-foreground prose-strong:font-medium"
+            class="prose prose-invert max-w-[35rem] text-[1.0625rem] leading-[1.7] text-foreground prose-p:text-foreground prose-p:leading-relaxed prose-a:text-primary prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-foreground prose-strong:font-medium"
             set:html={marked.parse(about.content)}
           />
         </section>
 
         <!-- Experience -->
         <section id="experience" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground">02</span></div>
+          <div class="mb-3 font-mono text-xs uppercase tracking-wider text-muted-foreground" aria-hidden="true">02</div>
           <h2 class="display-section mb-8">Experience</h2>
           <ul class="group/list flex flex-col gap-5">
             {experience.meta.entries.slice(0, 2).map((exp: any) => (
@@ -159,31 +160,31 @@ const SOCIAL_ICON_PATHS = {
             ))}
           </ul>
           <div class="mt-10">
-            <a class="group inline-flex items-center justify-center rounded-md border bg-card px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground" href="/experience/">
+            <ArchiveLink href="/experience/">
               <span>View full work experience</span><span class="transition-transform group-hover:translate-x-1">&rarr;</span>
-            </a>
+            </ArchiveLink>
           </div>
         </section>
 
         <!-- Projects -->
         <section id="projects" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground">03</span></div>
+          <div class="mb-3 font-mono text-xs uppercase tracking-wider text-muted-foreground" aria-hidden="true">03</div>
           <h2 class="display-section mb-8">Projects</h2>
           <ul class="group/list flex flex-col gap-5">
-            {projects.meta.entries.slice(0, 2).map((proj: any) => (
+            {projects.meta.entries.slice(0, 4).map((proj: any) => (
               <li><ProjectCard {...proj} contentHtml={marked.parse(projSections[proj.slug] || '') as string} /></li>
             ))}
           </ul>
           <div class="mt-10">
-            <a class="group inline-flex items-center justify-center rounded-md border bg-card px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground" href="/archive/">
+            <ArchiveLink href="/archive/">
               <span>View full project archive</span><span class="transition-transform group-hover:translate-x-1">&rarr;</span>
-            </a>
+            </ArchiveLink>
           </div>
         </section>
 
         <!-- Writing -->
         <section id="writing" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground">04</span></div>
+          <div class="mb-3 font-mono text-xs uppercase tracking-wider text-muted-foreground" aria-hidden="true">04</div>
           <h2 class="display-section mb-8">Writing</h2>
           {latestPosts.length === 0 ? (
             <p class="border border-border px-5 py-6 font-mono text-sm text-muted-foreground">
@@ -197,23 +198,23 @@ const SOCIAL_ICON_PATHS = {
             </ul>
           )}
           <div class="mt-10">
-            <a class="group inline-flex items-center justify-center rounded-md border bg-card px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground" href="/blogs/">
+            <ArchiveLink href="/blogs/">
               <span>View all posts</span><span class="transition-transform group-hover:translate-x-1">&rarr;</span>
-            </a>
+            </ArchiveLink>
           </div>
         </section>
 
         <!-- Education -->
         <section id="education" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground">05</span></div>
+          <div class="mb-3 font-mono text-xs uppercase tracking-wider text-muted-foreground" aria-hidden="true">05</div>
           <h2 class="display-section mb-8">Education</h2>
           <ul class="grid gap-4 sm:grid-cols-2">
             {education.meta.entries.map((edu: any, i: number) => (
-              <li class={`rounded-xl border bg-card text-card-foreground shadow-sm group/list-item px-5 py-6 lg:px-6 lg:py-7`}>
-                <span class="font-mono text-xs uppercase tracking-wider text-muted-foreground">{edu.startDate} — {edu.endDate}</span>
-                <h3 class="mt-2 text-xl font-semibold leading-snug">{edu.institution}</h3>
+              <li class={`rounded-xl border bg-card text-card-foreground shadow-sm group/list-item px-5 py-6 lg:px-6 lg:py-7 transition-all duration-200 hover:-translate-y-0.5 hover:border-input hover:shadow-none motion-reduce:translate-none motion-reduce:transition-none`}>
+                <span class="font-mono text-xs uppercase tracking-wider text-number-ink">{edu.startDate} &mdash; {edu.endDate}</span>
+                <h3 class="mt-2 text-xl font-semibold leading-snug text-heading">{edu.institution}</h3>
                 <div class="mt-1 text-sm text-foreground">
-                  {edu.degree}{edu.field && <span class="text-muted-foreground"> — {edu.field}</span>}
+                  {edu.degree}{edu.field && <span class="text-foreground"> &mdash; {edu.field}</span>}
                 </div>
               </li>
             ))}
@@ -222,20 +223,20 @@ const SOCIAL_ICON_PATHS = {
 
         <!-- Achievements -->
         <section id="achievements" class="mb-20 scroll-mt-16 md:mb-28 lg:scroll-mt-24">
-          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground">06</span></div>
+          <div class="mb-3 font-mono text-xs uppercase tracking-wider text-muted-foreground" aria-hidden="true">06</div>
           <h2 class="display-section mb-8">Achievements</h2>
           <div
-            class="prose prose-invert max-w-[35rem] text-foreground prose-p:text-foreground prose-li:text-foreground marker:text-muted-foreground prose-a:text-primary prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-foreground"
+            class="prose prose-invert max-w-[35rem] text-[1.0625rem] leading-[1.7] text-foreground prose-p:text-foreground prose-li:text-foreground marker:text-muted-foreground prose-a:text-primary prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-foreground"
             set:html={marked.parse(achievements.content)}
           />
         </section>
 
         <!-- Interests -->
         <section id="interests" class="mb-12 scroll-mt-16 md:mb-16 lg:scroll-mt-24">
-          <div class="text-sm mb-4"><span class="font-mono text-xs uppercase tracking-wider text-muted-foreground">07</span></div>
+          <div class="mb-3 font-mono text-xs uppercase tracking-wider text-muted-foreground" aria-hidden="true">07</div>
           <h2 class="display-section mb-8">Interests</h2>
           <div
-            class="prose prose-invert max-w-[35rem] text-foreground prose-p:text-foreground prose-li:text-foreground marker:text-muted-foreground prose-a:text-primary prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-foreground"
+            class="prose prose-invert max-w-[35rem] text-[1.0625rem] leading-[1.7] text-foreground prose-p:text-foreground prose-li:text-foreground marker:text-muted-foreground prose-a:text-primary prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-foreground"
             set:html={marked.parse(interests.content)}
           />
         </section>
@@ -247,11 +248,11 @@ const SOCIAL_ICON_PATHS = {
             the footer: past the last line there is nothing left to look at, so
             the same space there just reads as the page failing to end. */}
         <footer class="mt-[29vh] border-t border-border pt-12 pb-20 md:mt-[33vh] md:pb-24">
-          <p class="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+          <p class="font-mono text-xs uppercase tracking-wider text-foreground">
             <span class="text-primary">&#9656;</span> {STAR_COUNT} named stars at true J2000 positions
             for your location. Every mark on the canvas is a catalogued object.
           </p>
-          <p class="font-mono text-xs uppercase tracking-wider text-muted-foreground mt-2">Built with Astro.</p>
+          <p class="mt-2 font-mono text-xs uppercase tracking-wider text-foreground">Built with Astro.</p>
         </footer>
 
 

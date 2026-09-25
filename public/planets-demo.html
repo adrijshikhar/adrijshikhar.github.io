@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Observatory Planet & Moon Vector Design Lab</title>
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --surface: #121820;
+      --surface-elevated: #161f2c;
+      --border: #243042;
+      --border-subtle: #1a2332;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #61afef;
+      --accent-glow: rgba(97, 175, 239, 0.15);
+      --moon-lit: #f5f4ef;
+      --earthshine: rgba(220, 228, 240, 0.08);
+      --sun-gold: #e5c07b;
+      --mars-rust: #e06c75;
+      --jupiter-tan: #d19a66;
+      --venus-silver: #e2e8f0;
+      --mercury-slate: #9aa5b1;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      padding: 2.5rem 1.5rem 5rem;
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* Instrument Header */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 2rem;
+      margin-bottom: 2.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 1.5rem;
+    }
+
+    .tag {
+      font-family: ui-monospace, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.6875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+      display: inline-block;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    p.lead {
+      color: var(--text-muted);
+      font-size: 0.9375rem;
+      max-width: 620px;
+      margin-top: 0.5rem;
+    }
+
+    /* Live Controls Bar */
+    .controls-bar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 2.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 2rem;
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 0.75rem;
+    }
+
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .control-label {
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .slider-val {
+      color: var(--accent);
+      font-weight: 600;
+      min-width: 3.5rem;
+    }
+
+    input[type=range] {
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    /* Section Styling */
+    .section-title {
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 0.8125rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .section-title::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* Grid of Cards */
+    .moon-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3.5rem;
+    }
+
+    .planets-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      transition: border-color 0.2s;
+    }
+
+    .card:hover {
+      border-color: var(--accent);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 0.75rem;
+    }
+
+    .card-title {
+      font-size: 1.0625rem;
+      font-weight: 600;
+    }
+
+    .card-meta {
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 0.6875rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    /* Preview Arena */
+    .comparison-row {
+      display: flex;
+      gap: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .preview-box {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 1.25rem 0.75rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 160px;
+      position: relative;
+    }
+
+    .preview-badge {
+      position: absolute;
+      top: 0.5rem;
+      left: 0.6rem;
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 0.625rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .scale-indicator {
+      position: absolute;
+      bottom: 0.4rem;
+      right: 0.6rem;
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 0.5625rem;
+      color: #556275;
+    }
+
+    .card-desc {
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .card-desc strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .features-list {
+      margin-top: 0.75rem;
+      padding-left: 1.1rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .features-list li {
+      margin-bottom: 0.35rem;
+    }
+
+    .highlight-pill {
+      display: inline-block;
+      padding: 0.1rem 0.4rem;
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 0.6875rem;
+      color: var(--accent);
+      margin-right: 0.3rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <span class="tag">Observatory Celestial Vector Laboratory</span>
+        <h1>Planet & Moon Vector Design Lab</h1>
+        <p class="lead">
+          Comparison between current canvas line-art and proposed high-fidelity vector SVGs.
+          Every design preserves astronomical accuracy while elevating visual prestige.
+        </p>
+      </div>
+      <div>
+        <a href="/" style="font-family: ui-monospace, monospace; font-size: 0.75rem; color: var(--accent); text-decoration: none; border: 1px solid var(--border); padding: 0.5rem 0.9rem; border-radius: 6px;">&larr; Back to Portfolio</a>
+      </div>
+    </header>
+
+    <!-- Interactive Phase Controller -->
+    <div class="controls-bar">
+      <div class="control-group">
+        <span class="control-label">Moon / Venus Illumination:</span>
+        <input type="range" id="phaseSlider" min="0" max="100" value="68" style="width: 160px;">
+        <span class="slider-val" id="phaseVal">68%</span>
+      </div>
+      <div class="control-group">
+        <span class="control-label">Phase Type:</span>
+        <label style="cursor: pointer; display: flex; align-items: center; gap: 0.3rem;">
+          <input type="radio" name="waxing" value="true" checked> Waxing
+        </label>
+        <label style="cursor: pointer; display: flex; align-items: center; gap: 0.3rem;">
+          <input type="radio" name="waxing" value="false"> Waning
+        </label>
+      </div>
+      <div class="control-group" style="margin-left: auto;">
+        <span class="control-label">Canvas Mode:</span>
+        <span class="highlight-pill">DPR 2x Crisp Vectors</span>
+      </div>
+    </div>
+
+    <!-- MOON SECTION -->
+    <h2 class="section-title">The Moon — 3 Visual Directions</h2>
+    <div class="moon-grid">
+      <!-- Option A -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Option A: Astrolabe Maria + Earthshine</div>
+          <span class="card-meta" style="color: var(--accent);">Recommended</span>
+        </div>
+        <div class="comparison-row">
+          <!-- Current -->
+          <div class="preview-box">
+            <span class="preview-badge">Current</span>
+            <svg id="moon-current-a" width="70" height="70" viewBox="0 0 70 70"></svg>
+            <span class="scale-indicator">1x &bull; Flat</span>
+          </div>
+          <!-- Proposed -->
+          <div class="preview-box" style="border-color: var(--accent);">
+            <span class="preview-badge" style="color: var(--accent);">Option A</span>
+            <svg id="moon-opt-a" width="90" height="90" viewBox="0 0 100 100"></svg>
+            <span class="scale-indicator">Vector &bull; Maria</span>
+          </div>
+        </div>
+        <p class="card-desc">
+          <strong>Authentic Lunar Geography:</strong> Features real vector silhouettes of major lunar maria (<em>Oceanus Procellarum</em>, <em>Sea of Tranquility</em>, <em>Mare Serenitatis</em>).
+        </p>
+        <ul class="features-list">
+          <li><strong>Earthshine Disc:</strong> Night side softly glows (8% luminous unlit disk) as seen through binoculars.</li>
+          <li><strong>Geographic Relief:</strong> Maria naturally darken the lit phase, making the Moon unmistakably lunar.</li>
+          <li><strong>Terminator Precision:</strong> True elliptical phase sweep across the face.</li>
+        </ul>
+      </div>
+
+      <!-- Option B -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Option B: Relief Terminator & Rays</div>
+          <span class="card-meta">Telescopic</span>
+        </div>
+        <div class="comparison-row">
+          <div class="preview-box">
+            <span class="preview-badge">Current</span>
+            <svg id="moon-current-b" width="70" height="70" viewBox="0 0 70 70"></svg>
+            <span class="scale-indicator">1x &bull; Flat</span>
+          </div>
+          <div class="preview-box">
+            <span class="preview-badge">Option B</span>
+            <svg id="moon-opt-b" width="90" height="90" viewBox="0 0 100 100"></svg>
+            <span class="scale-indicator">Vector &bull; Relief</span>
+          </div>
+        </div>
+        <p class="card-desc">
+          <strong>Crater Rim Relief:</strong> Features micro-serrations along the shadow boundary where mountain peaks catch sunlight, plus the Tycho crater ray system.
+        </p>
+        <ul class="features-list">
+          <li><strong>Crater Shadows:</strong> Shadow terminator has delicate peak interruptions.</li>
+          <li><strong>Tycho Crater Rays:</strong> High-albedo impact ejecta rays spreading across south.</li>
+          <li><strong>Limb Glow:</strong> Soft crescent cusp sharpening.</li>
+        </ul>
+      </div>
+
+      <!-- Option C -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Option C: Minimal Astrolabe Hatching</div>
+          <span class="card-meta">Schematic</span>
+        </div>
+        <div class="comparison-row">
+          <div class="preview-box">
+            <span class="preview-badge">Current</span>
+            <svg id="moon-current-c" width="70" height="70" viewBox="0 0 70 70"></svg>
+            <span class="scale-indicator">1x &bull; Flat</span>
+          </div>
+          <div class="preview-box">
+            <span class="preview-badge">Option C</span>
+            <svg id="moon-opt-c" width="90" height="90" viewBox="0 0 100 100"></svg>
+            <span class="scale-indicator">Vector &bull; Engraved</span>
+          </div>
+        </div>
+        <p class="card-desc">
+          <strong>Engraved Astronomical Print:</strong> Uses concentric coordinate lines and precision hatching across the illuminated sector.
+        </p>
+        <ul class="features-list">
+          <li><strong>Coordinate Rings:</strong> Concentric latitude grid lines.</li>
+          <li><strong>Clean Geometry:</strong> Zero organic noise; strictly technical instrument blueprint.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- PLANETS SECTION -->
+    <h2 class="section-title">The Five Classical Planets (Vector Upgrades)</h2>
+    <div class="planets-grid">
+      <!-- Saturn -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🪐 Saturn</div>
+          <span class="card-meta">Cassini Division + Globe Shadow</span>
+        </div>
+        <div class="comparison-row">
+          <div class="preview-box">
+            <span class="preview-badge">Current (1 Ring)</span>
+            <svg id="saturn-cur" width="80" height="60" viewBox="0 0 80 60"></svg>
+          </div>
+          <div class="preview-box" style="border-color: var(--accent);">
+            <span class="preview-badge" style="color: var(--accent);">Proposed</span>
+            <svg id="saturn-new" width="110" height="70" viewBox="0 0 120 70"></svg>
+          </div>
+        </div>
+        <p class="card-desc">
+          <strong>Cassini Division:</strong> Two distinct concentric ring decks (A Ring & B Ring) separated by the dark Cassini gap. Features the globe's shadow cast over the rear ring, creating authentic 3D celestial depth.
+        </p>
+      </div>
+
+      <!-- Jupiter -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">♃ Jupiter</div>
+          <span class="card-meta">Belts + Red Spot + 4 Galilean Moons</span>
+        </div>
+        <div class="comparison-row">
+          <div class="preview-box">
+            <span class="preview-badge">Current (3 Lines)</span>
+            <svg id="jupiter-cur" width="60" height="60" viewBox="0 0 60 60"></svg>
+          </div>
+          <div class="preview-box" style="border-color: var(--accent);">
+            <span class="preview-badge" style="color: var(--accent);">Proposed</span>
+            <svg id="jupiter-new" width="130" height="70" viewBox="0 0 140 70"></svg>
+          </div>
+        </div>
+        <p class="card-desc">
+          <strong>Galileo's 1610 Observation:</strong> True equatorial wave bands, the iconic Great Red Spot storm oval, and the 4 Galilean moons (<em>Io, Europa, Ganymede, Callisto</em>) aligned along its orbital axis.
+        </p>
+      </div>
+
+      <!-- Mars -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">♂ Mars</div>
+          <span class="card-meta">Polar Ice Cap + Syrtis Major</span>
+        </div>
+        <div class="comparison-row">
+          <div class="preview-box">
+            <span class="preview-badge">Current (Blank Disc)</span>
+            <svg id="mars-cur" width="50" height="50" viewBox="0 0 50 50"></svg>
+          </div>
+          <div class="preview-box" style="border-color: var(--accent);">
+            <span class="preview-badge" style="color: var(--accent);">Proposed</span>
+            <svg id="mars-new" width="70" height="70" viewBox="0 0 70 70"></svg>
+          </div>
+        </div>
+        <p class="card-desc">
+          <strong>Surface Features:</strong> Brilliant white North Polar Ice Cap, the famous dark albedo triangle of <em>Syrtis Major Planum</em>, and warm Martian chromatic styling.
+        </p>
+      </div>
+
+      <!-- Venus -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">♀ Venus</div>
+          <span class="card-meta">Jewel Glint + Cloud Deck</span>
+        </div>
+        <div class="comparison-row">
+          <div class="preview-box">
+            <span class="preview-badge">Current</span>
+            <svg id="venus-cur" width="50" height="50" viewBox="0 0 50 50"></svg>
+          </div>
+          <div class="preview-box" style="border-color: var(--accent);">
+            <span class="preview-badge" style="color: var(--accent);">Proposed</span>
+            <svg id="venus-new" width="80" height="80" viewBox="0 0 80 80"></svg>
+          </div>
+        </div>
+        <p class="card-desc">
+          <strong>The Morning Star:</strong> As the brightest planet in the night sky, it gains a delicate 4-point optical diffraction diamond glint, UV chevron cloud curves, and live Galilean phase tracking.
+        </p>
+      </div>
+
+      <!-- Mercury -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">☿ Mercury</div>
+          <span class="card-meta">Caloris Impact Basin</span>
+        </div>
+        <div class="comparison-row">
+          <div class="preview-box">
+            <span class="preview-badge">Current (Generic)</span>
+            <svg id="mercury-cur" width="50" height="50" viewBox="0 0 50 50"></svg>
+          </div>
+          <div class="preview-box" style="border-color: var(--accent);">
+            <span class="preview-badge" style="color: var(--accent);">Proposed</span>
+            <svg id="mercury-new" width="60" height="60" viewBox="0 0 60 60"></svg>
+          </div>
+        </div>
+        <p class="card-desc">
+          <strong>Cratered Iron Planet:</strong> Distinctive concentric shock rings of the massive Caloris Basin impact and a micro-cratered limb, separating it from stars and Venus.
+        </p>
+      </div>
+    </div>
+
+    <!-- ENHANCED OPTION 4 SUN SECTION -->
+    <h2 class="section-title">The Sun — 4 Enhanced Variations of Option 4 (Filament &amp; Active Region)</h2>
+    <p style="color: var(--text-muted); font-size: 0.8125rem; margin-bottom: 1.5rem; margin-top: -0.5rem;">
+      Focusing exclusively on the organic solar filament and magnetic arcade architecture, optimized to match the <strong>exact design palette of the other planets</strong>: obsidian globe fill (<code>#121820</code>), Spectral solar gold (<code>#e5c07b</code>), crisp white optical highlight (<code>#f5f4ef</code>, matching Mars’s polar cap &amp; Venus’s glint), warm active amber (<code>#eda05b</code>, matching Jupiter’s Red Spot), and semi-transparent plasma ribbon depth.
+    </p>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 1.5rem; margin-bottom: 3.5rem;">
+      <!-- Variation 4A: Spectral Harmonized -->
+      <div class="card" style="border-color: var(--sun-gold);">
+        <div class="card-header">
+          <div class="card-title">☉ Option 4A: Spectral Harmonized</div>
+          <span class="card-meta" style="color: var(--sun-gold);">Recommended &bull; Full Palette Parity</span>
+        </div>
+        <div class="comparison-row">
+          <div class="preview-box">
+            <span class="preview-badge">Current (Ticks)</span>
+            <svg id="sun-cur-4a" width="70" height="70" viewBox="0 0 70 70"></svg>
+          </div>
+          <div class="preview-box" style="border-color: var(--sun-gold);">
+            <span class="preview-badge" style="color: var(--sun-gold);">Option 4A</span>
+            <svg id="sun-opt-4a" width="95" height="95" viewBox="0 0 95 95"></svg>
+          </div>
+        </div>
+        <p class="card-desc">
+          <strong>Full Planetary Palette Integration:</strong> Features a shaded semi-transparent plasma ribbon (matching Jupiter’s belt wave fills) with a dark absorption spine, an eastern limb prominence loop arch, southern bipolar active sunspots in warm amber, and a brilliant white flare reconnection glint (matching Mars’s polar cap &amp; Venus’s glint).
+        </p>
+        <ul class="features-list">
+          <li><strong>Shaded plasma depth:</strong> Multi-tone fill (22% opacity) + crisp vector filament spine.</li>
+          <li><strong>White optical highlight:</strong> High-energy micro-flare kernel in brilliant white (#f5f4ef).</li>
+          <li><strong>Harmonious outer ring:</strong> 0.8px dashed chromosphere halo matching Mars and Mercury.</li>
+        </ul>
+      </div>
+
+      <!-- Variation 4B: Pure Vector Dual-Tone -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">☉ Option 4B: Pure Vector Dual-Tone</div>
+          <span class="card-meta">Minimalist &bull; High Contrast</span>
+        </div>
+        <div class="comparison-row">
+          <div class="preview-box">
+            <span class="preview-badge">Current (Ticks)</span>
+            <svg id="sun-cur-4b" width="70" height="70" viewBox="0 0 70 70"></svg>
+          </div>
+          <div class="preview-box">
+            <span class="preview-badge">Option 4B</span>
+            <svg id="sun-opt-4b" width="95" height="95" viewBox="0 0 95 95"></svg>
+          </div>
+        </div>
+        <p class="card-desc">
+          <strong>Twin Intertwined Filaments:</strong> Ultra-clean vector lines with zero heavy fills. Features twin winding magnetic filaments across the northern active latitude, a southern magnetic loop arch with a central white optical glint, and an eastern limb prominence catch.
+        </p>
+        <ul class="features-list">
+          <li><strong>Crisp line weight:</strong> Strict 1px / 0.8px stroke hierarchy matching Saturn’s rings.</li>
+          <li><strong>Optical glint:</strong> Sharp focal dot anchoring the magnetic loop.</li>
+          <li><strong>Clean spherical contour:</strong> 100% vector clarity on Retina displays.</li>
+        </ul>
+      </div>
+
+      <!-- Variation 4C: Astrolabe Magnetic Arcade -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">☉ Option 4C: Astrolabe Magnetic Arcade</div>
+          <span class="card-meta">Instrument Grid &bull; Field Lines</span>
+        </div>
+        <div class="comparison-row">
+          <div class="preview-box">
+            <span class="preview-badge">Current (Ticks)</span>
+            <svg id="sun-cur-4c" width="70" height="70" viewBox="0 0 70 70"></svg>
+          </div>
+          <div class="preview-box">
+            <span class="preview-badge">Option 4C</span>
+            <svg id="sun-opt-4c" width="95" height="95" viewBox="0 0 95 95"></svg>
+          </div>
+        </div>
+        <p class="card-desc">
+          <strong>Instrument Field Lines:</strong> Combines solar physics with telescope reticle elegance. Features solar latitude guide chords in instrument slate (#8b949e), a dark filament following differential rotation, and a multi-tier magnetic coronal arcade.
+        </p>
+        <ul class="features-list">
+          <li><strong>Astrolabe grid chords:</strong> Subtle 7.25° tilted solar latitude guides in instrument ink.</li>
+          <li><strong>Coronal arcade:</strong> Concentric magnetic flux field arcs connecting active poles.</li>
+          <li><strong>Cardinal tick accents:</strong> Fine 3px boundary tick marks at 90° intervals.</li>
+        </ul>
+      </div>
+
+      <!-- Variation 4D: Coronal Loop Breakout -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">☉ Option 4D: Coronal Loop Breakout</div>
+          <span class="card-meta">Dynamic Prominence &bull; Multi-Tier</span>
+        </div>
+        <div class="comparison-row">
+          <div class="preview-box">
+            <span class="preview-badge">Current (Ticks)</span>
+            <svg id="sun-cur-4d" width="70" height="70" viewBox="0 0 70 70"></svg>
+          </div>
+          <div class="preview-box">
+            <span class="preview-badge">Option 4D</span>
+            <svg id="sun-opt-4d" width="95" height="95" viewBox="0 0 95 95"></svg>
+          </div>
+        </div>
+        <p class="card-desc">
+          <strong>Dynamic Limb Prominence:</strong> Emphasizes the explosive beauty of solar magnetic storms. Features a dramatic prominence loop arch leaping high off the northwest limb into space, paired with a central serpentine filament and triple nested magnetic arcades.
+        </p>
+        <ul class="features-list">
+          <li><strong>High-arch prominence:</strong> Smooth double-bezier coronal loop arching into space.</li>
+          <li><strong>Triple nested arcade:</strong> 3 concentric magnetic field lines spanning active regions.</li>
+          <li><strong>Warm active cores:</strong> Multi-spectral amber and white core points.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State
+    let illumFraction = 0.68;
+    let isWaxing = true;
+
+    const slider = document.getElementById('phaseSlider');
+    const valDisplay = document.getElementById('phaseVal');
+    const radioButtons = document.querySelectorAll('input[name="waxing"]');
+
+    slider.addEventListener('input', (e) => {
+      illumFraction = parseInt(e.target.value, 10) / 100;
+      valDisplay.innerText = `${e.target.value}%`;
+      renderAll();
+    });
+
+    radioButtons.forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        isWaxing = e.target.value === 'true';
+        renderAll();
+      });
+    });
+
+    // RENDER FUNCTIONS
+    function renderAll() {
+      renderMoonCurrent();
+      renderMoonOptA();
+      renderMoonOptB();
+      renderMoonOptC();
+      renderPlanets();
+    }
+
+    // 1. Current Moon Rendering (Flat terminator)
+    function renderMoonCurrent() {
+      const k = illumFraction;
+      const r = 24;
+      const cx = 35, cy = 35;
+      const side = isWaxing ? 1 : -1;
+      const bRad = r * Math.abs(1 - 2 * k);
+
+      // SVG path construction matching canvas ellipse & arc
+      const d = `M ${cx} ${cy - r}
+                 A ${r} ${r} 0 0 ${side > 0 ? 1 : 0} ${cx} ${cy + r}
+                 A ${bRad} ${r} 0 0 ${(k > 0.5) === (side > 0) ? 0 : 1} ${cx} ${cy - r} Z`;
+
+      const markup = `
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(240,240,240,0.22)" stroke-width="1" />
+        <path d="${d}" fill="#e6edf3" />
+      `;
+      document.getElementById('moon-current-a').innerHTML = markup;
+      document.getElementById('moon-current-b').innerHTML = markup;
+      document.getElementById('moon-current-c').innerHTML = markup;
+    }
+
+    // 2. Moon Option A: Astrolabe Maria + Earthshine
+    function renderMoonOptA() {
+      const k = illumFraction;
+      const r = 36;
+      const cx = 50, cy = 50;
+      const side = isWaxing ? 1 : -1;
+      const bRad = r * Math.abs(1 - 2 * k);
+
+      const clipPath = `M ${cx} ${cy - r}
+                        A ${r} ${r} 0 0 ${side > 0 ? 1 : 0} ${cx} ${cy + r}
+                        A ${bRad} ${r} 0 0 ${(k > 0.5) === (side > 0) ? 0 : 1} ${cx} ${cy - r} Z`;
+
+      // Lunar Maria shapes (scaled relative to moon center)
+      const maria = `
+        <!-- Oceanus Procellarum -->
+        <ellipse cx="${cx - 10}" cy="${cy - 4}" rx="12" ry="16" fill="rgba(15, 23, 35, 0.35)" transform="rotate(-15 ${cx - 10} ${cy - 4})"/>
+        <!-- Mare Imbrium -->
+        <circle cx="${cx - 4}" cy="${cy - 14}" r="9" fill="rgba(15, 23, 35, 0.4)"/>
+        <!-- Mare Serenitatis -->
+        <circle cx="${cx + 8}" cy="${cy - 12}" r="7" fill="rgba(15, 23, 35, 0.38)"/>
+        <!-- Mare Tranquillitatis -->
+        <circle cx="${cx + 12}" cy="${cy - 2}" r="8" fill="rgba(15, 23, 35, 0.42)"/>
+        <!-- Mare Crisium -->
+        <ellipse cx="${cx + 22}" cy="${cy - 8}" rx="5" ry="4" fill="rgba(15, 23, 35, 0.45)"/>
+        <!-- Mare Fecunditatis -->
+        <ellipse cx="${cx + 14}" cy="${cy + 8}" rx="7" ry="5" fill="rgba(15, 23, 35, 0.36)"/>
+        <!-- Mare Nubium -->
+        <circle cx="${cx - 5}" cy="${cy + 12}" r="7" fill="rgba(15, 23, 35, 0.38)"/>
+      `;
+
+      document.getElementById('moon-opt-a').innerHTML = `
+        <defs>
+          <clipPath id="moonLitClipA">
+            <path d="${clipPath}" />
+          </clipPath>
+        </defs>
+        <!-- Earthshine unlit disc -->
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="rgba(180, 200, 230, 0.08)" stroke="#61afef" stroke-opacity="0.3" stroke-width="1" />
+        <g opacity="0.3">${maria}</g>
+        
+        <!-- Lit side with illuminated maria -->
+        <g clip-path="url(#moonLitClipA)">
+          <circle cx="${cx}" cy="${cy}" r="${r}" fill="#f5f4ee" />
+          ${maria}
+        </g>
+        
+        <!-- Terminator edge subtle rule -->
+        <path d="M ${cx} ${cy - r} A ${bRad} ${r} 0 0 ${(k > 0.5) === (side > 0) ? 0 : 1} ${cx} ${cy + r}" fill="none" stroke="#61afef" stroke-width="0.8" opacity="0.5"/>
+      `;
+    }
+
+    // 3. Moon Option B: Relief Terminator & Tycho Rays
+    function renderMoonOptB() {
+      const k = illumFraction;
+      const r = 36;
+      const cx = 50, cy = 50;
+      const side = isWaxing ? 1 : -1;
+      const bRad = r * Math.abs(1 - 2 * k);
+
+      const clipPath = `M ${cx} ${cy - r}
+                        A ${r} ${r} 0 0 ${side > 0 ? 1 : 0} ${cx} ${cy + r}
+                        A ${bRad} ${r} 0 0 ${(k > 0.5) === (side > 0) ? 0 : 1} ${cx} ${cy - r} Z`;
+
+      document.getElementById('moon-opt-b').innerHTML = `
+        <defs>
+          <clipPath id="moonLitClipB">
+            <path d="${clipPath}" />
+          </clipPath>
+        </defs>
+        <!-- Earthshine base -->
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="rgba(180, 200, 230, 0.08)" stroke="rgba(255,255,255,0.25)" stroke-width="1" />
+        
+        <!-- Lit phase -->
+        <g clip-path="url(#moonLitClipB)">
+          <circle cx="${cx}" cy="${cy}" r="${r}" fill="#e8eaed" />
+          <!-- Tycho crater and ray ejection lines -->
+          <circle cx="${cx - 3}" cy="${cy + 20}" r="2" fill="#fff" />
+          <line x1="${cx - 3}" y1="${cy + 20}" x2="${cx - 18}" y2="${cy - 10}" stroke="#fff" stroke-width="0.7" opacity="0.6"/>
+          <line x1="${cx - 3}" y1="${cy + 20}" x2="${cx + 12}" y2="${cy - 8}" stroke="#fff" stroke-width="0.7" opacity="0.6"/>
+          <line x1="${cx - 3}" y1="${cy + 20}" x2="${cx + 22}" y2="${cy + 5}" stroke="#fff" stroke-width="0.7" opacity="0.6"/>
+          <!-- Crater Copernicus -->
+          <circle cx="${cx - 10}" cy="${cy - 2}" r="2.5" fill="#fff" opacity="0.9" />
+          <circle cx="${cx - 10}" cy="${cy - 2}" r="1" fill="#bbb" />
+        </g>
+        
+        <!-- Micro-serrated relief on terminator -->
+        <path d="M ${cx} ${cy - r} A ${bRad} ${r} 0 0 ${(k > 0.5) === (side > 0) ? 0 : 1} ${cx} ${cy + r}" fill="none" stroke="rgba(20,30,45,0.7)" stroke-width="1.2" stroke-dasharray="2 1"/>
+      `;
+    }
+
+    // 4. Moon Option C: Minimal Astrolabe
+    function renderMoonOptC() {
+      const k = illumFraction;
+      const r = 36;
+      const cx = 50, cy = 50;
+      const side = isWaxing ? 1 : -1;
+      const bRad = r * Math.abs(1 - 2 * k);
+
+      const clipPath = `M ${cx} ${cy - r}
+                        A ${r} ${r} 0 0 ${side > 0 ? 1 : 0} ${cx} ${cy + r}
+                        A ${bRad} ${r} 0 0 ${(k > 0.5) === (side > 0) ? 0 : 1} ${cx} ${cy - r} Z`;
+
+      document.getElementById('moon-opt-c').innerHTML = `
+        <defs>
+          <clipPath id="moonLitClipC">
+            <path d="${clipPath}" />
+          </clipPath>
+        </defs>
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#61afef" stroke-width="1" stroke-dasharray="3 3"/>
+        <circle cx="${cx}" cy="${cy}" r="${r - 8}" fill="none" stroke="#30363d" stroke-width="0.75"/>
+        <g clip-path="url(#moonLitClipC)">
+          <circle cx="${cx}" cy="${cy}" r="${r}" fill="rgba(97, 175, 239, 0.15)" stroke="#61afef" stroke-width="1.5"/>
+          <line x1="${cx - r}" y1="${cy - 12}" x2="${cx + r}" y2="${cy - 12}" stroke="#61afef" stroke-width="0.8"/>
+          <line x1="${cx - r}" y1="${cy}" x2="${cx + r}" y2="${cy}" stroke="#61afef" stroke-width="0.8"/>
+          <line x1="${cx - r}" y1="${cy + 12}" x2="${cx + r}" y2="${cy + 12}" stroke="#61afef" stroke-width="0.8"/>
+        </g>
+      `;
+    }
+
+    // 5. Render All Planets
+    function renderPlanets() {
+      // SATURN CURRENT
+      document.getElementById('saturn-cur').innerHTML = `
+        <g transform="translate(40,30) rotate(-22)">
+          <path d="M -30 0 A 30 9 0 0 1 30 0" fill="none" stroke="#61afef" stroke-width="1.2"/>
+          <circle cx="0" cy="0" r="14" fill="none" stroke="#61afef" stroke-width="1.2"/>
+          <path d="M 30 0 A 30 9 0 0 1 -30 0" fill="none" stroke="#61afef" stroke-width="1.2"/>
+        </g>
+      `;
+
+      // SATURN PROPOSED (Cassini Division + Globe Shadow + Atmospheric Band)
+      document.getElementById('saturn-new').innerHTML = `
+        <defs>
+          <clipPath id="saturnRearRingClip">
+            <rect x="-60" y="-35" width="120" height="35" />
+          </clipPath>
+          <clipPath id="saturnFrontRingClip">
+            <rect x="-60" y="0" width="120" height="35" />
+          </clipPath>
+        </defs>
+        <g transform="translate(60,35) rotate(-22)">
+          <!-- REAR RINGS (passing behind globe) -->
+          <g clip-path="url(#saturnRearRingClip)">
+            <!-- Outer A Ring -->
+            <ellipse cx="0" cy="0" rx="46" ry="14" fill="none" stroke="#61afef" stroke-width="2.5" opacity="0.85"/>
+            <!-- Cassini Division (dark gap) -->
+            <ellipse cx="0" cy="0" rx="41.5" ry="12.6" fill="none" stroke="#0b0f14" stroke-width="1.2"/>
+            <!-- Inner B Ring (brighter) -->
+            <ellipse cx="0" cy="0" rx="38" ry="11.5" fill="none" stroke="#61afef" stroke-width="4" opacity="0.95"/>
+            <!-- Crepe C Ring -->
+            <ellipse cx="0" cy="0" rx="31" ry="9.4" fill="none" stroke="#61afef" stroke-width="1.5" opacity="0.35"/>
+            <!-- Shadow cast by globe onto rear ring -->
+            <ellipse cx="-4" cy="-3" rx="14" ry="14" fill="rgba(11, 15, 20, 0.85)"/>
+          </g>
+
+          <!-- SATURN GLOBE -->
+          <circle cx="0" cy="0" r="16" fill="#121820" stroke="#61afef" stroke-width="1.5"/>
+          <!-- Atmospheric cloud belt -->
+          <path d="M -15 2 Q 0 4 15 2" fill="none" stroke="#61afef" stroke-width="1" opacity="0.6"/>
+          <path d="M -13 -4 Q 0 -2 13 -4" fill="none" stroke="#61afef" stroke-width="0.8" opacity="0.4"/>
+
+          <!-- FRONT RINGS (passing in front of globe) -->
+          <g clip-path="url(#saturnFrontRingClip)">
+            <!-- Outer A Ring -->
+            <ellipse cx="0" cy="0" rx="46" ry="14" fill="none" stroke="#61afef" stroke-width="2.5" opacity="0.85"/>
+            <!-- Cassini Division -->
+            <ellipse cx="0" cy="0" rx="41.5" ry="12.6" fill="none" stroke="#0b0f14" stroke-width="1.2"/>
+            <!-- Inner B Ring -->
+            <ellipse cx="0" cy="0" rx="38" ry="11.5" fill="none" stroke="#61afef" stroke-width="4" opacity="0.95"/>
+            <!-- Crepe C Ring -->
+            <ellipse cx="0" cy="0" rx="31" ry="9.4" fill="none" stroke="#61afef" stroke-width="1.5" opacity="0.35"/>
+          </g>
+        </g>
+      `;
+
+      // JUPITER CURRENT
+      document.getElementById('jupiter-cur').innerHTML = `
+        <g transform="translate(30,30)">
+          <circle cx="0" cy="0" r="18" fill="none" stroke="#61afef" stroke-width="1.2"/>
+          <line x1="-15" y1="-6" x2="15" y2="-6" stroke="#61afef" stroke-width="1.2"/>
+          <line x1="-18" y1="1" x2="18" y2="1" stroke="#61afef" stroke-width="1.2"/>
+          <line x1="-15" y1="8" x2="15" y2="8" stroke="#61afef" stroke-width="1.2"/>
+        </g>
+      `;
+
+      // JUPITER PROPOSED (Belts, Red Spot, 4 Moons)
+      document.getElementById('jupiter-new').innerHTML = `
+        <g transform="translate(70,35)">
+          <!-- 4 Galilean Moons aligned along equator -->
+          <!-- Callisto -->
+          <circle cx="-54" cy="-3" r="1.5" fill="#61afef" opacity="0.75" />
+          <!-- Ganymede -->
+          <circle cx="-34" cy="-2" r="2.2" fill="#61afef" opacity="0.95" />
+          <!-- Io -->
+          <circle cx="28" cy="1.5" r="1.8" fill="#e5c07b" opacity="0.95" />
+          <!-- Europa -->
+          <circle cx="48" cy="2.5" r="1.6" fill="#e6edf3" opacity="0.85" />
+          
+          <!-- Equatorial alignment guide -->
+          <line x1="-58" y1="-3.5" x2="52" y2="3" stroke="#61afef" stroke-width="0.5" stroke-dasharray="2 3" opacity="0.3"/>
+
+          <!-- Globe -->
+          <circle cx="0" cy="0" r="18" fill="#121820" stroke="#61afef" stroke-width="1.4"/>
+          
+          <!-- Clip to disc -->
+          <g clip-path="url(#jupClip)">
+            <!-- North Equatorial Belt (NEB) with wave -->
+            <path d="M -18 -4 Q -8 -2 0 -5 Q 8 -8 18 -4 L 18 -8 L -18 -8 Z" fill="#61afef" opacity="0.35"/>
+            <!-- South Equatorial Belt (SEB) with Red Spot notch -->
+            <path d="M -18 3 Q -6 5 2 2 Q 10 5 18 3 L 18 8 L -18 8 Z" fill="#61afef" opacity="0.35"/>
+            <!-- Great Red Spot Storm Oval -->
+            <ellipse cx="6" cy="5" rx="3.5" ry="2.2" fill="#e06c75" stroke="#61afef" stroke-width="0.8"/>
+            <!-- Polar Shading -->
+            <path d="M -18 -13 Q 0 -10 18 -13 L 18 -18 L -18 -18 Z" fill="#61afef" opacity="0.2"/>
+            <path d="M -18 13 Q 0 10 18 13 L 18 18 L -18 18 Z" fill="#61afef" opacity="0.2"/>
+          </g>
+          <defs>
+            <clipPath id="jupClip"><circle cx="0" cy="0" r="17.4"/></clipPath>
+          </defs>
+        </g>
+      `;
+
+      // MARS CURRENT
+      document.getElementById('mars-cur').innerHTML = `
+        <g transform="translate(25,25)">
+          <circle cx="0" cy="0" r="10" fill="#61afef"/>
+          <circle cx="0" cy="0" r="13.5" fill="none" stroke="#61afef" stroke-width="1.1" opacity="0.65"/>
+        </g>
+      `;
+
+      // MARS PROPOSED (Polar Ice Cap + Syrtis Major + Astrolabe Cross)
+      document.getElementById('mars-new').innerHTML = `
+        <g transform="translate(35,35)">
+          <!-- Target reticle brackets -->
+          <circle cx="0" cy="0" r="18" fill="none" stroke="#e06c75" stroke-width="0.75" stroke-dasharray="3 4" opacity="0.4"/>
+          <!-- Globe -->
+          <circle cx="0" cy="0" r="12" fill="#181318" stroke="#e06c75" stroke-width="1.3"/>
+          <g clip-path="url(#marsClip)">
+            <!-- North Polar Ice Cap -->
+            <ellipse cx="0" cy="-11" rx="5" ry="2.5" fill="#f5f4ef"/>
+            <!-- Syrtis Major Planum (triangular albedo feature) -->
+            <path d="M 0 -2 L 5 4 L -3 5 Z" fill="#e06c75" opacity="0.55"/>
+            <!-- Southern highlands terrain -->
+            <path d="M -10 7 Q 0 4 10 8 L 10 12 L -10 12 Z" fill="#e06c75" opacity="0.3"/>
+          </g>
+          <defs>
+            <clipPath id="marsClip"><circle cx="0" cy="0" r="11.5"/></clipPath>
+          </defs>
+        </g>
+      `;
+
+      // VENUS CURRENT
+      document.getElementById('venus-cur').innerHTML = `
+        <g transform="translate(25,25)">
+          <circle cx="0" cy="0" r="11" fill="none" stroke="#61afef" stroke-width="1.1"/>
+          <path d="M 0 -11 A 11 11 0 0 1 0 11 A 5 11 0 0 1 0 -11 Z" fill="#61afef"/>
+        </g>
+      `;
+
+      // VENUS PROPOSED (Optical Diamond Glint + Cloud Deck + Live Phase)
+      const vk = illumFraction;
+      const vr = 14;
+      const vSide = isWaxing ? 1 : -1;
+      const vbRad = vr * Math.abs(1 - 2 * vk);
+      const vClip = `M 0 ${-vr} A ${vr} ${vr} 0 0 ${vSide > 0 ? 1 : 0} 0 ${vr} A ${vbRad} ${vr} 0 0 ${(vk > 0.5) === (vSide > 0) ? 0 : 1} 0 ${-vr} Z`;
+
+      document.getElementById('venus-new').innerHTML = `
+        <defs>
+          <clipPath id="venusPhaseClip"><path d="${vClip}"/></clipPath>
+        </defs>
+        <g transform="translate(40,40)">
+          <!-- Brilliant 4-point Diamond Glint (The Morning Star) -->
+          <line x1="0" y1="-28" x2="0" y2="28" stroke="#e6edf3" stroke-width="0.8" opacity="0.6"/>
+          <line x1="-28" y1="0" x2="28" y2="0" stroke="#e6edf3" stroke-width="0.8" opacity="0.6"/>
+          <line x1="-12" y1="-12" x2="12" y2="12" stroke="#61afef" stroke-width="0.5" opacity="0.35"/>
+          <line x1="12" y1="-12" x2="-12" y2="12" stroke="#61afef" stroke-width="0.5" opacity="0.35"/>
+
+          <!-- Dark disc outline -->
+          <circle cx="0" cy="0" r="${vr}" fill="rgba(240,245,255,0.05)" stroke="#61afef" stroke-width="1" opacity="0.4"/>
+          
+          <!-- Illuminated Cloud Deck with Y-chevron arcs -->
+          <g clip-path="url(#venusPhaseClip)">
+            <circle cx="0" cy="0" r="${vr}" fill="#f0f4f8"/>
+            <path d="M -8 -6 Q 0 -3 8 -6" fill="none" stroke="#cbd5e1" stroke-width="1.2"/>
+            <path d="M -10 0 Q 0 3 10 0" fill="none" stroke="#cbd5e1" stroke-width="1.2"/>
+            <path d="M -8 6 Q 0 9 8 6" fill="none" stroke="#cbd5e1" stroke-width="1.2"/>
+          </g>
+        </g>
+      `;
+
+      // MERCURY CURRENT
+      document.getElementById('mercury-cur').innerHTML = `
+        <g transform="translate(25,25)">
+          <circle cx="0" cy="0" r="7" fill="#61afef"/>
+          <circle cx="0" cy="0" r="10.5" fill="none" stroke="#61afef" stroke-width="1" opacity="0.6"/>
+        </g>
+      `;
+
+      // MERCURY PROPOSED (Caloris Basin shock rings)
+      document.getElementById('mercury-new').innerHTML = `
+        <g transform="translate(30,30)">
+          <circle cx="0" cy="0" r="8" fill="#121820" stroke="#9aa5b1" stroke-width="1.2"/>
+          <!-- Caloris Basin impact rings -->
+          <circle cx="-2" cy="-1" r="2" fill="none" stroke="#9aa5b1" stroke-width="0.8" opacity="0.8"/>
+          <circle cx="-2" cy="-1" r="4.2" fill="none" stroke="#9aa5b1" stroke-width="0.6" stroke-dasharray="1.5 1.5" opacity="0.6"/>
+          <!-- Cratered limb ticks -->
+          <line x1="6" y1="-2" x2="8" y2="-2" stroke="#9aa5b1" stroke-width="0.8"/>
+          <line x1="5" y1="4" x2="7.5" y2="4" stroke="#9aa5b1" stroke-width="0.8"/>
+          <!-- Astrolabe reticle tick -->
+          <circle cx="0" cy="0" r="12" fill="none" stroke="#9aa5b1" stroke-width="0.6" stroke-dasharray="2 3" opacity="0.4"/>
+        </g>
+      `;
+
+      // SUN RENDERING (4 ENHANCED VARIATIONS OF OPTION 4)
+      function renderSunCurrent(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const rays = 12;
+        const r = 14;
+        let rayLines = '';
+        for (let k = 0; k < rays; k++) {
+          const ang = (k / rays) * Math.PI * 2;
+          const x1 = Math.cos(ang) * (r * 0.95);
+          const y1 = Math.sin(ang) * (r * 0.95);
+          const x2 = Math.cos(ang) * (r * 1.35);
+          const y2 = Math.sin(ang) * (r * 1.35);
+          rayLines += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#e5c07b" stroke-width="1.1" stroke-linecap="round"/>`;
+        }
+        el.innerHTML = `
+          <g transform="translate(35,35)">
+            <circle cx="0" cy="0" r="${r * 0.72}" fill="none" stroke="#e5c07b" stroke-width="1.2"/>
+            ${rayLines}
+          </g>
+        `;
+      }
+
+      renderSunCurrent('sun-cur-4a');
+      renderSunCurrent('sun-cur-4b');
+      renderSunCurrent('sun-cur-4c');
+      renderSunCurrent('sun-cur-4d');
+
+      // OPTION 4A: Spectral Harmonized (Full Planetary Parity - Recommended)
+      document.getElementById('sun-opt-4a').innerHTML = `
+        <defs>
+          <clipPath id="sunClip4A"><circle cx="0" cy="0" r="17.4"/></clipPath>
+        </defs>
+        <g transform="translate(47.5,47.5)">
+          <!-- Outer Chromosphere guide ring (continuous circular rotation) -->
+          <circle cx="0" cy="0" r="23" fill="none" stroke="#e5c07b" stroke-width="0.8" stroke-dasharray="2.5 3" opacity="0.45">
+            <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0" dur="18s" repeatCount="indefinite"/>
+          </circle>
+          
+          <!-- Eastern Limb Prominence Loop Arch (breaching into space) -->
+          <path d="M 12.5 -12.5 C 18 -19, 23 -13.5, 16.5 -7" fill="none" stroke="#e5c07b" stroke-width="1.2" stroke-linecap="round"/>
+          <path d="M 13.5 -11 C 17 -15.5, 20.5 -12, 16 -7.5" fill="none" stroke="#eda05b" stroke-width="0.6" opacity="0.6"/>
+
+          <!-- Photosphere Solar Globe (Obsidian surface fill matching Jupiter/Saturn) -->
+          <circle cx="0" cy="0" r="18" fill="#121820" stroke="#e5c07b" stroke-width="1.4"/>
+          
+          <!-- Interior Solar Features -->
+          <g clip-path="url(#sunClip4A)">
+            <!-- Solar Equator Axis (7.25° tilt) in instrument slate -->
+            <line x1="-18" y1="-2.3" x2="18" y2="2.3" stroke="#8b949e" stroke-width="0.6" stroke-dasharray="2 2" opacity="0.3"/>
+            
+            <!-- Northern Filament Channel: Shaded plasma ribbon (like Jupiter's wave belts) -->
+            <path d="M -14 -4 Q -7 -11 0 -5 Q 7 1 13 -3 L 13 -6 Q 7 -2 0 -8 Q -7 -14 -14 -7 Z" fill="#e5c07b" opacity="0.22"/>
+            
+            <!-- Core dark absorption spine of the filament -->
+            <path d="M -13 -5.5 Q -6.5 -11.5 0.5 -5.5 Q 7.5 0.5 13.5 -3.5" fill="none" stroke="#e5c07b" stroke-width="1.3" opacity="0.95" stroke-linecap="round"/>
+            <path d="M -8 -3.5 Q -3 -7 3 -2" fill="none" stroke="#e5c07b" stroke-width="0.75" opacity="0.55" stroke-linecap="round"/>
+
+            <!-- Southern Bipolar Active Region & Magnetic Coronal Arcade -->
+            <path d="M -6 8 Q -1 0 5 10" fill="none" stroke="#e5c07b" stroke-width="0.85" opacity="0.7"/>
+            <path d="M -8 9 Q -1 -3 7 11" fill="none" stroke="#e5c07b" stroke-width="0.6" stroke-dasharray="1.5 1.5" opacity="0.45"/>
+            
+            <!-- Active Sunspots (warm amber #eda05b with obsidian umbra cores) -->
+            <circle cx="-6" cy="8" r="2.2" fill="#eda05b"/>
+            <circle cx="-6" cy="8" r="1.3" fill="#0b0f14"/>
+            <circle cx="5" cy="10" r="1.8" fill="#eda05b"/>
+            <circle cx="5" cy="10" r="1" fill="#0b0f14"/>
+            
+            <!-- Brilliant white micro-flare reconnection spark (matching Mars ice cap & Venus glint) -->
+            <circle cx="-1" cy="5" r="1.3" fill="#f5f4ef"/>
+            <line x1="-1" y1="2.5" x2="-1" y2="7.5" stroke="#f5f4ef" stroke-width="0.6" opacity="0.75"/>
+            <line x1="-3.5" y1="5" x2="1.5" y2="5" stroke="#f5f4ef" stroke-width="0.6" opacity="0.75"/>
+
+            <!-- Polar Plumes in instrument slate -->
+            <path d="M -9 -15 Q 0 -13 9 -15" fill="none" stroke="#8b949e" stroke-width="0.6" opacity="0.35"/>
+            <path d="M -9 15 Q 0 13 9 15" fill="none" stroke="#8b949e" stroke-width="0.6" opacity="0.35"/>
+          </g>
+        </g>
+      `;
+
+      // OPTION 4B: Pure Vector Dual-Tone (Crisp & High-Contrast)
+      document.getElementById('sun-opt-4b').innerHTML = `
+        <defs>
+          <clipPath id="sunClip4B"><circle cx="0" cy="0" r="17.4"/></clipPath>
+        </defs>
+        <g transform="translate(47.5,47.5)">
+          <!-- Outer guide ring (continuous circular rotation) -->
+          <circle cx="0" cy="0" r="23" fill="none" stroke="#e5c07b" stroke-width="0.8" stroke-dasharray="2 3" opacity="0.45">
+            <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0" dur="18s" repeatCount="indefinite"/>
+          </circle>
+          
+          <!-- Mini limb prominence arch at 1 o'clock -->
+          <path d="M 12 -12 C 16 -17 21 -13 16 -8" fill="none" stroke="#e5c07b" stroke-width="1.1" stroke-linecap="round"/>
+
+          <!-- Photosphere globe -->
+          <circle cx="0" cy="0" r="18" fill="#121820" stroke="#e5c07b" stroke-width="1.4"/>
+          
+          <!-- Interior features -->
+          <g clip-path="url(#sunClip4B)">
+            <!-- Twin intertwined filaments -->
+            <path d="M -13 -6 Q -6 -12 1 -6 Q 7 0 14 -4" fill="none" stroke="#e5c07b" stroke-width="1.3" stroke-linecap="round"/>
+            <path d="M -10 -2 Q -3 -8 4 -2 Q 10 3 15 -1" fill="none" stroke="#e5c07b" stroke-width="0.8" opacity="0.6" stroke-linecap="round"/>
+            
+            <!-- Southern magnetic loop arch -->
+            <path d="M -5 7 Q -0.5 2 4 9" fill="none" stroke="#e5c07b" stroke-width="0.8" stroke-dasharray="1.5 1.5"/>
+            <circle cx="-5" cy="7" r="2.2" fill="#e5c07b"/>
+            <circle cx="4" cy="9" r="1.6" fill="#e5c07b"/>
+            
+            <!-- White optical glint focal core -->
+            <circle cx="-0.5" cy="4.5" r="1.4" fill="#f5f4ef"/>
+          </g>
+        </g>
+      `;
+
+      // OPTION 4C: Astrolabe Magnetic Arcade (Instrument Grid & Field Lines)
+      document.getElementById('sun-opt-4c').innerHTML = `
+        <defs>
+          <clipPath id="sunClip4C"><circle cx="0" cy="0" r="17.4"/></clipPath>
+        </defs>
+        <g transform="translate(47.5,47.5)">
+          <!-- Outer guide ring with 4 cardinal tick marks -->
+          <circle cx="0" cy="0" r="23" fill="none" stroke="#e5c07b" stroke-width="0.8" stroke-dasharray="2 3" opacity="0.45">
+            <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0" dur="18s" repeatCount="indefinite"/>
+          </circle>
+          <line x1="0" y1="-23" x2="0" y2="-26" stroke="#e5c07b" stroke-width="1" stroke-linecap="round"/>
+          <line x1="0" y1="23" x2="0" y2="26" stroke="#e5c07b" stroke-width="1" stroke-linecap="round"/>
+          <line x1="-23" y1="0" x2="-26" y2="0" stroke="#e5c07b" stroke-width="1" stroke-linecap="round"/>
+          <line x1="23" y1="0" x2="26" y2="0" stroke="#e5c07b" stroke-width="1" stroke-linecap="round"/>
+
+          <!-- Photosphere globe -->
+          <circle cx="0" cy="0" r="18" fill="#121820" stroke="#e5c07b" stroke-width="1.4"/>
+          
+          <g clip-path="url(#sunClip4C)">
+            <!-- Astrolabe solar latitude grid lines in instrument slate -->
+            <line x1="-18" y1="-2.3" x2="18" y2="2.3" stroke="#8b949e" stroke-width="0.6" stroke-dasharray="2 2" opacity="0.45"/>
+            <line x1="-16" y1="-8" x2="16" y2="-4" stroke="#8b949e" stroke-width="0.5" stroke-dasharray="2 3" opacity="0.3"/>
+            <line x1="-16" y1="4" x2="16" y2="8" stroke="#8b949e" stroke-width="0.5" stroke-dasharray="2 3" opacity="0.3"/>
+
+            <!-- Active filament following northern differential rotation -->
+            <path d="M -12 -6 Q -5 -11 2 -5 Q 8 0 13 -4" fill="none" stroke="#e5c07b" stroke-width="1.4" stroke-linecap="round"/>
+
+            <!-- Multi-tier magnetic arcade in southern hemisphere -->
+            <path d="M -6 6 Q 0 0 6 7" fill="none" stroke="#e5c07b" stroke-width="0.85"/>
+            <path d="M -8 7 Q 0 -3 8 8" fill="none" stroke="#e5c07b" stroke-width="0.6" stroke-dasharray="2 2" opacity="0.55"/>
+            <circle cx="-6" cy="6" r="1.8" fill="#e5c07b"/>
+            <circle cx="6" cy="7" r="1.8" fill="#e5c07b"/>
+            <circle cx="0" cy="2.5" r="1.2" fill="#f5f4ef"/>
+          </g>
+        </g>
+      `;
+
+      // OPTION 4D: Coronal Loop Breakout (Dynamic Prominence & Multi-Tier Arcade)
+      document.getElementById('sun-opt-4d').innerHTML = `
+        <defs>
+          <clipPath id="sunClip4D"><circle cx="0" cy="0" r="17.4"/></clipPath>
+        </defs>
+        <g transform="translate(47.5,47.5)">
+          <!-- Dynamic High-Arch Prominence Loop at 10 o'clock leaping into space -->
+          <path d="M -11 -13 C -17 -22, -24 -15, -16 -6" fill="none" stroke="#e5c07b" stroke-width="1.3" stroke-linecap="round"/>
+          <path d="M -10 -11 C -15 -18, -20 -13, -15 -7" fill="none" stroke="#eda05b" stroke-width="0.7" opacity="0.6"/>
+
+          <!-- Outer chromosphere guide ring (continuous circular rotation) -->
+          <circle cx="0" cy="0" r="23" fill="none" stroke="#e5c07b" stroke-width="0.8" stroke-dasharray="2 3" opacity="0.45">
+            <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0" dur="18s" repeatCount="indefinite"/>
+          </circle>
+
+          <!-- Photosphere globe -->
+          <circle cx="0" cy="0" r="18" fill="#121820" stroke="#e5c07b" stroke-width="1.4"/>
+          
+          <g clip-path="url(#sunClip4D)">
+            <!-- Central serpentine filament -->
+            <path d="M -13 -4 Q -6 -9 1 -3 Q 7 2 13 -2" fill="none" stroke="#e5c07b" stroke-width="1.3" stroke-linecap="round"/>
+            <path d="M -7 -1 Q -1 -5 5 0" fill="none" stroke="#e5c07b" stroke-width="0.7" opacity="0.5"/>
+
+            <!-- Triple nested coronal arcade in south -->
+            <path d="M -4 9 Q 0 4 4 9" fill="none" stroke="#e5c07b" stroke-width="0.9"/>
+            <path d="M -7 10 Q 0 1 7 10" fill="none" stroke="#e5c07b" stroke-width="0.7" opacity="0.7"/>
+            <path d="M -10 11 Q 0 -2 10 11" fill="none" stroke="#e5c07b" stroke-width="0.5" stroke-dasharray="1.5 1.5" opacity="0.45"/>
+            
+            <circle cx="-5" cy="9.5" r="2" fill="#eda05b"/>
+            <circle cx="5" cy="9.5" r="2" fill="#eda05b"/>
+            <circle cx="0" cy="6" r="1.3" fill="#f5f4ef"/>
+          </g>
+        </g>
+      `;
+    }
+
+    // Initial render
+    renderAll();
+  </script>
+</body>
+</html>
