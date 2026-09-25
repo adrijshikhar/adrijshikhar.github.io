@@ -6,6 +6,7 @@ entries:
     date: "Aug 2026 - Present"
     year: 2026
     link: "https://binsight.adrijshikhar.dev"
+    github: "https://github.com/adrijshikhar/binsight"
     builtWith: ["Go", "React", "Astro", "Tailwind CSS", "SQLite", "MySQL", "MariaDB"]
   - slug: aim
     title: "aim"
@@ -13,6 +14,7 @@ entries:
     date: "Sep 2026 - Present"
     year: 2026
     link: "https://github.com/adrijshikhar/aim"
+    github: "https://github.com/adrijshikhar/aim"
     builtWith: ["Go", "Bubble Tea", "CLI", "TUI"]
   - slug: catalyst
     title: "Catalyst"
@@ -20,6 +22,7 @@ entries:
     date: "May 2026"
     year: 2026
     link: "https://github.com/adrijshikhar/catalyst"
+    github: "https://github.com/adrijshikhar/catalyst"
     builtWith: ["Agent Skills", "Python", "Shell", "JSON Schema"]
   - slug: sshdiag
     title: "sshdiag"
@@ -27,13 +30,15 @@ entries:
     date: "Aug 2026 - Present"
     year: 2026
     link: "https://github.com/adrijshikhar/sshdiag"
+    github: "https://github.com/adrijshikhar/sshdiag"
     builtWith: ["Go", "Bubble Tea", "Linux", "Homebrew"]
   - slug: cxstatusline
     title: "cxstatusline"
     company: "Open Source"
     date: "Sep 2026 - Present"
     year: 2026
-    link: "https://github.com/adrijshikhar/cxstatusline"
+    link: "https://cxstatusline.adrijshikhar.dev"
+    github: "https://github.com/adrijshikhar/cxstatusline"
     builtWith: ["TypeScript", "Bun", "Ink", "Rust"]
   - slug: resume-ops
     title: "resume-ops"
@@ -47,6 +52,7 @@ entries:
     date: "Jun 2026"
     year: 2026
     link: "https://central.sonatype.com/artifact/io.github.adrijshikhar/retry-thread-pool"
+    github: "https://github.com/adrijshikhar/retry-thread-pool"
     builtWith: ["Java 17", "Concurrency", "Maven Central"]
   - slug: observatory
     title: "adrijshikhar.dev"
@@ -155,7 +161,7 @@ entries:
 
 <!-- binsight -->
 
-A local, read-only MySQL and MariaDB binlog viewer, decoder, and transaction analyser. [Website](https://binsight.adrijshikhar.dev) · [GitHub](https://github.com/adrijshikhar/binsight).
+A local, read-only MySQL and MariaDB binlog viewer, decoder, and transaction analyser.
 
 - Indexes decoded binlogs in SQLite and presents a filterable, virtualized event stream with transaction grouping and row-image inspection.
 - Compares `go-mysql` decoding with native `mysqlbinlog` output, and reports six documented transaction and position anomalies.
@@ -163,7 +169,7 @@ A local, read-only MySQL and MariaDB binlog viewer, decoder, and transaction ana
 
 <!-- aim -->
 
-A CLI and interactive TUI for running AI coding assistants in isolated profiles. [GitHub](https://github.com/adrijshikhar/aim).
+A CLI and interactive TUI for running AI coding assistants in isolated profiles.
 
 - Gives each profile a separate virtual home, configuration, token state, and history.
 - Supports Antigravity CLI, Gemini CLI, Claude Code, and OpenAI Codex, with agent-aware profile selection and quota telemetry.
@@ -171,7 +177,7 @@ A CLI and interactive TUI for running AI coding assistants in isolated profiles.
 
 <!-- catalyst -->
 
-A cross-agent coding-session handoff harness. [GitHub](https://github.com/adrijshikhar/catalyst).
+A cross-agent coding-session handoff harness.
 
 - Stores typed, schema-validated handoff briefs in the repository so work can resume across sessions and agents.
 - Documents verified handoff and hook behavior for Claude Code and Codex CLI, plus verified Antigravity CLI support with its documented registration step.
@@ -179,7 +185,7 @@ A cross-agent coding-session handoff harness. [GitHub](https://github.com/adrijs
 
 <!-- sshdiag -->
 
-SSH tunnel diagnostics for Linux hosts, with a separate capture analyser. [GitHub](https://github.com/adrijshikhar/sshdiag).
+SSH tunnel diagnostics for Linux hosts, with a separate capture analyser.
 
 - `sshdiag` records host and tunnel measurements; `sshanalyse` reads a capture and reports a verdict with explicit missing checks.
 - Requires no root for ordinary collection and records unavailable measurements as `null` rather than fabricating a zero.
@@ -187,7 +193,7 @@ SSH tunnel diagnostics for Linux hosts, with a separate capture analyser. [GitHu
 
 <!-- cxstatusline -->
 
-A configurable one-to-three-row statusline for OpenAI Codex CLI. [Website](https://cxstatusline.adrijshikhar.dev) · [GitHub](https://github.com/adrijshikhar/cxstatusline).
+A configurable one-to-three-row statusline for OpenAI Codex CLI.
 
 - Shows documented session telemetry including model, context, Git state, usage, and reset timers.
 - Provides an interactive terminal configuration UI and a browser playground for layouts, widgets, and ANSI themes.
