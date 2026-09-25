@@ -213,45 +213,69 @@ export type KeepOut = { x: number; y: number; w: number; h: number; strength?: n
  *  Scoped to the column, not the viewport. It used to be full width, which
  *  erased 45% of every mark on the canvas — including the planet labels and the
  *  hover readout out in the empty margins, where there is no text to protect. */
+let keepOutCanvas: HTMLCanvasElement | null = null;
+let keepOutCtx: CanvasRenderingContext2D | null = null;
+
+/** Erase canvas ink under the reading column so text keeps its contrast.
+ *
+ *  `destination-out`, rendered through a smooth 2D offscreen buffer in a single
+ *  composite blit so there are zero stepped bands, zero horizontal seams, and
+ *  zero artifacts crossing celestial landmarks outside the prose column. */
 function applyKeepOut(ctx: CanvasRenderingContext2D, k: KeepOut, W: number): void {
   const strength = k.strength ?? 0.45;
   const feather = 140;
-  const side = 72;
-  const prev = ctx.globalCompositeOperation;
-  ctx.globalCompositeOperation = 'destination-out';
-
-  // Horizontal extent is the READING COLUMN, not the viewport. This used to be
-  // fillRect(0, …, W, …), which erased 45% of every mark on the canvas —
-  // including the planet labels and the hover readout out in the empty margins,
-  // where there is no text to protect. Those labels are the instrument's own
-  // voice; dimming them by half bought no legibility, it just made the sky
-  // unreadable. Text only ever sits inside the column, so that is all the
-  // keep-out needs to cover.
+  const side = 40; // tightly bounds the column without spilling into empty sky
   const x0 = Math.max(0, k.x - side);
   const x1 = Math.min(W, k.x + k.w + side);
+  const kw = Math.round(x1 - x0);
+  const kh = Math.round(k.h + feather);
+  if (kw <= 0 || kh <= 0) return;
 
-  // Feathered on all four sides now: a hard vertical edge in open sky reads as a
-  // seam, which is exactly the failure the top edge was already feathered to
-  // avoid.
-  const band = (y: number, h: number, alpha: number) => {
-    const g = ctx.createLinearGradient(x0, 0, x1, 0);
-    g.addColorStop(0, 'rgba(0,0,0,0)');
-    g.addColorStop(Math.min(0.49, side / Math.max(1, x1 - x0)), `rgba(0,0,0,${alpha})`);
-    g.addColorStop(Math.max(0.51, 1 - side / Math.max(1, x1 - x0)), `rgba(0,0,0,${alpha})`);
-    g.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = g;
-    ctx.fillRect(x0, y, x1 - x0, h);
-  };
+  if (typeof document === 'undefined') return;
 
-  // Vertical feather at the top edge: that boundary is where the hero hands over
-  // to the content, so a gradient there reads as the sky receding, not a seam.
-  const steps = 12;
-  for (let i = 0; i < steps; i++) {
-    const t = (i + 1) / steps;
-    band(k.y - feather + (feather * i) / steps, feather / steps + 1, strength * t);
+  if (!keepOutCanvas) {
+    keepOutCanvas = document.createElement('canvas');
+    keepOutCtx = keepOutCanvas.getContext('2d');
   }
-  band(k.y, k.h, strength);
+  if (!keepOutCanvas || !keepOutCtx) return;
 
+  if (keepOutCanvas.width < kw || keepOutCanvas.height < kh) {
+    keepOutCanvas.width = Math.max(keepOutCanvas.width, kw);
+    keepOutCanvas.height = Math.max(keepOutCanvas.height, kh);
+  }
+
+  // Clear scratch region
+  keepOutCtx.clearRect(0, 0, kw, kh);
+
+  // 1. Horizontal gradient envelope: smooth fade along left and right flanks
+  const gHoriz = keepOutCtx.createLinearGradient(0, 0, kw, 0);
+  gHoriz.addColorStop(0, 'rgba(0,0,0,0)');
+  const sLeft = Math.min(0.48, side / kw);
+  const sRight = Math.max(0.52, 1 - side / kw);
+  gHoriz.addColorStop(sLeft, 'rgba(0,0,0,1)');
+  gHoriz.addColorStop(sRight, 'rgba(0,0,0,1)');
+  gHoriz.addColorStop(1, 'rgba(0,0,0,0)');
+  keepOutCtx.fillStyle = gHoriz;
+  keepOutCtx.fillRect(0, 0, kw, kh);
+
+  // 2. Vertical gradient: smooth top feather over `feather` pixels
+  keepOutCtx.globalCompositeOperation = 'source-in';
+  const gVert = keepOutCtx.createLinearGradient(0, 0, 0, kh);
+  const fStop = Math.min(0.99, feather / kh);
+  gVert.addColorStop(0, 'rgba(0,0,0,0)');
+  gVert.addColorStop(fStop, 'rgba(0,0,0,1)');
+  gVert.addColorStop(1, 'rgba(0,0,0,1)');
+  keepOutCtx.fillStyle = gVert;
+  keepOutCtx.fillRect(0, 0, kw, kh);
+  keepOutCtx.globalCompositeOperation = 'source-over';
+
+  // 3. Composite onto destination canvas in one single smooth blit
+  const prev = ctx.globalCompositeOperation;
+  const prevAlpha = ctx.globalAlpha;
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.globalAlpha = strength;
+  ctx.drawImage(keepOutCanvas, 0, 0, kw, kh, x0, k.y - feather, kw, kh);
+  ctx.globalAlpha = prevAlpha;
   ctx.globalCompositeOperation = prev;
 }
 
@@ -609,9 +633,9 @@ export function drawGraticule(
     ctx.stroke();
   }
 
-  ctx.font = '500 8px ui-monospace,Menlo,monospace';
+  ctx.font = '600 9px ui-monospace,Menlo,monospace';
   ctx.textAlign = 'left';
-  ctx.globalAlpha = Math.min(1, 0.34 * K);
+  ctx.globalAlpha = Math.min(1, 0.55 * K);
   ctx.fillStyle = colors.muted;
   for (const a of [60, 30, 0]) {
     ctx.fillText(a === 0 ? 'HORIZON' : `${a}°`, cx + 6, cy - altR(a) + 11);
@@ -691,9 +715,9 @@ export function drawBodies(
       // terminators for inner planets. Vector paths scale natively to any DPR
       // without raster downsampling blur in Safari or other WebKit engines.
       if (s.isSun) {
-        ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.92);
+        ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.95);
         ctx.strokeStyle = colour;
-        ctx.lineWidth = Math.max(0.75, r * 0.085);
+        ctx.lineWidth = Math.max(1.15, r * 0.1);
         ctx.lineCap = 'round';
         ctx.beginPath();
         ctx.arc(s.x, s.y, r * 0.62, 0, Math.PI * 2);
@@ -707,9 +731,9 @@ export function drawBodies(
           ctx.stroke();
         }
       } else if (s.name === 'Saturn') {
-        ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.92);
+        ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.95);
         ctx.strokeStyle = colour;
-        ctx.lineWidth = Math.max(0.7, r * 0.085);
+        ctx.lineWidth = Math.max(1.1, r * 0.09);
         // Back half of the ring, then the globe, then the front half. Drawing it
         // in three passes is what makes the ring read as passing BEHIND Saturn
         // rather than as a flat ellipse laid over it.
@@ -739,9 +763,9 @@ export function drawBodies(
         // This is Galileo's observation of Venus, drawn from live geometry.
         const k = s.illum;
         const br = r * 0.9;
-        ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.92);
+        ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.95);
         ctx.strokeStyle = colour;
-        ctx.lineWidth = Math.max(0.7, r * 0.085);
+        ctx.lineWidth = Math.max(1.1, r * 0.09);
         ctx.beginPath();
         ctx.arc(s.x, s.y, br, 0, Math.PI * 2);
         ctx.stroke();
@@ -751,9 +775,9 @@ export function drawBodies(
         ctx.ellipse(s.x, s.y, br * Math.abs(1 - 2 * k), br, 0, Math.PI / 2, -Math.PI / 2, k > 0.5);
         ctx.fill();
       } else if (s.name === 'Jupiter') {
-        ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.92);
+        ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.95);
         ctx.strokeStyle = colour;
-        ctx.lineWidth = Math.max(0.7, r * 0.085);
+        ctx.lineWidth = Math.max(1.1, r * 0.09);
         ctx.beginPath();
         ctx.arc(s.x, s.y, r * 0.9, 0, Math.PI * 2);
         ctx.stroke();
@@ -773,18 +797,18 @@ export function drawBodies(
       // ringed stars is exactly how a print chart distinguishes a planet from a
       // star, so here the shape difference is signal rather than noise.
       if (colors.engraved && !s.isPlanet) {
-        markStar(ctx, s.x, s.y, r, colour, a * (i === hoverIndex ? 1 : 0.92), true);
+        markStar(ctx, s.x, s.y, r, colour, a * (i === hoverIndex ? 1 : 0.95), true);
       } else {
-        ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.92);
+        ctx.globalAlpha = a * (i === hoverIndex ? 1 : 0.95);
         ctx.fillStyle = colour;
         ctx.beginPath();
         ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
         ctx.fill();
       }
       if (s.isPlanet) {
-        ctx.globalAlpha = a * 0.3;
+        ctx.globalAlpha = Math.min(0.65, a * 0.65);
         ctx.strokeStyle = planet;
-        ctx.lineWidth = 1;
+        ctx.lineWidth = 1.1;
         ctx.beginPath();
         ctx.arc(s.x, s.y, r + 3.5, 0, Math.PI * 2);
         ctx.stroke();
@@ -793,12 +817,10 @@ export function drawBodies(
     }
 
     // persistent label for planets and the Moon — they earn a name without hover.
-    // Same cap as the disc: near the zenith this formula alone reaches 0.67,
-    // which is exactly the kind of "bright body over prose" the cap exists for.
     if ((s.isPlanet || s.isMoon || s.isSun) && s.alt > 0 && i !== hoverIndex) {
-      ctx.globalAlpha = Math.min(BODY_ALPHA_CAP, 0.42 + 0.25 * (s.alt / 90));
+      ctx.globalAlpha = Math.min(0.85, 0.65 + 0.2 * (s.alt / 90));
       ctx.fillStyle = colors.label ?? planet;
-      ctx.font = '500 9px ui-monospace,Menlo,monospace';
+      ctx.font = '600 10px ui-monospace,Menlo,monospace';
       ctx.textAlign = 'center';
       ctx.fillText(s.name.toUpperCase(), Math.round(s.x), Math.round(s.y + r + 11));
       ctx.textAlign = 'start';

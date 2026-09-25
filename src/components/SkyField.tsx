@@ -802,7 +802,9 @@ export default function SkyField({ mode }: SkyFieldProps) {
 
   return (
     <>
-      <canvas ref={canvasRef} id="sky" aria-hidden="true" className="fixed inset-0 -z-[1] pointer-events-none" />
+      <div className="fixed inset-0 -z-[1] pointer-events-none overflow-hidden" aria-hidden="true">
+        <canvas ref={canvasRef} id="sky" className="block" />
+      </div>
 
       {/* Bottom-left instrument readout — the observer this sky is actually
           computed for. Not an atmospheric locale strip: the coordinates ARE
