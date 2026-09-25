@@ -40,7 +40,7 @@ export default function ExpCard({
         <div className="font-mono text-xs uppercase tracking-wider text-number-ink">
           {startDate} &ndash; {endDate}
         </div>
-        <CardTitle className="text-heading text-xl leading-snug">
+        <CardTitle role="heading" aria-level={3} className="text-heading text-xl leading-snug">
           {isPreview ? (
             <a
               href={`/experience/#${slug}`}

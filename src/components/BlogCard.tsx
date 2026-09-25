@@ -17,7 +17,7 @@ export default function BlogCard({ title, date, href, description }: BlogCardPro
     <Card className="group relative h-full transition-all duration-200 hover:-translate-y-0.5 hover:border-input hover:shadow-none focus-within:border-ring motion-reduce:translate-none motion-reduce:transition-none">
       <CardHeader>
         <div className="font-mono text-xs uppercase tracking-wider text-number-ink">{date}</div>
-        <CardTitle className="text-heading text-xl leading-snug">
+        <CardTitle role="heading" aria-level={3} className="text-heading text-xl leading-snug">
           <a
             href={href}
             className="group text-heading no-underline after:absolute after:inset-0 after:rounded-xl after:content-[''] hover:text-heading hover:no-underline"

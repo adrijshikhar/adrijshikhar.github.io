@@ -27,7 +27,7 @@ export default function ProjectCard({
           <span className="text-number-ink">{date}</span>
           {company && <span className="text-muted-foreground">{company}</span>}
         </div>
-        <CardTitle className="text-heading text-xl leading-snug">
+        <CardTitle role="heading" aria-level={3} className="text-heading text-xl leading-snug">
           {link ? (
             <a
               href={link}

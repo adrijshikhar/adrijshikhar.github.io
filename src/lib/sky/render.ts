@@ -633,7 +633,7 @@ export function drawGraticule(
     ctx.stroke();
   }
 
-  ctx.font = '600 9px ui-monospace,Menlo,monospace';
+  ctx.font = '600 11px ui-monospace,Menlo,monospace';
   ctx.textAlign = 'left';
   ctx.globalAlpha = Math.min(1, 0.55 * K);
   ctx.fillStyle = colors.muted;
@@ -820,7 +820,7 @@ export function drawBodies(
     if ((s.isPlanet || s.isMoon || s.isSun) && s.alt > 0 && i !== hoverIndex) {
       ctx.globalAlpha = Math.min(0.85, 0.65 + 0.2 * (s.alt / 90));
       ctx.fillStyle = colors.label ?? planet;
-      ctx.font = '600 10px ui-monospace,Menlo,monospace';
+      ctx.font = '600 11px ui-monospace,Menlo,monospace';
       ctx.textAlign = 'center';
       ctx.fillText(s.name.toUpperCase(), Math.round(s.x), Math.round(s.y + r + 11));
       ctx.textAlign = 'start';

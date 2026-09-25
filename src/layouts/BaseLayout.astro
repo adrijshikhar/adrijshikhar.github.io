@@ -99,6 +99,12 @@ const cfBeaconToken =
     <!-- Skip link, first focusable thing on the page. index.astro already carries
          <main id="content">; without this, keyboard users tab the whole rail and
          the sky easter egg before reaching any content. -->
+    <a
+      href="#content"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:rounded-md focus:border focus:border-border focus:bg-background focus:px-4 focus:py-2 focus:font-mono focus:text-xs focus:text-primary focus:shadow-md"
+    >
+      Skip to content
+    </a>
     <aside aria-label="Sky instrument">
       <SkyField client:visible mode={skyMode} />
     </aside>

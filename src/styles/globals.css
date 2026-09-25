@@ -608,7 +608,7 @@ body.spinning * {
     bottom: 1.4rem;
     z-index: 30;
     font-family: var(--font-mono);
-    font-size: 0.625rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--muted-foreground);
@@ -652,7 +652,7 @@ body.spinning * {
     display: inline-block;
     width: 4.5rem;
     text-indent: 0;
-    font-size: 0.5625rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.16em;
   }
   .readout-row b { font-variant-numeric: tabular-nums; }
@@ -684,7 +684,7 @@ body.spinning * {
        text-transform reset, which put HUMAN/MACHINE at 14px sentence case
        inside a 10px uppercase panel. */
     font-family: var(--font-mono);
-    font-size: 0.5625rem;
+    font-size: 0.6875rem;
     font-weight: 400;
     letter-spacing: 0.16em;
     text-transform: uppercase;
@@ -742,7 +742,7 @@ body.spinning * {
     align-items: center;
     gap: 0.7rem;
     font-family: var(--font-mono);
-    font-size: 0.5625rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     color: var(--muted-foreground);

@@ -938,7 +938,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
               owns fixed bottom-6 left-1/2, z-[1100] — sharing that spot would
               have it permanently paint over half the tool bar. */}
           {playing && figure && (
-            <p className="mass-note fixed right-6 bottom-6 z-[45] max-w-[15rem] text-right font-mono text-[0.625rem] leading-relaxed tracking-[0.14em] uppercase text-muted-foreground">
+            <p className="mass-note fixed right-6 bottom-6 z-[45] max-w-[15rem] text-right font-mono text-[0.6875rem] leading-relaxed tracking-[0.14em] uppercase text-muted-foreground">
               {figure.drawn === figure.total ? (
                 <>
                   <b className="font-medium text-primary">{figure.name}</b> complete &mdash; all {figure.total} segments
@@ -953,7 +953,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
           )}
 
           {playing && !figure && massNote && (
-            <p className="mass-note fixed right-6 bottom-6 z-[45] max-w-[15rem] text-right font-mono text-[0.625rem] leading-relaxed tracking-[0.14em] uppercase text-muted-foreground">
+            <p className="mass-note fixed right-6 bottom-6 z-[45] max-w-[15rem] text-right font-mono text-[0.6875rem] leading-relaxed tracking-[0.14em] uppercase text-muted-foreground">
               same pull, less mass &mdash; <b className="font-medium text-primary">faint stars fly faster</b>
               <span className="text-muted-foreground"> · v &prop; 1/&radic;m</span>
             </p>
