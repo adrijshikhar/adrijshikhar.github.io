@@ -71,7 +71,6 @@ function applyOpticalProgress(
   humanPlane: HTMLElement,
   machinePlane: HTMLElement,
   skyEl: HTMLElement | null,
-  brackets: NodeListOf<HTMLElement> | null = null,
 ) {
   p = clampP(p);
 
@@ -145,6 +144,8 @@ function applyOpticalProgress(
 }
 
 function triggerDetentBounce(needleEl: HTMLElement | null) {
+  if (prefersReduced()) return;
+
   const brackets = document.querySelectorAll<HTMLElement>('.viewfinder i');
   if (brackets.length > 0) {
     animate(brackets, {
@@ -205,7 +206,7 @@ export default function ViewToggle() {
       ensureMachineLoaded(machinePlane);
     }
     if (humanPlane && machinePlane) {
-      applyOpticalProgress(clamped, humanPlane, machinePlane, skyEl, null);
+      applyOpticalProgress(clamped, humanPlane, machinePlane, skyEl);
     }
   }, []);
 
@@ -303,7 +304,7 @@ export default function ViewToggle() {
       currentProgressRef.current = 1.0;
       setProgress(1.0);
       if (humanPlane && machinePlane) {
-        applyOpticalProgress(1.0, humanPlane, machinePlane, skyEl, null);
+        applyOpticalProgress(1.0, humanPlane, machinePlane, skyEl);
       }
       document.documentElement.classList.remove('machine-boot');
     }
@@ -432,6 +433,8 @@ export default function ViewToggle() {
         tabIndex={0}
         aria-label="Optical focal length"
         aria-valuenow={Math.round(progress * 100)}
+        aria-valuemin={0}
+        aria-valuemax={100}
         aria-valuetext={
           progress < 0.25
             ? '24mm Human'
