@@ -855,15 +855,6 @@ body.spinning * {
   html.machine-boot .side-rail {
     transition: none !important;
   }
-
-  html.machine-mode .side-rail,
-  body.machine-mode .side-rail {
-    opacity: 0;
-    pointer-events: none;
-  }
-  .side-rail {
-    transition: opacity 0.4s var(--ease-out);
-  }
 }
 
 
