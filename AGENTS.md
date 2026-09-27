@@ -261,9 +261,7 @@ sky chrome, and is worth reading before changing any readout.
 
 ## Deployment
 
-Push to the **`content`** branch → `.github/workflows/deploy.yml` builds with Bun and publishes
-`dist/` to GitHub Pages (`actions/deploy-pages`). `build.yml` runs the build on PRs into
-`content`. PRs target `content`, not `main`/`master`.
+**Never push directly to `content`.** Always branch off (`feat/...`, `fix/...`), push to the remote branch, and open a PR targeting `content`. Merging the PR into **`content`** triggers `.github/workflows/deploy.yml`, which builds with Bun and publishes `dist/` to GitHub Pages (`actions/deploy-pages`). `build.yml` runs the build on PRs into `content`. PRs target `content`, not `main`/`master`.
 
 Workflow conventions to preserve: **major-version action tags** (e.g. `@v6` — not SHA pins),
 **least-privilege `permissions:`** per workflow, and **never interpolate untrusted input into
