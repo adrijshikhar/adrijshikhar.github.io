@@ -617,24 +617,12 @@ body.spinning * {
   }
   .instrument-l { left: 1.6rem; }
   .instrument-r { right: 1.6rem; text-align: right; }
-  /* Top-left ephemeris block — the one corner the instrument left empty.
-     Tucked under the viewfinder bracket, with a narrower label column than the
-     bottom readout: those labels are two words, these are one, and carrying the
-     wide column up here left the values stranded mid-corner. */
-  /* Mirrors the bottom-left readout exactly: same 1.6rem indent, so the
-     viewfinder bracket (14px, 18px square) FRAMES the text the way it does
-     down there. Aligning the block flush to the bracket's own left edge
-     instead left the bracket sitting on top of it, framing nothing — which is
-     what read as a gap, even though the vertical spacing already matched. */
-  .instrument-tl { left: 1.6rem; top: 1.2rem; bottom: auto; }
-  .instrument-tl .k { width: 4.2rem; }
-  .instrument-tl .readout-cell { padding-left: 4.2rem; text-indent: -4.2rem; }
   /* Two instruments share the right corner: this usage hint sits at the base
      .instrument bottom (1.4rem); the easter-egg hook (SkyField.tsx) is
      positioned independently via its own `bottom-24` (6rem) Tailwind class —
      fixed apart so neither moves when the other appears. */
   .instrument b { color: var(--foreground); font-weight: 500; }
-  .instrument .k { color: var(--secondary-foreground); font-weight: 500; display: inline-block; width: 6.5rem; }
+  .instrument .k { color: var(--secondary-foreground); font-weight: 500; display: inline-block; white-space: nowrap; }
 
   .readout-row {
     display: flex;
@@ -647,15 +635,36 @@ body.spinning * {
     padding-left: 4.5rem;
     text-indent: -4.5rem;
   }
-  .readout-row b { overflow-wrap: anywhere; }
+  .readout-row b { overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
   .readout-row .k {
     display: inline-block;
     width: 4.5rem;
     text-indent: 0;
     font-size: 0.6875rem;
     letter-spacing: 0.16em;
+    white-space: nowrap;
   }
-  .readout-row b { font-variant-numeric: tabular-nums; }
+
+  /* Top-left ephemeris block — the one corner the instrument left empty.
+     Tucked under the viewfinder bracket, with a narrower label column than the
+     bottom readout: those labels are two words, these are one, and carrying the
+     wide column up here left the values stranded mid-corner.
+     Mirrors the bottom-left readout exactly: same 1.6rem indent, so the
+     viewfinder bracket (14px, 18px square) FRAMES the text the way it does
+     down there. Aligning the block flush to the bracket's own left edge
+     instead left the bracket sitting on top of it, framing nothing — which is
+     what read as a gap, even though the vertical spacing already matched. */
+  .instrument-tl { left: 1.6rem; top: 1.2rem; bottom: auto; }
+  .instrument-tl .k { width: 4.2rem; }
+  .instrument-tl .readout-cell { padding-left: 4.2rem; text-indent: -4.2rem; }
+
+  /* Bottom-left observer block: two-word labels ('Above you', 'Brightest').
+     5.75rem (92px) gives a clean tabular column that accommodates 9-character
+     monospace labels (75.2px) without wrapping or colliding with the value,
+     leaving a comfortable ~2ch gap before the value. */
+  .instrument-l { left: 1.6rem; }
+  .instrument-l .k { width: 5.75rem; }
+  .instrument-l .readout-cell { padding-left: 5.75rem; text-indent: -5.75rem; }
 
 
   /* Every floating control shares this. Square, hairline, unshadowed — the
