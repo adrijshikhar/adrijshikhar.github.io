@@ -176,13 +176,6 @@ function applyOpticalProgress(
   }
 }
 
-const BARREL_STEP = 11;
-const DETENT_24_X = 264; // step 24
-const DETENT_48_X = 440; // step 40
-const SPAN_X = DETENT_48_X - DETENT_24_X; // 176px
-const TOTAL_STEPS = 64;
-const TOTAL_BARREL_WIDTH = TOTAL_STEPS * BARREL_STEP; // 704px
-
 export default function ViewToggle() {
   const [progress, setProgress] = useState(0.0);
   const currentProgressRef = useRef(0.0);
@@ -191,7 +184,9 @@ export default function ViewToggle() {
   const dragStartPRef = useRef(0);
   const machineLoadedRef = useRef(false);
   const trackRef = useRef<HTMLDivElement>(null);
-  const barrelRef = useRef<HTMLDivElement>(null);
+  const indicatorRef = useRef<HTMLDivElement>(null);
+  const humanBtnRef = useRef<HTMLButtonElement>(null);
+  const machineBtnRef = useRef<HTMLButtonElement>(null);
   const animRef = useRef<any>(null);
   const settleTimerRef = useRef<number | null>(null);
 
@@ -211,18 +206,30 @@ export default function ViewToggle() {
     }
   };
 
+  const getDetents = useCallback(() => {
+    if (!trackRef.current) return { x24: 56, x48: 248, span: 192 };
+    const trackRect = trackRef.current.getBoundingClientRect();
+    const trackW = trackRect.width || 320;
+    if (humanBtnRef.current && machineBtnRef.current) {
+      const hRect = humanBtnRef.current.getBoundingClientRect();
+      const mRect = machineBtnRef.current.getBoundingClientRect();
+      const x24 = hRect.left + hRect.width / 2 - trackRect.left;
+      const x48 = mRect.left + mRect.width / 2 - trackRect.left;
+      return { x24, x48, span: Math.max(1, x48 - x24) };
+    }
+    return { x24: 56, x48: trackW - 56, span: Math.max(1, trackW - 112) };
+  }, []);
+
   const updateProgress = useCallback((p: number) => {
     const clamped = clampP(p);
     currentProgressRef.current = clamped;
     setProgress(clamped);
 
-    // Scroll the line between the two ends
-    if (barrelRef.current && trackRef.current) {
-      const containerW = trackRef.current.clientWidth || 440;
-      const center = containerW / 2;
-      const currentX = DETENT_24_X + clamped * SPAN_X;
-      const offset = center - currentX;
-      barrelRef.current.style.transform = `translateX(${offset}px)`;
+    // Position the highlighted line identifier between the two modes
+    if (indicatorRef.current) {
+      const { x24, x48 } = getDetents();
+      const currentX = x24 + clamped * (x48 - x24);
+      indicatorRef.current.style.transform = `translateX(${currentX}px) translateX(-50%)`;
     }
 
     const { humanPlane, machinePlane, skyEl } = getPlanes();
@@ -230,7 +237,7 @@ export default function ViewToggle() {
       ensureMachineLoaded(machinePlane);
       applyOpticalProgress(clamped, humanPlane, machinePlane, skyEl);
     }
-  }, []);
+  }, [getDetents]);
 
   const finalizeSettle = (targetP: number) => {
     updateProgress(targetP);
@@ -322,8 +329,9 @@ export default function ViewToggle() {
   const handlePointerMove = (e: React.PointerEvent) => {
     if (!isDraggingRef.current) return;
     const deltaX = e.clientX - dragStartXRef.current;
-    // Moving barrel: dragging left advances progress towards 48mm
-    const rawP = dragStartPRef.current - deltaX / SPAN_X;
+    const { span } = getDetents();
+    // Dragging right advances progress towards 48mm Machine mode
+    const rawP = dragStartPRef.current + deltaX / span;
     updateProgress(clampP(rawP));
   };
 
@@ -336,9 +344,12 @@ export default function ViewToggle() {
 
     const deltaX = e.clientX - dragStartXRef.current;
     if (Math.abs(deltaX) < 5) {
-      const rect = trackRef.current.getBoundingClientRect();
-      const clickFromCenter = e.clientX - (rect.left + rect.width / 2);
-      snapTo(clickFromCenter < 0 ? 0.0 : 1.0);
+      // Direct tap on track: snap to whichever mode is closer
+      const trackRect = trackRef.current.getBoundingClientRect();
+      const clickX = e.clientX - trackRect.left;
+      const { x24, x48 } = getDetents();
+      const mid = (x24 + x48) / 2;
+      snapTo(clickX < mid ? 0.0 : 1.0);
       return;
     }
 
@@ -380,7 +391,7 @@ export default function ViewToggle() {
     document.documentElement.classList.remove('machine-boot');
   }, [updateProgress]);
 
-  // Initial barrel alignment on mount and window resize
+  // Initial alignment on mount and window resize
   useEffect(() => {
     const align = () => updateProgress(currentProgressRef.current);
     align();
@@ -394,105 +405,95 @@ export default function ViewToggle() {
     >
       {/* Endpoints Row: 24mm and 48mm always present at the two ends */}
       <div className="flex justify-between items-center w-full px-2 text-[11px] font-mono tracking-wider">
-          <button
-            type="button"
-            onClick={() => snapTo(0.0)}
-            className={`tap-44 flex items-center transition-colors cursor-pointer ${
-              progress < 0.5 ? 'text-foreground font-medium' : 'text-muted-foreground hover:text-foreground'
-            }`}
-            aria-label="24mm Human view"
-          >
-            <span className={`text-primary transition-opacity ${progress < 0.5 ? 'opacity-100' : 'opacity-0'}`}>[</span>
-            <span className="px-1">24mm · HUMAN</span>
-            <span className={`text-primary transition-opacity ${progress < 0.5 ? 'opacity-100' : 'opacity-0'}`}>]</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => snapTo(1.0)}
-            className={`tap-44 flex items-center transition-colors cursor-pointer ${
-              progress >= 0.5 ? 'text-foreground font-medium' : 'text-muted-foreground hover:text-foreground'
-            }`}
-            aria-label="48mm Machine view"
-          >
-            <span className={`text-primary transition-opacity ${progress >= 0.5 ? 'opacity-100' : 'opacity-0'}`}>[</span>
-            <span className="px-1">48mm · MACHINE</span>
-            <span className={`text-primary transition-opacity ${progress >= 0.5 ? 'opacity-100' : 'opacity-0'}`}>]</span>
-          </button>
-        </div>
-
-        {/* Reticle Track: Subtle scrolling line of ticks between the two ends */}
-        <div
-          ref={trackRef}
-          className="relative w-full h-7 overflow-hidden cursor-ew-resize mt-0.5"
-          style={{
-            maskImage: 'linear-gradient(90deg, transparent 0%, black 18%, black 82%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(90deg, transparent 0%, black 18%, black 82%, transparent 100%)',
-            touchAction: 'none',
-          }}
-          role="slider"
-          tabIndex={0}
-          aria-label="Optical focal length"
-          aria-valuemin={24}
-          aria-valuemax={48}
-          aria-valuenow={Math.round(24 + progress * 24)}
-          aria-valuetext={progress < 0.5 ? '24mm Human' : '48mm Machine'}
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          onPointerCancel={handlePointerUp}
-          onKeyDown={handleKeyDown}
+        <button
+          ref={humanBtnRef}
+          type="button"
+          onClick={() => snapTo(0.0)}
+          className={`tap-44 flex items-center transition-colors cursor-pointer ${
+            progress < 0.5 ? 'text-foreground font-medium' : 'text-muted-foreground hover:text-foreground'
+          }`}
+          aria-label="24mm Human view"
         >
-          {/* Top Stationary Reticle Hairline Index at center */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-1.5 bg-primary pointer-events-none z-10" />
+          <span className={`text-primary transition-opacity ${progress < 0.5 ? 'opacity-100' : 'opacity-0'}`}>[</span>
+          <span className="px-1">24mm · HUMAN</span>
+          <span className={`text-primary transition-opacity ${progress < 0.5 ? 'opacity-100' : 'opacity-0'}`}>]</span>
+        </button>
 
-          {/* Bottom Stationary Vernier Index Arrow ▲ at center */}
-          <div className="absolute bottom-1 left-1/2 -translate-x-1/2 pointer-events-none z-10">
-            <div className="w-0 h-0 border-l-[3.5px] border-l-transparent border-r-[3.5px] border-r-transparent border-b-[5px] border-b-primary" />
-          </div>
-
-          {/* The Scrolling Line Assembly That Moves Between The Two Ends */}
-          <div
-            ref={barrelRef}
-            className="absolute top-0 left-0 h-full will-change-transform pointer-events-none"
-            style={{ width: `${TOTAL_BARREL_WIDTH}px` }}
-          >
-            <div className="relative w-full h-3.5 pointer-events-none">
-              <svg
-                viewBox={`0 0 ${TOTAL_BARREL_WIDTH} 14`}
-                className="w-full h-full overflow-visible"
-                preserveAspectRatio="none"
-              >
-                {Array.from({ length: TOTAL_STEPS + 1 }).map((_, k) => {
-                  const x = k * BARREL_STEP;
-                  const isDetent = k === 24 || k === 40;
-                  const isMajorGraduation = k % 4 === 0;
-                  const height = isDetent ? 10 : isMajorGraduation ? 7 : 4;
-                  const stroke = isDetent
-                    ? 'var(--foreground)'
-                    : isMajorGraduation
-                    ? 'var(--muted-foreground)'
-                    : 'var(--muted-foreground)';
-                  const strokeOpacity = isDetent ? 0.95 : isMajorGraduation ? 0.7 : 0.3;
-                  const strokeWidth = isDetent ? 1.5 : 1;
-                  return (
-                    <line
-                      key={k}
-                      x1={x}
-                      y1={0}
-                      x2={x}
-                      y2={height}
-                      stroke={stroke}
-                      strokeOpacity={strokeOpacity}
-                      strokeWidth={strokeWidth}
-                      strokeLinecap="square"
-                    />
-                  );
-                })}
-              </svg>
-            </div>
-          </div>
-        </div>
+        <button
+          ref={machineBtnRef}
+          type="button"
+          onClick={() => snapTo(1.0)}
+          className={`tap-44 flex items-center transition-colors cursor-pointer ${
+            progress >= 0.5 ? 'text-foreground font-medium' : 'text-muted-foreground hover:text-foreground'
+          }`}
+          aria-label="48mm Machine view"
+        >
+          <span className={`text-primary transition-opacity ${progress >= 0.5 ? 'opacity-100' : 'opacity-0'}`}>[</span>
+          <span className="px-1">48mm · MACHINE</span>
+          <span className={`text-primary transition-opacity ${progress >= 0.5 ? 'opacity-100' : 'opacity-0'}`}>]</span>
+        </button>
       </div>
-    );
-  }
+
+      {/* Reticle Track: Static subtle etched graduation line between the two ends */}
+      <div
+        ref={trackRef}
+        className="relative w-full h-5 overflow-hidden cursor-ew-resize mt-0.5"
+        style={{
+          maskImage: 'linear-gradient(90deg, transparent 0%, black 14%, black 86%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(90deg, transparent 0%, black 14%, black 86%, transparent 100%)',
+          touchAction: 'none',
+        }}
+        role="slider"
+        tabIndex={0}
+        aria-label="Optical focal length"
+        aria-valuemin={24}
+        aria-valuemax={48}
+        aria-valuenow={Math.round(24 + progress * 24)}
+        aria-valuetext={progress < 0.5 ? '24mm Human' : '48mm Machine'}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
+        onKeyDown={handleKeyDown}
+      >
+        {/* Static Graduation Ticks */}
+        <div className="relative w-full h-full pointer-events-none">
+          <svg
+            viewBox="0 0 320 16"
+            className="w-full h-full overflow-visible"
+            preserveAspectRatio="none"
+          >
+            {Array.from({ length: 41 }).map((_, k) => {
+              const x = (k / 40) * 320;
+              const isMajorGraduation = k % 4 === 0;
+              const height = isMajorGraduation ? 7 : 4;
+              const strokeOpacity = isMajorGraduation ? 0.45 : 0.2;
+              return (
+                <line
+                  key={k}
+                  x1={x}
+                  y1={0}
+                  x2={x}
+                  y2={height}
+                  stroke="var(--muted-foreground)"
+                  strokeOpacity={strokeOpacity}
+                  strokeWidth={1}
+                  strokeLinecap="square"
+                />
+              );
+            })}
+          </svg>
+        </div>
+
+        {/* The Highlighted Simple Line Identifier that moves between the two modes */}
+        <div
+          ref={indicatorRef}
+          className="absolute top-0 left-0 w-[2px] h-3.5 bg-primary will-change-transform pointer-events-none z-10 rounded-[0.5px]"
+          style={{
+            boxShadow: '0 0 5px var(--primary)',
+          }}
+        />
+      </div>
+    </div>
+  );
+}
