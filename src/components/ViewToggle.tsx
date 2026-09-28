@@ -76,50 +76,79 @@ function applyOpticalProgress(
 
   const reduced = prefersReduced();
 
+  // Opacity curves: Smooth sine/cosine crossfade with generous optical overlap across p ∈ [0.15, 0.85]
+  let humanOpacity = 1.0;
+  if (p <= 0.15) {
+    humanOpacity = 1.0;
+  } else if (p >= 0.75) {
+    humanOpacity = 0.0;
+  } else {
+    const t = (p - 0.15) / 0.60;
+    humanOpacity = Math.max(0, Math.cos(t * Math.PI * 0.5));
+  }
+
+  let machineOpacity = 0.0;
+  if (p <= 0.25) {
+    machineOpacity = 0.0;
+  } else if (p >= 0.85) {
+    machineOpacity = 1.0;
+  } else {
+    const u = (p - 0.25) / 0.60;
+    machineOpacity = Math.min(1, Math.sin(u * Math.PI * 0.5));
+  }
+
+  // Optical Blur Math:
+  // Human starts at 0px blur at p=0, racks up to 14px by p=0.5, stays soft until it dissolves
+  // Machine starts at 14px bokeh blur when appearing, tightens down to 0px at p=1.0
+  const humanBlur = reduced ? 0 : Number((Math.min(1, p / 0.5) * 14).toFixed(1));
+  const machineBlur = reduced ? 0 : Number((Math.min(1, (1 - p) / 0.5) * 14).toFixed(1));
+
   // Apply optical blur, opacity, and scale to observatory background elements
-  const applyObservatory = (opacity: string, blurPx: number, isSettled: boolean) => {
+  const applyObservatory = (opacityStr: string, blurPx: number, isSettled: boolean) => {
     const filterVal = !reduced && blurPx > 0 && !isSettled ? `blur(${blurPx}px)` : '';
 
     if (skyEl) {
       skyEl.style.transition = isSettled ? '' : 'none';
-      skyEl.style.opacity = opacity;
+      skyEl.style.opacity = opacityStr;
       skyEl.style.filter = filterVal;
       skyEl.style.transform = isSettled || p === 0 ? '' : `scale(${(1 + p * 0.08).toFixed(3)})`;
     }
 
     if (sideRail) {
       sideRail.style.transition = isSettled ? '' : 'none';
-      sideRail.style.opacity = opacity;
+      sideRail.style.opacity = opacityStr;
       sideRail.style.filter = filterVal;
       sideRail.style.pointerEvents = isSettled ? (p === 0 ? '' : 'none') : (p < 0.2 ? '' : 'none');
     }
 
     if (viewfinder) {
       viewfinder.style.transition = isSettled ? '' : 'none';
-      viewfinder.style.opacity = opacity;
+      viewfinder.style.opacity = opacityStr;
       viewfinder.style.filter = filterVal;
     }
 
     instruments.forEach((inst) => {
       inst.style.transition = isSettled ? '' : 'none';
-      inst.style.opacity = opacity;
+      inst.style.opacity = opacityStr;
       inst.style.filter = filterVal;
       inst.style.pointerEvents = isSettled ? (p === 0 ? '' : 'none') : (p < 0.2 ? '' : 'none');
     });
   };
 
-  if (p <= 0.45) {
-    const t = p / 0.45;
-    const opacity = p === 0 ? '1' : Math.max(0, 1 - Math.pow(t, 1.2)).toFixed(3);
-    const blur = reduced ? 0 : Number((t * 14).toFixed(1));
-
+  // State 1: Pin-sharp Human (settled at p=0)
+  if (p === 0) {
     humanPlane.style.display = 'block';
-    humanPlane.style.opacity = opacity;
-    humanPlane.style.filter = blur > 0 ? `blur(${blur}px)` : '';
-    humanPlane.style.willChange = p === 0 ? '' : 'filter, opacity';
-    humanPlane.style.pointerEvents = p < 0.2 ? 'auto' : 'none';
+    humanPlane.style.position = '';
+    humanPlane.style.opacity = '1';
+    humanPlane.style.filter = '';
+    humanPlane.style.willChange = '';
+    humanPlane.style.pointerEvents = 'auto';
 
     machinePlane.style.display = 'none';
+    machinePlane.style.position = '';
+    machinePlane.style.top = '';
+    machinePlane.style.left = '';
+    machinePlane.style.width = '';
     machinePlane.style.height = '';
     machinePlane.style.overflow = '';
     machinePlane.style.opacity = '0';
@@ -127,44 +156,76 @@ function applyOpticalProgress(
     machinePlane.style.willChange = '';
     machinePlane.style.pointerEvents = 'none';
 
-    applyObservatory(opacity, blur, p === 0);
-  } else if (p >= 0.55) {
-    const u = (p - 0.55) / 0.45;
-    const opacity = p === 1 ? '1' : Math.min(1, Math.pow(u, 1.2)).toFixed(3);
-    const blur = reduced ? 0 : Number(((1 - u) * 14).toFixed(1));
-
+    applyObservatory('1', 0, true);
+  }
+  // State 2: Pin-sharp Machine (settled at p=1)
+  else if (p === 1) {
     humanPlane.style.display = 'none';
+    humanPlane.style.position = '';
     humanPlane.style.opacity = '0';
     humanPlane.style.filter = '';
     humanPlane.style.willChange = '';
     humanPlane.style.pointerEvents = 'none';
 
     machinePlane.style.display = 'block';
+    machinePlane.style.position = '';
+    machinePlane.style.top = '';
+    machinePlane.style.left = '';
+    machinePlane.style.width = '';
     machinePlane.style.height = 'auto';
     machinePlane.style.overflow = 'visible';
-    machinePlane.style.opacity = opacity;
-    machinePlane.style.filter = blur > 0 ? `blur(${blur}px)` : '';
-    machinePlane.style.willChange = p === 1 ? '' : 'filter, opacity';
-    machinePlane.style.pointerEvents = p > 0.8 ? 'auto' : 'none';
-
-    applyObservatory('0', 14, p === 1);
-  } else {
-    // Narrow clean breath (p: 0.45 -> 0.55): Clean dark ground, zero text bleed
-    humanPlane.style.display = 'none';
-    humanPlane.style.opacity = '0';
-    humanPlane.style.filter = '';
-    humanPlane.style.willChange = '';
-    humanPlane.style.pointerEvents = 'none';
-
-    machinePlane.style.display = 'none';
-    machinePlane.style.height = '';
-    machinePlane.style.overflow = '';
-    machinePlane.style.opacity = '0';
+    machinePlane.style.opacity = '1';
     machinePlane.style.filter = '';
     machinePlane.style.willChange = '';
-    machinePlane.style.pointerEvents = 'none';
+    machinePlane.style.pointerEvents = 'auto';
 
-    applyObservatory('0', 14, false);
+    applyObservatory('0', 0, true);
+  }
+  // State 3: Active Continuous Optical Transit (0 < p < 1)
+  else {
+    // Both planes are active and displayed simultaneously with optical overlap
+    if (humanOpacity > 0) {
+      humanPlane.style.display = 'block';
+      humanPlane.style.position = '';
+      humanPlane.style.opacity = humanOpacity.toFixed(3);
+      humanPlane.style.filter = humanBlur > 0 ? `blur(${humanBlur}px)` : '';
+      humanPlane.style.willChange = 'filter, opacity';
+      humanPlane.style.pointerEvents = p < 0.3 ? 'auto' : 'none';
+    } else {
+      humanPlane.style.display = 'none';
+      humanPlane.style.opacity = '0';
+      humanPlane.style.filter = '';
+      humanPlane.style.willChange = '';
+      humanPlane.style.pointerEvents = 'none';
+    }
+
+    if (machineOpacity > 0) {
+      machinePlane.style.display = 'block';
+      machinePlane.style.position = 'absolute';
+      machinePlane.style.top = '0';
+      machinePlane.style.left = '0';
+      machinePlane.style.width = '100%';
+      machinePlane.style.height = 'auto';
+      machinePlane.style.overflow = 'visible';
+      machinePlane.style.opacity = machineOpacity.toFixed(3);
+      machinePlane.style.filter = machineBlur > 0 ? `blur(${machineBlur}px)` : '';
+      machinePlane.style.willChange = 'filter, opacity';
+      machinePlane.style.pointerEvents = p > 0.7 ? 'auto' : 'none';
+    } else {
+      machinePlane.style.display = 'none';
+      machinePlane.style.position = '';
+      machinePlane.style.top = '';
+      machinePlane.style.left = '';
+      machinePlane.style.width = '';
+      machinePlane.style.height = '';
+      machinePlane.style.overflow = '';
+      machinePlane.style.opacity = '0';
+      machinePlane.style.filter = '';
+      machinePlane.style.willChange = '';
+      machinePlane.style.pointerEvents = 'none';
+    }
+
+    applyObservatory(humanOpacity.toFixed(3), humanBlur, false);
   }
 }
 
