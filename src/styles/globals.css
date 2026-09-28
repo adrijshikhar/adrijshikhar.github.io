@@ -380,9 +380,7 @@ body.machine-mode #sky {
   opacity: 0;
 }
 #sky {
-  /* Motion, not colour: without this the sky snaps out on toggle instead of
-     dissolving, and the machine view is contractually a pure opacity crossfade. */
-  transition: opacity 0.5s var(--ease-out);
+  /* Motion is handled entirely by Anime.js (src/lib/motion.ts) */
 }
 
 /* Reduced-motion: kill section-reveal transforms set inline by scripts */
@@ -860,13 +858,6 @@ body.cur-focal-dragging * {
   body.machine-mode .instrument {
     opacity: 0;
   }
-  .viewfinder,
-  .instrument {
-    /* Crossfade, not colour: the human<->machine toggle is a pure opacity
-       transition, so the instrument has to fade with it rather than snap. */
-    transition: opacity 0.5s var(--ease-out);
-  }
-
   /* Below md the corners collide with content and the toolbar; the frame is
      an enhancement, not load-bearing, so it simply steps aside. */
   @media (max-width: 767px) {

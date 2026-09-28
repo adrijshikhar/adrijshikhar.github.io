@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { animate } from '../lib/motion';
+import { animate, utils } from '../lib/motion';
 
 const startsInMachine = () =>
   typeof window !== 'undefined' &&
@@ -115,88 +115,113 @@ function applyOpticalProgress(
   // Focal Zoom Shift: Outward expansion of corners and margins as focal length increases (24mm -> 48mm)
   const shift = !reduced && p > 0 ? Number((p * 24).toFixed(1)) : 0;
 
-  // Apply optical blur, opacity, and radial outward shift to observatory background elements
+  // Apply optical blur, opacity, and radial outward shift to observatory background elements via Anime.js
   const applyObservatory = (opacityStr: string, blurPx: number, isSettled: boolean) => {
     const filterVal = !reduced && blurPx > 0 && !isSettled ? `blur(${blurPx}px)` : '';
 
     if (obs.skyEl) {
-      obs.skyEl.style.transition = isSettled ? '' : 'none';
-      obs.skyEl.style.opacity = opacityStr;
-      obs.skyEl.style.filter = filterVal;
-      obs.skyEl.style.transform = isSettled || p === 0 ? '' : `scale(${(1 + p * 0.08).toFixed(3)})`;
+      utils.set(obs.skyEl, {
+        opacity: opacityStr,
+        filter: filterVal,
+        scale: isSettled || p === 0 ? 1 : 1 + p * 0.08,
+      });
     }
 
     if (obs.sideRail) {
-      obs.sideRail.style.transition = isSettled ? '' : 'none';
-      obs.sideRail.style.opacity = opacityStr;
-      obs.sideRail.style.filter = filterVal;
-      obs.sideRail.style.transform = isSettled || p === 0 ? '' : `translate3d(-${shift}px, -50%, 0)`;
+      utils.set(obs.sideRail, {
+        opacity: opacityStr,
+        filter: filterVal,
+        translateX: isSettled || p === 0 ? 0 : -shift,
+      });
       obs.sideRail.style.pointerEvents = isSettled ? (p === 0 ? '' : 'none') : (p < 0.2 ? '' : 'none');
     }
 
     // Viewfinder brackets: 4 corners expanding outward
     if (obs.brackets.length >= 4) {
       const [bTL, bTR, bBL, bBR] = obs.brackets;
-      [bTL, bTR, bBL, bBR].forEach((b) => {
-        b.style.transition = isSettled ? '' : 'none';
-        b.style.opacity = opacityStr;
-        b.style.filter = filterVal;
+      utils.set(bTL, {
+        opacity: opacityStr,
+        filter: filterVal,
+        translateX: !isSettled && shift > 0 ? -shift : 0,
+        translateY: !isSettled && shift > 0 ? -shift : 0,
       });
-
-      bTL.style.transform = !isSettled && shift > 0 ? `translate3d(-${shift}px, -${shift}px, 0)` : '';
-      bTR.style.transform = !isSettled && shift > 0 ? `translate3d(${shift}px, -${shift}px, 0)` : '';
-      bBL.style.transform = !isSettled && shift > 0 ? `translate3d(-${shift}px, ${shift}px, 0)` : '';
-      bBR.style.transform = !isSettled && shift > 0 ? `translate3d(${shift}px, ${shift}px, 0)` : '';
+      utils.set(bTR, {
+        opacity: opacityStr,
+        filter: filterVal,
+        translateX: !isSettled && shift > 0 ? shift : 0,
+        translateY: !isSettled && shift > 0 ? -shift : 0,
+      });
+      utils.set(bBL, {
+        opacity: opacityStr,
+        filter: filterVal,
+        translateX: !isSettled && shift > 0 ? -shift : 0,
+        translateY: !isSettled && shift > 0 ? shift : 0,
+      });
+      utils.set(bBR, {
+        opacity: opacityStr,
+        filter: filterVal,
+        translateX: !isSettled && shift > 0 ? shift : 0,
+        translateY: !isSettled && shift > 0 ? shift : 0,
+      });
     }
 
     // Top-Left corner instruments (Sun, Moon, Planets)
     if (obs.instTL) {
-      obs.instTL.style.transition = isSettled ? '' : 'none';
-      obs.instTL.style.opacity = opacityStr;
-      obs.instTL.style.filter = filterVal;
-      obs.instTL.style.transform = !isSettled && shift > 0 ? `translate3d(-${shift}px, -${shift}px, 0)` : '';
+      utils.set(obs.instTL, {
+        opacity: opacityStr,
+        filter: filterVal,
+        translateX: !isSettled && shift > 0 ? -shift : 0,
+        translateY: !isSettled && shift > 0 ? -shift : 0,
+      });
       obs.instTL.style.pointerEvents = isSettled ? (p === 0 ? '' : 'none') : (p < 0.2 ? '' : 'none');
     }
 
     // Bottom-Left corner instruments (Observer, Bengaluru, Sidereal)
     if (obs.instBL) {
-      obs.instBL.style.transition = isSettled ? '' : 'none';
-      obs.instBL.style.opacity = opacityStr;
-      obs.instBL.style.filter = filterVal;
-      obs.instBL.style.transform = !isSettled && shift > 0 ? `translate3d(-${shift}px, ${shift}px, 0)` : '';
+      utils.set(obs.instBL, {
+        opacity: opacityStr,
+        filter: filterVal,
+        translateX: !isSettled && shift > 0 ? -shift : 0,
+        translateY: !isSettled && shift > 0 ? shift : 0,
+      });
       obs.instBL.style.pointerEvents = isSettled ? (p === 0 ? '' : 'none') : (p < 0.2 ? '' : 'none');
     }
 
     // Bottom-Right corner instruments (interaction hint)
     if (obs.instBR) {
-      obs.instBR.style.transition = isSettled ? '' : 'none';
-      obs.instBR.style.opacity = opacityStr;
-      obs.instBR.style.filter = filterVal;
-      obs.instBR.style.transform = !isSettled && shift > 0 ? `translate3d(${shift}px, ${shift}px, 0)` : '';
+      utils.set(obs.instBR, {
+        opacity: opacityStr,
+        filter: filterVal,
+        translateX: !isSettled && shift > 0 ? shift : 0,
+        translateY: !isSettled && shift > 0 ? shift : 0,
+      });
       obs.instBR.style.pointerEvents = isSettled ? (p === 0 ? '' : 'none') : (p < 0.2 ? '' : 'none');
     }
 
     // Bottom-Right easter egg (✦ orbital mechanics)
     if (obs.eggHint) {
-      obs.eggHint.style.transition = isSettled ? '' : 'none';
-      obs.eggHint.style.opacity = opacityStr;
-      obs.eggHint.style.filter = filterVal;
-      obs.eggHint.style.transform = !isSettled && shift > 0 ? `translate3d(${shift}px, ${shift}px, 0)` : '';
+      utils.set(obs.eggHint, {
+        opacity: opacityStr,
+        filter: filterVal,
+        translateX: !isSettled && shift > 0 ? shift : 0,
+        translateY: !isSettled && shift > 0 ? shift : 0,
+      });
       obs.eggHint.style.pointerEvents = isSettled ? (p === 0 ? '' : 'none') : (p < 0.2 ? '' : 'none');
     }
 
     // Top-Center telemetry strip (ALT, STARS, JD): Keep centered without horizontal drift
     if (obs.telemetry) {
-      obs.telemetry.style.transition = isSettled ? '' : 'none';
-      obs.telemetry.style.opacity = opacityStr;
-      obs.telemetry.style.filter = filterVal;
-      obs.telemetry.style.transform = '';
+      utils.set(obs.telemetry, {
+        opacity: opacityStr,
+        filter: filterVal,
+      });
     }
 
     obs.otherInstruments.forEach((inst) => {
-      inst.style.transition = isSettled ? '' : 'none';
-      inst.style.opacity = opacityStr;
-      inst.style.filter = filterVal;
+      utils.set(inst, {
+        opacity: opacityStr,
+        filter: filterVal,
+      });
       inst.style.pointerEvents = isSettled ? (p === 0 ? '' : 'none') : (p < 0.2 ? '' : 'none');
     });
   };
@@ -205,11 +230,8 @@ function applyOpticalProgress(
   if (p === 0) {
     humanPlane.style.display = 'block';
     humanPlane.style.position = '';
-    humanPlane.style.opacity = '1';
-    humanPlane.style.filter = '';
-    humanPlane.style.transform = '';
-    humanPlane.style.willChange = '';
     humanPlane.style.pointerEvents = 'auto';
+    utils.set(humanPlane, { opacity: 1, filter: '', scale: 1 });
 
     machinePlane.style.display = 'none';
     machinePlane.style.position = '';
@@ -218,11 +240,8 @@ function applyOpticalProgress(
     machinePlane.style.width = '';
     machinePlane.style.height = '';
     machinePlane.style.overflow = '';
-    machinePlane.style.opacity = '0';
-    machinePlane.style.filter = '';
-    machinePlane.style.transform = '';
-    machinePlane.style.willChange = '';
     machinePlane.style.pointerEvents = 'none';
+    utils.set(machinePlane, { opacity: 0, filter: '', scale: 1 });
 
     applyObservatory('1', 0, true);
   }
@@ -230,11 +249,8 @@ function applyOpticalProgress(
   else if (p === 1) {
     humanPlane.style.display = 'none';
     humanPlane.style.position = '';
-    humanPlane.style.opacity = '0';
-    humanPlane.style.filter = '';
-    humanPlane.style.transform = '';
-    humanPlane.style.willChange = '';
     humanPlane.style.pointerEvents = 'none';
+    utils.set(humanPlane, { opacity: 0, filter: '', scale: 1 });
 
     machinePlane.style.display = 'block';
     machinePlane.style.position = '';
@@ -243,11 +259,8 @@ function applyOpticalProgress(
     machinePlane.style.width = '';
     machinePlane.style.height = 'auto';
     machinePlane.style.overflow = 'visible';
-    machinePlane.style.opacity = '1';
-    machinePlane.style.filter = '';
-    machinePlane.style.transform = '';
-    machinePlane.style.willChange = '';
     machinePlane.style.pointerEvents = 'auto';
+    utils.set(machinePlane, { opacity: 1, filter: '', scale: 1 });
 
     applyObservatory('0', 0, true);
   }
@@ -257,19 +270,17 @@ function applyOpticalProgress(
     if (humanOpacity > 0) {
       humanPlane.style.display = 'block';
       humanPlane.style.position = '';
-      humanPlane.style.opacity = humanOpacity.toFixed(3);
-      humanPlane.style.filter = humanBlur > 0 ? `blur(${humanBlur}px)` : '';
       humanPlane.style.transformOrigin = '50% 30vh';
-      humanPlane.style.transform = !reduced && p > 0 ? `scale(${(1 + p * 0.035).toFixed(3)})` : '';
-      humanPlane.style.willChange = 'filter, opacity, transform';
       humanPlane.style.pointerEvents = p < 0.3 ? 'auto' : 'none';
+      utils.set(humanPlane, {
+        opacity: humanOpacity,
+        filter: humanBlur > 0 ? `blur(${humanBlur}px)` : '',
+        scale: !reduced && p > 0 ? 1 + p * 0.035 : 1,
+      });
     } else {
       humanPlane.style.display = 'none';
-      humanPlane.style.opacity = '0';
-      humanPlane.style.filter = '';
-      humanPlane.style.transform = '';
-      humanPlane.style.willChange = '';
       humanPlane.style.pointerEvents = 'none';
+      utils.set(humanPlane, { opacity: 0, filter: '', scale: 1 });
     }
 
     if (machineOpacity > 0) {
@@ -280,12 +291,13 @@ function applyOpticalProgress(
       machinePlane.style.width = '100%';
       machinePlane.style.height = 'auto';
       machinePlane.style.overflow = 'visible';
-      machinePlane.style.opacity = machineOpacity.toFixed(3);
-      machinePlane.style.filter = machineBlur > 0 ? `blur(${machineBlur}px)` : '';
       machinePlane.style.transformOrigin = '50% 30vh';
-      machinePlane.style.transform = !reduced && p < 1 ? `scale(${(0.965 + p * 0.035).toFixed(3)})` : '';
-      machinePlane.style.willChange = 'filter, opacity, transform';
       machinePlane.style.pointerEvents = p > 0.7 ? 'auto' : 'none';
+      utils.set(machinePlane, {
+        opacity: machineOpacity,
+        filter: machineBlur > 0 ? `blur(${machineBlur}px)` : '',
+        scale: !reduced && p < 1 ? 0.965 + p * 0.035 : 1,
+      });
     } else {
       machinePlane.style.display = 'none';
       machinePlane.style.position = '';
@@ -294,11 +306,8 @@ function applyOpticalProgress(
       machinePlane.style.width = '';
       machinePlane.style.height = '';
       machinePlane.style.overflow = '';
-      machinePlane.style.opacity = '0';
-      machinePlane.style.filter = '';
-      machinePlane.style.transform = '';
-      machinePlane.style.willChange = '';
       machinePlane.style.pointerEvents = 'none';
+      utils.set(machinePlane, { opacity: 0, filter: '', scale: 1 });
     }
 
     applyObservatory(humanOpacity.toFixed(3), humanBlur, false);
@@ -326,71 +335,87 @@ export default function ViewToggle() {
   const compactMachineRef = useRef<HTMLButtonElement>(null);
   const fullHumanRef = useRef<HTMLButtonElement>(null);
   const fullMachineRef = useRef<HTMLButtonElement>(null);
-  const expandProgressRef = useRef(0.0);
   const expandAnimRef = useRef<any>(null);
   const isHoveredRef = useRef(false);
   const animRef = useRef<any>(null);
   const settleTimerRef = useRef<number | null>(null);
 
-  const applyExpansion = useCallback((e: number) => {
-    expandProgressRef.current = e;
-    if (labelColRef.current) {
-      const w = 20 + e * 64;
-      labelColRef.current.style.width = `${w.toFixed(1)}px`;
+  const setExpanded = useCallback((expanded: boolean) => {
+    const compactEls = [compactHumanRef.current, compactMachineRef.current].filter(Boolean) as HTMLElement[];
+    const fullEls = [fullHumanRef.current, fullMachineRef.current].filter(Boolean) as HTMLElement[];
+
+    if (prefersReduced()) {
+      if (labelColRef.current) labelColRef.current.style.width = expanded ? '84px' : '20px';
+      compactEls.forEach((el) => {
+        el.style.opacity = expanded ? '0' : '1';
+        el.style.transform = expanded ? 'translateX(-6px)' : '';
+        el.style.pointerEvents = expanded ? 'none' : 'auto';
+        el.setAttribute('aria-hidden', expanded ? 'true' : 'false');
+        el.tabIndex = expanded ? -1 : 0;
+      });
+      fullEls.forEach((el) => {
+        el.style.opacity = expanded ? '1' : '0';
+        el.style.transform = expanded ? '' : 'translateX(8px)';
+        el.style.pointerEvents = expanded ? 'auto' : 'none';
+        el.setAttribute('aria-hidden', expanded ? 'false' : 'true');
+        el.tabIndex = expanded ? 0 : -1;
+      });
+      return;
     }
 
-    const compactOpacity = Math.max(0, 1 - e * 2.2).toFixed(3);
-    const compactShift = (-e * 6).toFixed(1);
-    const compactHide = e > 0.5;
-    [compactHumanRef.current, compactMachineRef.current].forEach((el) => {
-      if (!el) return;
-      el.style.opacity = compactOpacity;
-      el.style.transform = `translate3d(${compactShift}px, 0, 0)`;
-      el.style.pointerEvents = e < 0.3 ? 'auto' : 'none';
-      el.setAttribute('aria-hidden', compactHide ? 'true' : 'false');
-      el.tabIndex = compactHide ? -1 : 0;
-    });
+    if (expandAnimRef.current) {
+      expandAnimRef.current.pause?.();
+      expandAnimRef.current = null;
+    }
 
-    const fullOpacity = Math.min(1, Math.max(0, (e - 0.25) * 1.33)).toFixed(3);
-    const fullShift = ((1 - e) * 8).toFixed(1);
-    const fullHide = e < 0.5;
-    [fullHumanRef.current, fullMachineRef.current].forEach((el) => {
-      if (!el) return;
-      el.style.opacity = fullOpacity;
-      el.style.transform = `translate3d(${fullShift}px, 0, 0)`;
-      el.style.pointerEvents = e > 0.7 ? 'auto' : 'none';
-      el.setAttribute('aria-hidden', fullHide ? 'true' : 'false');
-      el.tabIndex = fullHide ? -1 : 0;
-    });
-  }, []);
+    if (expanded) {
+      compactEls.forEach((el) => {
+        el.style.pointerEvents = 'none';
+        el.setAttribute('aria-hidden', 'true');
+        el.tabIndex = -1;
+      });
+      fullEls.forEach((el) => {
+        el.style.pointerEvents = 'auto';
+        el.setAttribute('aria-hidden', 'false');
+        el.tabIndex = 0;
+      });
+    } else {
+      compactEls.forEach((el) => {
+        el.style.pointerEvents = 'auto';
+        el.setAttribute('aria-hidden', 'false');
+        el.tabIndex = 0;
+      });
+      fullEls.forEach((el) => {
+        el.style.pointerEvents = 'none';
+        el.setAttribute('aria-hidden', 'true');
+        el.tabIndex = -1;
+      });
+    }
 
-  const setExpanded = useCallback(
-    (expanded: boolean) => {
-      const targetE = expanded ? 1.0 : 0.0;
-      if (prefersReduced()) {
-        applyExpansion(targetE);
-        return;
-      }
-      if (expandAnimRef.current) {
-        expandAnimRef.current.pause?.();
-        expandAnimRef.current = null;
-      }
-      const proxy = { e: expandProgressRef.current };
-      expandAnimRef.current = animate(proxy, {
-        e: targetE,
+    if (labelColRef.current) {
+      animate(labelColRef.current, {
+        width: expanded ? '84px' : '20px',
         duration: expanded ? 260 : 200,
         ease: 'outCubic',
-        onUpdate: () => {
-          applyExpansion(proxy.e);
-        },
-        onComplete: () => {
-          expandAnimRef.current = null;
-          applyExpansion(targetE);
-        },
       });
-    },
-    [applyExpansion]
-  );
+    }
+    if (compactEls.length > 0) {
+      animate(compactEls, {
+        opacity: expanded ? 0 : 1,
+        translateX: expanded ? -6 : 0,
+        duration: expanded ? 180 : 200,
+        ease: 'outCubic',
+      });
+    }
+    if (fullEls.length > 0) {
+      animate(fullEls, {
+        opacity: expanded ? 1 : 0,
+        translateX: expanded ? 0 : 8,
+        duration: expanded ? 260 : 180,
+        ease: 'outCubic',
+      });
+    }
+  }, []);
 
   const getPlanes = () => {
     const humanPlane = document.querySelector('.human-view') as HTMLElement | null;
@@ -448,10 +473,10 @@ export default function ViewToggle() {
     // Cylindrical knob travel: 72px between 24mm (y=36px) and 48mm (y=108px)
     const offset = clamped * 72;
     if (desktopLinesRef.current) {
-      desktopLinesRef.current.style.transform = `translate3d(0, ${offset}px, 0)`;
+      utils.set(desktopLinesRef.current, { translateY: offset });
     }
     if (mobileLinesRef.current) {
-      mobileLinesRef.current.style.transform = `translate3d(${offset}px, 0, 0)`;
+      utils.set(mobileLinesRef.current, { translateX: offset });
     }
 
     const { humanPlane, machinePlane, obs } = getPlanes();
@@ -689,8 +714,8 @@ export default function ViewToggle() {
   // Initial alignment and expansion on mount
   useEffect(() => {
     updateProgress(currentProgressRef.current);
-    applyExpansion(0.0);
-  }, [updateProgress, applyExpansion]);
+    setExpanded(false);
+  }, [updateProgress, setExpanded]);
 
   return (
     <div
