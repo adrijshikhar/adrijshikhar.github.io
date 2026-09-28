@@ -114,7 +114,6 @@ function applyOpticalProgress(
 
   // Focal Zoom Shift: Outward expansion of corners and margins as focal length increases (24mm -> 48mm)
   const shift = !reduced && p > 0 ? Number((p * 24).toFixed(1)) : 0;
-  const shiftHalf = !reduced && p > 0 ? Number((p * 14).toFixed(1)) : 0;
 
   // Apply optical blur, opacity, and radial outward shift to observatory background elements
   const applyObservatory = (opacityStr: string, blurPx: number, isSettled: boolean) => {
@@ -186,12 +185,12 @@ function applyOpticalProgress(
       obs.eggHint.style.pointerEvents = isSettled ? (p === 0 ? '' : 'none') : (p < 0.2 ? '' : 'none');
     }
 
-    // Top-Center telemetry strip (ALT, STARS, JD)
+    // Top-Center telemetry strip (ALT, STARS, JD): Keep centered without horizontal drift
     if (obs.telemetry) {
       obs.telemetry.style.transition = isSettled ? '' : 'none';
       obs.telemetry.style.opacity = opacityStr;
       obs.telemetry.style.filter = filterVal;
-      obs.telemetry.style.transform = !isSettled && shiftHalf > 0 ? `translate3d(-50%, -${shiftHalf}px, 0)` : '';
+      obs.telemetry.style.transform = '';
     }
 
     obs.otherInstruments.forEach((inst) => {
