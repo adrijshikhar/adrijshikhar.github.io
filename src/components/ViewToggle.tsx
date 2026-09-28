@@ -185,7 +185,7 @@ export default function ViewToggle() {
   const dragStartPRef = useRef(0);
   const machineLoadedRef = useRef(false);
   const trackRef = useRef<HTMLDivElement>(null);
-  const indicatorRef = useRef<HTMLDivElement>(null);
+  const scaleRef = useRef<HTMLDivElement>(null);
   const humanBtnRef = useRef<HTMLButtonElement>(null);
   const machineBtnRef = useRef<HTMLButtonElement>(null);
   const animRef = useRef<any>(null);
@@ -208,27 +208,7 @@ export default function ViewToggle() {
   };
 
   const getTravel = useCallback(() => {
-    if (!trackRef.current) {
-      return isDesktop
-        ? { start: 26, end: 104, span: 78, isVert: true }
-        : { start: 56, end: 204, span: 148, isVert: false };
-    }
-    const r = trackRef.current.getBoundingClientRect();
-    if (isDesktop) {
-      const start = 26;
-      const end = 104;
-      return { start, end, span: Math.max(1, end - start), isVert: true };
-    } else {
-      const trackW = r.width || 260;
-      if (humanBtnRef.current && machineBtnRef.current) {
-        const hRect = humanBtnRef.current.getBoundingClientRect();
-        const mRect = machineBtnRef.current.getBoundingClientRect();
-        const x24 = hRect.left + hRect.width / 2 - r.left;
-        const x48 = mRect.left + mRect.width / 2 - r.left;
-        return { start: x24, end: x48, span: Math.max(1, x48 - x24), isVert: false };
-      }
-      return { start: 52, end: trackW - 52, span: Math.max(1, trackW - 104), isVert: false };
-    }
+    return { span: 104, isVert: isDesktop };
   }, [isDesktop]);
 
   const updateProgress = useCallback((p: number) => {
@@ -236,14 +216,15 @@ export default function ViewToggle() {
     currentProgressRef.current = clamped;
     setProgress(clamped);
 
-    // Position the highlighted line identifier between the two modes
-    if (indicatorRef.current) {
-      const { start, end, isVert } = getTravel();
-      const currentPos = start + clamped * (end - start);
-      if (isVert) {
-        indicatorRef.current.style.transform = `translateY(${currentPos}px)`;
+    // Scroll/translate the focal line (tick scale) itself behind the stationary center index mark
+    if (scaleRef.current) {
+      if (isDesktop) {
+        const currentY = -13 - clamped * 104;
+        scaleRef.current.style.transform = `translateY(${currentY}px)`;
       } else {
-        indicatorRef.current.style.transform = `translateX(${currentPos}px) translateX(-50%)`;
+        const trackW = trackRef.current?.getBoundingClientRect().width || 260;
+        const currentX = (trackW / 2 - 130) - clamped * 104;
+        scaleRef.current.style.transform = `translateX(${currentX}px)`;
       }
     }
 
@@ -252,7 +233,7 @@ export default function ViewToggle() {
       ensureMachineLoaded(machinePlane);
       applyOpticalProgress(clamped, humanPlane, machinePlane, skyEl);
     }
-  }, [getTravel]);
+  }, [isDesktop]);
 
   const finalizeSettle = (targetP: number) => {
     updateProgress(targetP);
@@ -471,11 +452,19 @@ export default function ViewToggle() {
         </button>
       </div>
 
-      {/* Reticle Track: Subtle etched graduation line (horizontal on mobile, vertical on desktop) */}
+      {/* Reticle Track Window: Masked viewport where the focal line translates behind the center index */}
       <div
         ref={trackRef}
-        className="relative w-full h-5 lg:w-6 lg:h-[130px] cursor-ew-resize lg:cursor-ns-resize mt-0.5 lg:my-1"
-        style={{ touchAction: 'none' }}
+        className="relative w-full h-6 lg:w-6 lg:h-[130px] overflow-hidden cursor-ew-resize lg:cursor-ns-resize mt-0.5 lg:my-1 select-none"
+        style={{
+          touchAction: 'none',
+          maskImage: isDesktop
+            ? 'linear-gradient(180deg, transparent 0%, #000 20%, #000 80%, transparent 100%)'
+            : 'linear-gradient(90deg, transparent 0%, #000 20%, #000 80%, transparent 100%)',
+          WebkitMaskImage: isDesktop
+            ? 'linear-gradient(180deg, transparent 0%, #000 20%, #000 80%, transparent 100%)'
+            : 'linear-gradient(90deg, transparent 0%, #000 20%, #000 80%, transparent 100%)',
+        }}
         role="slider"
         tabIndex={0}
         aria-label="Optical focal length"
@@ -489,23 +478,72 @@ export default function ViewToggle() {
         onPointerCancel={handlePointerUp}
         onKeyDown={handleKeyDown}
       >
-        {/* Static Graduation Ticks with tapered roll fade - 1:1 match with .viewfinder u */}
-        <div
-          className={`${isDesktop ? 'focal-scale-vert' : 'focal-scale-horiz'} mx-auto pointer-events-none`}
-        />
-
-        {/* The Highlighted Simple Line Identifier that moves between the two modes */}
+        {/* The Moving Focal Line: SVG Vector Ticks matching the viewfinder scale 1:1 */}
         {isDesktop ? (
           <div
-            ref={indicatorRef}
-            className="absolute top-0 left-[9px] w-[6px] h-[1px] bg-primary will-change-transform pointer-events-none z-10"
-          />
+            ref={scaleRef}
+            className="absolute top-0 left-0 w-6 h-[312px] will-change-transform pointer-events-none"
+          >
+            <svg
+              viewBox="0 0 24 312"
+              className="w-full h-full overflow-visible"
+              aria-hidden="true"
+            >
+              {Array.from({ length: 13 }).map((_, k) => {
+                const y = k * 26;
+                return (
+                  <line
+                    key={k}
+                    x1="9"
+                    y1={y}
+                    x2="15"
+                    y2={y}
+                    stroke="var(--muted-foreground)"
+                    strokeOpacity={0.4}
+                    strokeWidth={1}
+                    strokeLinecap="square"
+                  />
+                );
+              })}
+            </svg>
+          </div>
         ) : (
           <div
-            ref={indicatorRef}
-            className="absolute top-0 left-0 w-[1px] h-[6px] bg-primary will-change-transform pointer-events-none z-10"
-          />
+            ref={scaleRef}
+            className="absolute top-0 left-0 w-[520px] h-6 will-change-transform pointer-events-none"
+          >
+            <svg
+              viewBox="0 0 520 24"
+              className="w-full h-full overflow-visible"
+              aria-hidden="true"
+            >
+              {Array.from({ length: 21 }).map((_, k) => {
+                const x = k * 26;
+                return (
+                  <line
+                    key={k}
+                    x1={x}
+                    y1="9"
+                    x2={x}
+                    y2="15"
+                    stroke="var(--muted-foreground)"
+                    strokeOpacity={0.4}
+                    strokeWidth={1}
+                    strokeLinecap="square"
+                  />
+                );
+              })}
+            </svg>
+          </div>
         )}
+
+        {/* Stationary Center Reference Index Mark */}
+        <div
+          className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary pointer-events-none z-10 ${
+            isDesktop ? 'w-[6px] h-[1px]' : 'w-[1px] h-[6px]'
+          }`}
+          aria-hidden="true"
+        />
       </div>
 
       {/* On desktop: 48mm Machine button is beneath the vertical track */}
