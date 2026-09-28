@@ -389,23 +389,11 @@ export default function ViewToggle() {
   }, [updateProgress]);
 
   return (
-    <>
-      {/* Bottom atmospheric reading shelf: 100% solid behind the switcher (0-80px),
-          smoothly feathering to transparent above it (80-144px).
-          Guarantees zero text pass-through while preserving the frameless, subtle etched sky aesthetic. */}
-      <div
-        className="fixed bottom-0 left-1/2 -translate-x-1/2 w-[min(100vw,680px)] h-36 pointer-events-none z-[1050]"
-        style={{
-          background: 'linear-gradient(to top, #0a0d12 0%, #0a0d12 55%, rgba(10, 13, 18, 0.75) 75%, transparent 100%)',
-        }}
-      />
-
-      {/* The Subtle Etched Horizontal Focal Switcher */}
-      <div
-        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[1100] flex flex-col items-center select-none w-[min(calc(100vw-32px),440px)] pointer-events-auto"
-      >
-        {/* Endpoints Row: 24mm and 48mm always present at the two ends */}
-        <div className="flex justify-between items-center w-full px-5 text-[11px] font-mono tracking-wider">
+    <div
+      className="fixed bottom-4 left-1/2 -translate-x-1/2 lg:bottom-auto lg:left-auto lg:right-6 xl:right-10 lg:top-1/2 lg:-translate-y-1/2 lg:translate-x-0 z-[1100] flex flex-col items-center select-none w-[min(calc(100vw-32px),320px)] pointer-events-auto"
+    >
+      {/* Endpoints Row: 24mm and 48mm always present at the two ends */}
+      <div className="flex justify-between items-center w-full px-2 text-[11px] font-mono tracking-wider">
           <button
             type="button"
             onClick={() => snapTo(0.0)}
@@ -506,6 +494,5 @@ export default function ViewToggle() {
           </div>
         </div>
       </div>
-    </>
-  );
-}
+    );
+  }
