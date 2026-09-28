@@ -17,7 +17,9 @@
 html.machine-boot .human-view {
   display: none;
 }
-html.machine-boot .machine-view {
+html.machine-boot .machine-view,
+html.machine-mode .machine-view,
+body.machine-mode .machine-view {
   height: auto;
   opacity: 1;
   overflow: visible;

@@ -78,6 +78,8 @@ function applyOpticalProgress(
     humanPlane.style.pointerEvents = p < 0.2 ? 'auto' : 'none';
 
     machinePlane.style.display = 'none';
+    machinePlane.style.height = '';
+    machinePlane.style.overflow = '';
     machinePlane.style.opacity = '0';
     machinePlane.style.pointerEvents = 'none';
 
@@ -89,6 +91,8 @@ function applyOpticalProgress(
     humanPlane.style.pointerEvents = 'none';
 
     machinePlane.style.display = 'block';
+    machinePlane.style.height = 'auto';
+    machinePlane.style.overflow = 'visible';
     machinePlane.style.opacity = opacity;
     machinePlane.style.pointerEvents = p > 0.8 ? 'auto' : 'none';
 
@@ -100,6 +104,8 @@ function applyOpticalProgress(
     humanPlane.style.pointerEvents = 'none';
 
     machinePlane.style.display = 'none';
+    machinePlane.style.height = '';
+    machinePlane.style.overflow = '';
     machinePlane.style.opacity = '0';
     machinePlane.style.pointerEvents = 'none';
 
