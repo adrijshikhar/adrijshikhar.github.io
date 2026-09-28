@@ -71,29 +71,45 @@ function applyOpticalProgress(
   document.documentElement.classList.toggle('machine-mode', isMachine);
   document.body.classList.toggle('machine-mode', isMachine);
 
+  const reduced = prefersReduced();
+
   if (p <= 0.45) {
-    const opacity = p === 0 ? '1' : Math.max(0, 1 - p * 2.22).toFixed(3);
+    const t = p / 0.45;
+    const opacity = p === 0 ? '1' : Math.max(0, 1 - Math.pow(t, 1.2)).toFixed(3);
+    const blur = reduced ? 0 : (t * 14).toFixed(1);
+
     humanPlane.style.display = 'block';
     humanPlane.style.opacity = opacity;
+    humanPlane.style.filter = Number(blur) > 0 ? `blur(${blur}px)` : '';
+    humanPlane.style.willChange = p === 0 ? '' : 'filter, opacity';
     humanPlane.style.pointerEvents = p < 0.2 ? 'auto' : 'none';
 
     machinePlane.style.display = 'none';
     machinePlane.style.height = '';
     machinePlane.style.overflow = '';
     machinePlane.style.opacity = '0';
+    machinePlane.style.filter = '';
+    machinePlane.style.willChange = '';
     machinePlane.style.pointerEvents = 'none';
 
     if (skyEl) skyEl.style.opacity = opacity;
   } else if (p >= 0.55) {
-    const opacity = p === 1 ? '1' : Math.min(1, (p - 0.55) * 2.22).toFixed(3);
+    const u = (p - 0.55) / 0.45;
+    const opacity = p === 1 ? '1' : Math.min(1, Math.pow(u, 1.2)).toFixed(3);
+    const blur = reduced ? 0 : ((1 - u) * 14).toFixed(1);
+
     humanPlane.style.display = 'none';
     humanPlane.style.opacity = '0';
+    humanPlane.style.filter = '';
+    humanPlane.style.willChange = '';
     humanPlane.style.pointerEvents = 'none';
 
     machinePlane.style.display = 'block';
     machinePlane.style.height = 'auto';
     machinePlane.style.overflow = 'visible';
     machinePlane.style.opacity = opacity;
+    machinePlane.style.filter = Number(blur) > 0 ? `blur(${blur}px)` : '';
+    machinePlane.style.willChange = p === 1 ? '' : 'filter, opacity';
     machinePlane.style.pointerEvents = p > 0.8 ? 'auto' : 'none';
 
     if (skyEl) skyEl.style.opacity = '0';
@@ -101,12 +117,16 @@ function applyOpticalProgress(
     // Narrow clean breath (p: 0.45 -> 0.55): Clean dark ground, zero text bleed
     humanPlane.style.display = 'none';
     humanPlane.style.opacity = '0';
+    humanPlane.style.filter = '';
+    humanPlane.style.willChange = '';
     humanPlane.style.pointerEvents = 'none';
 
     machinePlane.style.display = 'none';
     machinePlane.style.height = '';
     machinePlane.style.overflow = '';
     machinePlane.style.opacity = '0';
+    machinePlane.style.filter = '';
+    machinePlane.style.willChange = '';
     machinePlane.style.pointerEvents = 'none';
 
     if (skyEl) skyEl.style.opacity = '0';
