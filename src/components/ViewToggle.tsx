@@ -69,22 +69,12 @@ function applyOpticalProgress(
   machinePlane.style.transition = 'none';
   if (skyEl) skyEl.style.transition = 'none';
 
-  // Both planes visible during transit
-  humanPlane.style.display = p === 1 ? 'none' : 'block';
-  machinePlane.style.display = p === 0 ? 'none' : 'block';
-
-  // In-flow overlay coordination: machine-view is .view-overlay while p < 1
-  if (p < 1) {
-    machinePlane.classList.add('view-overlay');
-  } else {
-    machinePlane.classList.remove('view-overlay');
-  }
-
-  // Final states: restore clean in-flow styling
+  // Final settled states
   if (p === 0) {
     humanPlane.style.transformOrigin = '';
     humanPlane.style.transform = '';
     humanPlane.style.filter = '';
+    humanPlane.style.display = 'block';
     humanPlane.style.opacity = '1';
     humanPlane.style.pointerEvents = 'auto';
     humanPlane.style.willChange = '';
@@ -92,9 +82,11 @@ function applyOpticalProgress(
     machinePlane.style.transformOrigin = '';
     machinePlane.style.transform = '';
     machinePlane.style.filter = '';
+    machinePlane.style.display = 'none';
     machinePlane.style.opacity = '0';
     machinePlane.style.pointerEvents = 'none';
     machinePlane.style.willChange = '';
+    machinePlane.classList.remove('view-overlay');
 
     if (skyEl) {
       skyEl.style.transform = '';
@@ -111,6 +103,7 @@ function applyOpticalProgress(
     humanPlane.style.transformOrigin = '';
     humanPlane.style.transform = '';
     humanPlane.style.filter = '';
+    humanPlane.style.display = 'none';
     humanPlane.style.opacity = '0';
     humanPlane.style.pointerEvents = 'none';
     humanPlane.style.willChange = '';
@@ -118,11 +111,13 @@ function applyOpticalProgress(
     machinePlane.style.transformOrigin = '';
     machinePlane.style.transform = '';
     machinePlane.style.filter = '';
+    machinePlane.style.display = 'block';
     machinePlane.style.opacity = '1';
     machinePlane.style.pointerEvents = 'auto';
     machinePlane.style.height = 'auto';
     machinePlane.style.overflow = 'visible';
     machinePlane.style.willChange = '';
+    machinePlane.classList.remove('view-overlay');
 
     if (skyEl) {
       skyEl.style.transform = '';
@@ -135,29 +130,67 @@ function applyOpticalProgress(
     return;
   }
 
-  // Active transit: Pure GPU Composited Opacity Crossfade (120 FPS buttery smooth)
-  humanPlane.style.willChange = 'opacity';
-  humanPlane.style.opacity = (1 - p).toFixed(3);
-  humanPlane.style.pointerEvents = p < 0.5 ? 'auto' : 'none';
+  // Active transit: Clean sequential dissolve — NEVER render both views superimposed!
+  // First half (p: 0 -> 0.45): Human view dissolves to 0. Machine view stays hidden.
+  // Second half (p: 0.55 -> 1.0): Machine view fades in from 0 to 1. Human view is hidden.
+  if (p < 0.45) {
+    humanPlane.style.willChange = 'opacity';
+    humanPlane.style.display = 'block';
+    humanPlane.style.opacity = Math.max(0, 1 - p * 2.22).toFixed(3);
+    humanPlane.style.pointerEvents = p < 0.2 ? 'auto' : 'none';
 
-  machinePlane.style.willChange = 'opacity';
-  machinePlane.style.opacity = p.toFixed(3);
-  machinePlane.style.pointerEvents = p >= 0.5 ? 'auto' : 'none';
-  machinePlane.style.height = 'auto';
-  machinePlane.style.overflow = 'visible';
+    machinePlane.style.display = 'none';
+    machinePlane.style.opacity = '0';
+    machinePlane.style.pointerEvents = 'none';
+    machinePlane.classList.remove('view-overlay');
 
-  // Astronomy Sky Canvas Alpha
-  if (skyEl) {
-    skyEl.style.opacity = (1 - p).toFixed(3);
-  }
+    if (skyEl) {
+      skyEl.style.opacity = Math.max(0, 1 - p * 2.22).toFixed(3);
+    }
 
-  // Class toggles on html and body (machine-mode when p > 0.5)
-  if (p > 0.5) {
+    document.documentElement.classList.remove('machine-mode');
+    document.body.classList.remove('machine-mode');
+  } else if (p > 0.55) {
+    humanPlane.style.display = 'none';
+    humanPlane.style.opacity = '0';
+    humanPlane.style.pointerEvents = 'none';
+
+    machinePlane.style.willChange = 'opacity';
+    machinePlane.style.display = 'block';
+    machinePlane.style.height = 'auto';
+    machinePlane.style.overflow = 'visible';
+    machinePlane.style.opacity = Math.min(1, (p - 0.55) * 2.22).toFixed(3);
+    machinePlane.style.pointerEvents = p > 0.8 ? 'auto' : 'none';
+    machinePlane.classList.remove('view-overlay');
+
+    if (skyEl) {
+      skyEl.style.opacity = '0';
+    }
+
     document.documentElement.classList.add('machine-mode');
     document.body.classList.add('machine-mode');
   } else {
-    document.documentElement.classList.remove('machine-mode');
-    document.body.classList.remove('machine-mode');
+    // Narrow clean breath (p: 0.45 -> 0.55): Clean dark ground, zero text bleed
+    humanPlane.style.display = 'none';
+    humanPlane.style.opacity = '0';
+    humanPlane.style.pointerEvents = 'none';
+
+    machinePlane.style.display = 'none';
+    machinePlane.style.opacity = '0';
+    machinePlane.style.pointerEvents = 'none';
+    machinePlane.classList.remove('view-overlay');
+
+    if (skyEl) {
+      skyEl.style.opacity = '0';
+    }
+
+    if (p >= 0.5) {
+      document.documentElement.classList.add('machine-mode');
+      document.body.classList.add('machine-mode');
+    } else {
+      document.documentElement.classList.remove('machine-mode');
+      document.body.classList.remove('machine-mode');
+    }
   }
 }
 
@@ -243,8 +276,11 @@ export default function ViewToggle() {
     const { machinePlane } = getPlanes();
     ensureMachineLoaded(machinePlane);
 
-    // Scroll to top up front when entering machine view
-    if (targetP === 1.0 && currentProgressRef.current < 0.5) {
+    // Scroll to top up front when switching views
+    if (
+      (targetP === 1.0 && currentProgressRef.current < 0.5) ||
+      (targetP === 0.0 && currentProgressRef.current >= 0.5)
+    ) {
       window.scrollTo({ top: 0, behavior: 'auto' });
     }
 
@@ -458,19 +494,23 @@ export default function ViewToggle() {
             className="absolute top-[36px] -translate-y-1/2 right-0 flex flex-col items-end cursor-pointer group text-right focus:outline-none whitespace-nowrap"
             aria-label="24mm Human view"
           >
-            <span className="font-mono text-[9px] tracking-[0.18em] text-muted-foreground/60 transition-colors group-hover:text-muted-foreground uppercase whitespace-nowrap leading-none mb-1">
-              24MM
-            </span>
             <span
-              className={`font-mono text-[11px] tracking-[0.12em] font-medium transition-colors uppercase whitespace-nowrap leading-none ${
+              className={`font-mono text-[9px] tracking-[0.18em] uppercase whitespace-nowrap leading-none mb-1.5 transition-colors text-right ${
                 activeMode === 'human'
-                  ? 'text-foreground'
+                  ? 'text-primary font-medium'
                   : 'text-muted-foreground/50 group-hover:text-muted-foreground'
               }`}
             >
-              <span className={`text-primary transition-opacity ${activeMode === 'human' ? 'opacity-100' : 'opacity-0'}`}>[ </span>
+              24MM
+            </span>
+            <span
+              className={`font-mono text-[11px] tracking-[0.14em] uppercase whitespace-nowrap leading-none transition-colors text-right ${
+                activeMode === 'human'
+                  ? 'text-foreground font-semibold'
+                  : 'text-muted-foreground/40 group-hover:text-muted-foreground'
+              }`}
+            >
               HUMAN
-              <span className={`text-primary transition-opacity ${activeMode === 'human' ? 'opacity-100' : 'opacity-0'}`}> ]</span>
             </span>
           </button>
 
@@ -481,19 +521,23 @@ export default function ViewToggle() {
             className="absolute top-[108px] -translate-y-1/2 right-0 flex flex-col items-end cursor-pointer group text-right focus:outline-none whitespace-nowrap"
             aria-label="48mm Machine view"
           >
-            <span className="font-mono text-[9px] tracking-[0.18em] text-muted-foreground/60 transition-colors group-hover:text-muted-foreground uppercase whitespace-nowrap leading-none mb-1">
-              48MM
-            </span>
             <span
-              className={`font-mono text-[11px] tracking-[0.12em] font-medium transition-colors uppercase whitespace-nowrap leading-none ${
+              className={`font-mono text-[9px] tracking-[0.18em] uppercase whitespace-nowrap leading-none mb-1.5 transition-colors text-right ${
                 activeMode === 'machine'
-                  ? 'text-foreground'
+                  ? 'text-primary font-medium'
                   : 'text-muted-foreground/50 group-hover:text-muted-foreground'
               }`}
             >
-              <span className={`text-primary transition-opacity ${activeMode === 'machine' ? 'opacity-100' : 'opacity-0'}`}>[ </span>
+              48MM
+            </span>
+            <span
+              className={`font-mono text-[11px] tracking-[0.14em] uppercase whitespace-nowrap leading-none transition-colors text-right ${
+                activeMode === 'machine'
+                  ? 'text-foreground font-semibold'
+                  : 'text-muted-foreground/40 group-hover:text-muted-foreground'
+              }`}
+            >
               MACHINE
-              <span className={`text-primary transition-opacity ${activeMode === 'machine' ? 'opacity-100' : 'opacity-0'}`}> ]</span>
             </span>
           </button>
         </div>
@@ -564,17 +608,19 @@ export default function ViewToggle() {
           className="flex flex-col items-center cursor-pointer text-center select-none focus:outline-none whitespace-nowrap"
           aria-label="24mm Human view"
         >
-          <span className="font-mono text-[9px] tracking-wider text-muted-foreground/60 uppercase whitespace-nowrap leading-none mb-1">
+          <span
+            className={`font-mono text-[9px] tracking-wider uppercase whitespace-nowrap leading-none mb-1 transition-colors ${
+              activeMode === 'human' ? 'text-primary font-medium' : 'text-muted-foreground/60'
+            }`}
+          >
             24MM
           </span>
           <span
-            className={`font-mono text-[10px] tracking-wider font-medium transition-colors uppercase whitespace-nowrap leading-none ${
-              activeMode === 'human' ? 'text-foreground' : 'text-muted-foreground/50'
+            className={`font-mono text-[10px] tracking-wider uppercase whitespace-nowrap leading-none transition-colors ${
+              activeMode === 'human' ? 'text-foreground font-semibold' : 'text-muted-foreground/50'
             }`}
           >
-            <span className={`text-primary transition-opacity ${activeMode === 'human' ? 'opacity-100' : 'opacity-0'}`}>[ </span>
             HUMAN
-            <span className={`text-primary transition-opacity ${activeMode === 'human' ? 'opacity-100' : 'opacity-0'}`}> ]</span>
           </span>
         </button>
 
@@ -640,17 +686,19 @@ export default function ViewToggle() {
           className="flex flex-col items-center cursor-pointer text-center select-none focus:outline-none whitespace-nowrap"
           aria-label="48mm Machine view"
         >
-          <span className="font-mono text-[9px] tracking-wider text-muted-foreground/60 uppercase whitespace-nowrap leading-none mb-1">
+          <span
+            className={`font-mono text-[9px] tracking-wider uppercase whitespace-nowrap leading-none mb-1 transition-colors ${
+              activeMode === 'machine' ? 'text-primary font-medium' : 'text-muted-foreground/60'
+            }`}
+          >
             48MM
           </span>
           <span
-            className={`font-mono text-[10px] tracking-wider font-medium transition-colors uppercase whitespace-nowrap leading-none ${
-              activeMode === 'machine' ? 'text-foreground' : 'text-muted-foreground/50'
+            className={`font-mono text-[10px] tracking-wider uppercase whitespace-nowrap leading-none transition-colors ${
+              activeMode === 'machine' ? 'text-foreground font-semibold' : 'text-muted-foreground/50'
             }`}
           >
-            <span className={`text-primary transition-opacity ${activeMode === 'machine' ? 'opacity-100' : 'opacity-0'}`}>[ </span>
             MACHINE
-            <span className={`text-primary transition-opacity ${activeMode === 'machine' ? 'opacity-100' : 'opacity-0'}`}> ]</span>
           </span>
         </button>
       </div>
