@@ -1,6 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { animate } from '../lib/motion';
-import { Toggle } from './ui/toggle';
 
 const startsInMachine = () =>
   typeof window !== 'undefined' &&
@@ -178,10 +177,14 @@ function applyOpticalProgress(
 }
 
 export default function ViewToggle() {
-  const [mode, setMode] = useState<'human' | 'machine'>('human');
-  const transitioningRef = useRef(false);
+  const [progress, setProgress] = useState(0.0);
+  const currentProgressRef = useRef(0.0);
+  const isDraggingRef = useRef(false);
   const machineLoadedRef = useRef(false);
-  const islandRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const needleRef = useRef<HTMLDivElement>(null);
+  const animRef = useRef<any>(null);
+  const settleTimerRef = useRef<number | null>(null);
 
   const getPlanes = () => {
     const humanPlane = document.querySelector('.human-view') as HTMLElement | null;
@@ -199,57 +202,141 @@ export default function ViewToggle() {
     }
   };
 
-  const switchMode = (nextMode: 'human' | 'machine') => {
-    if (transitioningRef.current || nextMode === mode) return;
-    transitioningRef.current = true;
+  const updateProgress = useCallback((p: number) => {
+    const clamped = clampP(p);
+    currentProgressRef.current = clamped;
+    setProgress(clamped);
 
-    // Synchronize URL query parameter without navigation
+    const { humanPlane, machinePlane, skyEl } = getPlanes();
+    if (humanPlane && machinePlane) {
+      ensureMachineLoaded(machinePlane);
+      applyOpticalProgress(clamped, humanPlane, machinePlane, skyEl);
+    }
+  }, []);
+
+  const finalizeSettle = (targetP: number) => {
+    updateProgress(targetP);
     const params = new URLSearchParams(window.location.search);
-    if (nextMode === 'machine') {
+    if (targetP === 1.0) {
       params.set('machine', 'true');
     } else {
       params.delete('machine');
     }
     const qs = params.toString();
     window.history.replaceState({}, '', qs ? `?${qs}` : window.location.pathname);
+  };
 
-    const { humanPlane, machinePlane, skyEl } = getPlanes();
-    if (!humanPlane || !machinePlane) {
-      setMode(nextMode);
-      transitioningRef.current = false;
-      return;
+  const snapTo = (targetP: number) => {
+    if (settleTimerRef.current) {
+      clearTimeout(settleTimerRef.current);
+      settleTimerRef.current = null;
     }
 
+    const { machinePlane } = getPlanes();
     ensureMachineLoaded(machinePlane);
 
-    // Pin scroll to top once up front
-    window.scrollTo({ top: 0, behavior: 'auto' });
-    setMode(nextMode);
+    // Scroll to top up front when entering machine view
+    if (targetP === 1.0 && currentProgressRef.current < 0.5) {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    }
 
-    const startP = nextMode === 'machine' ? 0.0 : 1.0;
-    const targetP = nextMode === 'machine' ? 1.0 : 0.0;
-
-    // Reduced motion fallback: instant application
     if (prefersReduced()) {
-      applyOpticalProgress(targetP, humanPlane, machinePlane, skyEl);
-      transitioningRef.current = false;
+      updateProgress(targetP);
+      finalizeSettle(targetP);
       return;
     }
 
-    // Optical focus rack animation via Anime.js v4
+    if (animRef.current) {
+      animRef.current.pause?.();
+      animRef.current = null;
+    }
+
+    const startP = currentProgressRef.current;
     const proxy = { p: startP };
-    animate(proxy, {
+    animRef.current = animate(proxy, {
       p: targetP,
       duration: 380,
       ease: 'inOutQuad',
       onUpdate: () => {
-        applyOpticalProgress(proxy.p, humanPlane, machinePlane, skyEl);
+        updateProgress(proxy.p);
       },
       onComplete: () => {
-        applyOpticalProgress(targetP, humanPlane, machinePlane, skyEl);
-        transitioningRef.current = false;
+        animRef.current = null;
+        finalizeSettle(targetP);
       },
     });
+  };
+
+  // Wheel scrubbing on track
+  useEffect(() => {
+    const el = trackRef.current;
+    if (!el) return;
+
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+      const nextP = clampP(currentProgressRef.current + delta * 0.0025);
+      updateProgress(nextP);
+
+      if (settleTimerRef.current) clearTimeout(settleTimerRef.current);
+      settleTimerRef.current = window.setTimeout(() => {
+        const nearest = nextP < 0.5 ? 0.0 : 1.0;
+        snapTo(nearest);
+      }, 260);
+    };
+
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, [updateProgress]);
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    if (!trackRef.current) return;
+    isDraggingRef.current = true;
+    trackRef.current.setPointerCapture(e.pointerId);
+    if (animRef.current) {
+      animRef.current.pause?.();
+      animRef.current = null;
+    }
+    const rect = trackRef.current.getBoundingClientRect();
+    const leftBound = rect.left + rect.width * 0.20;
+    const rightBound = rect.left + rect.width * 0.80;
+    const rawP = (e.clientX - leftBound) / (rightBound - leftBound);
+    updateProgress(clampP(rawP));
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!isDraggingRef.current || !trackRef.current) return;
+    const rect = trackRef.current.getBoundingClientRect();
+    const leftBound = rect.left + rect.width * 0.20;
+    const rightBound = rect.left + rect.width * 0.80;
+    const rawP = (e.clientX - leftBound) / (rightBound - leftBound);
+    updateProgress(clampP(rawP));
+  };
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (!isDraggingRef.current || !trackRef.current) return;
+    isDraggingRef.current = false;
+    try {
+      trackRef.current.releasePointerCapture(e.pointerId);
+    } catch {}
+    const nearest = currentProgressRef.current < 0.5 ? 0.0 : 1.0;
+    snapTo(nearest);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      snapTo(0.0);
+    } else if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      snapTo(1.0);
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      snapTo(0.0);
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      snapTo(1.0);
+    }
   };
 
   // Direct ?machine=true initial mount handling
@@ -259,45 +346,128 @@ export default function ViewToggle() {
     const { humanPlane, machinePlane, skyEl } = getPlanes();
     if (!humanPlane || !machinePlane) return;
 
-    setMode('machine');
     ensureMachineLoaded(machinePlane);
-
-    applyOpticalProgress(1.0, humanPlane, machinePlane, skyEl);
+    updateProgress(1.0);
+    finalizeSettle(1.0);
 
     // Drop the no-FOUC boot class once state is active
     document.documentElement.classList.remove('machine-boot');
-  }, []);
+  }, [updateProgress]);
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[1100] flex items-center gap-2">
+    <div
+      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[1100] flex flex-col items-center select-none w-[min(calc(100vw-32px),440px)] px-3 py-1.5"
+      style={{
+        background: 'rgba(10, 13, 18, 0.72)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+      }}
+    >
+      {/* Endpoints Row: 24mm [HUMAN] and 48mm [MACHINE] aligned over detents */}
+      <div className="relative w-full h-7 text-[11px] font-mono tracking-wider">
+        <button
+          type="button"
+          onClick={() => snapTo(0.0)}
+          style={{ left: '20%', transform: 'translateX(-50%)' }}
+          className={`tap-44 absolute top-0 flex items-center transition-colors cursor-pointer whitespace-nowrap ${
+            progress < 0.5 ? 'text-foreground font-medium' : 'text-muted-foreground hover:text-foreground'
+          }`}
+          aria-label="24mm Human view"
+        >
+          <span className={`text-primary transition-opacity ${progress < 0.5 ? 'opacity-100' : 'opacity-0'}`}>[</span>
+          <span className="px-1">24mm · HUMAN</span>
+          <span className={`text-primary transition-opacity ${progress < 0.5 ? 'opacity-100' : 'opacity-0'}`}>]</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => snapTo(1.0)}
+          style={{ left: '80%', transform: 'translateX(-50%)' }}
+          className={`tap-44 absolute top-0 flex items-center transition-colors cursor-pointer whitespace-nowrap ${
+            progress >= 0.5 ? 'text-foreground font-medium' : 'text-muted-foreground hover:text-foreground'
+          }`}
+          aria-label="48mm Machine view"
+        >
+          <span className={`text-primary transition-opacity ${progress >= 0.5 ? 'opacity-100' : 'opacity-0'}`}>[</span>
+          <span className="px-1">48mm · MACHINE</span>
+          <span className={`text-primary transition-opacity ${progress >= 0.5 ? 'opacity-100' : 'opacity-0'}`}>]</span>
+        </button>
+      </div>
+
+      {/* Cylindrical Lens Barrel Reticle Track */}
       <div
-        ref={islandRef}
-        className="chrome-panel"
-        role="group"
-        aria-label="View mode"
+        ref={trackRef}
+        className="relative w-full h-7 flex items-center cursor-ew-resize"
+        style={{ touchAction: 'none' }}
+        role="slider"
+        tabIndex={0}
+        aria-label="Optical focal length"
+        aria-valuemin={24}
+        aria-valuemax={48}
+        aria-valuenow={Math.round(24 + progress * 24)}
+        aria-valuetext={progress < 0.5 ? '24mm Human' : '48mm Machine'}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
+        onKeyDown={handleKeyDown}
       >
-        <Toggle
-          pressed={mode === 'human'}
-          onPressedChange={(pressed) => {
-            if (pressed && mode !== 'human') switchMode('human');
+        {/* Etched measurement ticks with fading sides creating the circular roll barrel effect */}
+        <div
+          className="absolute inset-x-0 top-0 h-3.5 pointer-events-none"
+          style={{
+            maskImage: 'linear-gradient(90deg, transparent 0%, black 18%, black 82%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(90deg, transparent 0%, black 18%, black 82%, transparent 100%)',
           }}
-          className="chrome-seg tap-44 flex h-auto min-w-0 items-center gap-1 rounded-none bg-transparent px-3 py-1.5 text-[0.6875rem] font-normal hover:bg-transparent aria-pressed:bg-transparent data-[state=on]:bg-transparent"
         >
-          <span className="chrome-bracket" aria-hidden="true">[</span>
-          <span>Human</span>
-          <span className="chrome-bracket" aria-hidden="true">]</span>
-        </Toggle>
-        <Toggle
-          pressed={mode === 'machine'}
-          onPressedChange={(pressed) => {
-            if (pressed && mode !== 'machine') switchMode('machine');
+          <svg viewBox="0 0 440 14" className="w-full h-full overflow-visible" preserveAspectRatio="none">
+            {/* 40 integer steps across 440px (11px per step):
+                - k=8 is 24mm detent (x=88, 20%)
+                - k=32 is 48mm detent (x=352, 80%)
+                - k % 4 === 0 are major graduations (every 44px / 4mm)
+                - other k are minor etched ticks (every 11px)
+            */}
+            {Array.from({ length: 41 }).map((_, k) => {
+              const x = k * 11;
+              const isDetent = k === 8 || k === 32;
+              const isMajorGraduation = k % 4 === 0;
+              const height = isDetent ? 10 : isMajorGraduation ? 7 : 4;
+              const stroke = isDetent
+                ? 'var(--foreground)'
+                : isMajorGraduation
+                ? 'var(--muted-foreground)'
+                : 'var(--muted-foreground)';
+              const strokeOpacity = isDetent ? 1 : isMajorGraduation ? 0.75 : 0.35;
+              const strokeWidth = isDetent ? 1.5 : 1;
+              return (
+                <line
+                  key={k}
+                  x1={x}
+                  y1={0}
+                  x2={x}
+                  y2={height}
+                  stroke={stroke}
+                  strokeOpacity={strokeOpacity}
+                  strokeWidth={strokeWidth}
+                  strokeLinecap="square"
+                />
+              );
+            })}
+          </svg>
+        </div>
+
+        {/* Sliding vernier index indicator ▲ */}
+        <div
+          ref={needleRef}
+          className="absolute pointer-events-none transition-transform duration-75 ease-out"
+          style={{
+            left: `${20 + progress * 60}%`,
+            top: '12px',
+            transform: 'translateX(-50%)',
           }}
-          className="chrome-seg tap-44 flex h-auto min-w-0 items-center gap-1 rounded-none bg-transparent px-3 py-1.5 text-[0.6875rem] font-normal hover:bg-transparent aria-pressed:bg-transparent data-[state=on]:bg-transparent"
         >
-          <span className="chrome-bracket" aria-hidden="true">[</span>
-          <span>Machine</span>
-          <span className="chrome-bracket" aria-hidden="true">]</span>
-        </Toggle>
+          <div className="w-0 h-0 border-l-[3.5px] border-l-transparent border-r-[3.5px] border-r-transparent border-b-[5px] border-b-primary" />
+        </div>
       </div>
     </div>
   );
