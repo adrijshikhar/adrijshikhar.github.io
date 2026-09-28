@@ -304,16 +304,6 @@
   /* Machine view FOLLOWS the active light/dark mode: it's token-driven (see machine.css), so its
      canvas equals the human canvas in that mode. The human↔machine toggle therefore never changes
      background colour — it's a pure opacity crossfade (always smooth, in both modes). */
-
-  /* Shared overlay helper: the OUTGOING view lifts out of flow during the crossfade so the
-     INCOMING view occupies the space immediately at its natural height — zero reflow. */
-  .view-overlay {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-  }
-
-
 }
 
 /* Fenced code: the inline-code chrome (border/bg/padding from the prose-code utilities)
@@ -621,24 +611,28 @@ body.cur-focal-dragging * {
   }
 
   /* Dragging: mechanical clamp - triangles pull closer and photonic bloom increases */
-  body.cur-focal-dragging #sky-cursor-ring {
-    width: 14px !important;
-    height: 20px !important;
-    margin: -10px 0 0 -7px !important;
-    border-color: var(--primary) !important;
-    border-width: 2px !important;
-    box-shadow: 0 0 14px rgba(127, 168, 245, 0.6) !important;
+  body.cur-focal-dragging #sky-cursor-ring,
+  body.cur-focal.cur-focal-dragging #sky-cursor-ring {
+    width: 14px;
+    height: 20px;
+    margin: -10px 0 0 -7px;
+    border-color: var(--primary);
+    border-width: 2px;
+    box-shadow: 0 0 14px rgba(127, 168, 245, 0.6);
   }
-  body.cur-focal-dragging #sky-cursor-ring::before {
+  body.cur-focal-dragging #sky-cursor-ring::before,
+  body.cur-focal.cur-focal-dragging #sky-cursor-ring::before {
     top: -6px;
     border-bottom-color: var(--primary);
   }
-  body.cur-focal-dragging #sky-cursor-ring::after {
+  body.cur-focal-dragging #sky-cursor-ring::after,
+  body.cur-focal.cur-focal-dragging #sky-cursor-ring::after {
     bottom: -6px;
     border-top-color: var(--primary);
   }
-  body.cur-focal-dragging #sky-cursor-dot {
-    background: var(--primary) !important;
+  body.cur-focal-dragging #sky-cursor-dot,
+  body.cur-focal.cur-focal-dragging #sky-cursor-dot {
+    background: var(--primary);
     transform: scale(1.2);
   }
 }
@@ -678,7 +672,6 @@ body.cur-focal-dragging * {
   .viewfinder i:nth-child(2) { top: 14px; right: 14px; border-top-width: 1px; border-right-width: 1px; }
   .viewfinder i:nth-child(3) { bottom: 14px; left: 14px; border-bottom-width: 1px; border-left-width: 1px; }
   .viewfinder i:nth-child(4) { bottom: 14px; right: 14px; border-bottom-width: 1px; border-right-width: 1px; }
-
 
   /* Corner instruments. Same type as the prototype's `.readout` / `.hint`. */
   .instrument {
@@ -859,8 +852,6 @@ body.cur-focal-dragging * {
   @media (prefers-reduced-motion: reduce) {
     .scroll-cue-rail::after { animation: none; transform: none; height: 100%; opacity: .5; }
   }
-
-
 
   /* The instrument frame belongs to the sky, so it leaves with the sky. */
   html.machine-mode .viewfinder,

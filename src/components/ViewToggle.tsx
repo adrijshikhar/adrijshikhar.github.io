@@ -57,6 +57,8 @@ const buildMachineHtml = (): string => {
   return `<div class="machine-content-wrapper"><pre class="machine-pre">${coloured}</pre></div>`;
 };
 
+const KNOB_LINE_INDICES = Array.from({ length: 30 }, (_, i) => i - 10);
+
 function applyOpticalProgress(
   p: number,
   humanPlane: HTMLElement,
@@ -65,110 +67,32 @@ function applyOpticalProgress(
 ) {
   p = clampP(p);
 
-  humanPlane.style.transition = 'none';
-  machinePlane.style.transition = 'none';
-  if (skyEl) skyEl.style.transition = 'none';
+  const isMachine = p >= 0.5;
+  document.documentElement.classList.toggle('machine-mode', isMachine);
+  document.body.classList.toggle('machine-mode', isMachine);
 
-  // Final settled states
-  if (p === 0) {
-    humanPlane.style.transformOrigin = '';
-    humanPlane.style.transform = '';
-    humanPlane.style.filter = '';
+  if (p <= 0.45) {
+    const opacity = p === 0 ? '1' : Math.max(0, 1 - p * 2.22).toFixed(3);
     humanPlane.style.display = 'block';
-    humanPlane.style.opacity = '1';
-    humanPlane.style.pointerEvents = 'auto';
-    humanPlane.style.willChange = '';
-
-    machinePlane.style.transformOrigin = '';
-    machinePlane.style.transform = '';
-    machinePlane.style.filter = '';
-    machinePlane.style.display = 'none';
-    machinePlane.style.opacity = '0';
-    machinePlane.style.pointerEvents = 'none';
-    machinePlane.style.willChange = '';
-    machinePlane.classList.remove('view-overlay');
-
-    if (skyEl) {
-      skyEl.style.transform = '';
-      skyEl.style.opacity = '1';
-      skyEl.style.transition = '';
-    }
-
-    document.documentElement.classList.remove('machine-mode');
-    document.body.classList.remove('machine-mode');
-    return;
-  }
-
-  if (p === 1) {
-    humanPlane.style.transformOrigin = '';
-    humanPlane.style.transform = '';
-    humanPlane.style.filter = '';
-    humanPlane.style.display = 'none';
-    humanPlane.style.opacity = '0';
-    humanPlane.style.pointerEvents = 'none';
-    humanPlane.style.willChange = '';
-
-    machinePlane.style.transformOrigin = '';
-    machinePlane.style.transform = '';
-    machinePlane.style.filter = '';
-    machinePlane.style.display = 'block';
-    machinePlane.style.opacity = '1';
-    machinePlane.style.pointerEvents = 'auto';
-    machinePlane.style.height = 'auto';
-    machinePlane.style.overflow = 'visible';
-    machinePlane.style.willChange = '';
-    machinePlane.classList.remove('view-overlay');
-
-    if (skyEl) {
-      skyEl.style.transform = '';
-      skyEl.style.opacity = '0';
-      skyEl.style.transition = '';
-    }
-
-    document.documentElement.classList.add('machine-mode');
-    document.body.classList.add('machine-mode');
-    return;
-  }
-
-  // Active transit: Clean sequential dissolve — NEVER render both views superimposed!
-  // First half (p: 0 -> 0.45): Human view dissolves to 0. Machine view stays hidden.
-  // Second half (p: 0.55 -> 1.0): Machine view fades in from 0 to 1. Human view is hidden.
-  if (p < 0.45) {
-    humanPlane.style.willChange = 'opacity';
-    humanPlane.style.display = 'block';
-    humanPlane.style.opacity = Math.max(0, 1 - p * 2.22).toFixed(3);
+    humanPlane.style.opacity = opacity;
     humanPlane.style.pointerEvents = p < 0.2 ? 'auto' : 'none';
 
     machinePlane.style.display = 'none';
     machinePlane.style.opacity = '0';
     machinePlane.style.pointerEvents = 'none';
-    machinePlane.classList.remove('view-overlay');
 
-    if (skyEl) {
-      skyEl.style.opacity = Math.max(0, 1 - p * 2.22).toFixed(3);
-    }
-
-    document.documentElement.classList.remove('machine-mode');
-    document.body.classList.remove('machine-mode');
-  } else if (p > 0.55) {
+    if (skyEl) skyEl.style.opacity = opacity;
+  } else if (p >= 0.55) {
+    const opacity = p === 1 ? '1' : Math.min(1, (p - 0.55) * 2.22).toFixed(3);
     humanPlane.style.display = 'none';
     humanPlane.style.opacity = '0';
     humanPlane.style.pointerEvents = 'none';
 
-    machinePlane.style.willChange = 'opacity';
     machinePlane.style.display = 'block';
-    machinePlane.style.height = 'auto';
-    machinePlane.style.overflow = 'visible';
-    machinePlane.style.opacity = Math.min(1, (p - 0.55) * 2.22).toFixed(3);
+    machinePlane.style.opacity = opacity;
     machinePlane.style.pointerEvents = p > 0.8 ? 'auto' : 'none';
-    machinePlane.classList.remove('view-overlay');
 
-    if (skyEl) {
-      skyEl.style.opacity = '0';
-    }
-
-    document.documentElement.classList.add('machine-mode');
-    document.body.classList.add('machine-mode');
+    if (skyEl) skyEl.style.opacity = '0';
   } else {
     // Narrow clean breath (p: 0.45 -> 0.55): Clean dark ground, zero text bleed
     humanPlane.style.display = 'none';
@@ -178,19 +102,8 @@ function applyOpticalProgress(
     machinePlane.style.display = 'none';
     machinePlane.style.opacity = '0';
     machinePlane.style.pointerEvents = 'none';
-    machinePlane.classList.remove('view-overlay');
 
-    if (skyEl) {
-      skyEl.style.opacity = '0';
-    }
-
-    if (p >= 0.5) {
-      document.documentElement.classList.add('machine-mode');
-      document.body.classList.add('machine-mode');
-    } else {
-      document.documentElement.classList.remove('machine-mode');
-      document.body.classList.remove('machine-mode');
-    }
+    if (skyEl) skyEl.style.opacity = '0';
   }
 }
 
@@ -228,39 +141,29 @@ export default function ViewToggle() {
       labelColRef.current.style.width = `${w.toFixed(1)}px`;
     }
 
-    const compactOpacity = Math.max(0, 1 - e * 2.2);
-    const compactShift = -e * 6;
-    if (compactHumanRef.current) {
-      compactHumanRef.current.style.opacity = compactOpacity.toFixed(3);
-      compactHumanRef.current.style.transform = `translate3d(${compactShift.toFixed(1)}px, 0, 0)`;
-      compactHumanRef.current.style.pointerEvents = e < 0.3 ? 'auto' : 'none';
-      compactHumanRef.current.setAttribute('aria-hidden', e > 0.5 ? 'true' : 'false');
-      compactHumanRef.current.tabIndex = e > 0.5 ? -1 : 0;
-    }
-    if (compactMachineRef.current) {
-      compactMachineRef.current.style.opacity = compactOpacity.toFixed(3);
-      compactMachineRef.current.style.transform = `translate3d(${compactShift.toFixed(1)}px, 0, 0)`;
-      compactMachineRef.current.style.pointerEvents = e < 0.3 ? 'auto' : 'none';
-      compactMachineRef.current.setAttribute('aria-hidden', e > 0.5 ? 'true' : 'false');
-      compactMachineRef.current.tabIndex = e > 0.5 ? -1 : 0;
-    }
+    const compactOpacity = Math.max(0, 1 - e * 2.2).toFixed(3);
+    const compactShift = (-e * 6).toFixed(1);
+    const compactHide = e > 0.5;
+    [compactHumanRef.current, compactMachineRef.current].forEach((el) => {
+      if (!el) return;
+      el.style.opacity = compactOpacity;
+      el.style.transform = `translate3d(${compactShift}px, 0, 0)`;
+      el.style.pointerEvents = e < 0.3 ? 'auto' : 'none';
+      el.setAttribute('aria-hidden', compactHide ? 'true' : 'false');
+      el.tabIndex = compactHide ? -1 : 0;
+    });
 
-    const fullOpacity = Math.min(1, Math.max(0, (e - 0.25) * 1.33));
-    const fullShift = (1 - e) * 8;
-    if (fullHumanRef.current) {
-      fullHumanRef.current.style.opacity = fullOpacity.toFixed(3);
-      fullHumanRef.current.style.transform = `translate3d(${fullShift.toFixed(1)}px, 0, 0)`;
-      fullHumanRef.current.style.pointerEvents = e > 0.7 ? 'auto' : 'none';
-      fullHumanRef.current.setAttribute('aria-hidden', e < 0.5 ? 'true' : 'false');
-      fullHumanRef.current.tabIndex = e < 0.5 ? -1 : 0;
-    }
-    if (fullMachineRef.current) {
-      fullMachineRef.current.style.opacity = fullOpacity.toFixed(3);
-      fullMachineRef.current.style.transform = `translate3d(${fullShift.toFixed(1)}px, 0, 0)`;
-      fullMachineRef.current.style.pointerEvents = e > 0.7 ? 'auto' : 'none';
-      fullMachineRef.current.setAttribute('aria-hidden', e < 0.5 ? 'true' : 'false');
-      fullMachineRef.current.tabIndex = e < 0.5 ? -1 : 0;
-    }
+    const fullOpacity = Math.min(1, Math.max(0, (e - 0.25) * 1.33)).toFixed(3);
+    const fullShift = ((1 - e) * 8).toFixed(1);
+    const fullHide = e < 0.5;
+    [fullHumanRef.current, fullMachineRef.current].forEach((el) => {
+      if (!el) return;
+      el.style.opacity = fullOpacity;
+      el.style.transform = `translate3d(${fullShift}px, 0, 0)`;
+      el.style.pointerEvents = e > 0.7 ? 'auto' : 'none';
+      el.setAttribute('aria-hidden', fullHide ? 'true' : 'false');
+      el.tabIndex = fullHide ? -1 : 0;
+    });
   }, []);
 
   const setExpanded = useCallback(
@@ -728,7 +631,7 @@ export default function ViewToggle() {
               className="w-full h-[144px] overflow-visible pointer-events-none"
               aria-hidden="true"
             >
-              {Array.from({ length: 30 }, (_, i) => i - 10).map((k) => {
+              {KNOB_LINE_INDICES.map((k) => {
                 const y = k * 12;
                 const isHighlighter = k === 3;
                 return (
@@ -812,7 +715,7 @@ export default function ViewToggle() {
               className="w-[144px] h-full overflow-visible pointer-events-none"
               aria-hidden="true"
             >
-              {Array.from({ length: 30 }, (_, i) => i - 10).map((k) => {
+              {KNOB_LINE_INDICES.map((k) => {
                 const x = k * 12;
                 const isHighlighter = k === 3;
                 return (
