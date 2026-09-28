@@ -813,7 +813,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
           geo lookup 404s, and says so rather than implying a real fix. */}
       {mode === 'full' && !machine && (
         <div
-          className="pointer-events-none fixed left-1/2 top-[1.9rem] -z-[1] flex -translate-x-1/2
+          className="pointer-events-none fixed left-1/2 top-[14px] -z-[1] flex -translate-x-1/2
             gap-2 font-mono text-xs whitespace-nowrap text-muted-foreground"
           aria-hidden="true"
         >

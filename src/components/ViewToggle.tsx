@@ -491,30 +491,7 @@ export default function ViewToggle() {
       >
         {/* Static Graduation Ticks with tapered roll fade - 1:1 match with .viewfinder u */}
         <div
-          className="mx-auto pointer-events-none"
-          style={
-            isDesktop
-              ? {
-                  width: '6px',
-                  height: '130px',
-                  background:
-                    'repeating-linear-gradient(180deg, var(--muted-foreground) 0 1px, transparent 1px 100%) 0 0 / 100% 26px',
-                  WebkitMaskImage:
-                    'linear-gradient(180deg, transparent 0%, #000 20%, #000 80%, transparent 100%)',
-                  maskImage:
-                    'linear-gradient(180deg, transparent 0%, #000 20%, #000 80%, transparent 100%)',
-                }
-              : {
-                  width: 'min(calc(100vw - 48px), 260px)',
-                  height: '6px',
-                  background:
-                    'repeating-linear-gradient(90deg, var(--muted-foreground) 0 1px, transparent 1px 100%) 0 0 / 26px 100%',
-                  WebkitMaskImage:
-                    'linear-gradient(90deg, transparent 0%, #000 20%, #000 80%, transparent 100%)',
-                  maskImage:
-                    'linear-gradient(90deg, transparent 0%, #000 20%, #000 80%, transparent 100%)',
-                }
-          }
+          className={`${isDesktop ? 'focal-scale-vert' : 'focal-scale-horiz'} mx-auto pointer-events-none`}
         />
 
         {/* The Highlighted Simple Line Identifier that moves between the two modes */}
