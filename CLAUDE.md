@@ -57,8 +57,9 @@ Two traps when verifying in a headless browser, both hit in anger:
    a broken layout that is not broken. Use CDP `captureBeyondViewport` with the viewport
    left at 1440x900.
 
-No lint script exists. Prettier is a dependency but is not wired to a script. The
-`deploy` npm script (`gh-pages`) is legacy/unused — deployment is via GitHub Actions (below).
+No lint script exists. Prettier is a dependency but is not wired to a script.
+Deployment is via GitHub Actions (below) — there is no `deploy` script. The shadcn CLI is
+not a dependency either: run `bun x shadcn@latest add <component>` to add a component.
 
 If a dev-server React island fails to hydrate with `jsxDEV is not a function` after editing
 `astro.config.mjs`, clear stale caches and restart: `rm -rf node_modules/.vite .astro && bun run dev`.
