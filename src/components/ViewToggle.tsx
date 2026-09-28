@@ -208,10 +208,86 @@ export default function ViewToggle() {
   const mobileTrackRef = useRef<HTMLDivElement>(null);
   const desktopLinesRef = useRef<HTMLDivElement>(null);
   const mobileLinesRef = useRef<HTMLDivElement>(null);
-  const humanBtnRef = useRef<HTMLButtonElement>(null);
-  const machineBtnRef = useRef<HTMLButtonElement>(null);
+  const labelColRef = useRef<HTMLDivElement>(null);
+  const compactHumanRef = useRef<HTMLButtonElement>(null);
+  const compactMachineRef = useRef<HTMLButtonElement>(null);
+  const fullHumanRef = useRef<HTMLButtonElement>(null);
+  const fullMachineRef = useRef<HTMLButtonElement>(null);
+  const expandProgressRef = useRef(0.0);
+  const expandAnimRef = useRef<any>(null);
+  const isHoveredRef = useRef(false);
   const animRef = useRef<any>(null);
   const settleTimerRef = useRef<number | null>(null);
+
+  const applyExpansion = useCallback((e: number) => {
+    expandProgressRef.current = e;
+    if (labelColRef.current) {
+      const w = 20 + e * 64;
+      labelColRef.current.style.width = `${w.toFixed(1)}px`;
+    }
+
+    const compactOpacity = Math.max(0, 1 - e * 2.2);
+    const compactShift = -e * 6;
+    if (compactHumanRef.current) {
+      compactHumanRef.current.style.opacity = compactOpacity.toFixed(3);
+      compactHumanRef.current.style.transform = `translate3d(${compactShift.toFixed(1)}px, -50%, 0)`;
+      compactHumanRef.current.style.pointerEvents = e < 0.3 ? 'auto' : 'none';
+      compactHumanRef.current.setAttribute('aria-hidden', e > 0.5 ? 'true' : 'false');
+      compactHumanRef.current.tabIndex = e > 0.5 ? -1 : 0;
+    }
+    if (compactMachineRef.current) {
+      compactMachineRef.current.style.opacity = compactOpacity.toFixed(3);
+      compactMachineRef.current.style.transform = `translate3d(${compactShift.toFixed(1)}px, -50%, 0)`;
+      compactMachineRef.current.style.pointerEvents = e < 0.3 ? 'auto' : 'none';
+      compactMachineRef.current.setAttribute('aria-hidden', e > 0.5 ? 'true' : 'false');
+      compactMachineRef.current.tabIndex = e > 0.5 ? -1 : 0;
+    }
+
+    const fullOpacity = Math.min(1, Math.max(0, (e - 0.25) * 1.33));
+    const fullShift = (1 - e) * 8;
+    if (fullHumanRef.current) {
+      fullHumanRef.current.style.opacity = fullOpacity.toFixed(3);
+      fullHumanRef.current.style.transform = `translate3d(${fullShift.toFixed(1)}px, -50%, 0)`;
+      fullHumanRef.current.style.pointerEvents = e > 0.7 ? 'auto' : 'none';
+      fullHumanRef.current.setAttribute('aria-hidden', e < 0.5 ? 'true' : 'false');
+      fullHumanRef.current.tabIndex = e < 0.5 ? -1 : 0;
+    }
+    if (fullMachineRef.current) {
+      fullMachineRef.current.style.opacity = fullOpacity.toFixed(3);
+      fullMachineRef.current.style.transform = `translate3d(${fullShift.toFixed(1)}px, -50%, 0)`;
+      fullMachineRef.current.style.pointerEvents = e > 0.7 ? 'auto' : 'none';
+      fullMachineRef.current.setAttribute('aria-hidden', e < 0.5 ? 'true' : 'false');
+      fullMachineRef.current.tabIndex = e < 0.5 ? -1 : 0;
+    }
+  }, []);
+
+  const setExpanded = useCallback(
+    (expanded: boolean) => {
+      const targetE = expanded ? 1.0 : 0.0;
+      if (prefersReduced()) {
+        applyExpansion(targetE);
+        return;
+      }
+      if (expandAnimRef.current) {
+        expandAnimRef.current.pause?.();
+        expandAnimRef.current = null;
+      }
+      const proxy = { e: expandProgressRef.current };
+      expandAnimRef.current = animate(proxy, {
+        e: targetE,
+        duration: expanded ? 260 : 200,
+        ease: 'outCubic',
+        onUpdate: () => {
+          applyExpansion(proxy.e);
+        },
+        onComplete: () => {
+          expandAnimRef.current = null;
+          applyExpansion(targetE);
+        },
+      });
+    },
+    [applyExpansion]
+  );
 
   const getPlanes = () => {
     const humanPlane = document.querySelector('.human-view') as HTMLElement | null;
@@ -320,6 +396,7 @@ export default function ViewToggle() {
 
       const onWheel = (e: WheelEvent) => {
         e.preventDefault();
+        setExpanded(true);
         const delta = isVert
           ? e.deltaY
           : (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY);
@@ -336,6 +413,9 @@ export default function ViewToggle() {
         settleTimerRef.current = window.setTimeout(() => {
           const nearest = currentProgressRef.current < 0.5 ? 0.0 : 1.0;
           snapTo(nearest);
+          if (!isHoveredRef.current && !isDraggingRef.current) {
+            setExpanded(false);
+          }
         }, 220);
       };
       el.addEventListener('wheel', onWheel, { passive: false });
@@ -351,7 +431,7 @@ export default function ViewToggle() {
       cleanupDesktop();
       cleanupMobile();
     };
-  }, [updateProgress]);
+  }, [updateProgress, setExpanded]);
 
   // Window-level safety cleanup for dragging and cursor states
   useEffect(() => {
@@ -359,6 +439,9 @@ export default function ViewToggle() {
       if (isDraggingRef.current) {
         isDraggingRef.current = false;
         document.body.classList.remove('cur-focal-dragging');
+        if (!isHoveredRef.current) {
+          setExpanded(false);
+        }
       }
     };
     window.addEventListener('pointerup', onGlobalPointerUp);
@@ -369,12 +452,13 @@ export default function ViewToggle() {
       document.body.classList.remove('cur-focal');
       document.body.classList.remove('cur-focal-dragging');
     };
-  }, []);
+  }, [setExpanded]);
 
   const handlePointerDown = (e: React.PointerEvent, isVert: boolean) => {
     e.preventDefault();
     window.getSelection()?.removeAllRanges();
     document.body.classList.add('cur-focal-dragging');
+    setExpanded(true);
     const target = e.currentTarget as HTMLElement;
     isDraggingRef.current = true;
     dragStartCoordRef.current = isVert ? e.clientY : e.clientX;
@@ -404,6 +488,9 @@ export default function ViewToggle() {
     document.body.classList.remove('cur-focal-dragging');
     if (!isDraggingRef.current) return;
     isDraggingRef.current = false;
+    if (!isHoveredRef.current) {
+      setExpanded(false);
+    }
     if (rafIdRef.current !== null) {
       cancelAnimationFrame(rafIdRef.current);
       rafIdRef.current = null;
@@ -466,32 +553,89 @@ export default function ViewToggle() {
     document.documentElement.classList.remove('machine-boot');
   }, [updateProgress]);
 
-  // Initial alignment on mount
+  // Initial alignment and expansion on mount
   useEffect(() => {
     updateProgress(currentProgressRef.current);
-  }, [updateProgress]);
+    applyExpansion(0.0);
+  }, [updateProgress, applyExpansion]);
 
   return (
     <div
       className="fixed bottom-4 left-1/2 -translate-x-1/2 lg:bottom-auto lg:left-auto lg:right-9 lg:top-1/2 lg:-translate-y-1/2 lg:translate-x-0 z-[1100] select-none pointer-events-auto"
       onPointerEnter={() => {
+        isHoveredRef.current = true;
         document.body.classList.add('cur-focal');
+        setExpanded(true);
       }}
       onPointerLeave={() => {
+        isHoveredRef.current = false;
         if (!isDraggingRef.current) {
           document.body.classList.remove('cur-focal');
+          setExpanded(false);
+        }
+      }}
+      onFocus={() => {
+        setExpanded(true);
+      }}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
+          if (!isHoveredRef.current && !isDraggingRef.current) {
+            setExpanded(false);
+          }
         }
       }}
     >
       {/* Desktop Layout: Stacked Labels on the LEFT, Bar on the RIGHT */}
       <div className="hidden lg:flex items-center gap-2.5">
-        {/* Desktop Labels Column: Compact stacked labels aligned with knob stops */}
-        <div className="relative h-[144px] w-[84px] select-none">
+        {/* Desktop Labels Column: Expands to the left on hover */}
+        <div
+          ref={labelColRef}
+          className="relative h-[144px] w-[20px] select-none pointer-events-auto"
+        >
+          {/* Compact Monogram: H */}
           <button
-            ref={humanBtnRef}
+            ref={compactHumanRef}
             type="button"
             onClick={() => snapTo(0.0)}
-            className="absolute top-[36px] -translate-y-1/2 right-0 flex flex-col items-end cursor-pointer group text-right focus:outline-none whitespace-nowrap"
+            className="absolute top-[36px] -translate-y-1/2 right-0 flex items-center justify-end cursor-pointer group text-right focus:outline-none whitespace-nowrap p-0 m-0 bg-transparent border-0"
+            aria-label="24mm Human view"
+          >
+            <span
+              className={`font-mono text-[11px] tracking-[0.14em] uppercase whitespace-nowrap leading-none transition-colors text-right ${
+                activeMode === 'human'
+                  ? 'text-foreground font-semibold'
+                  : 'text-muted-foreground/40 group-hover:text-muted-foreground'
+              }`}
+            >
+              H
+            </span>
+          </button>
+
+          {/* Compact Monogram: M */}
+          <button
+            ref={compactMachineRef}
+            type="button"
+            onClick={() => snapTo(1.0)}
+            className="absolute top-[108px] -translate-y-1/2 right-0 flex items-center justify-end cursor-pointer group text-right focus:outline-none whitespace-nowrap p-0 m-0 bg-transparent border-0"
+            aria-label="48mm Machine view"
+          >
+            <span
+              className={`font-mono text-[11px] tracking-[0.14em] uppercase whitespace-nowrap leading-none transition-colors text-right ${
+                activeMode === 'machine'
+                  ? 'text-foreground font-semibold'
+                  : 'text-muted-foreground/40 group-hover:text-muted-foreground'
+              }`}
+            >
+              M
+            </span>
+          </button>
+
+          {/* Full Stacked Label: 24MM HUMAN */}
+          <button
+            ref={fullHumanRef}
+            type="button"
+            onClick={() => snapTo(0.0)}
+            className="absolute top-[36px] -translate-y-1/2 right-0 flex flex-col items-end cursor-pointer group text-right focus:outline-none whitespace-nowrap p-0 m-0 bg-transparent border-0 opacity-0 pointer-events-none"
             aria-label="24mm Human view"
           >
             <span
@@ -514,11 +658,12 @@ export default function ViewToggle() {
             </span>
           </button>
 
+          {/* Full Stacked Label: 48MM MACHINE */}
           <button
-            ref={machineBtnRef}
+            ref={fullMachineRef}
             type="button"
             onClick={() => snapTo(1.0)}
-            className="absolute top-[108px] -translate-y-1/2 right-0 flex flex-col items-end cursor-pointer group text-right focus:outline-none whitespace-nowrap"
+            className="absolute top-[108px] -translate-y-1/2 right-0 flex flex-col items-end cursor-pointer group text-right focus:outline-none whitespace-nowrap p-0 m-0 bg-transparent border-0 opacity-0 pointer-events-none"
             aria-label="48mm Machine view"
           >
             <span
