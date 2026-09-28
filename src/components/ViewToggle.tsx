@@ -133,27 +133,25 @@ function applyOpticalProgress(
   const humanScale = (1 + p * 0.035).toFixed(4);
   const machineScale = (0.965 + p * 0.035).toFixed(4);
 
-  // Optical Blur & Photonic Bloom
-  const humanBlur = (p * 11).toFixed(1);
-  const machineBlur = ((1 - p) * 11).toFixed(1);
-  const midIntensity = Math.sin(p * Math.PI);
-  const bloomDrop = midIntensity > 0.35 ? ' drop-shadow(0 0 10px rgba(127, 168, 245, 0.45))' : '';
+  // Optical Blur: Smooth continuous Gaussian blur without drop-shadow shader invalidation
+  const humanBlur = (p * 10).toFixed(1);
+  const machineBlur = ((1 - p) * 10).toFixed(1);
 
   // Opacity Crossfade
-  const humanOpacity = Math.max(0, 1 - p * 1.45).toFixed(3);
-  const machineOpacity = Math.max(0, (p - 0.22) * 1.3).toFixed(3);
+  const humanOpacity = Math.max(0, 1 - p * 1.4).toFixed(3);
+  const machineOpacity = Math.max(0, (p - 0.2) * 1.25).toFixed(3);
 
   humanPlane.style.willChange = 'transform, filter, opacity';
   humanPlane.style.transformOrigin = '50% 15vh';
   humanPlane.style.transform = `scale(${humanScale})`;
-  humanPlane.style.filter = `blur(${humanBlur}px)${bloomDrop}`;
+  humanPlane.style.filter = Number(humanBlur) > 0.1 ? `blur(${humanBlur}px)` : 'none';
   humanPlane.style.opacity = humanOpacity;
   humanPlane.style.pointerEvents = p < 0.35 ? 'auto' : 'none';
 
   machinePlane.style.willChange = 'transform, filter, opacity';
   machinePlane.style.transformOrigin = '50% 15vh';
   machinePlane.style.transform = `scale(${machineScale})`;
-  machinePlane.style.filter = `blur(${machineBlur}px)${bloomDrop}`;
+  machinePlane.style.filter = Number(machineBlur) > 0.1 ? `blur(${machineBlur}px)` : 'none';
   machinePlane.style.opacity = machineOpacity;
   machinePlane.style.pointerEvents = p > 0.65 ? 'auto' : 'none';
   machinePlane.style.height = 'auto';
@@ -177,11 +175,14 @@ function applyOpticalProgress(
 }
 
 export default function ViewToggle() {
-  const [progress, setProgress] = useState(0.0);
+  const [activeMode, setActiveMode] = useState<'human' | 'machine'>('human');
+  const activeModeRef = useRef<'human' | 'machine'>('human');
   const currentProgressRef = useRef(0.0);
   const isDraggingRef = useRef(false);
   const dragStartCoordRef = useRef(0);
   const dragStartPRef = useRef(0);
+  const pendingCoordRef = useRef(0);
+  const rafIdRef = useRef<number | null>(null);
   const machineLoadedRef = useRef(false);
   const desktopTrackRef = useRef<HTMLDivElement>(null);
   const mobileTrackRef = useRef<HTMLDivElement>(null);
@@ -211,17 +212,20 @@ export default function ViewToggle() {
   const updateProgress = useCallback((p: number) => {
     const clamped = clampP(p);
     currentProgressRef.current = clamped;
-    setProgress(clamped);
 
-    // Rotate the cylindrical knob: the entire set of lines translates together
-    // At p = 0.0: offset = 0px (line k=1 is at y=12px, aligned with 24mm)
-    // At p = 1.0: offset = 72px (line k=1 is at y=84px, aligned with 48mm)
+    const newMode = clamped < 0.5 ? 'human' : 'machine';
+    if (newMode !== activeModeRef.current) {
+      activeModeRef.current = newMode;
+      setActiveMode(newMode);
+    }
+
+    // Cylindrical knob travel: 72px between 24mm (y=36px) and 48mm (y=108px)
     const offset = clamped * 72;
     if (desktopLinesRef.current) {
-      desktopLinesRef.current.style.transform = `translateY(${offset}px)`;
+      desktopLinesRef.current.style.transform = `translate3d(0, ${offset}px, 0)`;
     }
     if (mobileLinesRef.current) {
-      mobileLinesRef.current.style.transform = `translateX(${offset}px)`;
+      mobileLinesRef.current.style.transform = `translate3d(${offset}px, 0, 0)`;
     }
 
     const { humanPlane, machinePlane, skyEl } = getPlanes();
@@ -272,8 +276,8 @@ export default function ViewToggle() {
     const proxy = { p: startP };
     animRef.current = animate(proxy, {
       p: targetP,
-      duration: 380,
-      ease: 'inOutQuad',
+      duration: 320,
+      ease: 'outCubic',
       onUpdate: () => {
         updateProgress(proxy.p);
       },
@@ -284,26 +288,38 @@ export default function ViewToggle() {
     });
   };
 
-  // Wheel scrubbing on both desktop and mobile tracks
+  // Wheel scrubbing on both desktop and mobile tracks with rAF batching
   useEffect(() => {
     const attachWheel = (el: HTMLElement | null, isVert: boolean) => {
       if (!el) return () => {};
+      let wheelRaf: number | null = null;
+      let targetP = currentProgressRef.current;
+
       const onWheel = (e: WheelEvent) => {
         e.preventDefault();
         const delta = isVert
           ? e.deltaY
           : (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY);
-        const nextP = clampP(currentProgressRef.current + delta * 0.003);
-        updateProgress(nextP);
+        targetP = clampP(currentProgressRef.current + delta * 0.003);
+
+        if (wheelRaf === null) {
+          wheelRaf = requestAnimationFrame(() => {
+            wheelRaf = null;
+            updateProgress(targetP);
+          });
+        }
 
         if (settleTimerRef.current) clearTimeout(settleTimerRef.current);
         settleTimerRef.current = window.setTimeout(() => {
-          const nearest = nextP < 0.5 ? 0.0 : 1.0;
+          const nearest = currentProgressRef.current < 0.5 ? 0.0 : 1.0;
           snapTo(nearest);
-        }, 260);
+        }, 220);
       };
       el.addEventListener('wheel', onWheel, { passive: false });
-      return () => el.removeEventListener('wheel', onWheel);
+      return () => {
+        el.removeEventListener('wheel', onWheel);
+        if (wheelRaf !== null) cancelAnimationFrame(wheelRaf);
+      };
     };
 
     const cleanupDesktop = attachWheel(desktopTrackRef.current, true);
@@ -328,16 +344,25 @@ export default function ViewToggle() {
 
   const handlePointerMove = (e: React.PointerEvent, isVert: boolean) => {
     if (!isDraggingRef.current) return;
-    const delta = isVert
-      ? (e.clientY - dragStartCoordRef.current)
-      : (e.clientX - dragStartCoordRef.current);
-    const rawP = dragStartPRef.current + delta / 72;
-    updateProgress(clampP(rawP));
+    pendingCoordRef.current = isVert ? e.clientY : e.clientX;
+    if (rafIdRef.current === null) {
+      rafIdRef.current = requestAnimationFrame(() => {
+        rafIdRef.current = null;
+        if (!isDraggingRef.current) return;
+        const delta = pendingCoordRef.current - dragStartCoordRef.current;
+        const rawP = dragStartPRef.current + delta / 72;
+        updateProgress(clampP(rawP));
+      });
+    }
   };
 
   const handlePointerUp = (e: React.PointerEvent, isVert: boolean) => {
     if (!isDraggingRef.current) return;
     isDraggingRef.current = false;
+    if (rafIdRef.current !== null) {
+      cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = null;
+    }
     const target = e.currentTarget as HTMLElement;
     try {
       target.releasePointerCapture(e.pointerId);
@@ -405,55 +430,75 @@ export default function ViewToggle() {
     <div
       className="fixed bottom-4 left-1/2 -translate-x-1/2 lg:bottom-auto lg:left-auto lg:right-9 lg:top-1/2 lg:-translate-y-1/2 lg:translate-x-0 z-[1100] select-none pointer-events-auto"
     >
-      {/* Desktop Layout: Labels on the LEFT, Bar on the RIGHT */}
-      <div className="hidden lg:flex items-center gap-3">
-        {/* Desktop Labels Column */}
-        <div className="flex flex-col justify-between h-[96px] text-right font-mono text-[11px] tracking-[0.14em] uppercase">
+      {/* Desktop Layout: Stacked Labels on the LEFT, Bar on the RIGHT */}
+      <div className="hidden lg:flex items-center gap-2.5">
+        {/* Desktop Labels Column: Compact stacked labels aligned with knob stops */}
+        <div className="relative h-[144px] w-[84px] select-none">
           <button
             ref={humanBtnRef}
             type="button"
             onClick={() => snapTo(0.0)}
-            className={`h-6 flex items-center justify-end transition-colors cursor-pointer ${
-              progress < 0.5 ? 'text-foreground font-medium' : 'text-muted-foreground hover:text-foreground'
-            }`}
+            className="absolute top-[36px] -translate-y-1/2 right-0 flex flex-col items-end cursor-pointer group text-right focus:outline-none whitespace-nowrap"
             aria-label="24mm Human view"
           >
-            <span className={`text-primary transition-opacity ${progress < 0.5 ? 'opacity-100' : 'opacity-0'}`}>[</span>
-            <span className="px-1 whitespace-nowrap">24mm · HUMAN</span>
-            <span className={`text-primary transition-opacity ${progress < 0.5 ? 'opacity-100' : 'opacity-0'}`}>]</span>
+            <span className="font-mono text-[9px] tracking-[0.18em] text-muted-foreground/60 transition-colors group-hover:text-muted-foreground uppercase whitespace-nowrap leading-none mb-1">
+              24MM
+            </span>
+            <span
+              className={`font-mono text-[11px] tracking-[0.12em] font-medium transition-colors uppercase whitespace-nowrap leading-none ${
+                activeMode === 'human'
+                  ? 'text-foreground'
+                  : 'text-muted-foreground/50 group-hover:text-muted-foreground'
+              }`}
+            >
+              <span className={`text-primary transition-opacity ${activeMode === 'human' ? 'opacity-100' : 'opacity-0'}`}>[ </span>
+              HUMAN
+              <span className={`text-primary transition-opacity ${activeMode === 'human' ? 'opacity-100' : 'opacity-0'}`}> ]</span>
+            </span>
           </button>
 
           <button
             ref={machineBtnRef}
             type="button"
             onClick={() => snapTo(1.0)}
-            className={`h-6 flex items-center justify-end transition-colors cursor-pointer ${
-              progress >= 0.5 ? 'text-foreground font-medium' : 'text-muted-foreground hover:text-foreground'
-            }`}
+            className="absolute top-[108px] -translate-y-1/2 right-0 flex flex-col items-end cursor-pointer group text-right focus:outline-none whitespace-nowrap"
             aria-label="48mm Machine view"
           >
-            <span className={`text-primary transition-opacity ${progress >= 0.5 ? 'opacity-100' : 'opacity-0'}`}>[</span>
-            <span className="px-1 whitespace-nowrap">48mm · MACHINE</span>
-            <span className={`text-primary transition-opacity ${progress >= 0.5 ? 'opacity-100' : 'opacity-0'}`}>]</span>
+            <span className="font-mono text-[9px] tracking-[0.18em] text-muted-foreground/60 transition-colors group-hover:text-muted-foreground uppercase whitespace-nowrap leading-none mb-1">
+              48MM
+            </span>
+            <span
+              className={`font-mono text-[11px] tracking-[0.12em] font-medium transition-colors uppercase whitespace-nowrap leading-none ${
+                activeMode === 'machine'
+                  ? 'text-foreground'
+                  : 'text-muted-foreground/50 group-hover:text-muted-foreground'
+              }`}
+            >
+              <span className={`text-primary transition-opacity ${activeMode === 'machine' ? 'opacity-100' : 'opacity-0'}`}>[ </span>
+              MACHINE
+              <span className={`text-primary transition-opacity ${activeMode === 'machine' ? 'opacity-100' : 'opacity-0'}`}> ]</span>
+            </span>
           </button>
         </div>
 
         {/* Desktop Vertical Textured Knob Track */}
         <div
           ref={desktopTrackRef}
-          className="relative w-4 h-[96px] overflow-hidden cursor-ns-resize select-none shrink-0"
+          className="relative w-4 h-[144px] overflow-hidden cursor-ns-resize select-none shrink-0"
           style={{
             touchAction: 'none',
-            maskImage: 'linear-gradient(180deg, transparent 0%, #000 10%, #000 90%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(180deg, transparent 0%, #000 10%, #000 90%, transparent 100%)',
+            maskImage:
+              'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.4) 10%, #000 24%, #000 76%, rgba(0,0,0,0.4) 90%, transparent 100%)',
+            WebkitMaskImage:
+              'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.4) 10%, #000 24%, #000 76%, rgba(0,0,0,0.4) 90%, transparent 100%)',
           }}
           role="slider"
           tabIndex={0}
           aria-label="Optical focal length"
           aria-valuemin={24}
           aria-valuemax={48}
-          aria-valuenow={Math.round(24 + progress * 24)}
-          aria-valuetext={progress < 0.5 ? '24mm Human' : '48mm Machine'}
+          aria-valuenow={activeMode === 'human' ? 24 : 48}
+          aria-valuetext={activeMode === 'human' ? '24mm Human' : '48mm Machine'}
           onPointerDown={(e) => handlePointerDown(e, true)}
           onPointerMove={(e) => handlePointerMove(e, true)}
           onPointerUp={(e) => handlePointerUp(e, true)}
@@ -464,17 +509,17 @@ export default function ViewToggle() {
           <div
             ref={desktopLinesRef}
             className="absolute top-0 left-0 w-full will-change-transform pointer-events-none"
-            style={{ transform: 'translateY(0px)' }}
+            style={{ transform: 'translate3d(0, 0px, 0)' }}
             aria-hidden="true"
           >
             <svg
-              viewBox="0 0 16 96"
-              className="w-full h-[96px] overflow-visible pointer-events-none"
+              viewBox="0 0 16 144"
+              className="w-full h-[144px] overflow-visible pointer-events-none"
               aria-hidden="true"
             >
-              {Array.from({ length: 25 }, (_, i) => i - 12).map((k) => {
+              {Array.from({ length: 30 }, (_, i) => i - 10).map((k) => {
                 const y = k * 12;
-                const isHighlighter = k === 1;
+                const isHighlighter = k === 3;
                 return (
                   <line
                     key={k}
@@ -499,31 +544,40 @@ export default function ViewToggle() {
         <button
           type="button"
           onClick={() => snapTo(0.0)}
-          className={`tap-44 flex items-center transition-colors cursor-pointer text-[11px] font-mono tracking-wider ${
-            progress < 0.5 ? 'text-foreground font-medium' : 'text-muted-foreground hover:text-foreground'
-          }`}
+          className="flex flex-col items-center cursor-pointer text-center select-none focus:outline-none whitespace-nowrap"
           aria-label="24mm Human view"
         >
-          <span className={`text-primary transition-opacity ${progress < 0.5 ? 'opacity-100' : 'opacity-0'}`}>[</span>
-          <span className="px-1 whitespace-nowrap">24mm · HUMAN</span>
-          <span className={`text-primary transition-opacity ${progress < 0.5 ? 'opacity-100' : 'opacity-0'}`}>]</span>
+          <span className="font-mono text-[9px] tracking-wider text-muted-foreground/60 uppercase whitespace-nowrap leading-none mb-1">
+            24MM
+          </span>
+          <span
+            className={`font-mono text-[10px] tracking-wider font-medium transition-colors uppercase whitespace-nowrap leading-none ${
+              activeMode === 'human' ? 'text-foreground' : 'text-muted-foreground/50'
+            }`}
+          >
+            <span className={`text-primary transition-opacity ${activeMode === 'human' ? 'opacity-100' : 'opacity-0'}`}>[ </span>
+            HUMAN
+            <span className={`text-primary transition-opacity ${activeMode === 'human' ? 'opacity-100' : 'opacity-0'}`}> ]</span>
+          </span>
         </button>
 
         <div
           ref={mobileTrackRef}
-          className="relative w-[96px] h-4 overflow-hidden cursor-ew-resize select-none shrink-0"
+          className="relative w-[144px] h-4 overflow-hidden cursor-ew-resize select-none shrink-0"
           style={{
             touchAction: 'none',
-            maskImage: 'linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%)',
+            maskImage:
+              'linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.4) 10%, #000 24%, #000 76%, rgba(0,0,0,0.4) 90%, transparent 100%)',
+            WebkitMaskImage:
+              'linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.4) 10%, #000 24%, #000 76%, rgba(0,0,0,0.4) 90%, transparent 100%)',
           }}
           role="slider"
           tabIndex={0}
           aria-label="Optical focal length"
           aria-valuemin={24}
           aria-valuemax={48}
-          aria-valuenow={Math.round(24 + progress * 24)}
-          aria-valuetext={progress < 0.5 ? '24mm Human' : '48mm Machine'}
+          aria-valuenow={activeMode === 'human' ? 24 : 48}
+          aria-valuetext={activeMode === 'human' ? '24mm Human' : '48mm Machine'}
           onPointerDown={(e) => handlePointerDown(e, false)}
           onPointerMove={(e) => handlePointerMove(e, false)}
           onPointerUp={(e) => handlePointerUp(e, false)}
@@ -534,17 +588,17 @@ export default function ViewToggle() {
           <div
             ref={mobileLinesRef}
             className="absolute top-0 left-0 h-full will-change-transform pointer-events-none"
-            style={{ transform: 'translateX(0px)' }}
+            style={{ transform: 'translate3d(0px, 0, 0)' }}
             aria-hidden="true"
           >
             <svg
-              viewBox="0 0 96 16"
-              className="w-[96px] h-full overflow-visible pointer-events-none"
+              viewBox="0 0 144 16"
+              className="w-[144px] h-full overflow-visible pointer-events-none"
               aria-hidden="true"
             >
-              {Array.from({ length: 25 }, (_, i) => i - 12).map((k) => {
+              {Array.from({ length: 30 }, (_, i) => i - 10).map((k) => {
                 const x = k * 12;
-                const isHighlighter = k === 1;
+                const isHighlighter = k === 3;
                 return (
                   <line
                     key={k}
@@ -566,14 +620,21 @@ export default function ViewToggle() {
         <button
           type="button"
           onClick={() => snapTo(1.0)}
-          className={`tap-44 flex items-center transition-colors cursor-pointer text-[11px] font-mono tracking-wider ${
-            progress >= 0.5 ? 'text-foreground font-medium' : 'text-muted-foreground hover:text-foreground'
-          }`}
+          className="flex flex-col items-center cursor-pointer text-center select-none focus:outline-none whitespace-nowrap"
           aria-label="48mm Machine view"
         >
-          <span className={`text-primary transition-opacity ${progress >= 0.5 ? 'opacity-100' : 'opacity-0'}`}>[</span>
-          <span className="px-1 whitespace-nowrap">48mm · MACHINE</span>
-          <span className={`text-primary transition-opacity ${progress >= 0.5 ? 'opacity-100' : 'opacity-0'}`}>]</span>
+          <span className="font-mono text-[9px] tracking-wider text-muted-foreground/60 uppercase whitespace-nowrap leading-none mb-1">
+            48MM
+          </span>
+          <span
+            className={`font-mono text-[10px] tracking-wider font-medium transition-colors uppercase whitespace-nowrap leading-none ${
+              activeMode === 'machine' ? 'text-foreground' : 'text-muted-foreground/50'
+            }`}
+          >
+            <span className={`text-primary transition-opacity ${activeMode === 'machine' ? 'opacity-100' : 'opacity-0'}`}>[ </span>
+            MACHINE
+            <span className={`text-primary transition-opacity ${activeMode === 'machine' ? 'opacity-100' : 'opacity-0'}`}> ]</span>
+          </span>
         </button>
       </div>
     </div>
