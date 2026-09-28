@@ -230,14 +230,14 @@ export default function ViewToggle() {
     const compactShift = -e * 6;
     if (compactHumanRef.current) {
       compactHumanRef.current.style.opacity = compactOpacity.toFixed(3);
-      compactHumanRef.current.style.transform = `translate3d(${compactShift.toFixed(1)}px, -50%, 0)`;
+      compactHumanRef.current.style.transform = `translate3d(${compactShift.toFixed(1)}px, 0, 0)`;
       compactHumanRef.current.style.pointerEvents = e < 0.3 ? 'auto' : 'none';
       compactHumanRef.current.setAttribute('aria-hidden', e > 0.5 ? 'true' : 'false');
       compactHumanRef.current.tabIndex = e > 0.5 ? -1 : 0;
     }
     if (compactMachineRef.current) {
       compactMachineRef.current.style.opacity = compactOpacity.toFixed(3);
-      compactMachineRef.current.style.transform = `translate3d(${compactShift.toFixed(1)}px, -50%, 0)`;
+      compactMachineRef.current.style.transform = `translate3d(${compactShift.toFixed(1)}px, 0, 0)`;
       compactMachineRef.current.style.pointerEvents = e < 0.3 ? 'auto' : 'none';
       compactMachineRef.current.setAttribute('aria-hidden', e > 0.5 ? 'true' : 'false');
       compactMachineRef.current.tabIndex = e > 0.5 ? -1 : 0;
@@ -247,14 +247,14 @@ export default function ViewToggle() {
     const fullShift = (1 - e) * 8;
     if (fullHumanRef.current) {
       fullHumanRef.current.style.opacity = fullOpacity.toFixed(3);
-      fullHumanRef.current.style.transform = `translate3d(${fullShift.toFixed(1)}px, -50%, 0)`;
+      fullHumanRef.current.style.transform = `translate3d(${fullShift.toFixed(1)}px, 0, 0)`;
       fullHumanRef.current.style.pointerEvents = e > 0.7 ? 'auto' : 'none';
       fullHumanRef.current.setAttribute('aria-hidden', e < 0.5 ? 'true' : 'false');
       fullHumanRef.current.tabIndex = e < 0.5 ? -1 : 0;
     }
     if (fullMachineRef.current) {
       fullMachineRef.current.style.opacity = fullOpacity.toFixed(3);
-      fullMachineRef.current.style.transform = `translate3d(${fullShift.toFixed(1)}px, -50%, 0)`;
+      fullMachineRef.current.style.transform = `translate3d(${fullShift.toFixed(1)}px, 0, 0)`;
       fullMachineRef.current.style.pointerEvents = e > 0.7 ? 'auto' : 'none';
       fullMachineRef.current.setAttribute('aria-hidden', e < 0.5 ? 'true' : 'false');
       fullMachineRef.current.tabIndex = e < 0.5 ? -1 : 0;
