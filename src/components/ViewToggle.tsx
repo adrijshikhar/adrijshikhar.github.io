@@ -185,8 +185,8 @@ export default function ViewToggle() {
   const machineLoadedRef = useRef(false);
   const desktopTrackRef = useRef<HTMLDivElement>(null);
   const mobileTrackRef = useRef<HTMLDivElement>(null);
-  const desktopKnobRef = useRef<HTMLDivElement>(null);
-  const mobileKnobRef = useRef<HTMLDivElement>(null);
+  const desktopLinesRef = useRef<HTMLDivElement>(null);
+  const mobileLinesRef = useRef<HTMLDivElement>(null);
   const humanBtnRef = useRef<HTMLButtonElement>(null);
   const machineBtnRef = useRef<HTMLButtonElement>(null);
   const animRef = useRef<any>(null);
@@ -213,15 +213,15 @@ export default function ViewToggle() {
     currentProgressRef.current = clamped;
     setProgress(clamped);
 
-    // Position indicator along the 72px travel span:
-    // At p = 0.0: pos = 12px (aligns with 24mm stop)
-    // At p = 1.0: pos = 84px (aligns with 48mm stop)
-    const pos = 12 + clamped * 72;
-    if (desktopKnobRef.current) {
-      desktopKnobRef.current.style.transform = `translateY(${pos}px)`;
+    // Rotate the cylindrical knob: the entire set of lines translates together
+    // At p = 0.0: offset = 0px (line k=1 is at y=12px, aligned with 24mm)
+    // At p = 1.0: offset = 72px (line k=1 is at y=84px, aligned with 48mm)
+    const offset = clamped * 72;
+    if (desktopLinesRef.current) {
+      desktopLinesRef.current.style.transform = `translateY(${offset}px)`;
     }
-    if (mobileKnobRef.current) {
-      mobileKnobRef.current.style.transform = `translateX(${pos}px)`;
+    if (mobileLinesRef.current) {
+      mobileLinesRef.current.style.transform = `translateX(${offset}px)`;
     }
 
     const { humanPlane, machinePlane, skyEl } = getPlanes();
@@ -444,8 +444,8 @@ export default function ViewToggle() {
           className="relative w-4 h-[96px] overflow-hidden cursor-ns-resize select-none shrink-0"
           style={{
             touchAction: 'none',
-            maskImage: 'linear-gradient(180deg, transparent 0%, #000 12%, #000 88%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(180deg, transparent 0%, #000 12%, #000 88%, transparent 100%)',
+            maskImage: 'linear-gradient(180deg, transparent 0%, #000 10%, #000 90%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(180deg, transparent 0%, #000 10%, #000 90%, transparent 100%)',
           }}
           role="slider"
           tabIndex={0}
@@ -460,35 +460,36 @@ export default function ViewToggle() {
           onPointerCancel={(e) => handlePointerUp(e, true)}
           onKeyDown={handleKeyDown}
         >
-          {/* Knurled Ridges: 9 horizontal lines spaced 12px apart */}
-          <svg
-            viewBox="0 0 16 96"
-            className="w-full h-full overflow-visible pointer-events-none"
-            aria-hidden="true"
-          >
-            {[0, 12, 24, 36, 48, 60, 72, 84, 96].map((y) => (
-              <line
-                key={y}
-                x1="2"
-                y1={y}
-                x2="14"
-                y2={y}
-                stroke="var(--muted-foreground)"
-                strokeOpacity={0.4}
-                strokeWidth={1}
-                shapeRendering="crispEdges"
-              />
-            ))}
-          </svg>
-
-          {/* The Moving Coloured Line */}
+          {/* Rotating Cylindrical Knob: The entire set of lines moves up and down together */}
           <div
-            ref={desktopKnobRef}
-            className="absolute top-0 left-0 w-full h-[1px] will-change-transform pointer-events-none flex items-center justify-center"
-            style={{ transform: 'translateY(12px)' }}
+            ref={desktopLinesRef}
+            className="absolute top-0 left-0 w-full will-change-transform pointer-events-none"
+            style={{ transform: 'translateY(0px)' }}
             aria-hidden="true"
           >
-            <div className="w-3 h-[1px] bg-primary" />
+            <svg
+              viewBox="0 0 16 96"
+              className="w-full h-[96px] overflow-visible pointer-events-none"
+              aria-hidden="true"
+            >
+              {Array.from({ length: 25 }, (_, i) => i - 12).map((k) => {
+                const y = k * 12;
+                const isHighlighter = k === 1;
+                return (
+                  <line
+                    key={k}
+                    x1="2"
+                    y1={y}
+                    x2="14"
+                    y2={y}
+                    stroke={isHighlighter ? 'var(--primary)' : 'var(--muted-foreground)'}
+                    strokeOpacity={isHighlighter ? 1 : 0.4}
+                    strokeWidth={1}
+                    shapeRendering="crispEdges"
+                  />
+                );
+              })}
+            </svg>
           </div>
         </div>
       </div>
@@ -513,8 +514,8 @@ export default function ViewToggle() {
           className="relative w-[96px] h-4 overflow-hidden cursor-ew-resize select-none shrink-0"
           style={{
             touchAction: 'none',
-            maskImage: 'linear-gradient(90deg, transparent 0%, #000 12%, #000 88%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(90deg, transparent 0%, #000 12%, #000 88%, transparent 100%)',
+            maskImage: 'linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%)',
           }}
           role="slider"
           tabIndex={0}
@@ -529,33 +530,36 @@ export default function ViewToggle() {
           onPointerCancel={(e) => handlePointerUp(e, false)}
           onKeyDown={handleKeyDown}
         >
-          <svg
-            viewBox="0 0 96 16"
-            className="w-full h-full overflow-visible pointer-events-none"
-            aria-hidden="true"
-          >
-            {[0, 12, 24, 36, 48, 60, 72, 84, 96].map((x) => (
-              <line
-                key={x}
-                x1={x}
-                y1="2"
-                x2={x}
-                y2="14"
-                stroke="var(--muted-foreground)"
-                strokeOpacity={0.4}
-                strokeWidth={1}
-                shapeRendering="crispEdges"
-              />
-            ))}
-          </svg>
-
+          {/* Rotating Cylindrical Knob: The entire set of lines moves left and right together */}
           <div
-            ref={mobileKnobRef}
-            className="absolute top-0 left-0 w-[1px] h-full will-change-transform pointer-events-none flex items-center justify-center"
-            style={{ transform: 'translateX(12px)' }}
+            ref={mobileLinesRef}
+            className="absolute top-0 left-0 h-full will-change-transform pointer-events-none"
+            style={{ transform: 'translateX(0px)' }}
             aria-hidden="true"
           >
-            <div className="w-[1px] h-3 bg-primary" />
+            <svg
+              viewBox="0 0 96 16"
+              className="w-[96px] h-full overflow-visible pointer-events-none"
+              aria-hidden="true"
+            >
+              {Array.from({ length: 25 }, (_, i) => i - 12).map((k) => {
+                const x = k * 12;
+                const isHighlighter = k === 1;
+                return (
+                  <line
+                    key={k}
+                    x1={x}
+                    y1="2"
+                    x2={x}
+                    y2="14"
+                    stroke={isHighlighter ? 'var(--primary)' : 'var(--muted-foreground)'}
+                    strokeOpacity={isHighlighter ? 1 : 0.4}
+                    strokeWidth={1}
+                    shapeRendering="crispEdges"
+                  />
+                );
+              })}
+            </svg>
           </div>
         </div>
 
