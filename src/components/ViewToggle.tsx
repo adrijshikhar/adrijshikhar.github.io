@@ -502,10 +502,13 @@ export default function ViewToggle() {
     }
 
     const startP = currentProgressRef.current;
+    const dist = Math.abs(targetP - startP);
+    // Faster, responsive settlement: scale duration by remaining distance (~140-160ms when left midway)
+    const duration = Math.max(140, Math.round(dist * 240));
     const proxy = { p: startP };
     animRef.current = animate(proxy, {
       p: targetP,
-      duration: 360,
+      duration,
       ease: 'outCubic',
       onUpdate: () => {
         updateProgress(proxy.p);
@@ -546,7 +549,7 @@ export default function ViewToggle() {
           if (!isHoveredRef.current && !isDraggingRef.current) {
             setExpanded(false);
           }
-        }, 220);
+        }, 90);
       };
       el.addEventListener('wheel', onWheel, { passive: false });
       return () => {
