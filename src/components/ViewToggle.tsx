@@ -59,18 +59,27 @@ const buildMachineHtml = (): string => {
 
 const KNOB_LINE_INDICES = Array.from({ length: 30 }, (_, i) => i - 10);
 
+interface ObservatoryElements {
+  skyEl: HTMLElement | null;
+  sideRail: HTMLElement | null;
+  brackets: HTMLElement[];
+  instTL: HTMLElement | null;
+  instBL: HTMLElement | null;
+  instBR: HTMLElement | null;
+  eggHint: HTMLElement | null;
+  telemetry: HTMLElement | null;
+  otherInstruments: HTMLElement[];
+}
+
 function applyOpticalProgress(
   p: number,
   humanPlane: HTMLElement,
   machinePlane: HTMLElement,
-  skyEl: HTMLElement | null,
-  sideRail: HTMLElement | null = null,
-  viewfinder: HTMLElement | null = null,
-  instruments: HTMLElement[] = [],
+  obs: ObservatoryElements,
 ) {
   p = clampP(p);
 
-  const isMachine = p >= 0.5;
+  const isMachine = p >= 0.75;
   document.documentElement.classList.toggle('machine-mode', isMachine);
   document.body.classList.toggle('machine-mode', isMachine);
 
@@ -103,31 +112,89 @@ function applyOpticalProgress(
   const humanBlur = reduced ? 0 : Number((Math.min(1, p / 0.5) * 14).toFixed(1));
   const machineBlur = reduced ? 0 : Number((Math.min(1, (1 - p) / 0.5) * 14).toFixed(1));
 
-  // Apply optical blur, opacity, and scale to observatory background elements
+  // Focal Zoom Shift: Outward expansion of corners and margins as focal length increases (24mm -> 48mm)
+  const shift = !reduced && p > 0 ? Number((p * 24).toFixed(1)) : 0;
+  const shiftHalf = !reduced && p > 0 ? Number((p * 14).toFixed(1)) : 0;
+
+  // Apply optical blur, opacity, and radial outward shift to observatory background elements
   const applyObservatory = (opacityStr: string, blurPx: number, isSettled: boolean) => {
     const filterVal = !reduced && blurPx > 0 && !isSettled ? `blur(${blurPx}px)` : '';
 
-    if (skyEl) {
-      skyEl.style.transition = isSettled ? '' : 'none';
-      skyEl.style.opacity = opacityStr;
-      skyEl.style.filter = filterVal;
-      skyEl.style.transform = isSettled || p === 0 ? '' : `scale(${(1 + p * 0.08).toFixed(3)})`;
+    if (obs.skyEl) {
+      obs.skyEl.style.transition = isSettled ? '' : 'none';
+      obs.skyEl.style.opacity = opacityStr;
+      obs.skyEl.style.filter = filterVal;
+      obs.skyEl.style.transform = isSettled || p === 0 ? '' : `scale(${(1 + p * 0.08).toFixed(3)})`;
     }
 
-    if (sideRail) {
-      sideRail.style.transition = isSettled ? '' : 'none';
-      sideRail.style.opacity = opacityStr;
-      sideRail.style.filter = filterVal;
-      sideRail.style.pointerEvents = isSettled ? (p === 0 ? '' : 'none') : (p < 0.2 ? '' : 'none');
+    if (obs.sideRail) {
+      obs.sideRail.style.transition = isSettled ? '' : 'none';
+      obs.sideRail.style.opacity = opacityStr;
+      obs.sideRail.style.filter = filterVal;
+      obs.sideRail.style.transform = isSettled || p === 0 ? '' : `translate3d(-${shift}px, -50%, 0)`;
+      obs.sideRail.style.pointerEvents = isSettled ? (p === 0 ? '' : 'none') : (p < 0.2 ? '' : 'none');
     }
 
-    if (viewfinder) {
-      viewfinder.style.transition = isSettled ? '' : 'none';
-      viewfinder.style.opacity = opacityStr;
-      viewfinder.style.filter = filterVal;
+    // Viewfinder brackets: 4 corners expanding outward
+    if (obs.brackets.length >= 4) {
+      const [bTL, bTR, bBL, bBR] = obs.brackets;
+      [bTL, bTR, bBL, bBR].forEach((b) => {
+        b.style.transition = isSettled ? '' : 'none';
+        b.style.opacity = opacityStr;
+        b.style.filter = filterVal;
+      });
+
+      bTL.style.transform = !isSettled && shift > 0 ? `translate3d(-${shift}px, -${shift}px, 0)` : '';
+      bTR.style.transform = !isSettled && shift > 0 ? `translate3d(${shift}px, -${shift}px, 0)` : '';
+      bBL.style.transform = !isSettled && shift > 0 ? `translate3d(-${shift}px, ${shift}px, 0)` : '';
+      bBR.style.transform = !isSettled && shift > 0 ? `translate3d(${shift}px, ${shift}px, 0)` : '';
     }
 
-    instruments.forEach((inst) => {
+    // Top-Left corner instruments (Sun, Moon, Planets)
+    if (obs.instTL) {
+      obs.instTL.style.transition = isSettled ? '' : 'none';
+      obs.instTL.style.opacity = opacityStr;
+      obs.instTL.style.filter = filterVal;
+      obs.instTL.style.transform = !isSettled && shift > 0 ? `translate3d(-${shift}px, -${shift}px, 0)` : '';
+      obs.instTL.style.pointerEvents = isSettled ? (p === 0 ? '' : 'none') : (p < 0.2 ? '' : 'none');
+    }
+
+    // Bottom-Left corner instruments (Observer, Bengaluru, Sidereal)
+    if (obs.instBL) {
+      obs.instBL.style.transition = isSettled ? '' : 'none';
+      obs.instBL.style.opacity = opacityStr;
+      obs.instBL.style.filter = filterVal;
+      obs.instBL.style.transform = !isSettled && shift > 0 ? `translate3d(-${shift}px, ${shift}px, 0)` : '';
+      obs.instBL.style.pointerEvents = isSettled ? (p === 0 ? '' : 'none') : (p < 0.2 ? '' : 'none');
+    }
+
+    // Bottom-Right corner instruments (interaction hint)
+    if (obs.instBR) {
+      obs.instBR.style.transition = isSettled ? '' : 'none';
+      obs.instBR.style.opacity = opacityStr;
+      obs.instBR.style.filter = filterVal;
+      obs.instBR.style.transform = !isSettled && shift > 0 ? `translate3d(${shift}px, ${shift}px, 0)` : '';
+      obs.instBR.style.pointerEvents = isSettled ? (p === 0 ? '' : 'none') : (p < 0.2 ? '' : 'none');
+    }
+
+    // Bottom-Right easter egg (✦ orbital mechanics)
+    if (obs.eggHint) {
+      obs.eggHint.style.transition = isSettled ? '' : 'none';
+      obs.eggHint.style.opacity = opacityStr;
+      obs.eggHint.style.filter = filterVal;
+      obs.eggHint.style.transform = !isSettled && shift > 0 ? `translate3d(${shift}px, ${shift}px, 0)` : '';
+      obs.eggHint.style.pointerEvents = isSettled ? (p === 0 ? '' : 'none') : (p < 0.2 ? '' : 'none');
+    }
+
+    // Top-Center telemetry strip (ALT, STARS, JD)
+    if (obs.telemetry) {
+      obs.telemetry.style.transition = isSettled ? '' : 'none';
+      obs.telemetry.style.opacity = opacityStr;
+      obs.telemetry.style.filter = filterVal;
+      obs.telemetry.style.transform = !isSettled && shiftHalf > 0 ? `translate3d(-50%, -${shiftHalf}px, 0)` : '';
+    }
+
+    obs.otherInstruments.forEach((inst) => {
       inst.style.transition = isSettled ? '' : 'none';
       inst.style.opacity = opacityStr;
       inst.style.filter = filterVal;
@@ -141,6 +208,7 @@ function applyOpticalProgress(
     humanPlane.style.position = '';
     humanPlane.style.opacity = '1';
     humanPlane.style.filter = '';
+    humanPlane.style.transform = '';
     humanPlane.style.willChange = '';
     humanPlane.style.pointerEvents = 'auto';
 
@@ -153,6 +221,7 @@ function applyOpticalProgress(
     machinePlane.style.overflow = '';
     machinePlane.style.opacity = '0';
     machinePlane.style.filter = '';
+    machinePlane.style.transform = '';
     machinePlane.style.willChange = '';
     machinePlane.style.pointerEvents = 'none';
 
@@ -164,6 +233,7 @@ function applyOpticalProgress(
     humanPlane.style.position = '';
     humanPlane.style.opacity = '0';
     humanPlane.style.filter = '';
+    humanPlane.style.transform = '';
     humanPlane.style.willChange = '';
     humanPlane.style.pointerEvents = 'none';
 
@@ -176,6 +246,7 @@ function applyOpticalProgress(
     machinePlane.style.overflow = 'visible';
     machinePlane.style.opacity = '1';
     machinePlane.style.filter = '';
+    machinePlane.style.transform = '';
     machinePlane.style.willChange = '';
     machinePlane.style.pointerEvents = 'auto';
 
@@ -189,12 +260,15 @@ function applyOpticalProgress(
       humanPlane.style.position = '';
       humanPlane.style.opacity = humanOpacity.toFixed(3);
       humanPlane.style.filter = humanBlur > 0 ? `blur(${humanBlur}px)` : '';
-      humanPlane.style.willChange = 'filter, opacity';
+      humanPlane.style.transformOrigin = '50% 30vh';
+      humanPlane.style.transform = !reduced && p > 0 ? `scale(${(1 + p * 0.035).toFixed(3)})` : '';
+      humanPlane.style.willChange = 'filter, opacity, transform';
       humanPlane.style.pointerEvents = p < 0.3 ? 'auto' : 'none';
     } else {
       humanPlane.style.display = 'none';
       humanPlane.style.opacity = '0';
       humanPlane.style.filter = '';
+      humanPlane.style.transform = '';
       humanPlane.style.willChange = '';
       humanPlane.style.pointerEvents = 'none';
     }
@@ -209,7 +283,9 @@ function applyOpticalProgress(
       machinePlane.style.overflow = 'visible';
       machinePlane.style.opacity = machineOpacity.toFixed(3);
       machinePlane.style.filter = machineBlur > 0 ? `blur(${machineBlur}px)` : '';
-      machinePlane.style.willChange = 'filter, opacity';
+      machinePlane.style.transformOrigin = '50% 30vh';
+      machinePlane.style.transform = !reduced && p < 1 ? `scale(${(0.965 + p * 0.035).toFixed(3)})` : '';
+      machinePlane.style.willChange = 'filter, opacity, transform';
       machinePlane.style.pointerEvents = p > 0.7 ? 'auto' : 'none';
     } else {
       machinePlane.style.display = 'none';
@@ -221,6 +297,7 @@ function applyOpticalProgress(
       machinePlane.style.overflow = '';
       machinePlane.style.opacity = '0';
       machinePlane.style.filter = '';
+      machinePlane.style.transform = '';
       machinePlane.style.willChange = '';
       machinePlane.style.pointerEvents = 'none';
     }
@@ -321,11 +398,33 @@ export default function ViewToggle() {
     const machinePlane = document.querySelector('.machine-view') as HTMLElement | null;
     const skyEl = document.getElementById('sky');
     const sideRail = document.querySelector('.side-rail') as HTMLElement | null;
-    const viewfinder = document.querySelector('.viewfinder') as HTMLElement | null;
-    const instruments = Array.from(
-      document.querySelectorAll('.instrument, .sky-telemetry, .egg-hint, .chrome-panel, .mass-note'),
+    const brackets = Array.from(
+      document.querySelectorAll('.viewfinder i'),
     ) as HTMLElement[];
-    return { humanPlane, machinePlane, skyEl, sideRail, viewfinder, instruments };
+    const instTL = document.querySelector('.instrument-tl') as HTMLElement | null;
+    const instBL = document.querySelector('.instrument-l') as HTMLElement | null;
+    const instBR = document.querySelector('.instrument-r') as HTMLElement | null;
+    const eggHint = document.querySelector('.egg-hint') as HTMLElement | null;
+    const telemetry = document.querySelector('.sky-telemetry') as HTMLElement | null;
+    const otherInstruments = Array.from(
+      document.querySelectorAll('.chrome-panel, .mass-note'),
+    ) as HTMLElement[];
+
+    return {
+      humanPlane,
+      machinePlane,
+      obs: {
+        skyEl,
+        sideRail,
+        brackets,
+        instTL,
+        instBL,
+        instBR,
+        eggHint,
+        telemetry,
+        otherInstruments,
+      },
+    };
   };
 
   const ensureMachineLoaded = (machinePlane: HTMLElement | null) => {
@@ -356,10 +455,10 @@ export default function ViewToggle() {
       mobileLinesRef.current.style.transform = `translate3d(${offset}px, 0, 0)`;
     }
 
-    const { humanPlane, machinePlane, skyEl, sideRail, viewfinder, instruments } = getPlanes();
+    const { humanPlane, machinePlane, obs } = getPlanes();
     if (humanPlane && machinePlane) {
       ensureMachineLoaded(machinePlane);
-      applyOpticalProgress(clamped, humanPlane, machinePlane, skyEl, sideRail, viewfinder, instruments);
+      applyOpticalProgress(clamped, humanPlane, machinePlane, obs);
     }
   }, []);
 
