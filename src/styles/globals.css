@@ -417,10 +417,8 @@ body.machine-mode #sky {
    render at an effective 0.06 alpha. pointer-events go with it, so a drag
    crossing a link cannot navigate mid-throw. The game's own toolbar lives
    outside .human-view and stays at full strength. */
-.human-view {
-  transition: opacity 0.4s var(--ease-out);
-}
 body.playing .human-view {
+  transition: opacity 0.4s var(--ease-out);
   pointer-events: none;
 }
 /* On paper, 0.3 is not receding -- it is grey text on a grey ground with
@@ -438,7 +436,7 @@ body.playing .human-view {
   .mass-note { animation: none; }
 }
 
-/* No text selection anywhere in game mode. Gated on .playing alone, not just
+/* No text selection anywhere in game mode or during focal switcher drag. Gated on .playing alone, not just
    .grabbing — a drag that starts on empty sky (sky-travel) never sets
    .grabbing, so gating on that alone would still let the page highlight. */
 body.playing,
@@ -446,9 +444,11 @@ body.playing *,
 body.grabbing,
 body.grabbing *,
 body.spinning,
-body.spinning * {
-  user-select: none;
-  -webkit-user-select: none;
+body.spinning *,
+body.cur-focal-dragging,
+body.cur-focal-dragging * {
+  user-select: none !important;
+  -webkit-user-select: none !important;
 }
 
 /* Custom cursor: a small ring that trails the pointer with a hard dot at the
@@ -549,6 +549,25 @@ body.spinning * {
   body.grabbing #sky-cursor-ring {
     --ring-s: 0.692;
     border-color: var(--primary);
+  }
+  /* Focal switcher: calibrated optical reticle on hover, tight mechanical grip on drag */
+  body.cur-focal #sky-cursor-ring {
+    --ring-s: 0.82;
+    border-color: var(--primary);
+    border-width: 1.5px;
+  }
+  body.cur-focal #sky-cursor-dot {
+    background: var(--primary);
+  }
+  body.cur-focal-dragging #sky-cursor-ring {
+    --ring-s: 0.52 !important;
+    border-color: var(--primary) !important;
+    border-width: 2px !important;
+    box-shadow: 0 0 10px rgba(127, 168, 245, 0.45);
+  }
+  body.cur-focal-dragging #sky-cursor-dot {
+    background: var(--primary) !important;
+    transform: scale(1.25);
   }
 }
 @media (hover: none), (pointer: coarse) {

@@ -65,6 +65,10 @@ function applyOpticalProgress(
 ) {
   p = clampP(p);
 
+  humanPlane.style.transition = 'none';
+  machinePlane.style.transition = 'none';
+  if (skyEl) skyEl.style.transition = 'none';
+
   // Both planes visible during transit
   humanPlane.style.display = p === 1 ? 'none' : 'block';
   machinePlane.style.display = p === 0 ? 'none' : 'block';
@@ -76,18 +80,18 @@ function applyOpticalProgress(
     machinePlane.classList.remove('view-overlay');
   }
 
-  // Final states: restore clean, unblurred in-flow styling
+  // Final states: restore clean in-flow styling
   if (p === 0) {
     humanPlane.style.transformOrigin = '';
     humanPlane.style.transform = '';
-    humanPlane.style.filter = 'none';
+    humanPlane.style.filter = '';
     humanPlane.style.opacity = '1';
     humanPlane.style.pointerEvents = 'auto';
     humanPlane.style.willChange = '';
 
     machinePlane.style.transformOrigin = '';
     machinePlane.style.transform = '';
-    machinePlane.style.filter = 'none';
+    machinePlane.style.filter = '';
     machinePlane.style.opacity = '0';
     machinePlane.style.pointerEvents = 'none';
     machinePlane.style.willChange = '';
@@ -95,6 +99,7 @@ function applyOpticalProgress(
     if (skyEl) {
       skyEl.style.transform = '';
       skyEl.style.opacity = '1';
+      skyEl.style.transition = '';
     }
 
     document.documentElement.classList.remove('machine-mode');
@@ -105,14 +110,14 @@ function applyOpticalProgress(
   if (p === 1) {
     humanPlane.style.transformOrigin = '';
     humanPlane.style.transform = '';
-    humanPlane.style.filter = 'none';
+    humanPlane.style.filter = '';
     humanPlane.style.opacity = '0';
     humanPlane.style.pointerEvents = 'none';
     humanPlane.style.willChange = '';
 
     machinePlane.style.transformOrigin = '';
     machinePlane.style.transform = '';
-    machinePlane.style.filter = 'none';
+    machinePlane.style.filter = '';
     machinePlane.style.opacity = '1';
     machinePlane.style.pointerEvents = 'auto';
     machinePlane.style.height = 'auto';
@@ -122,6 +127,7 @@ function applyOpticalProgress(
     if (skyEl) {
       skyEl.style.transform = '';
       skyEl.style.opacity = '0';
+      skyEl.style.transition = '';
     }
 
     document.documentElement.classList.add('machine-mode');
@@ -129,39 +135,20 @@ function applyOpticalProgress(
     return;
   }
 
-  // Active transit: Focus Breathing (anchored at 50% 15vh)
-  const humanScale = (1 + p * 0.035).toFixed(4);
-  const machineScale = (0.965 + p * 0.035).toFixed(4);
+  // Active transit: Pure GPU Composited Opacity Crossfade (120 FPS buttery smooth)
+  humanPlane.style.willChange = 'opacity';
+  humanPlane.style.opacity = (1 - p).toFixed(3);
+  humanPlane.style.pointerEvents = p < 0.5 ? 'auto' : 'none';
 
-  // Optical Blur: Smooth continuous Gaussian blur without drop-shadow shader invalidation
-  const humanBlur = (p * 10).toFixed(1);
-  const machineBlur = ((1 - p) * 10).toFixed(1);
-
-  // Opacity Crossfade
-  const humanOpacity = Math.max(0, 1 - p * 1.4).toFixed(3);
-  const machineOpacity = Math.max(0, (p - 0.2) * 1.25).toFixed(3);
-
-  humanPlane.style.willChange = 'transform, filter, opacity';
-  humanPlane.style.transformOrigin = '50% 15vh';
-  humanPlane.style.transform = `scale(${humanScale})`;
-  humanPlane.style.filter = Number(humanBlur) > 0.1 ? `blur(${humanBlur}px)` : 'none';
-  humanPlane.style.opacity = humanOpacity;
-  humanPlane.style.pointerEvents = p < 0.35 ? 'auto' : 'none';
-
-  machinePlane.style.willChange = 'transform, filter, opacity';
-  machinePlane.style.transformOrigin = '50% 15vh';
-  machinePlane.style.transform = `scale(${machineScale})`;
-  machinePlane.style.filter = Number(machineBlur) > 0.1 ? `blur(${machineBlur}px)` : 'none';
-  machinePlane.style.opacity = machineOpacity;
-  machinePlane.style.pointerEvents = p > 0.65 ? 'auto' : 'none';
+  machinePlane.style.willChange = 'opacity';
+  machinePlane.style.opacity = p.toFixed(3);
+  machinePlane.style.pointerEvents = p >= 0.5 ? 'auto' : 'none';
   machinePlane.style.height = 'auto';
   machinePlane.style.overflow = 'visible';
 
-  // Astronomy Sky Canvas FOV Reactivity & Alpha
+  // Astronomy Sky Canvas Alpha
   if (skyEl) {
-    const skyScale = (1 + p * 0.08).toFixed(3);
-    skyEl.style.transform = `scale(${skyScale})`;
-    skyEl.style.opacity = Math.max(0, 1 - p * 1.25).toFixed(3);
+    skyEl.style.opacity = (1 - p).toFixed(3);
   }
 
   // Class toggles on html and body (machine-mode when p > 0.5)
@@ -276,7 +263,7 @@ export default function ViewToggle() {
     const proxy = { p: startP };
     animRef.current = animate(proxy, {
       p: targetP,
-      duration: 320,
+      duration: 360,
       ease: 'outCubic',
       onUpdate: () => {
         updateProgress(proxy.p);
@@ -330,7 +317,28 @@ export default function ViewToggle() {
     };
   }, [updateProgress]);
 
+  // Window-level safety cleanup for dragging and cursor states
+  useEffect(() => {
+    const onGlobalPointerUp = () => {
+      if (isDraggingRef.current) {
+        isDraggingRef.current = false;
+        document.body.classList.remove('cur-focal-dragging');
+      }
+    };
+    window.addEventListener('pointerup', onGlobalPointerUp);
+    window.addEventListener('pointercancel', onGlobalPointerUp);
+    return () => {
+      window.removeEventListener('pointerup', onGlobalPointerUp);
+      window.removeEventListener('pointercancel', onGlobalPointerUp);
+      document.body.classList.remove('cur-focal');
+      document.body.classList.remove('cur-focal-dragging');
+    };
+  }, []);
+
   const handlePointerDown = (e: React.PointerEvent, isVert: boolean) => {
+    e.preventDefault();
+    window.getSelection()?.removeAllRanges();
+    document.body.classList.add('cur-focal-dragging');
     const target = e.currentTarget as HTMLElement;
     isDraggingRef.current = true;
     dragStartCoordRef.current = isVert ? e.clientY : e.clientX;
@@ -357,6 +365,7 @@ export default function ViewToggle() {
   };
 
   const handlePointerUp = (e: React.PointerEvent, isVert: boolean) => {
+    document.body.classList.remove('cur-focal-dragging');
     if (!isDraggingRef.current) return;
     isDraggingRef.current = false;
     if (rafIdRef.current !== null) {
@@ -429,6 +438,14 @@ export default function ViewToggle() {
   return (
     <div
       className="fixed bottom-4 left-1/2 -translate-x-1/2 lg:bottom-auto lg:left-auto lg:right-9 lg:top-1/2 lg:-translate-y-1/2 lg:translate-x-0 z-[1100] select-none pointer-events-auto"
+      onPointerEnter={() => {
+        document.body.classList.add('cur-focal');
+      }}
+      onPointerLeave={() => {
+        if (!isDraggingRef.current) {
+          document.body.classList.remove('cur-focal');
+        }
+      }}
     >
       {/* Desktop Layout: Stacked Labels on the LEFT, Bar on the RIGHT */}
       <div className="hidden lg:flex items-center gap-2.5">

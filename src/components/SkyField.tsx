@@ -252,7 +252,6 @@ export default function SkyField({ mode }: SkyFieldProps) {
   // `cursor: none`) is added only once the loop is confirmed running, so a
   // failure here can never leave a visitor with no pointer at all.
   useEffect(() => {
-    if (machine) return;
     const fine = window.matchMedia('(hover: hover) and (pointer: fine)');
     const still = window.matchMedia('(prefers-reduced-motion: reduce)');
     if (!fine.matches || still.matches) return;
@@ -280,6 +279,10 @@ export default function SkyField({ mode }: SkyFieldProps) {
       dot.style.transform = `translate3d(${x}px, ${y}px, 0)`;
       const t = e.target as Element | null;
       document.body.classList.toggle('cur-ui', !!t?.closest?.(INTERACTIVE));
+      document.body.classList.toggle(
+        'cur-focal',
+        !!t?.closest?.('[aria-label="View mode"], [role="slider"], [aria-label*="Human view"], [aria-label*="Machine view"]'),
+      );
     };
     const onDown = () => { ring.style.opacity = '0.7'; };
     const onUp = () => { ring.style.opacity = '1'; };
@@ -308,7 +311,7 @@ export default function SkyField({ mode }: SkyFieldProps) {
       document.removeEventListener('pointerenter', onEnter);
       document.documentElement.classList.remove('cursor-custom');
     };
-  }, [machine]);
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -1052,12 +1055,8 @@ export default function SkyField({ mode }: SkyFieldProps) {
         </>
       )}
 
-      {!machine && (
-        <>
-          <div ref={cursorRingRef} id="sky-cursor-ring" aria-hidden="true" />
-          <div ref={cursorDotRef} id="sky-cursor-dot" aria-hidden="true" />
-        </>
-      )}
+      <div ref={cursorRingRef} id="sky-cursor-ring" aria-hidden="true" />
+      <div ref={cursorDotRef} id="sky-cursor-dot" aria-hidden="true" />
     </>
   );
 }
