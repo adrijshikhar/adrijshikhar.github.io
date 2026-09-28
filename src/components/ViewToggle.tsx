@@ -210,16 +210,16 @@ export default function ViewToggle() {
   const getTravel = useCallback(() => {
     if (!trackRef.current) {
       return isDesktop
-        ? { start: 12, end: 100, span: 88, isVert: true }
-        : { start: 56, end: 248, span: 192, isVert: false };
+        ? { start: 26, end: 104, span: 78, isVert: true }
+        : { start: 56, end: 204, span: 148, isVert: false };
     }
     const r = trackRef.current.getBoundingClientRect();
     if (isDesktop) {
-      const start = 12;
-      const end = (r.height || 112) - 12;
+      const start = 26;
+      const end = 104;
       return { start, end, span: Math.max(1, end - start), isVert: true };
     } else {
-      const trackW = r.width || 320;
+      const trackW = r.width || 260;
       if (humanBtnRef.current && machineBtnRef.current) {
         const hRect = humanBtnRef.current.getBoundingClientRect();
         const mRect = machineBtnRef.current.getBoundingClientRect();
@@ -227,7 +227,7 @@ export default function ViewToggle() {
         const x48 = mRect.left + mRect.width / 2 - r.left;
         return { start: x24, end: x48, span: Math.max(1, x48 - x24), isVert: false };
       }
-      return { start: 56, end: trackW - 56, span: Math.max(1, trackW - 112), isVert: false };
+      return { start: 52, end: trackW - 52, span: Math.max(1, trackW - 104), isVert: false };
     }
   }, [isDesktop]);
 
@@ -474,7 +474,7 @@ export default function ViewToggle() {
       {/* Reticle Track: Subtle etched graduation line (horizontal on mobile, vertical on desktop) */}
       <div
         ref={trackRef}
-        className="relative w-full h-5 lg:w-6 lg:h-28 cursor-ew-resize lg:cursor-ns-resize mt-0.5 lg:my-1"
+        className="relative w-full h-5 lg:w-6 lg:h-[130px] cursor-ew-resize lg:cursor-ns-resize mt-0.5 lg:my-1"
         style={{ touchAction: 'none' }}
         role="slider"
         tabIndex={0}
@@ -489,92 +489,44 @@ export default function ViewToggle() {
         onPointerCancel={handlePointerUp}
         onKeyDown={handleKeyDown}
       >
-        {/* Static Graduation Ticks with tapered roll fade */}
+        {/* Static Graduation Ticks with tapered roll fade - 1:1 match with .viewfinder u */}
         <div
-          className="relative w-full h-full pointer-events-none overflow-hidden"
-          style={{
-            maskImage: isDesktop
-              ? 'linear-gradient(180deg, transparent 0%, black 16%, black 84%, transparent 100%)'
-              : 'linear-gradient(90deg, transparent 0%, black 14%, black 86%, transparent 100%)',
-            WebkitMaskImage: isDesktop
-              ? 'linear-gradient(180deg, transparent 0%, black 16%, black 84%, transparent 100%)'
-              : 'linear-gradient(90deg, transparent 0%, black 14%, black 86%, transparent 100%)',
-          }}
-        >
-          {isDesktop ? (
-            <svg
-              viewBox="0 0 24 112"
-              className="w-full h-full overflow-visible"
-              preserveAspectRatio="none"
-            >
-              {Array.from({ length: 29 }).map((_, k) => {
-                const y = (k / 28) * 112;
-                const isDetent = k === 3 || k === 25;
-                const isMajor = k % 4 === 3;
-                const w = isDetent ? 18 : isMajor ? 14 : 8;
-                const x1 = (24 - w) / 2;
-                const x2 = x1 + w;
-                const strokeOpacity = isDetent ? 0.65 : isMajor ? 0.45 : 0.2;
-                return (
-                  <line
-                    key={k}
-                    x1={x1}
-                    y1={y}
-                    x2={x2}
-                    y2={y}
-                    stroke="var(--muted-foreground)"
-                    strokeOpacity={strokeOpacity}
-                    strokeWidth={1}
-                    strokeLinecap="square"
-                  />
-                );
-              })}
-            </svg>
-          ) : (
-            <svg
-              viewBox="0 0 320 16"
-              className="w-full h-full overflow-visible"
-              preserveAspectRatio="none"
-            >
-              {Array.from({ length: 41 }).map((_, k) => {
-                const x = (k / 40) * 320;
-                const isMajorGraduation = k % 4 === 0;
-                const height = isMajorGraduation ? 7 : 4;
-                const strokeOpacity = isMajorGraduation ? 0.45 : 0.2;
-                return (
-                  <line
-                    key={k}
-                    x1={x}
-                    y1={0}
-                    x2={x}
-                    y2={height}
-                    stroke="var(--muted-foreground)"
-                    strokeOpacity={strokeOpacity}
-                    strokeWidth={1}
-                    strokeLinecap="square"
-                  />
-                );
-              })}
-            </svg>
-          )}
-        </div>
+          className="mx-auto pointer-events-none"
+          style={
+            isDesktop
+              ? {
+                  width: '6px',
+                  height: '130px',
+                  background:
+                    'repeating-linear-gradient(180deg, var(--muted-foreground) 0 1px, transparent 1px 100%) 0 0 / 100% 26px',
+                  WebkitMaskImage:
+                    'linear-gradient(180deg, transparent 0%, #000 20%, #000 80%, transparent 100%)',
+                  maskImage:
+                    'linear-gradient(180deg, transparent 0%, #000 20%, #000 80%, transparent 100%)',
+                }
+              : {
+                  width: 'min(calc(100vw - 48px), 260px)',
+                  height: '6px',
+                  background:
+                    'repeating-linear-gradient(90deg, var(--muted-foreground) 0 1px, transparent 1px 100%) 0 0 / 26px 100%',
+                  WebkitMaskImage:
+                    'linear-gradient(90deg, transparent 0%, #000 20%, #000 80%, transparent 100%)',
+                  maskImage:
+                    'linear-gradient(90deg, transparent 0%, #000 20%, #000 80%, transparent 100%)',
+                }
+          }
+        />
 
         {/* The Highlighted Simple Line Identifier that moves between the two modes */}
         {isDesktop ? (
           <div
             ref={indicatorRef}
-            className="absolute top-0 left-[3px] w-[18px] h-[2px] bg-primary will-change-transform pointer-events-none z-10 rounded-[0.5px]"
-            style={{
-              boxShadow: '0 0 6px var(--primary)',
-            }}
+            className="absolute top-0 left-[9px] w-[6px] h-[1px] bg-primary will-change-transform pointer-events-none z-10"
           />
         ) : (
           <div
             ref={indicatorRef}
-            className="absolute top-0 left-0 w-[2px] h-3.5 bg-primary will-change-transform pointer-events-none z-10 rounded-[0.5px]"
-            style={{
-              boxShadow: '0 0 5px var(--primary)',
-            }}
+            className="absolute top-0 left-0 w-[1px] h-[6px] bg-primary will-change-transform pointer-events-none z-10"
           />
         )}
       </div>
