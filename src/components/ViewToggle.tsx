@@ -204,6 +204,8 @@ export default function ViewToggle() {
   const pendingCoordRef = useRef(0);
   const rafIdRef = useRef<number | null>(null);
   const machineLoadedRef = useRef(false);
+  const desktopContainerRef = useRef<HTMLDivElement>(null);
+  const mobileContainerRef = useRef<HTMLDivElement>(null);
   const desktopTrackRef = useRef<HTMLDivElement>(null);
   const mobileTrackRef = useRef<HTMLDivElement>(null);
   const desktopLinesRef = useRef<HTMLDivElement>(null);
@@ -425,8 +427,8 @@ export default function ViewToggle() {
       };
     };
 
-    const cleanupDesktop = attachWheel(desktopTrackRef.current, true);
-    const cleanupMobile = attachWheel(mobileTrackRef.current, false);
+    const cleanupDesktop = attachWheel(desktopContainerRef.current, true);
+    const cleanupMobile = attachWheel(mobileContainerRef.current, false);
     return () => {
       cleanupDesktop();
       cleanupMobile();
@@ -586,7 +588,10 @@ export default function ViewToggle() {
       }}
     >
       {/* Desktop Layout: Stacked Labels on the LEFT, Bar on the RIGHT */}
-      <div className="hidden lg:flex items-center gap-2.5">
+      <div
+        ref={desktopContainerRef}
+        className="hidden lg:flex items-center gap-2.5"
+      >
         {/* Desktop Labels Column: Expands to the left on hover */}
         <div
           ref={labelColRef}
@@ -746,7 +751,10 @@ export default function ViewToggle() {
       </div>
 
       {/* Mobile Layout: Horizontal bar in center, 24mm on left, 48mm on right */}
-      <div className="flex lg:hidden items-center gap-2 sm:gap-3">
+      <div
+        ref={mobileContainerRef}
+        className="flex lg:hidden items-center gap-2 sm:gap-3"
+      >
         <button
           type="button"
           onClick={() => snapTo(0.0)}
