@@ -178,9 +178,10 @@ function applyOpticalProgress(
 
 export default function ViewToggle() {
   const [progress, setProgress] = useState(0.0);
+  const [isDesktop, setIsDesktop] = useState(false);
   const currentProgressRef = useRef(0.0);
   const isDraggingRef = useRef(false);
-  const dragStartXRef = useRef(0);
+  const dragStartCoordRef = useRef(0);
   const dragStartPRef = useRef(0);
   const machineLoadedRef = useRef(false);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -206,19 +207,29 @@ export default function ViewToggle() {
     }
   };
 
-  const getDetents = useCallback(() => {
-    if (!trackRef.current) return { x24: 56, x48: 248, span: 192 };
-    const trackRect = trackRef.current.getBoundingClientRect();
-    const trackW = trackRect.width || 320;
-    if (humanBtnRef.current && machineBtnRef.current) {
-      const hRect = humanBtnRef.current.getBoundingClientRect();
-      const mRect = machineBtnRef.current.getBoundingClientRect();
-      const x24 = hRect.left + hRect.width / 2 - trackRect.left;
-      const x48 = mRect.left + mRect.width / 2 - trackRect.left;
-      return { x24, x48, span: Math.max(1, x48 - x24) };
+  const getTravel = useCallback(() => {
+    if (!trackRef.current) {
+      return isDesktop
+        ? { start: 12, end: 100, span: 88, isVert: true }
+        : { start: 56, end: 248, span: 192, isVert: false };
     }
-    return { x24: 56, x48: trackW - 56, span: Math.max(1, trackW - 112) };
-  }, []);
+    const r = trackRef.current.getBoundingClientRect();
+    if (isDesktop) {
+      const start = 12;
+      const end = (r.height || 112) - 12;
+      return { start, end, span: Math.max(1, end - start), isVert: true };
+    } else {
+      const trackW = r.width || 320;
+      if (humanBtnRef.current && machineBtnRef.current) {
+        const hRect = humanBtnRef.current.getBoundingClientRect();
+        const mRect = machineBtnRef.current.getBoundingClientRect();
+        const x24 = hRect.left + hRect.width / 2 - r.left;
+        const x48 = mRect.left + mRect.width / 2 - r.left;
+        return { start: x24, end: x48, span: Math.max(1, x48 - x24), isVert: false };
+      }
+      return { start: 56, end: trackW - 56, span: Math.max(1, trackW - 112), isVert: false };
+    }
+  }, [isDesktop]);
 
   const updateProgress = useCallback((p: number) => {
     const clamped = clampP(p);
@@ -227,9 +238,13 @@ export default function ViewToggle() {
 
     // Position the highlighted line identifier between the two modes
     if (indicatorRef.current) {
-      const { x24, x48 } = getDetents();
-      const currentX = x24 + clamped * (x48 - x24);
-      indicatorRef.current.style.transform = `translateX(${currentX}px) translateX(-50%)`;
+      const { start, end, isVert } = getTravel();
+      const currentPos = start + clamped * (end - start);
+      if (isVert) {
+        indicatorRef.current.style.transform = `translateY(${currentPos}px)`;
+      } else {
+        indicatorRef.current.style.transform = `translateX(${currentPos}px) translateX(-50%)`;
+      }
     }
 
     const { humanPlane, machinePlane, skyEl } = getPlanes();
@@ -237,7 +252,7 @@ export default function ViewToggle() {
       ensureMachineLoaded(machinePlane);
       applyOpticalProgress(clamped, humanPlane, machinePlane, skyEl);
     }
-  }, [getDetents]);
+  }, [getTravel]);
 
   const finalizeSettle = (targetP: number) => {
     updateProgress(targetP);
@@ -299,8 +314,10 @@ export default function ViewToggle() {
 
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
-      const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-      const nextP = clampP(currentProgressRef.current + delta * 0.0025);
+      const delta = isDesktop
+        ? e.deltaY
+        : (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY);
+      const nextP = clampP(currentProgressRef.current + delta * 0.003);
       updateProgress(nextP);
 
       if (settleTimerRef.current) clearTimeout(settleTimerRef.current);
@@ -312,12 +329,12 @@ export default function ViewToggle() {
 
     el.addEventListener('wheel', onWheel, { passive: false });
     return () => el.removeEventListener('wheel', onWheel);
-  }, [updateProgress]);
+  }, [updateProgress, isDesktop]);
 
   const handlePointerDown = (e: React.PointerEvent) => {
     if (!trackRef.current) return;
     isDraggingRef.current = true;
-    dragStartXRef.current = e.clientX;
+    dragStartCoordRef.current = isDesktop ? e.clientY : e.clientX;
     dragStartPRef.current = currentProgressRef.current;
     trackRef.current.setPointerCapture(e.pointerId);
     if (animRef.current) {
@@ -328,10 +345,11 @@ export default function ViewToggle() {
 
   const handlePointerMove = (e: React.PointerEvent) => {
     if (!isDraggingRef.current) return;
-    const deltaX = e.clientX - dragStartXRef.current;
-    const { span } = getDetents();
-    // Dragging right advances progress towards 48mm Machine mode
-    const rawP = dragStartPRef.current + deltaX / span;
+    const delta = isDesktop
+      ? (e.clientY - dragStartCoordRef.current)
+      : (e.clientX - dragStartCoordRef.current);
+    const { span } = getTravel();
+    const rawP = dragStartPRef.current + delta / span;
     updateProgress(clampP(rawP));
   };
 
@@ -342,14 +360,20 @@ export default function ViewToggle() {
       trackRef.current.releasePointerCapture(e.pointerId);
     } catch {}
 
-    const deltaX = e.clientX - dragStartXRef.current;
-    if (Math.abs(deltaX) < 5) {
-      // Direct tap on track: snap to whichever mode is closer
-      const trackRect = trackRef.current.getBoundingClientRect();
-      const clickX = e.clientX - trackRect.left;
-      const { x24, x48 } = getDetents();
-      const mid = (x24 + x48) / 2;
-      snapTo(clickX < mid ? 0.0 : 1.0);
+    const delta = isDesktop
+      ? Math.abs(e.clientY - dragStartCoordRef.current)
+      : Math.abs(e.clientX - dragStartCoordRef.current);
+    if (delta < 5) {
+      const rect = trackRef.current.getBoundingClientRect();
+      if (isDesktop) {
+        const clickY = e.clientY - rect.top;
+        const mid = rect.height / 2;
+        snapTo(clickY < mid ? 0.0 : 1.0);
+      } else {
+        const clickX = e.clientX - rect.left;
+        const mid = rect.width / 2;
+        snapTo(clickX < mid ? 0.0 : 1.0);
+      }
       return;
     }
 
@@ -358,10 +382,10 @@ export default function ViewToggle() {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
       e.preventDefault();
       snapTo(0.0);
-    } else if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+    } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
       e.preventDefault();
       snapTo(1.0);
     } else if (e.key === 'Home') {
@@ -391,6 +415,18 @@ export default function ViewToggle() {
     document.documentElement.classList.remove('machine-boot');
   }, [updateProgress]);
 
+  // Media query listener for desktop vertical layout
+  useEffect(() => {
+    const mql = window.matchMedia('(min-width: 1024px)');
+    setIsDesktop(mql.matches);
+    const handler = (e: MediaQueryListEvent) => {
+      setIsDesktop(e.matches);
+      setTimeout(() => updateProgress(currentProgressRef.current), 50);
+    };
+    mql.addEventListener('change', handler);
+    return () => mql.removeEventListener('change', handler);
+  }, [updateProgress]);
+
   // Initial alignment on mount and window resize
   useEffect(() => {
     const align = () => updateProgress(currentProgressRef.current);
@@ -401,15 +437,15 @@ export default function ViewToggle() {
 
   return (
     <div
-      className="fixed bottom-4 left-1/2 -translate-x-1/2 lg:bottom-auto lg:left-auto lg:right-6 xl:right-10 lg:top-1/2 lg:-translate-y-1/2 lg:translate-x-0 z-[1100] flex flex-col items-center select-none w-[min(calc(100vw-32px),320px)] pointer-events-auto"
+      className="fixed bottom-4 left-1/2 -translate-x-1/2 lg:bottom-auto lg:left-auto lg:right-6 xl:right-10 lg:top-1/2 lg:-translate-y-1/2 lg:translate-x-0 z-[1100] flex flex-col items-center select-none w-[min(calc(100vw-32px),320px)] lg:w-auto pointer-events-auto"
     >
-      {/* Endpoints Row: 24mm and 48mm always present at the two ends */}
-      <div className="flex justify-between items-center w-full px-2 text-[11px] font-mono tracking-wider">
+      {/* Top / Left: 24mm Human Button */}
+      <div className="w-full flex justify-between items-center px-2 lg:px-0 lg:w-auto lg:flex-col">
         <button
           ref={humanBtnRef}
           type="button"
           onClick={() => snapTo(0.0)}
-          className={`tap-44 flex items-center transition-colors cursor-pointer ${
+          className={`tap-44 flex items-center transition-colors cursor-pointer text-[11px] font-mono tracking-wider ${
             progress < 0.5 ? 'text-foreground font-medium' : 'text-muted-foreground hover:text-foreground'
           }`}
           aria-label="24mm Human view"
@@ -419,11 +455,12 @@ export default function ViewToggle() {
           <span className={`text-primary transition-opacity ${progress < 0.5 ? 'opacity-100' : 'opacity-0'}`}>]</span>
         </button>
 
+        {/* On mobile, machine button is in the same row; on desktop, it's below the track */}
         <button
           ref={machineBtnRef}
           type="button"
           onClick={() => snapTo(1.0)}
-          className={`tap-44 flex items-center transition-colors cursor-pointer ${
+          className={`tap-44 flex items-center transition-colors cursor-pointer text-[11px] font-mono tracking-wider lg:hidden ${
             progress >= 0.5 ? 'text-foreground font-medium' : 'text-muted-foreground hover:text-foreground'
           }`}
           aria-label="48mm Machine view"
@@ -434,15 +471,11 @@ export default function ViewToggle() {
         </button>
       </div>
 
-      {/* Reticle Track: Static subtle etched graduation line between the two ends */}
+      {/* Reticle Track: Subtle etched graduation line (horizontal on mobile, vertical on desktop) */}
       <div
         ref={trackRef}
-        className="relative w-full h-5 overflow-hidden cursor-ew-resize mt-0.5"
-        style={{
-          maskImage: 'linear-gradient(90deg, transparent 0%, black 14%, black 86%, transparent 100%)',
-          WebkitMaskImage: 'linear-gradient(90deg, transparent 0%, black 14%, black 86%, transparent 100%)',
-          touchAction: 'none',
-        }}
+        className="relative w-full h-5 lg:w-6 lg:h-28 cursor-ew-resize lg:cursor-ns-resize mt-0.5 lg:my-1"
+        style={{ touchAction: 'none' }}
         role="slider"
         tabIndex={0}
         aria-label="Optical focal length"
@@ -456,44 +489,109 @@ export default function ViewToggle() {
         onPointerCancel={handlePointerUp}
         onKeyDown={handleKeyDown}
       >
-        {/* Static Graduation Ticks */}
-        <div className="relative w-full h-full pointer-events-none">
-          <svg
-            viewBox="0 0 320 16"
-            className="w-full h-full overflow-visible"
-            preserveAspectRatio="none"
-          >
-            {Array.from({ length: 41 }).map((_, k) => {
-              const x = (k / 40) * 320;
-              const isMajorGraduation = k % 4 === 0;
-              const height = isMajorGraduation ? 7 : 4;
-              const strokeOpacity = isMajorGraduation ? 0.45 : 0.2;
-              return (
-                <line
-                  key={k}
-                  x1={x}
-                  y1={0}
-                  x2={x}
-                  y2={height}
-                  stroke="var(--muted-foreground)"
-                  strokeOpacity={strokeOpacity}
-                  strokeWidth={1}
-                  strokeLinecap="square"
-                />
-              );
-            })}
-          </svg>
+        {/* Static Graduation Ticks with tapered roll fade */}
+        <div
+          className="relative w-full h-full pointer-events-none overflow-hidden"
+          style={{
+            maskImage: isDesktop
+              ? 'linear-gradient(180deg, transparent 0%, black 16%, black 84%, transparent 100%)'
+              : 'linear-gradient(90deg, transparent 0%, black 14%, black 86%, transparent 100%)',
+            WebkitMaskImage: isDesktop
+              ? 'linear-gradient(180deg, transparent 0%, black 16%, black 84%, transparent 100%)'
+              : 'linear-gradient(90deg, transparent 0%, black 14%, black 86%, transparent 100%)',
+          }}
+        >
+          {isDesktop ? (
+            <svg
+              viewBox="0 0 24 112"
+              className="w-full h-full overflow-visible"
+              preserveAspectRatio="none"
+            >
+              {Array.from({ length: 29 }).map((_, k) => {
+                const y = (k / 28) * 112;
+                const isDetent = k === 3 || k === 25;
+                const isMajor = k % 4 === 3;
+                const w = isDetent ? 18 : isMajor ? 14 : 8;
+                const x1 = (24 - w) / 2;
+                const x2 = x1 + w;
+                const strokeOpacity = isDetent ? 0.65 : isMajor ? 0.45 : 0.2;
+                return (
+                  <line
+                    key={k}
+                    x1={x1}
+                    y1={y}
+                    x2={x2}
+                    y2={y}
+                    stroke="var(--muted-foreground)"
+                    strokeOpacity={strokeOpacity}
+                    strokeWidth={1}
+                    strokeLinecap="square"
+                  />
+                );
+              })}
+            </svg>
+          ) : (
+            <svg
+              viewBox="0 0 320 16"
+              className="w-full h-full overflow-visible"
+              preserveAspectRatio="none"
+            >
+              {Array.from({ length: 41 }).map((_, k) => {
+                const x = (k / 40) * 320;
+                const isMajorGraduation = k % 4 === 0;
+                const height = isMajorGraduation ? 7 : 4;
+                const strokeOpacity = isMajorGraduation ? 0.45 : 0.2;
+                return (
+                  <line
+                    key={k}
+                    x1={x}
+                    y1={0}
+                    x2={x}
+                    y2={height}
+                    stroke="var(--muted-foreground)"
+                    strokeOpacity={strokeOpacity}
+                    strokeWidth={1}
+                    strokeLinecap="square"
+                  />
+                );
+              })}
+            </svg>
+          )}
         </div>
 
         {/* The Highlighted Simple Line Identifier that moves between the two modes */}
-        <div
-          ref={indicatorRef}
-          className="absolute top-0 left-0 w-[2px] h-3.5 bg-primary will-change-transform pointer-events-none z-10 rounded-[0.5px]"
-          style={{
-            boxShadow: '0 0 5px var(--primary)',
-          }}
-        />
+        {isDesktop ? (
+          <div
+            ref={indicatorRef}
+            className="absolute top-0 left-[3px] w-[18px] h-[2px] bg-primary will-change-transform pointer-events-none z-10 rounded-[0.5px]"
+            style={{
+              boxShadow: '0 0 6px var(--primary)',
+            }}
+          />
+        ) : (
+          <div
+            ref={indicatorRef}
+            className="absolute top-0 left-0 w-[2px] h-3.5 bg-primary will-change-transform pointer-events-none z-10 rounded-[0.5px]"
+            style={{
+              boxShadow: '0 0 5px var(--primary)',
+            }}
+          />
+        )}
       </div>
+
+      {/* On desktop: 48mm Machine button is beneath the vertical track */}
+      <button
+        type="button"
+        onClick={() => snapTo(1.0)}
+        className={`tap-44 hidden lg:flex items-center transition-colors cursor-pointer text-[11px] font-mono tracking-wider ${
+          progress >= 0.5 ? 'text-foreground font-medium' : 'text-muted-foreground hover:text-foreground'
+        }`}
+        aria-label="48mm Machine view"
+      >
+        <span className={`text-primary transition-opacity ${progress >= 0.5 ? 'opacity-100' : 'opacity-0'}`}>[</span>
+        <span className="px-1">48mm · MACHINE</span>
+        <span className={`text-primary transition-opacity ${progress >= 0.5 ? 'opacity-100' : 'opacity-0'}`}>]</span>
+      </button>
     </div>
   );
 }
