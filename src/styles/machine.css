@@ -29,7 +29,7 @@ html.machine-boot .machine-view {
 .machine-content-wrapper {
   max-width: 640px;
   margin: 0 auto;
-  padding: 4rem 1.5rem 6rem;
+  padding: 4rem 1.5rem 12rem;
 }
 
 .machine-pre {

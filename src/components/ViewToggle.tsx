@@ -389,115 +389,123 @@ export default function ViewToggle() {
   }, [updateProgress]);
 
   return (
-    <div
-      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[1100] flex flex-col items-center select-none w-[min(calc(100vw-32px),440px)]"
-      style={{
-        background: 'radial-gradient(ellipse 80% 90% at 50% 50%, rgba(10, 13, 18, 0.85) 0%, rgba(10, 13, 18, 0.5) 60%, transparent 100%)',
-        backdropFilter: 'blur(8px)',
-        WebkitBackdropFilter: 'blur(8px)',
-      }}
-    >
-      {/* Endpoints Row: 24mm and 48mm always present at the two ends */}
-      <div className="flex justify-between items-center w-full px-5 text-[11px] font-mono tracking-wider">
-        <button
-          type="button"
-          onClick={() => snapTo(0.0)}
-          className={`tap-44 flex items-center transition-colors cursor-pointer ${
-            progress < 0.5 ? 'text-foreground font-medium' : 'text-muted-foreground hover:text-foreground'
-          }`}
-          aria-label="24mm Human view"
-        >
-          <span className={`text-primary transition-opacity ${progress < 0.5 ? 'opacity-100' : 'opacity-0'}`}>[</span>
-          <span className="px-1">24mm · HUMAN</span>
-          <span className={`text-primary transition-opacity ${progress < 0.5 ? 'opacity-100' : 'opacity-0'}`}>]</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => snapTo(1.0)}
-          className={`tap-44 flex items-center transition-colors cursor-pointer ${
-            progress >= 0.5 ? 'text-foreground font-medium' : 'text-muted-foreground hover:text-foreground'
-          }`}
-          aria-label="48mm Machine view"
-        >
-          <span className={`text-primary transition-opacity ${progress >= 0.5 ? 'opacity-100' : 'opacity-0'}`}>[</span>
-          <span className="px-1">48mm · MACHINE</span>
-          <span className={`text-primary transition-opacity ${progress >= 0.5 ? 'opacity-100' : 'opacity-0'}`}>]</span>
-        </button>
-      </div>
-
-      {/* Reticle Track: Scrolling line of ticks between the two ends */}
+    <>
+      {/* Bottom atmospheric reading shelf: 100% solid behind the switcher (0-80px),
+          smoothly feathering to transparent above it (80-144px).
+          Guarantees zero text pass-through while preserving the frameless, subtle etched sky aesthetic. */}
       <div
-        ref={trackRef}
-        className="relative w-full h-7 overflow-hidden cursor-ew-resize mt-0.5"
+        className="fixed bottom-0 left-1/2 -translate-x-1/2 w-[min(100vw,680px)] h-36 pointer-events-none z-[1050]"
         style={{
-          maskImage: 'linear-gradient(90deg, transparent 0%, black 18%, black 82%, transparent 100%)',
-          WebkitMaskImage: 'linear-gradient(90deg, transparent 0%, black 18%, black 82%, transparent 100%)',
-          touchAction: 'none',
+          background: 'linear-gradient(to top, #0a0d12 0%, #0a0d12 55%, rgba(10, 13, 18, 0.75) 75%, transparent 100%)',
         }}
-        role="slider"
-        tabIndex={0}
-        aria-label="Optical focal length"
-        aria-valuemin={24}
-        aria-valuemax={48}
-        aria-valuenow={Math.round(24 + progress * 24)}
-        aria-valuetext={progress < 0.5 ? '24mm Human' : '48mm Machine'}
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        onPointerCancel={handlePointerUp}
-        onKeyDown={handleKeyDown}
-      >
-        {/* Top Stationary Reticle Hairline Index at center */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-1.5 bg-primary pointer-events-none z-10" />
+      />
 
-        {/* Bottom Stationary Vernier Index Arrow ▲ at center */}
-        <div className="absolute bottom-1 left-1/2 -translate-x-1/2 pointer-events-none z-10">
-          <div className="w-0 h-0 border-l-[3.5px] border-l-transparent border-r-[3.5px] border-r-transparent border-b-[5px] border-b-primary" />
+      {/* The Subtle Etched Horizontal Focal Switcher */}
+      <div
+        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[1100] flex flex-col items-center select-none w-[min(calc(100vw-32px),440px)] pointer-events-auto"
+      >
+        {/* Endpoints Row: 24mm and 48mm always present at the two ends */}
+        <div className="flex justify-between items-center w-full px-5 text-[11px] font-mono tracking-wider">
+          <button
+            type="button"
+            onClick={() => snapTo(0.0)}
+            className={`tap-44 flex items-center transition-colors cursor-pointer ${
+              progress < 0.5 ? 'text-foreground font-medium' : 'text-muted-foreground hover:text-foreground'
+            }`}
+            aria-label="24mm Human view"
+          >
+            <span className={`text-primary transition-opacity ${progress < 0.5 ? 'opacity-100' : 'opacity-0'}`}>[</span>
+            <span className="px-1">24mm · HUMAN</span>
+            <span className={`text-primary transition-opacity ${progress < 0.5 ? 'opacity-100' : 'opacity-0'}`}>]</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => snapTo(1.0)}
+            className={`tap-44 flex items-center transition-colors cursor-pointer ${
+              progress >= 0.5 ? 'text-foreground font-medium' : 'text-muted-foreground hover:text-foreground'
+            }`}
+            aria-label="48mm Machine view"
+          >
+            <span className={`text-primary transition-opacity ${progress >= 0.5 ? 'opacity-100' : 'opacity-0'}`}>[</span>
+            <span className="px-1">48mm · MACHINE</span>
+            <span className={`text-primary transition-opacity ${progress >= 0.5 ? 'opacity-100' : 'opacity-0'}`}>]</span>
+          </button>
         </div>
 
-        {/* The Scrolling Line Assembly That Moves Between The Two Ends */}
+        {/* Reticle Track: Subtle scrolling line of ticks between the two ends */}
         <div
-          ref={barrelRef}
-          className="absolute top-0 left-0 h-full will-change-transform pointer-events-none"
-          style={{ width: `${TOTAL_BARREL_WIDTH}px` }}
+          ref={trackRef}
+          className="relative w-full h-7 overflow-hidden cursor-ew-resize mt-0.5"
+          style={{
+            maskImage: 'linear-gradient(90deg, transparent 0%, black 18%, black 82%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(90deg, transparent 0%, black 18%, black 82%, transparent 100%)',
+            touchAction: 'none',
+          }}
+          role="slider"
+          tabIndex={0}
+          aria-label="Optical focal length"
+          aria-valuemin={24}
+          aria-valuemax={48}
+          aria-valuenow={Math.round(24 + progress * 24)}
+          aria-valuetext={progress < 0.5 ? '24mm Human' : '48mm Machine'}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
+          onKeyDown={handleKeyDown}
         >
-          <div className="relative w-full h-3.5 pointer-events-none">
-            <svg
-              viewBox={`0 0 ${TOTAL_BARREL_WIDTH} 14`}
-              className="w-full h-full overflow-visible"
-              preserveAspectRatio="none"
-            >
-              {Array.from({ length: TOTAL_STEPS + 1 }).map((_, k) => {
-                const x = k * BARREL_STEP;
-                const isDetent = k === 24 || k === 40;
-                const isMajorGraduation = k % 4 === 0;
-                const height = isDetent ? 10 : isMajorGraduation ? 7 : 4;
-                const stroke = isDetent
-                  ? 'var(--foreground)'
-                  : isMajorGraduation
-                  ? 'var(--muted-foreground)'
-                  : 'var(--muted-foreground)';
-                const strokeOpacity = isDetent ? 0.95 : isMajorGraduation ? 0.7 : 0.3;
-                const strokeWidth = isDetent ? 1.5 : 1;
-                return (
-                  <line
-                    key={k}
-                    x1={x}
-                    y1={0}
-                    x2={x}
-                    y2={height}
-                    stroke={stroke}
-                    strokeOpacity={strokeOpacity}
-                    strokeWidth={strokeWidth}
-                    strokeLinecap="square"
-                  />
-                );
-              })}
-            </svg>
+          {/* Top Stationary Reticle Hairline Index at center */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-1.5 bg-primary pointer-events-none z-10" />
+
+          {/* Bottom Stationary Vernier Index Arrow ▲ at center */}
+          <div className="absolute bottom-1 left-1/2 -translate-x-1/2 pointer-events-none z-10">
+            <div className="w-0 h-0 border-l-[3.5px] border-l-transparent border-r-[3.5px] border-r-transparent border-b-[5px] border-b-primary" />
+          </div>
+
+          {/* The Scrolling Line Assembly That Moves Between The Two Ends */}
+          <div
+            ref={barrelRef}
+            className="absolute top-0 left-0 h-full will-change-transform pointer-events-none"
+            style={{ width: `${TOTAL_BARREL_WIDTH}px` }}
+          >
+            <div className="relative w-full h-3.5 pointer-events-none">
+              <svg
+                viewBox={`0 0 ${TOTAL_BARREL_WIDTH} 14`}
+                className="w-full h-full overflow-visible"
+                preserveAspectRatio="none"
+              >
+                {Array.from({ length: TOTAL_STEPS + 1 }).map((_, k) => {
+                  const x = k * BARREL_STEP;
+                  const isDetent = k === 24 || k === 40;
+                  const isMajorGraduation = k % 4 === 0;
+                  const height = isDetent ? 10 : isMajorGraduation ? 7 : 4;
+                  const stroke = isDetent
+                    ? 'var(--foreground)'
+                    : isMajorGraduation
+                    ? 'var(--muted-foreground)'
+                    : 'var(--muted-foreground)';
+                  const strokeOpacity = isDetent ? 0.95 : isMajorGraduation ? 0.7 : 0.3;
+                  const strokeWidth = isDetent ? 1.5 : 1;
+                  return (
+                    <line
+                      key={k}
+                      x1={x}
+                      y1={0}
+                      x2={x}
+                      y2={height}
+                      stroke={stroke}
+                      strokeOpacity={strokeOpacity}
+                      strokeWidth={strokeWidth}
+                      strokeLinecap="square"
+                    />
+                  );
+                })}
+              </svg>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
