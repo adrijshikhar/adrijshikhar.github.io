@@ -64,6 +64,9 @@ function applyOpticalProgress(
   humanPlane: HTMLElement,
   machinePlane: HTMLElement,
   skyEl: HTMLElement | null,
+  sideRail: HTMLElement | null = null,
+  viewfinder: HTMLElement | null = null,
+  instruments: HTMLElement[] = [],
 ) {
   p = clampP(p);
 
@@ -73,14 +76,46 @@ function applyOpticalProgress(
 
   const reduced = prefersReduced();
 
+  // Apply optical blur, opacity, and scale to observatory background elements
+  const applyObservatory = (opacity: string, blurPx: number, isSettled: boolean) => {
+    const filterVal = !reduced && blurPx > 0 && !isSettled ? `blur(${blurPx}px)` : '';
+
+    if (skyEl) {
+      skyEl.style.transition = isSettled ? '' : 'none';
+      skyEl.style.opacity = opacity;
+      skyEl.style.filter = filterVal;
+      skyEl.style.transform = isSettled || p === 0 ? '' : `scale(${(1 + p * 0.08).toFixed(3)})`;
+    }
+
+    if (sideRail) {
+      sideRail.style.transition = isSettled ? '' : 'none';
+      sideRail.style.opacity = opacity;
+      sideRail.style.filter = filterVal;
+      sideRail.style.pointerEvents = isSettled ? (p === 0 ? '' : 'none') : (p < 0.2 ? '' : 'none');
+    }
+
+    if (viewfinder) {
+      viewfinder.style.transition = isSettled ? '' : 'none';
+      viewfinder.style.opacity = opacity;
+      viewfinder.style.filter = filterVal;
+    }
+
+    instruments.forEach((inst) => {
+      inst.style.transition = isSettled ? '' : 'none';
+      inst.style.opacity = opacity;
+      inst.style.filter = filterVal;
+      inst.style.pointerEvents = isSettled ? (p === 0 ? '' : 'none') : (p < 0.2 ? '' : 'none');
+    });
+  };
+
   if (p <= 0.45) {
     const t = p / 0.45;
     const opacity = p === 0 ? '1' : Math.max(0, 1 - Math.pow(t, 1.2)).toFixed(3);
-    const blur = reduced ? 0 : (t * 14).toFixed(1);
+    const blur = reduced ? 0 : Number((t * 14).toFixed(1));
 
     humanPlane.style.display = 'block';
     humanPlane.style.opacity = opacity;
-    humanPlane.style.filter = Number(blur) > 0 ? `blur(${blur}px)` : '';
+    humanPlane.style.filter = blur > 0 ? `blur(${blur}px)` : '';
     humanPlane.style.willChange = p === 0 ? '' : 'filter, opacity';
     humanPlane.style.pointerEvents = p < 0.2 ? 'auto' : 'none';
 
@@ -92,11 +127,11 @@ function applyOpticalProgress(
     machinePlane.style.willChange = '';
     machinePlane.style.pointerEvents = 'none';
 
-    if (skyEl) skyEl.style.opacity = opacity;
+    applyObservatory(opacity, blur, p === 0);
   } else if (p >= 0.55) {
     const u = (p - 0.55) / 0.45;
     const opacity = p === 1 ? '1' : Math.min(1, Math.pow(u, 1.2)).toFixed(3);
-    const blur = reduced ? 0 : ((1 - u) * 14).toFixed(1);
+    const blur = reduced ? 0 : Number(((1 - u) * 14).toFixed(1));
 
     humanPlane.style.display = 'none';
     humanPlane.style.opacity = '0';
@@ -108,11 +143,11 @@ function applyOpticalProgress(
     machinePlane.style.height = 'auto';
     machinePlane.style.overflow = 'visible';
     machinePlane.style.opacity = opacity;
-    machinePlane.style.filter = Number(blur) > 0 ? `blur(${blur}px)` : '';
+    machinePlane.style.filter = blur > 0 ? `blur(${blur}px)` : '';
     machinePlane.style.willChange = p === 1 ? '' : 'filter, opacity';
     machinePlane.style.pointerEvents = p > 0.8 ? 'auto' : 'none';
 
-    if (skyEl) skyEl.style.opacity = '0';
+    applyObservatory('0', 14, p === 1);
   } else {
     // Narrow clean breath (p: 0.45 -> 0.55): Clean dark ground, zero text bleed
     humanPlane.style.display = 'none';
@@ -129,7 +164,7 @@ function applyOpticalProgress(
     machinePlane.style.willChange = '';
     machinePlane.style.pointerEvents = 'none';
 
-    if (skyEl) skyEl.style.opacity = '0';
+    applyObservatory('0', 14, false);
   }
 }
 
@@ -224,7 +259,12 @@ export default function ViewToggle() {
     const humanPlane = document.querySelector('.human-view') as HTMLElement | null;
     const machinePlane = document.querySelector('.machine-view') as HTMLElement | null;
     const skyEl = document.getElementById('sky');
-    return { humanPlane, machinePlane, skyEl };
+    const sideRail = document.querySelector('.side-rail') as HTMLElement | null;
+    const viewfinder = document.querySelector('.viewfinder') as HTMLElement | null;
+    const instruments = Array.from(
+      document.querySelectorAll('.instrument, .sky-telemetry, .egg-hint, .chrome-panel, .mass-note'),
+    ) as HTMLElement[];
+    return { humanPlane, machinePlane, skyEl, sideRail, viewfinder, instruments };
   };
 
   const ensureMachineLoaded = (machinePlane: HTMLElement | null) => {
@@ -255,10 +295,10 @@ export default function ViewToggle() {
       mobileLinesRef.current.style.transform = `translate3d(${offset}px, 0, 0)`;
     }
 
-    const { humanPlane, machinePlane, skyEl } = getPlanes();
+    const { humanPlane, machinePlane, skyEl, sideRail, viewfinder, instruments } = getPlanes();
     if (humanPlane && machinePlane) {
       ensureMachineLoaded(machinePlane);
-      applyOpticalProgress(clamped, humanPlane, machinePlane, skyEl);
+      applyOpticalProgress(clamped, humanPlane, machinePlane, skyEl, sideRail, viewfinder, instruments);
     }
   }, []);
 
