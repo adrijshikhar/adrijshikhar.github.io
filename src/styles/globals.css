@@ -581,57 +581,69 @@ body.cur-focal-dragging * {
     --ring-s: 0.692;
     border-color: var(--primary);
   }
-  /* Focal switcher: warp circle into knurled side-view knob flanked by up/down triangles */
+  /* Focal switcher: precision optical rangefinder reticle with wireframe index chevrons */
   body.cur-focal #sky-cursor-ring {
-    width: 14px;
-    height: 22px;
-    margin: -11px 0 0 -7px;
-    border-radius: 3px;
+    --ring-s: 0.78;
     border-color: var(--primary);
     border-width: 1.5px;
-    background: rgba(11, 13, 16, 0.45);
-    box-shadow: 0 0 8px rgba(127, 168, 245, 0.25);
+    background: rgba(11, 13, 16, 0.35);
+    box-shadow: 0 0 8px rgba(127, 168, 245, 0.3);
   }
   body.cur-focal #sky-cursor-ring::before {
+    content: '';
+    position: absolute;
+    top: -9px;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    border: none;
+    border-top: 1.5px solid var(--primary);
+    border-left: 1.5px solid var(--primary);
+    transform: translateX(-50%) rotate(45deg);
     opacity: 1;
-    top: -8px;
+    transition: top 0.18s ease-out, opacity 0.18s ease-out;
   }
   body.cur-focal #sky-cursor-ring::after {
+    content: '';
+    position: absolute;
+    bottom: -9px;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    border: none;
+    border-bottom: 1.5px solid var(--primary);
+    border-right: 1.5px solid var(--primary);
+    transform: translateX(-50%) rotate(45deg);
     opacity: 1;
-    bottom: -8px;
+    transition: bottom 0.18s ease-out, opacity 0.18s ease-out;
   }
   body.cur-focal #sky-cursor-dot {
     background: var(--primary);
-    width: 3px;
-    height: 3px;
-    margin: -1.5px 0 0 -1.5px;
+    width: 4px;
+    height: 4px;
+    margin: -2px 0 0 -2px;
     box-shadow: 0 0 6px var(--primary);
   }
 
-  /* Dragging: mechanical clamp - triangles pull closer and photonic bloom increases */
+  /* Dragging: mechanical focal clamp - ring tightens and wire chevrons draw inward */
   body.cur-focal-dragging #sky-cursor-ring,
   body.cur-focal.cur-focal-dragging #sky-cursor-ring {
-    width: 14px;
-    height: 20px;
-    margin: -10px 0 0 -7px;
-    border-color: var(--primary);
-    border-width: 2px;
-    box-shadow: 0 0 14px rgba(127, 168, 245, 0.6);
+    --ring-s: 0.65 !important;
+    border-width: 1.75px !important;
+    box-shadow: 0 0 12px rgba(127, 168, 245, 0.55) !important;
   }
   body.cur-focal-dragging #sky-cursor-ring::before,
   body.cur-focal.cur-focal-dragging #sky-cursor-ring::before {
-    top: -6px;
-    border-bottom-color: var(--primary);
+    top: -7px !important;
   }
   body.cur-focal-dragging #sky-cursor-ring::after,
   body.cur-focal.cur-focal-dragging #sky-cursor-ring::after {
-    bottom: -6px;
-    border-top-color: var(--primary);
+    bottom: -7px !important;
   }
   body.cur-focal-dragging #sky-cursor-dot,
   body.cur-focal.cur-focal-dragging #sky-cursor-dot {
-    background: var(--primary);
-    transform: scale(1.2);
+    background: var(--primary) !important;
+    transform: scale(1.25) !important;
   }
 }
 @media (hover: none), (pointer: coarse) {
