@@ -417,7 +417,7 @@ body.playing .human-view {
   animation: mass-note-in 0.5s var(--ease-out) both;
 }
 @keyframes mass-note-in {
-  from { opacity: 0; transform: translateY(6px); }
+  from { opacity: 0; transform: translateY(0.375rem); }
   to   { opacity: 1; transform: translateY(0); }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -498,9 +498,9 @@ body.cur-focal-dragging * {
      registered below so it interpolates; JS composes it into the transform. */
   #sky-cursor-ring {
     --ring-s: 1;
-    width: 34px;
-    height: 34px;
-    margin: -17px 0 0 -17px;
+    width: 2.125rem;
+    height: 2.125rem;
+    margin: -1.0625rem 0 0 -1.0625rem;
     border: 1.5px solid var(--foreground);
     transition:
       width 0.22s var(--ease-out),
@@ -512,9 +512,9 @@ body.cur-focal-dragging * {
       box-shadow 0.22s var(--ease-out);
   }
   #sky-cursor-dot {
-    width: 5px;
-    height: 5px;
-    margin: -2.5px 0 0 -2.5px;
+    width: 0.3125rem;
+    height: 0.3125rem;
+    margin: -0.15625rem 0 0 -0.15625rem;
     background: var(--foreground);
     transition:
       width 0.22s var(--ease-out),
@@ -530,21 +530,21 @@ body.cur-focal-dragging * {
     content: '';
     position: absolute;
     left: 50%;
-    width: 6px;
-    height: 6px;
+    width: 0.375rem;
+    height: 0.375rem;
     border: none;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.18s ease-out, top 0.18s ease-out, bottom 0.18s ease-out;
   }
   #sky-cursor-ring::before {
-    top: -7px;
+    top: -0.4375rem;
     border-top: 1.5px solid var(--primary);
     border-left: 1.5px solid var(--primary);
     transform: translateX(-50%) rotate(45deg);
   }
   #sky-cursor-ring::after {
-    bottom: -7px;
+    bottom: -0.4375rem;
     border-bottom: 1.5px solid var(--primary);
     border-right: 1.5px solid var(--primary);
     transform: translateX(-50%) rotate(45deg);
@@ -566,9 +566,9 @@ body.cur-focal-dragging * {
   }
   body.cur-ui #sky-cursor-dot {
     background: var(--primary);
-    width: 5px;
-    height: 5px;
-    margin: -2.5px 0 0 -2.5px;
+    width: 0.3125rem;
+    height: 0.3125rem;
+    margin: -0.15625rem 0 0 -0.15625rem;
   }
   /* dragging */
   body.grabbing #sky-cursor-ring {
@@ -584,18 +584,18 @@ body.cur-focal-dragging * {
     box-shadow: 0 0 8px rgba(127, 168, 245, 0.3);
   }
   body.cur-focal #sky-cursor-ring::before {
-    top: -9px;
+    top: -0.5625rem;
     opacity: 1;
   }
   body.cur-focal #sky-cursor-ring::after {
-    bottom: -9px;
+    bottom: -0.5625rem;
     opacity: 1;
   }
   body.cur-focal #sky-cursor-dot {
     background: var(--primary);
-    width: 4px;
-    height: 4px;
-    margin: -2px 0 0 -2px;
+    width: 0.25rem;
+    height: 0.25rem;
+    margin: -0.125rem 0 0 -0.125rem;
     box-shadow: 0 0 6px var(--primary);
   }
 
@@ -606,11 +606,11 @@ body.cur-focal-dragging * {
     box-shadow: 0 0 12px rgba(127, 168, 245, 0.55);
   }
   body.cur-focal-dragging #sky-cursor-ring::before {
-    top: -7px;
+    top: -0.4375rem;
     opacity: 1;
   }
   body.cur-focal-dragging #sky-cursor-ring::after {
-    bottom: -7px;
+    bottom: -0.4375rem;
     opacity: 1;
   }
   body.cur-focal-dragging #sky-cursor-dot {
@@ -646,14 +646,14 @@ body.cur-focal-dragging * {
   }
   .viewfinder i {
     position: absolute;
-    width: 18px;
-    height: 18px;
+    width: 1.125rem;
+    height: 1.125rem;
     border: 0 solid var(--muted-foreground);
   }
-  .viewfinder i:nth-child(1) { top: 14px; left: 14px; border-top-width: 1px; border-left-width: 1px; }
-  .viewfinder i:nth-child(2) { top: 14px; right: 14px; border-top-width: 1px; border-right-width: 1px; }
-  .viewfinder i:nth-child(3) { bottom: 14px; left: 14px; border-bottom-width: 1px; border-left-width: 1px; }
-  .viewfinder i:nth-child(4) { bottom: 14px; right: 14px; border-bottom-width: 1px; border-right-width: 1px; }
+  .viewfinder i:nth-child(1) { top: 0.875rem; left: 0.875rem; border-top-width: 1px; border-left-width: 1px; }
+  .viewfinder i:nth-child(2) { top: 0.875rem; right: 0.875rem; border-top-width: 1px; border-right-width: 1px; }
+  .viewfinder i:nth-child(3) { bottom: 0.875rem; left: 0.875rem; border-bottom-width: 1px; border-left-width: 1px; }
+  .viewfinder i:nth-child(4) { bottom: 0.875rem; right: 0.875rem; border-bottom-width: 1px; border-right-width: 1px; }
 
   /* Corner instruments. Same type as the prototype's `.readout` / `.hint`. */
   .instrument {
@@ -728,8 +728,8 @@ body.cur-focal-dragging * {
     align-items: stretch;
     border: 1px solid var(--border);
     background: var(--card);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(0.875rem);
+    -webkit-backdrop-filter: blur(0.875rem);
     font-family: var(--font-mono);
     font-size: 0.6875rem;   /* 11px: the mono floor. This was 9px. */
     letter-spacing: 0.16em;
@@ -887,8 +887,8 @@ body.cur-focal-dragging * {
     transform: translate(-50%, -50%);
     /* grows to 44px in BOTH axes without ever shrinking a control that is
        already larger, so it is safe to apply broadly */
-    min-width: 44px;
-    min-height: 44px;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
     width: 100%;
     height: 100%;
   }
@@ -976,7 +976,7 @@ body.cur-focal-dragging * {
     transition: transform 120ms ease-out;
   }
   .link-back:hover .arrow {
-    transform: translateX(-4px);
+    transform: translateX(-0.25rem);
   }
   @media (prefers-reduced-motion: reduce) {
     .link-back .arrow {

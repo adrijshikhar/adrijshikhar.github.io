@@ -137,17 +137,17 @@ function applyOpticalProgress(
   }
 
   // Optical Blur Math:
-  // Human starts at 0px blur at p=0, racks up to 14px by p=0.5, stays soft until it dissolves
-  // Machine starts at 14px bokeh blur when appearing, tightens down to 0px at p=1.0
-  const humanBlur = reduced ? 0 : Number((Math.min(1, p / 0.5) * 14).toFixed(1));
-  const machineBlur = reduced ? 0 : Number((Math.min(1, (1 - p) / 0.5) * 14).toFixed(1));
+  // Human starts at 0rem blur at p=0, racks up to 0.875rem (14px) by p=0.5, stays soft until it dissolves
+  // Machine starts at 0.875rem bokeh blur when appearing, tightens down to 0rem at p=1.0
+  const humanBlur = reduced ? 0 : Number((Math.min(1, p / 0.5) * 0.875).toFixed(3));
+  const machineBlur = reduced ? 0 : Number((Math.min(1, (1 - p) / 0.5) * 0.875).toFixed(3));
 
   // Focal Zoom Shift: Outward expansion of corners and margins as focal length increases (24mm -> 48mm)
-  const shift = !reduced && p > 0 ? Number((p * 24).toFixed(1)) : 0;
+  const shift = !reduced && p > 0 ? Number((p * 1.5).toFixed(3)) : 0;
 
   // Apply optical blur, opacity, and radial outward shift to observatory background elements
-  const applyObservatory = (opacityStr: string, blurPx: number, isSettled: boolean) => {
-    const filterVal = !reduced && blurPx > 0 && !isSettled ? `blur(${blurPx}px)` : '';
+  const applyObservatory = (opacityStr: string, blurRem: number, isSettled: boolean) => {
+    const filterVal = !reduced && blurRem > 0 && !isSettled ? `blur(${blurRem}rem)` : '';
 
     if (isSettled) {
       if (obs.skyEl) {
@@ -216,23 +216,23 @@ function applyOpticalProgress(
       });
       utils.set(bTL, {
         opacity: opacityStr,
-        translateX: -shift,
-        translateY: -shift,
+        translateX: `${-shift}rem`,
+        translateY: `${-shift}rem`,
       });
       utils.set(bTR, {
         opacity: opacityStr,
-        translateX: shift,
-        translateY: -shift,
+        translateX: `${shift}rem`,
+        translateY: `${-shift}rem`,
       });
       utils.set(bBL, {
         opacity: opacityStr,
-        translateX: -shift,
-        translateY: shift,
+        translateX: `${-shift}rem`,
+        translateY: `${shift}rem`,
       });
       utils.set(bBR, {
         opacity: opacityStr,
-        translateX: shift,
-        translateY: shift,
+        translateX: `${shift}rem`,
+        translateY: `${shift}rem`,
       });
     }
 
@@ -310,7 +310,7 @@ function applyOpticalProgress(
       humanPlane.style.display = 'block';
       humanPlane.style.position = '';
       humanPlane.style.transformOrigin = '50% 30vh';
-      humanPlane.style.filter = humanBlur > 0 ? `blur(${humanBlur}px)` : '';
+      humanPlane.style.filter = humanBlur > 0 ? `blur(${humanBlur}rem)` : '';
       humanPlane.style.pointerEvents = p < 0.3 ? 'auto' : 'none';
       utils.set(humanPlane, {
         opacity: humanOpacity,
@@ -329,7 +329,7 @@ function applyOpticalProgress(
       machinePlane.style.height = 'auto';
       machinePlane.style.overflow = 'visible';
       machinePlane.style.transformOrigin = '50% 30vh';
-      machinePlane.style.filter = machineBlur > 0 ? `blur(${machineBlur}px)` : '';
+      machinePlane.style.filter = machineBlur > 0 ? `blur(${machineBlur}rem)` : '';
       machinePlane.style.pointerEvents = p > 0.7 ? 'auto' : 'none';
       utils.set(machinePlane, {
         opacity: machineOpacity,
@@ -374,17 +374,17 @@ export default function ViewToggle() {
     const fullEls = [fullHumanRef.current, fullMachineRef.current].filter(Boolean) as HTMLElement[];
 
     if (prefersReduced()) {
-      if (labelColRef.current) labelColRef.current.style.width = expanded ? '84px' : '20px';
+      if (labelColRef.current) labelColRef.current.style.width = expanded ? '5.25rem' : '1.25rem';
       compactEls.forEach((el) => {
         el.style.opacity = expanded ? '0' : '1';
-        el.style.transform = expanded ? 'translateX(-6px)' : '';
+        el.style.transform = expanded ? 'translateX(-0.375rem)' : '';
         el.style.pointerEvents = expanded ? 'none' : 'auto';
         el.setAttribute('aria-hidden', expanded ? 'true' : 'false');
         el.tabIndex = expanded ? -1 : 0;
       });
       fullEls.forEach((el) => {
         el.style.opacity = expanded ? '1' : '0';
-        el.style.transform = expanded ? '' : 'translateX(8px)';
+        el.style.transform = expanded ? '' : 'translateX(0.5rem)';
         el.style.pointerEvents = expanded ? 'auto' : 'none';
         el.setAttribute('aria-hidden', expanded ? 'false' : 'true');
         el.tabIndex = expanded ? 0 : -1;
@@ -423,7 +423,7 @@ export default function ViewToggle() {
 
     if (labelColRef.current) {
       animate(labelColRef.current, {
-        width: expanded ? '84px' : '20px',
+        width: expanded ? '5.25rem' : '1.25rem',
         duration: expanded ? 260 : 200,
         ease: 'outCubic',
       });
@@ -431,7 +431,7 @@ export default function ViewToggle() {
     if (compactEls.length > 0) {
       animate(compactEls, {
         opacity: expanded ? 0 : 1,
-        translateX: expanded ? -6 : 0,
+        translateX: expanded ? '-0.375rem' : '0rem',
         duration: expanded ? 180 : 200,
         ease: 'outCubic',
       });
@@ -439,7 +439,7 @@ export default function ViewToggle() {
     if (fullEls.length > 0) {
       animate(fullEls, {
         opacity: expanded ? 1 : 0,
-        translateX: expanded ? 0 : 8,
+        translateX: expanded ? '0rem' : '0.5rem',
         duration: expanded ? 260 : 180,
         ease: 'outCubic',
       });
@@ -499,13 +499,13 @@ export default function ViewToggle() {
       setActiveMode(newMode);
     }
 
-    // Cylindrical knob travel: 72px between 24mm (y=36px) and 48mm (y=108px)
-    const offset = clamped * 72;
+    // Cylindrical knob travel: 4.5rem (72px) between 24mm (y=2.25rem) and 48mm (y=6.75rem)
+    const offset = clamped * 4.5;
     if (desktopLinesRef.current) {
-      utils.set(desktopLinesRef.current, { translateY: offset });
+      utils.set(desktopLinesRef.current, { translateY: `${offset}rem` });
     }
     if (mobileLinesRef.current) {
-      utils.set(mobileLinesRef.current, { translateX: offset });
+      utils.set(mobileLinesRef.current, { translateX: `${offset}rem` });
     }
 
     const { humanPlane, machinePlane, obs } = getPlanes();
@@ -665,7 +665,9 @@ export default function ViewToggle() {
         rafIdRef.current = null;
         if (!isDraggingRef.current) return;
         const delta = pendingCoordRef.current - dragStartCoordRef.current;
-        const rawP = dragStartPRef.current + delta / 72;
+        const remPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+        const travelPx = 4.5 * remPx; // 4.5rem travel
+        const rawP = dragStartPRef.current + delta / travelPx;
         updateProgress(clampP(rawP));
       });
     }
@@ -690,7 +692,9 @@ export default function ViewToggle() {
     const delta = isVert
       ? Math.abs(e.clientY - dragStartCoordRef.current)
       : Math.abs(e.clientX - dragStartCoordRef.current);
-    if (delta < 5) {
+    const remPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+    const clickThresholdPx = 0.3125 * remPx; // 0.3125rem (5px)
+    if (delta < clickThresholdPx) {
       const rect = target.getBoundingClientRect();
       if (isVert) {
         const clickY = e.clientY - rect.top;
@@ -780,18 +784,18 @@ export default function ViewToggle() {
         {/* Desktop Labels Column: Expands to the left on hover */}
         <div
           ref={labelColRef}
-          className="relative h-[144px] w-[20px] select-none pointer-events-auto"
+          className="relative h-[9rem] w-[1.25rem] select-none pointer-events-auto"
         >
           {/* Compact Monogram: H */}
           <button
             ref={compactHumanRef}
             type="button"
             onClick={() => snapTo(0.0)}
-            className="absolute top-[36px] -translate-y-1/2 right-0 flex items-center justify-end cursor-pointer group text-right focus:outline-none whitespace-nowrap p-0 m-0 bg-transparent border-0"
+            className="absolute top-[2.25rem] -translate-y-1/2 right-0 flex items-center justify-end cursor-pointer group text-right focus:outline-none whitespace-nowrap p-0 m-0 bg-transparent border-0"
             aria-label="24mm Human view"
           >
             <span
-              className={`font-mono text-[11px] tracking-[0.14em] uppercase whitespace-nowrap leading-none transition-colors text-right ${
+              className={`font-mono text-[0.6875rem] tracking-[0.14em] uppercase whitespace-nowrap leading-none transition-colors text-right ${
                 activeMode === 'human'
                   ? 'text-foreground font-semibold'
                   : 'text-muted-foreground group-hover:text-foreground'
@@ -806,11 +810,11 @@ export default function ViewToggle() {
             ref={compactMachineRef}
             type="button"
             onClick={() => snapTo(1.0)}
-            className="absolute top-[108px] -translate-y-1/2 right-0 flex items-center justify-end cursor-pointer group text-right focus:outline-none whitespace-nowrap p-0 m-0 bg-transparent border-0"
+            className="absolute top-[6.75rem] -translate-y-1/2 right-0 flex items-center justify-end cursor-pointer group text-right focus:outline-none whitespace-nowrap p-0 m-0 bg-transparent border-0"
             aria-label="48mm Machine view"
           >
             <span
-              className={`font-mono text-[11px] tracking-[0.14em] uppercase whitespace-nowrap leading-none transition-colors text-right ${
+              className={`font-mono text-[0.6875rem] tracking-[0.14em] uppercase whitespace-nowrap leading-none transition-colors text-right ${
                 activeMode === 'machine'
                   ? 'text-foreground font-semibold'
                   : 'text-muted-foreground group-hover:text-foreground'
@@ -825,11 +829,11 @@ export default function ViewToggle() {
             ref={fullHumanRef}
             type="button"
             onClick={() => snapTo(0.0)}
-            className="absolute top-[36px] -translate-y-1/2 right-0 flex flex-col items-end cursor-pointer group text-right focus:outline-none whitespace-nowrap p-0 m-0 bg-transparent border-0 opacity-0 pointer-events-none"
+            className="absolute top-[2.25rem] -translate-y-1/2 right-0 flex flex-col items-end cursor-pointer group text-right focus:outline-none whitespace-nowrap p-0 m-0 bg-transparent border-0 opacity-0 pointer-events-none"
             aria-label="24mm Human view"
           >
             <span
-              className={`font-mono text-[9px] tracking-[0.18em] uppercase whitespace-nowrap leading-none mb-1.5 transition-colors text-right ${
+              className={`font-mono text-[0.5625rem] tracking-[0.18em] uppercase whitespace-nowrap leading-none mb-1.5 transition-colors text-right ${
                 activeMode === 'human'
                   ? 'text-primary font-medium'
                   : 'text-muted-foreground group-hover:text-foreground'
@@ -838,7 +842,7 @@ export default function ViewToggle() {
               24MM
             </span>
             <span
-              className={`font-mono text-[11px] tracking-[0.14em] uppercase whitespace-nowrap leading-none transition-colors text-right ${
+              className={`font-mono text-[0.6875rem] tracking-[0.14em] uppercase whitespace-nowrap leading-none transition-colors text-right ${
                 activeMode === 'human'
                   ? 'text-foreground font-semibold'
                   : 'text-muted-foreground group-hover:text-foreground'
@@ -853,11 +857,11 @@ export default function ViewToggle() {
             ref={fullMachineRef}
             type="button"
             onClick={() => snapTo(1.0)}
-            className="absolute top-[108px] -translate-y-1/2 right-0 flex flex-col items-end cursor-pointer group text-right focus:outline-none whitespace-nowrap p-0 m-0 bg-transparent border-0 opacity-0 pointer-events-none"
+            className="absolute top-[6.75rem] -translate-y-1/2 right-0 flex flex-col items-end cursor-pointer group text-right focus:outline-none whitespace-nowrap p-0 m-0 bg-transparent border-0 opacity-0 pointer-events-none"
             aria-label="48mm Machine view"
           >
             <span
-              className={`font-mono text-[9px] tracking-[0.18em] uppercase whitespace-nowrap leading-none mb-1.5 transition-colors text-right ${
+              className={`font-mono text-[0.5625rem] tracking-[0.18em] uppercase whitespace-nowrap leading-none mb-1.5 transition-colors text-right ${
                 activeMode === 'machine'
                   ? 'text-primary font-medium'
                   : 'text-muted-foreground group-hover:text-foreground'
@@ -866,7 +870,7 @@ export default function ViewToggle() {
               48MM
             </span>
             <span
-              className={`font-mono text-[11px] tracking-[0.14em] uppercase whitespace-nowrap leading-none transition-colors text-right ${
+              className={`font-mono text-[0.6875rem] tracking-[0.14em] uppercase whitespace-nowrap leading-none transition-colors text-right ${
                 activeMode === 'machine'
                   ? 'text-foreground font-semibold'
                   : 'text-muted-foreground group-hover:text-foreground'
@@ -880,7 +884,7 @@ export default function ViewToggle() {
         {/* Desktop Vertical Textured Knob Track */}
         <div
           ref={desktopTrackRef}
-          className="focal-track-vert touch-none relative w-4 h-[144px] overflow-hidden cursor-ns-resize select-none shrink-0"
+          className="focal-track-vert touch-none relative w-4 h-[9rem] overflow-hidden cursor-ns-resize select-none shrink-0"
           role="slider"
           tabIndex={0}
           aria-label="Optical focal length"
@@ -902,7 +906,7 @@ export default function ViewToggle() {
           >
             <svg
               viewBox="0 0 16 144"
-              className="w-full h-[144px] overflow-visible pointer-events-none"
+              className="w-full h-[9rem] overflow-visible pointer-events-none"
               aria-hidden="true"
             >
               {KNOB_LINE_INDICES.map((k) => {
@@ -938,14 +942,14 @@ export default function ViewToggle() {
           aria-label="24mm Human view"
         >
           <span
-            className={`font-mono text-[9px] tracking-wider uppercase whitespace-nowrap leading-none mb-1 transition-colors ${
+            className={`font-mono text-[0.5625rem] tracking-wider uppercase whitespace-nowrap leading-none mb-1 transition-colors ${
               activeMode === 'human' ? 'text-primary font-medium' : 'text-muted-foreground'
             }`}
           >
             24MM
           </span>
           <span
-            className={`font-mono text-[10px] tracking-wider uppercase whitespace-nowrap leading-none transition-colors ${
+            className={`font-mono text-[0.625rem] tracking-wider uppercase whitespace-nowrap leading-none transition-colors ${
               activeMode === 'human' ? 'text-foreground font-semibold' : 'text-muted-foreground'
             }`}
           >
@@ -955,7 +959,7 @@ export default function ViewToggle() {
 
         <div
           ref={mobileTrackRef}
-          className="focal-track-horiz touch-none relative w-[144px] h-4 overflow-hidden cursor-ew-resize select-none shrink-0"
+          className="focal-track-horiz touch-none relative w-[9rem] h-4 overflow-hidden cursor-ew-resize select-none shrink-0"
           role="slider"
           tabIndex={0}
           aria-label="Optical focal length"
@@ -977,7 +981,7 @@ export default function ViewToggle() {
           >
             <svg
               viewBox="0 0 144 16"
-              className="w-[144px] h-full overflow-visible pointer-events-none"
+              className="w-[9rem] h-full overflow-visible pointer-events-none"
               aria-hidden="true"
             >
               {KNOB_LINE_INDICES.map((k) => {
@@ -1007,14 +1011,14 @@ export default function ViewToggle() {
           aria-label="48mm Machine view"
         >
           <span
-            className={`font-mono text-[9px] tracking-wider uppercase whitespace-nowrap leading-none mb-1 transition-colors ${
+            className={`font-mono text-[0.5625rem] tracking-wider uppercase whitespace-nowrap leading-none mb-1 transition-colors ${
               activeMode === 'machine' ? 'text-primary font-medium' : 'text-muted-foreground'
             }`}
           >
             48MM
           </span>
           <span
-            className={`font-mono text-[10px] tracking-wider uppercase whitespace-nowrap leading-none transition-colors ${
+            className={`font-mono text-[0.625rem] tracking-wider uppercase whitespace-nowrap leading-none transition-colors ${
               activeMode === 'machine' ? 'text-foreground font-semibold' : 'text-muted-foreground'
             }`}
           >
