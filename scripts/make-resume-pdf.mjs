@@ -13,6 +13,7 @@
 import { execFileSync } from 'node:child_process';
 import { readFileSync, writeFileSync, statSync } from 'node:fs';
 import { resolve, join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import * as yaml from 'js-yaml';
 
 const ROOT = resolve(import.meta.dirname, '..');
@@ -27,10 +28,10 @@ const CHROME = process.env.CHROME_BIN ||
     : 'google-chrome');
 
 function generateResumeHtml(data, rootDir) {
-  const fontSG = 'file://' + join(rootDir, 'node_modules/@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2');
-  const fontFG = 'file://' + join(rootDir, 'node_modules/@fontsource-variable/familjen-grotesk/files/familjen-grotesk-latin-wght-normal.woff2');
-  const fontPM400 = 'file://' + join(rootDir, 'node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2');
-  const fontPM600 = 'file://' + join(rootDir, 'node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-600-normal.woff2');
+  const fontSG = pathToFileURL(join(rootDir, 'node_modules/@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2')).href;
+  const fontFG = pathToFileURL(join(rootDir, 'node_modules/@fontsource-variable/familjen-grotesk/files/familjen-grotesk-latin-wght-normal.woff2')).href;
+  const fontPM400 = pathToFileURL(join(rootDir, 'node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2')).href;
+  const fontPM600 = pathToFileURL(join(rootDir, 'node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-600-normal.woff2')).href;
 
   const p = data.personal;
 
@@ -61,8 +62,8 @@ function generateResumeHtml(data, rootDir) {
 
   const projectsHtml = data.projects.map(proj => {
     const links = [];
-    if (proj.url) links.push(`<a href="${proj.url}">${proj.url.replace('https://', '')}</a>`);
-    if (proj.github) links.push(`<a href="${proj.github}">${proj.github.replace('https://github.com/', 'github.com/')}</a>`);
+    if (proj.url) links.push(`<a href="${proj.url}">${proj.url.replace(/^https?:\/\/(www\.)?/, '')}</a>`);
+    if (proj.github) links.push(`<a href="${proj.github}">${proj.github.replace(/^https?:\/\/(www\.)?/, '')}</a>`);
     return `
       <div class="project-entry">
         <div class="entry-header">
@@ -109,7 +110,7 @@ function generateResumeHtml(data, rootDir) {
     <div class="ref-card">
       <div class="ref-name">${r.name}</div>
       <div class="ref-title">${r.title} &bull; ${r.company}</div>
-      <div class="ref-link"><a href="${r.linkedin}">${r.linkedin.replace('https://www.', '').replace('https://', '')}</a></div>
+      <div class="ref-link"><a href="${r.linkedin}">${r.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</a></div>
     </div>
   `).join('\n');
 
@@ -579,11 +580,11 @@ html, body {
         <span>${p.location}</span>
       </div>
       <div class="telemetry-row">
-        <span><a href="${p.website}">${p.website.replace('https://', '')}</a></span>
+        <span><a href="${p.website}">${p.website.replace(/^https?:\/\/(www\.)?/, '')}</a></span>
         <span class="dot">•</span>
-        <span><a href="${p.github}">${p.github.replace('https://', '')}</a></span>
+        <span><a href="${p.github}">${p.github.replace(/^https?:\/\/(www\.)?/, '')}</a></span>
         <span class="dot">•</span>
-        <span><a href="${p.linkedin}">${p.linkedin.replace('https://www.', '')}</a></span>
+        <span><a href="${p.linkedin}">${p.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</a></span>
       </div>
     </div>
   </header>
@@ -658,7 +659,7 @@ execFileSync(CHROME, [
   '--allow-file-access-from-files',
   '--no-pdf-header-footer',
   `--print-to-pdf=${PDF_OUT}`,
-  `file://${HTML_OUT}`
+  pathToFileURL(HTML_OUT).href
 ], { stdio: 'ignore' });
 
 console.log(`  wrote public/assets/resume.pdf (${(statSync(PDF_OUT).size / 1024).toFixed(0)} KB)`);
