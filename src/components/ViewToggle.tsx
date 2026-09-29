@@ -206,48 +206,46 @@ function applyOpticalProgress(
       });
     }
 
+    // Corner instruments & telemetry: stationary in place without position drift
     if (obs.instTL) {
       obs.instTL.style.filter = filterVal;
+      obs.instTL.style.transform = '';
       utils.set(obs.instTL, {
         opacity: opacityStr,
-        translateX: -shift,
-        translateY: -shift,
       });
       obs.instTL.style.pointerEvents = p < 0.2 ? '' : 'none';
     }
 
     if (obs.instBL) {
       obs.instBL.style.filter = filterVal;
+      obs.instBL.style.transform = '';
       utils.set(obs.instBL, {
         opacity: opacityStr,
-        translateX: -shift,
-        translateY: shift,
       });
       obs.instBL.style.pointerEvents = p < 0.2 ? '' : 'none';
     }
 
     if (obs.instBR) {
       obs.instBR.style.filter = filterVal;
+      obs.instBR.style.transform = '';
       utils.set(obs.instBR, {
         opacity: opacityStr,
-        translateX: shift,
-        translateY: shift,
       });
       obs.instBR.style.pointerEvents = p < 0.2 ? '' : 'none';
     }
 
     if (obs.eggHint) {
       obs.eggHint.style.filter = filterVal;
+      obs.eggHint.style.transform = '';
       utils.set(obs.eggHint, {
         opacity: opacityStr,
-        translateX: shift,
-        translateY: shift,
       });
       obs.eggHint.style.pointerEvents = p < 0.2 ? '' : 'none';
     }
 
     if (obs.telemetry) {
       obs.telemetry.style.filter = filterVal;
+      obs.telemetry.style.transform = '';
       utils.set(obs.telemetry, {
         opacity: opacityStr,
       });
@@ -255,6 +253,7 @@ function applyOpticalProgress(
 
     obs.otherInstruments.forEach((inst) => {
       inst.style.filter = filterVal;
+      inst.style.transform = '';
       utils.set(inst, {
         opacity: opacityStr,
       });
