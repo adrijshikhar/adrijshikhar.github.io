@@ -232,7 +232,7 @@ const SOCIAL_ICON_PATHS = {
         </section>
 
         <!-- Interests -->
-        <section id="interests" class="mb-12 scroll-mt-16 md:mb-16 lg:scroll-mt-24">
+        <section id="interests" class="mb-12 scroll-mt-16 md:mb-16 lg:scroll-mt-24 min-h-[calc(100dvh-6rem)]">
           <div class="mb-3 font-mono text-xs uppercase tracking-wider text-muted-foreground" aria-hidden="true">07</div>
           <h2 class="display-section mb-8">Interests</h2>
           <div
@@ -241,13 +241,9 @@ const SOCIAL_ICON_PATHS = {
           />
         </section>
 
-        {/* The gap above the rule is open sky, not slack. The orbital-mechanics
-            game plays over the whole viewport, so the page needs a stretch with
-            no prose under it — otherwise every sling is thrown across text.
-            Viewport-relative so the room is real on any screen. It sits BEFORE
-            the footer: past the last line there is nothing left to look at, so
-            the same space there just reads as the page failing to end. */}
-        <footer class="mt-[29vh] border-t border-border pt-12 pb-20 md:mt-[33vh] md:pb-24">
+        {/* Section 07 frames the final viewport with open sky beneath its prose for
+            orbital mechanics, while the footer sits at the true end of the scroll. */}
+        <footer class="mt-16 border-t border-border pt-12 pb-32 md:mt-24 md:pb-28">
           <p class="font-mono text-xs uppercase tracking-wider text-foreground">
             <span class="text-primary">&#9656;</span> {STAR_COUNT} named stars at true J2000 positions
             for your location. Every mark on the canvas is a catalogued object.
