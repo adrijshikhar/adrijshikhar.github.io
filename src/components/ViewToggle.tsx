@@ -115,114 +115,149 @@ function applyOpticalProgress(
   // Focal Zoom Shift: Outward expansion of corners and margins as focal length increases (24mm -> 48mm)
   const shift = !reduced && p > 0 ? Number((p * 24).toFixed(1)) : 0;
 
-  // Apply optical blur, opacity, and radial outward shift to observatory background elements via Anime.js
+  // Apply optical blur, opacity, and radial outward shift to observatory background elements
   const applyObservatory = (opacityStr: string, blurPx: number, isSettled: boolean) => {
     const filterVal = !reduced && blurPx > 0 && !isSettled ? `blur(${blurPx}px)` : '';
 
+    if (isSettled) {
+      if (obs.skyEl) {
+        obs.skyEl.style.filter = '';
+        obs.skyEl.style.transform = '';
+        obs.skyEl.style.opacity = opacityStr;
+      }
+      if (obs.sideRail) {
+        obs.sideRail.style.filter = '';
+        obs.sideRail.style.transform = '';
+        obs.sideRail.style.opacity = opacityStr;
+        obs.sideRail.style.pointerEvents = p === 0 ? '' : 'none';
+      }
+      if (obs.brackets.length >= 4) {
+        obs.brackets.forEach((b) => {
+          b.style.filter = '';
+          b.style.transform = '';
+          b.style.opacity = opacityStr;
+        });
+      }
+      [obs.instTL, obs.instBL, obs.instBR, obs.eggHint].forEach((inst) => {
+        if (inst) {
+          inst.style.filter = '';
+          inst.style.transform = '';
+          inst.style.opacity = opacityStr;
+          inst.style.pointerEvents = p === 0 ? '' : 'none';
+        }
+      });
+      if (obs.telemetry) {
+        obs.telemetry.style.filter = '';
+        obs.telemetry.style.transform = '';
+        obs.telemetry.style.opacity = opacityStr;
+      }
+      obs.otherInstruments.forEach((inst) => {
+        inst.style.filter = '';
+        inst.style.transform = '';
+        inst.style.opacity = opacityStr;
+        inst.style.pointerEvents = p === 0 ? '' : 'none';
+      });
+      return;
+    }
+
+    // In transit (0 < p < 1):
     if (obs.skyEl) {
+      obs.skyEl.style.filter = filterVal;
       utils.set(obs.skyEl, {
         opacity: opacityStr,
-        filter: filterVal,
-        scale: isSettled || p === 0 ? 1 : 1 + p * 0.08,
+        scale: 1 + p * 0.08,
       });
     }
 
     if (obs.sideRail) {
+      obs.sideRail.style.filter = filterVal;
       utils.set(obs.sideRail, {
         opacity: opacityStr,
-        filter: filterVal,
-        translateX: isSettled || p === 0 ? 0 : -shift,
+        translateX: -shift,
       });
-      obs.sideRail.style.pointerEvents = isSettled ? (p === 0 ? '' : 'none') : (p < 0.2 ? '' : 'none');
+      obs.sideRail.style.pointerEvents = p < 0.2 ? '' : 'none';
     }
 
-    // Viewfinder brackets: 4 corners expanding outward
     if (obs.brackets.length >= 4) {
       const [bTL, bTR, bBL, bBR] = obs.brackets;
+      [bTL, bTR, bBL, bBR].forEach((b) => {
+        b.style.filter = filterVal;
+      });
       utils.set(bTL, {
         opacity: opacityStr,
-        filter: filterVal,
-        translateX: !isSettled && shift > 0 ? -shift : 0,
-        translateY: !isSettled && shift > 0 ? -shift : 0,
+        translateX: -shift,
+        translateY: -shift,
       });
       utils.set(bTR, {
         opacity: opacityStr,
-        filter: filterVal,
-        translateX: !isSettled && shift > 0 ? shift : 0,
-        translateY: !isSettled && shift > 0 ? -shift : 0,
+        translateX: shift,
+        translateY: -shift,
       });
       utils.set(bBL, {
         opacity: opacityStr,
-        filter: filterVal,
-        translateX: !isSettled && shift > 0 ? -shift : 0,
-        translateY: !isSettled && shift > 0 ? shift : 0,
+        translateX: -shift,
+        translateY: shift,
       });
       utils.set(bBR, {
         opacity: opacityStr,
-        filter: filterVal,
-        translateX: !isSettled && shift > 0 ? shift : 0,
-        translateY: !isSettled && shift > 0 ? shift : 0,
+        translateX: shift,
+        translateY: shift,
       });
     }
 
-    // Top-Left corner instruments (Sun, Moon, Planets)
     if (obs.instTL) {
+      obs.instTL.style.filter = filterVal;
       utils.set(obs.instTL, {
         opacity: opacityStr,
-        filter: filterVal,
-        translateX: !isSettled && shift > 0 ? -shift : 0,
-        translateY: !isSettled && shift > 0 ? -shift : 0,
+        translateX: -shift,
+        translateY: -shift,
       });
-      obs.instTL.style.pointerEvents = isSettled ? (p === 0 ? '' : 'none') : (p < 0.2 ? '' : 'none');
+      obs.instTL.style.pointerEvents = p < 0.2 ? '' : 'none';
     }
 
-    // Bottom-Left corner instruments (Observer, Bengaluru, Sidereal)
     if (obs.instBL) {
+      obs.instBL.style.filter = filterVal;
       utils.set(obs.instBL, {
         opacity: opacityStr,
-        filter: filterVal,
-        translateX: !isSettled && shift > 0 ? -shift : 0,
-        translateY: !isSettled && shift > 0 ? shift : 0,
+        translateX: -shift,
+        translateY: shift,
       });
-      obs.instBL.style.pointerEvents = isSettled ? (p === 0 ? '' : 'none') : (p < 0.2 ? '' : 'none');
+      obs.instBL.style.pointerEvents = p < 0.2 ? '' : 'none';
     }
 
-    // Bottom-Right corner instruments (interaction hint)
     if (obs.instBR) {
+      obs.instBR.style.filter = filterVal;
       utils.set(obs.instBR, {
         opacity: opacityStr,
-        filter: filterVal,
-        translateX: !isSettled && shift > 0 ? shift : 0,
-        translateY: !isSettled && shift > 0 ? shift : 0,
+        translateX: shift,
+        translateY: shift,
       });
-      obs.instBR.style.pointerEvents = isSettled ? (p === 0 ? '' : 'none') : (p < 0.2 ? '' : 'none');
+      obs.instBR.style.pointerEvents = p < 0.2 ? '' : 'none';
     }
 
-    // Bottom-Right easter egg (✦ orbital mechanics)
     if (obs.eggHint) {
+      obs.eggHint.style.filter = filterVal;
       utils.set(obs.eggHint, {
         opacity: opacityStr,
-        filter: filterVal,
-        translateX: !isSettled && shift > 0 ? shift : 0,
-        translateY: !isSettled && shift > 0 ? shift : 0,
+        translateX: shift,
+        translateY: shift,
       });
-      obs.eggHint.style.pointerEvents = isSettled ? (p === 0 ? '' : 'none') : (p < 0.2 ? '' : 'none');
+      obs.eggHint.style.pointerEvents = p < 0.2 ? '' : 'none';
     }
 
-    // Top-Center telemetry strip (ALT, STARS, JD): Keep centered without horizontal drift
     if (obs.telemetry) {
+      obs.telemetry.style.filter = filterVal;
       utils.set(obs.telemetry, {
         opacity: opacityStr,
-        filter: filterVal,
       });
     }
 
     obs.otherInstruments.forEach((inst) => {
+      inst.style.filter = filterVal;
       utils.set(inst, {
         opacity: opacityStr,
-        filter: filterVal,
       });
-      inst.style.pointerEvents = isSettled ? (p === 0 ? '' : 'none') : (p < 0.2 ? '' : 'none');
+      inst.style.pointerEvents = p < 0.2 ? '' : 'none';
     });
   };
 
@@ -230,8 +265,11 @@ function applyOpticalProgress(
   if (p === 0) {
     humanPlane.style.display = 'block';
     humanPlane.style.position = '';
+    humanPlane.style.opacity = '1';
+    humanPlane.style.filter = '';
+    humanPlane.style.transform = '';
+    humanPlane.style.willChange = '';
     humanPlane.style.pointerEvents = 'auto';
-    utils.set(humanPlane, { opacity: 1, filter: '', scale: 1 });
 
     machinePlane.style.display = 'none';
     machinePlane.style.position = '';
@@ -240,8 +278,11 @@ function applyOpticalProgress(
     machinePlane.style.width = '';
     machinePlane.style.height = '';
     machinePlane.style.overflow = '';
+    machinePlane.style.opacity = '0';
+    machinePlane.style.filter = '';
+    machinePlane.style.transform = '';
+    machinePlane.style.willChange = '';
     machinePlane.style.pointerEvents = 'none';
-    utils.set(machinePlane, { opacity: 0, filter: '', scale: 1 });
 
     applyObservatory('1', 0, true);
   }
@@ -249,8 +290,11 @@ function applyOpticalProgress(
   else if (p === 1) {
     humanPlane.style.display = 'none';
     humanPlane.style.position = '';
+    humanPlane.style.opacity = '0';
+    humanPlane.style.filter = '';
+    humanPlane.style.transform = '';
+    humanPlane.style.willChange = '';
     humanPlane.style.pointerEvents = 'none';
-    utils.set(humanPlane, { opacity: 0, filter: '', scale: 1 });
 
     machinePlane.style.display = 'block';
     machinePlane.style.position = '';
@@ -259,8 +303,11 @@ function applyOpticalProgress(
     machinePlane.style.width = '';
     machinePlane.style.height = 'auto';
     machinePlane.style.overflow = 'visible';
+    machinePlane.style.opacity = '1';
+    machinePlane.style.filter = '';
+    machinePlane.style.transform = '';
+    machinePlane.style.willChange = '';
     machinePlane.style.pointerEvents = 'auto';
-    utils.set(machinePlane, { opacity: 1, filter: '', scale: 1 });
 
     applyObservatory('0', 0, true);
   }
@@ -271,16 +318,18 @@ function applyOpticalProgress(
       humanPlane.style.display = 'block';
       humanPlane.style.position = '';
       humanPlane.style.transformOrigin = '50% 30vh';
+      humanPlane.style.filter = humanBlur > 0 ? `blur(${humanBlur}px)` : '';
       humanPlane.style.pointerEvents = p < 0.3 ? 'auto' : 'none';
       utils.set(humanPlane, {
         opacity: humanOpacity,
-        filter: humanBlur > 0 ? `blur(${humanBlur}px)` : '',
         scale: !reduced && p > 0 ? 1 + p * 0.035 : 1,
       });
     } else {
       humanPlane.style.display = 'none';
+      humanPlane.style.opacity = '0';
+      humanPlane.style.filter = '';
+      humanPlane.style.transform = '';
       humanPlane.style.pointerEvents = 'none';
-      utils.set(humanPlane, { opacity: 0, filter: '', scale: 1 });
     }
 
     if (machineOpacity > 0) {
@@ -292,10 +341,10 @@ function applyOpticalProgress(
       machinePlane.style.height = 'auto';
       machinePlane.style.overflow = 'visible';
       machinePlane.style.transformOrigin = '50% 30vh';
+      machinePlane.style.filter = machineBlur > 0 ? `blur(${machineBlur}px)` : '';
       machinePlane.style.pointerEvents = p > 0.7 ? 'auto' : 'none';
       utils.set(machinePlane, {
         opacity: machineOpacity,
-        filter: machineBlur > 0 ? `blur(${machineBlur}px)` : '',
         scale: !reduced && p < 1 ? 0.965 + p * 0.035 : 1,
       });
     } else {
@@ -306,8 +355,10 @@ function applyOpticalProgress(
       machinePlane.style.width = '';
       machinePlane.style.height = '';
       machinePlane.style.overflow = '';
+      machinePlane.style.opacity = '0';
+      machinePlane.style.filter = '';
+      machinePlane.style.transform = '';
       machinePlane.style.pointerEvents = 'none';
-      utils.set(machinePlane, { opacity: 0, filter: '', scale: 1 });
     }
 
     applyObservatory(humanOpacity.toFixed(3), humanBlur, false);
