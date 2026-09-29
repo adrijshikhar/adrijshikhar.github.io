@@ -1,105 +1,770 @@
-<!doctype html><html><head><meta charset="utf-8"><title>Adrij Shikhar — Resume</title><style>
-@font-face{font-family:'FG';src:url('file:///Users/nemesis/Projects/my-projects/adrijshikhar.github.io/node_modules/@fontsource-variable/familjen-grotesk/files/familjen-grotesk-latin-wght-normal.woff2')format('woff2');font-weight:400 700}
-@font-face{font-family:'PM';src:url('file:///Users/nemesis/Projects/my-projects/adrijshikhar.github.io/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2')format('woff2');font-weight:400}
-@page{size:A4;margin:0}
-*{margin:0;padding:0;box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-html,body{width:210mm;height:297mm}
-body{font-family:'FG',-apple-system,Helvetica,sans-serif;color:#3a3a3a;display:grid;grid-template-columns:65mm 1fr}
-/* ---- sidebar ---- */
-aside{background:#003d74;color:#fff;padding:14mm 0 0}
-aside h1{font-size:20.5pt;font-weight:700;letter-spacing:-.01em;line-height:1.1;padding:0 7mm;margin-bottom:11mm}
-aside .band{background:#00315d;padding:2.4mm 7mm;font-size:11.5pt;font-weight:700;margin-bottom:4.5mm}
-aside section{padding:0 7mm}
-aside dt{font-size:8.4pt;font-weight:700;margin-top:3.6mm}
-aside dd{font-size:8pt;color:#e8eef5;line-height:1.35;word-break:break-word}
-aside .period{font-size:8.4pt;color:#e8eef5}
-aside .school{font-size:9.2pt;font-weight:700;line-height:1.3;margin:1.6mm 0 1.2mm}
-aside .degree{font-size:8.4pt;color:#e8eef5}
-/* ---- main ---- */
-main{padding:9mm 8mm 0 7mm}
-h2{color:#003d74;font-size:14.5pt;font-weight:700;padding-bottom:1.6mm;border-bottom:.9px solid #c9d3de;margin-bottom:4mm}
-h2+.role{margin-top:0}
-.role{display:flex;justify-content:space-between;align-items:baseline}
-.role .title{font-size:11.2pt;font-weight:700;color:#1a1a1a}
-.role .when{font-size:8.4pt;font-style:italic;color:#6e6e6e}
-.where{font-size:9.6pt;font-style:italic;color:#003d74;margin:.9mm 0 3.4mm}
-.where span{color:#3a3a3a}
-h3{font-size:9.2pt;font-weight:700;color:#1a1a1a;margin:2.6mm 0 1.3mm}
-ul{list-style:none}
-li{font-size:8.6pt;line-height:1.34;padding-left:4.2mm;position:relative;margin-bottom:1.5mm;text-align:left}
-li::before{content:'•';position:absolute;left:.6mm;color:#6e6e6e}
-li i{font-style:italic}
-.refs{margin-top:5mm}
-.ref{margin-bottom:3.4mm}
-.ref b{font-size:9.6pt;color:#1a1a1a}
-.ref span{font-size:9.2pt}
-.ref a{display:block;font-size:8.4pt;color:#003d74;text-decoration:none;margin-top:1mm}
-</style></head><body>
-<aside>
-  <h1>Adrij Shikhar</h1>
-  <div class="band">Personal Information</div>
-  <section><dl>
-    <dt>Email</dt><dd>adrijshikhar85@gmail.com</dd>
-    <dt>Phone</dt><dd>+918218058928</dd>
-    <dt>Github</dt><dd>https://github.com/adrijshikhar</dd>
-    <dt>LinkedIn</dt><dd>https://www.linkedin.com/in/adrij-shikhar/</dd>
-    <dt>Website</dt><dd>https://adrijshikhar.dev</dd>
-  </dl></section>
-  <div class="band" style="margin-top:9mm">Education</div>
-  <section>
-    <div class="period">July 2018 - May 2022</div>
-    <div class="school">Indian Institute of Technology, Roorkee</div>
-    <div class="degree">Chemical B.Tech.</div>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Adrij Shikhar — Resume</title>
+<style>
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 300 700;
+  src: url('file:///Users/nemesis/Projects/my-projects/adrijshikhar.github.io/node_modules/@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Familjen Grotesk';
+  font-style: normal;
+  font-weight: 400 700;
+  src: url('file:///Users/nemesis/Projects/my-projects/adrijshikhar.github.io/node_modules/@fontsource-variable/familjen-grotesk/files/familjen-grotesk-latin-wght-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  src: url('file:///Users/nemesis/Projects/my-projects/adrijshikhar.github.io/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  src: url('file:///Users/nemesis/Projects/my-projects/adrijshikhar.github.io/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-600-normal.woff2') format('woff2');
+}
+
+@page {
+  size: A4;
+  margin: 0;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+html, body {
+  width: 210mm;
+  background: #FFFFFF;
+  color: #1E293B;
+  font-family: 'Familjen Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+@media screen {
+  body {
+    background: #E2E8F0;
+    padding: 20mm 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12mm;
+  }
+  .page {
+    box-shadow: 0 4px 24px rgba(15, 23, 42, 0.12);
+  }
+}
+
+.page {
+  width: 210mm;
+  height: 297mm;
+  max-height: 297mm;
+  overflow: hidden;
+  box-sizing: border-box;
+  padding: 11mm 13mm;
+  background: #FFFFFF;
+  position: relative;
+}
+
+.page-1 {
+  page-break-after: always;
+  break-after: page;
+}
+
+.page-2 {
+  page-break-after: avoid;
+  break-after: avoid;
+}
+
+/* Header */
+.header {
+  border-bottom: 1.2px solid #0F172A;
+  padding-bottom: 2.2mm;
+  margin-bottom: 3.2mm;
+}
+.header-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 2mm;
+}
+.header-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 22pt;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1;
+  color: #0F172A;
+}
+.header-subtitle {
+  font-family: 'Familjen Grotesk', sans-serif;
+  font-size: 9.4pt;
+  font-weight: 600;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  gap: 1.8mm;
+  margin-top: 1.4mm;
+}
+.header-subtitle .sep {
+  color: #94A3B8;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8pt;
+}
+.telemetry-grid {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 7.3pt;
+  color: #475569;
+  display: flex;
+  flex-direction: column;
+  gap: 1mm;
+  line-height: 1.3;
+}
+.telemetry-row {
+  display: flex;
+  align-items: center;
+  gap: 2mm;
+}
+.telemetry-row a {
+  color: #1D4ED8;
+  text-decoration: none;
+}
+.telemetry-row .dot {
+  color: #CBD5E1;
+}
+
+/* Section Common */
+.section {
+  margin-bottom: 2.6mm;
+}
+.section-title-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 1px solid #CBD5E1;
+  padding-bottom: 0.9mm;
+  margin-bottom: 2.2mm;
+}
+.section-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 9.6pt;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #0F172A;
+}
+.section-badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 6.8pt;
+  font-weight: 600;
+  color: #64748B;
+  letter-spacing: 0.04em;
+}
+
+/* Company / Entry Headers */
+.company-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 2.4mm;
+}
+.company-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11pt;
+  font-weight: 700;
+  color: #0F172A;
+}
+.role-name {
+  font-family: 'Familjen Grotesk', sans-serif;
+  font-size: 9.5pt;
+  font-weight: 600;
+  color: #1E293B;
+}
+.company-meta {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 7.8pt;
+  color: #475569;
+}
+.sep {
+  color: #94A3B8;
+  margin: 0 1.2mm;
+}
+
+/* Domains */
+.domain-group {
+  margin-bottom: 2.4mm;
+}
+.domain-group:last-child {
+  margin-bottom: 0;
+}
+.domain-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 8.8pt;
+  font-weight: 700;
+  color: #0F172A;
+  margin-bottom: 0.8mm;
+  display: flex;
+  align-items: center;
+}
+.domain-marker {
+  font-family: 'IBM Plex Mono', monospace;
+  color: #1D4ED8;
+  font-size: 7pt;
+  margin-right: 1.4mm;
+  font-weight: 600;
+}
+.bullet-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.bullet-list li {
+  position: relative;
+  padding-left: 3.5mm;
+  font-size: 8.15pt;
+  line-height: 1.34;
+  color: #1E293B;
+  margin-bottom: 1mm;
+  text-align: justify;
+}
+.bullet-list li:last-child {
+  margin-bottom: 0;
+}
+.bullet-list li::before {
+  content: '–';
+  position: absolute;
+  left: 0.5mm;
+  color: #64748B;
+  font-weight: 600;
+}
+
+/* Page 2: Projects */
+.project-entry {
+  margin-bottom: 2.8mm;
+}
+.project-entry:last-child {
+  margin-bottom: 0;
+}
+.entry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 2mm;
+  margin-bottom: 0.8mm;
+}
+.entry-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 1.4mm;
+  flex-shrink: 0;
+}
+.entry-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 9.8pt;
+  font-weight: 700;
+  color: #0F172A;
+}
+.entry-sep {
+  color: #94A3B8;
+  font-size: 7.5pt;
+}
+.entry-role {
+  font-family: 'Familjen Grotesk', sans-serif;
+  font-size: 8.3pt;
+  font-weight: 600;
+  color: #475569;
+}
+.entry-meta {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 7pt;
+  color: #475569;
+  white-space: nowrap;
+}
+.entry-meta a {
+  color: #1D4ED8;
+  text-decoration: none;
+}
+.sep-dot {
+  color: #CBD5E1;
+  margin: 0 1.2mm;
+}
+.tech-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2mm;
+  margin-bottom: 1.1mm;
+}
+.tech-pill {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 6.7pt;
+  font-weight: 500;
+  background: #F1F5F9;
+  border: 0.8px solid #CBD5E1;
+  color: #334155;
+  padding: 0.3mm 1.5mm;
+  border-radius: 2px;
+}
+
+/* Page 2: Earlier Experience */
+.earlier-entry {
+  margin-bottom: 1.6mm;
+}
+.earlier-entry:last-child {
+  margin-bottom: 0;
+}
+.earlier-header {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 8.5pt;
+  font-weight: 600;
+  color: #0F172A;
+  margin-bottom: 0.4mm;
+  display: flex;
+  align-items: baseline;
+  gap: 1.2mm;
+}
+.earlier-company {
+  font-weight: 700;
+  color: #0F172A;
+}
+.earlier-role {
+  font-family: 'Familjen Grotesk', sans-serif;
+  font-weight: 500;
+  color: #334155;
+}
+.earlier-period {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 7.3pt;
+  color: #64748B;
+  margin-left: auto;
+}
+.earlier-summary {
+  font-family: 'Familjen Grotesk', sans-serif;
+  font-size: 8.05pt;
+  line-height: 1.3;
+  color: #334155;
+}
+
+/* Page 2: Skills */
+.skill-row {
+  font-size: 8.15pt;
+  line-height: 1.36;
+  margin-bottom: 1mm;
+}
+.skill-row:last-child {
+  margin-bottom: 0;
+}
+.skill-category {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  color: #0F172A;
+  margin-right: 1.2mm;
+}
+.skill-items {
+  font-family: 'Familjen Grotesk', sans-serif;
+  color: #334155;
+}
+
+/* Page 2: Education */
+.education-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.education-main {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 9pt;
+  font-weight: 700;
+  color: #0F172A;
+}
+.education-degree {
+  font-family: 'Familjen Grotesk', sans-serif;
+  font-weight: 500;
+  color: #334155;
+}
+.education-period {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 7.5pt;
+  color: #64748B;
+}
+
+/* Page 2: References */
+.references-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3.5mm;
+}
+.ref-card {
+  border: 1px solid #CBD5E1;
+  background: #F8FAFC;
+  padding: 2mm 2.6mm;
+  border-radius: 3px;
+}
+.ref-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 8.8pt;
+  font-weight: 700;
+  color: #0F172A;
+}
+.ref-title {
+  font-family: 'Familjen Grotesk', sans-serif;
+  font-size: 8pt;
+  color: #334155;
+  margin-top: 0.4mm;
+}
+.ref-link {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 7.2pt;
+  margin-top: 0.8mm;
+}
+.ref-link a {
+  color: #1D4ED8;
+  text-decoration: none;
+}
+</style>
+</head>
+<body>
+<div class="page page-1">
+  <header class="header">
+    <div class="header-main">
+      <div>
+        <h1 class="header-name">Adrij Shikhar</h1>
+        <div class="header-subtitle">
+          <span class="role-title">Senior Software Engineer</span>
+          <span class="sep">/</span>
+          <span class="role-desc">Systems, Connector Platforms & Agent Tooling</span>
+        </div>
+      </div>
+    </div>
+    <div class="telemetry-grid">
+      <div class="telemetry-row">
+        <span><a href="mailto:adrijshikhar26@gmail.com">adrijshikhar26@gmail.com</a></span>
+        <span class="dot">•</span>
+        <span><a href="tel:+918218058928">+918218058928</a></span>
+        <span class="dot">•</span>
+        <span>Bengaluru, India</span>
+      </div>
+      <div class="telemetry-row">
+        <span><a href="https://adrijshikhar.dev">adrijshikhar.dev</a></span>
+        <span class="dot">•</span>
+        <span><a href="https://github.com/adrijshikhar">github.com/adrijshikhar</a></span>
+        <span class="dot">•</span>
+        <span><a href="https://www.linkedin.com/in/adrij-shikhar">linkedin.com/in/adrij-shikhar</a></span>
+      </div>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="section-title-bar">
+      <h2 class="section-title">EXPERIENCE</h2>
+      <span class="section-badge">CORE SYSTEMS &amp; FLEET PLATFORM</span>
+    </div>
+    
+    <div class="company-block">
+      <div class="company-header">
+        <div class="company-role">
+          <span class="company-name">Hevo Data</span>
+          <span class="sep">•</span>
+          <span class="role-name">Senior Software Engineer</span>
+        </div>
+        <div class="company-meta">
+          <span>Bengaluru</span>
+          <span class="sep">/</span>
+          <span>Jun 2022 – Present</span>
+        </div>
+      </div>
+      
+        <div class="domain-group">
+          <div class="domain-title"><span class="domain-marker">::</span> Agent-Native Tooling</div>
+          <ul class="bullet-list">
+            <li>Built the surface that lets LLMs generate and operate connectors: construct library, connector generator, installable CLI, skill library, and an MCP server exposing platform APIs to agents.</li>
+            <li>Started the internal agent-tooling platform the team now builds on — repo structure, skill conventions, CI auto-release, and marketplace distribution.</li>
+          </ul>
+        </div>
+      
+      
+        <div class="domain-group">
+          <div class="domain-title"><span class="domain-marker">::</span> Connector Platform & Architecture</div>
+          <ul class="bullet-list">
+            <li>Made connector authentication declarative: transformed auth from bespoke platform processors, DB migrations, and cross-service coordination into zero-code configuration files.</li>
+            <li>Moved runtime configuration and config templates into connectors behind a compatibility kit that gates correctness at build time rather than in review.</li>
+            <li>Standardised connector repo creation, versioning, and release behind a central BOM, decoupling the fleet from the shared platform SDK runtime.</li>
+          </ul>
+        </div>
+      
+      
+        <div class="domain-group">
+          <div class="domain-title"><span class="domain-marker">::</span> Connection Reliability & Validation</div>
+          <ul class="bullet-list">
+            <li>Owned the test-connection contract end-to-end; dropped false-negative rate from >30% to nil in validation — ensuring failing checks indicate true connection faults.</li>
+            <li>Delivered pre-flight configuration validation across all sources/destinations (Postgres, MySQL, Oracle, SQL Server, Snowflake, BigQuery, Redshift) with p95 latency < 10s.</li>
+          </ul>
+        </div>
+      
+      
+        <div class="domain-group">
+          <div class="domain-title"><span class="domain-marker">::</span> Failure Visibility & Performance</div>
+          <ul class="bullet-list">
+            <li>Engineered dynamic error classification, cutting classification cycle time from 3–7 days (full release) down to minutes.</li>
+            <li>Root-caused production pipeline hangs to the regex engine; migrated to RE2J to bound worst-case evaluation under 5s, reducing load test stalls from several minutes to 1m19s.</li>
+            <li>Instrumented connection health metrics and HTTP client telemetry in construct libraries to detect API rate-limiting before sync failure.</li>
+          </ul>
+        </div>
+      
+      
+        <div class="domain-group">
+          <div class="domain-title"><span class="domain-marker">::</span> Data Correctness & Scale</div>
+          <ul class="bullet-list">
+            <li>Delivered SCD Type 2 history mode across Snowflake, BigQuery, and Redshift (including Redshift's non-MERGE four-statement path).</li>
+            <li>Implemented real-time CDC on Debezium and built the schema catalog service from scratch — schema versioning, metadata management, and compatibility checks across evolution.</li>
+            <li>Scaled object handling from 1,000 to 25,000 objects with a 5x gain in MySQL ingestion throughput, and engineered parent-child handling with inferred deletes.</li>
+          </ul>
+        </div>
+      
+      
+        <div class="domain-group">
+          <div class="domain-title"><span class="domain-marker">::</span> Engineering Velocity</div>
+          <ul class="bullet-list">
+            <li>Cut build/CI runtimes against 90-day baselines: mvn clean verify from 31:43 to 10:33, CI from 43:32 to 21:24 on initial service, and 11:07 to 5:15 across the fleet.</li>
+            <li>Built the unified developer CLI and local platform so teams execute full pipeline stacks locally rather than contending for shared cloud environments.</li>
+          </ul>
+        </div>
+      
+    </div>
+  
   </section>
-</aside>
-<main>
-  <h2>Work History</h2>
-  <div class="role"><span class="title">Senior Software Engineer</span><span class="when">Jun 2022 - Current</span></div>
-  <div class="where">Hevo Data<span>, Bengaluru</span></div>
+</div>
 
-  <h3>Agent-Native Connector Development</h3>
-  <ul>
-    <li><i>Connector Agent:</i> Built the surface that lets LLMs generate and operate connectors — a construct library, a connector generator, an installable CLI, a skill library, and an MCP server exposing platform APIs to agents.</li>
-    <li><i>Tooling Platform:</i> Started the internal agent-tooling platform the team now builds on — repo structure, skill conventions, CI auto-release, marketplace distribution.</li>
-  </ul>
+<div class="page page-2">
+  <section class="section">
+    <div class="section-title-bar">
+      <h2 class="section-title">SELECTED SYSTEMS PROJECTS</h2>
+      <span class="section-badge">DISTRIBUTED SYSTEMS &amp; DEV TOOLS</span>
+    </div>
+    
+      <div class="project-entry">
+        <div class="entry-header">
+          <div class="entry-title-row">
+            <span class="entry-name">Binsight</span>
+            <span class="entry-sep">•</span>
+            <span class="entry-role">Author / Maintainer</span>
+          </div>
+          <div class="entry-meta">
+            <a href="https://binsight.adrijshikhar.dev">binsight.adrijshikhar.dev</a><span class="sep-dot">•</span><a href="https://github.com/adrijshikhar/binsight">github.com/adrijshikhar/binsight</a><span class="sep-dot">•</span>
+            <span class="period">2026 – Present</span>
+          </div>
+        </div>
+        <div class="tech-pills">
+          <span class="tech-pill">Go</span><span class="tech-pill">SQLite</span><span class="tech-pill">React</span><span class="tech-pill">Astro</span><span class="tech-pill">Tailwind CSS</span><span class="tech-pill">MySQL</span><span class="tech-pill">Docker</span><span class="tech-pill">Homebrew</span>
+        </div>
+        <ul class="bullet-list">
+          <li>Engineered a local, read-only MySQL/MariaDB binlog viewer, decoder, and transaction analyzer.</li>
+          <li>Indexes decoded binlogs in SQLite with a virtualized event stream, transaction grouping, row-image inspection, and anomaly detection across 6 position traps.</li>
+        </ul>
+      </div>
+    
 
-  <h3>Connector Platform &amp; Developer Experience</h3>
-  <ul>
-    <li><i>Declarative Auth:</i> Made connector authentication declarative. A provider used to be its own processor inside the platform — a code change, a database migration, and coordination across three services. It is now a config file, with no platform change at all.</li>
-    <li><i>Ownership Boundary:</i> Moved runtime configuration and config templates into the connector, behind a compatibility kit that gates correctness at build time instead of in review.</li>
-    <li><i>Fleet Standardisation:</i> Standardised how connector repos are created, versioned and released behind a central BOM, and decoupled the fleet from the shared platform SDK.</li>
-  </ul>
+      <div class="project-entry">
+        <div class="entry-header">
+          <div class="entry-title-row">
+            <span class="entry-name">aim</span>
+            <span class="entry-sep">•</span>
+            <span class="entry-role">Author / Maintainer</span>
+          </div>
+          <div class="entry-meta">
+            <a href="https://github.com/adrijshikhar/aim">github.com/adrijshikhar/aim</a><span class="sep-dot">•</span>
+            <span class="period">2026 – Present</span>
+          </div>
+        </div>
+        <div class="tech-pills">
+          <span class="tech-pill">Go</span><span class="tech-pill">Bubble Tea</span><span class="tech-pill">TUI</span><span class="tech-pill">CLI</span><span class="tech-pill">OAuth PKCE</span>
+        </div>
+        <ul class="bullet-list">
+          <li>Built an interactive TUI/CLI for running AI coding assistants (Claude Code, Codex, Antigravity) in isolated profiles with separate configs, token states, and histories.</li>
+          <li>Features browser OAuth PKCE authentication, session browsing, and real-time quota telemetry.</li>
+        </ul>
+      </div>
+    
 
-  <h3>Connection Reliability</h3>
-  <ul>
-    <li><i>Test-Connection Contract:</i> Owned the contract end to end and took its false-negative rate from over 30% to nil in validation — a failing check now means an actual connection problem.</li>
-    <li><i>Validation Coverage:</i> Delivered configuration validation across every source and destination — Postgres, MySQL, Oracle, SQL Server, Snowflake, BigQuery, Redshift — so a misconfiguration surfaces at connect time rather than at first sync, with p95 latency under 10 seconds.</li>
-  </ul>
+      <div class="project-entry">
+        <div class="entry-header">
+          <div class="entry-title-row">
+            <span class="entry-name">cxstatusline</span>
+            <span class="entry-sep">•</span>
+            <span class="entry-role">Author / Maintainer</span>
+          </div>
+          <div class="entry-meta">
+            <a href="https://cxstatusline.adrijshikhar.dev">cxstatusline.adrijshikhar.dev</a><span class="sep-dot">•</span><a href="https://github.com/adrijshikhar/cxstatusline">github.com/adrijshikhar/cxstatusline</a><span class="sep-dot">•</span>
+            <span class="period">2026 – Present</span>
+          </div>
+        </div>
+        <div class="tech-pills">
+          <span class="tech-pill">TypeScript</span><span class="tech-pill">Bun</span><span class="tech-pill">Rust</span><span class="tech-pill">Ink</span>
+        </div>
+        <ul class="bullet-list">
+          <li>Developed a 1–3 row terminal statusline for OpenAI Codex CLI with an interactive terminal config UI and browser playground.</li>
+          <li>Instruments session context, Git state, token usage, and reset timers via a versioned Rust patch.</li>
+        </ul>
+      </div>
+    
 
-  <h3>Failure Visibility &amp; Diagnosis</h3>
-  <ul>
-    <li><i>Dynamic Classification:</i> Replaced static error classification with a dynamic system. A classification change used to wait on a connector's full release cycle; it now takes minutes instead of 3–7 days.</li>
-    <li><i>Regex Engine Root Cause:</i> Root-caused a class of production hangs to the regex engine rather than the queries being run, and migrated to RE2J — bounding worst-case evaluation under five seconds and taking a load run from a multi-minute stall to 1m19s.</li>
-    <li><i>Observability:</i> Built metrics and dashboards for connection health, and put HTTP client metrics into the connector construct library so teams see a rate-limiting API before it becomes a sync failure.</li>
-  </ul>
+      <div class="project-entry">
+        <div class="entry-header">
+          <div class="entry-title-row">
+            <span class="entry-name">catalyst</span>
+            <span class="entry-sep">•</span>
+            <span class="entry-role">Author / Maintainer</span>
+          </div>
+          <div class="entry-meta">
+            <a href="https://github.com/adrijshikhar/catalyst">github.com/adrijshikhar/catalyst</a><span class="sep-dot">•</span>
+            <span class="period">2026 – Present</span>
+          </div>
+        </div>
+        <div class="tech-pills">
+          <span class="tech-pill">Agent Skills</span><span class="tech-pill">Python</span><span class="tech-pill">Shell</span><span class="tech-pill">JSON Schema</span>
+        </div>
+        <ul class="bullet-list">
+          <li>Designed a cross-agent coding session handoff harness storing typed, schema-validated briefs in repository state for seamless task resumption.</li>
+        </ul>
+      </div>
+    
+  </section>
 
-  <h3>Data Correctness at Scale</h3>
-  <ul>
-    <li><i>History Mode:</i> Delivered SCD Type 2 history mode across Snowflake, BigQuery and Redshift, handling the per-destination SQL differences — Redshift has no MERGE and needs a four-statement path.</li>
-    <li><i>CDC Framework:</i> Implemented real-time CDC on the Debezium engine and built the schema catalog service behind it from scratch — schema versioning, metadata management and compatibility checks, so a pipeline survives schema evolution.</li>
-    <li><i>Object Scale:</i> Scaled object handling from 1,000 to 25,000 objects with a 5x gain in MySQL ingestion throughput, and added parent-child handling with inferred deletes.</li>
-  </ul>
+  <section class="section">
+    <div class="section-title-bar">
+      <h2 class="section-title">EARLIER ENGINEERING EXPERIENCE</h2>
+      <span class="section-badge">2020 – 2021 INTERNSHIPS</span>
+    </div>
+    
+    <div class="earlier-entry">
+      <div class="earlier-header">
+        <span class="earlier-company">Hevo Data</span>
+        <span class="entry-sep">•</span>
+        <span class="earlier-role">Software Development Intern</span>
+        <span class="earlier-period">Sep 2021 – Oct 2021</span>
+      </div>
+      <div class="earlier-summary">Integrated 'wal2json' replication plugin for Postgres; cut WAL processing latency by 60% with dynamic Guice injection.</div>
+    </div>
+  
 
-  <h3>Engineering Velocity</h3>
-  <ul>
-    <li><i>Build &amp; CI Runtime:</i> Cut runtime with measured before and after — <code>mvn clean verify</code> 31:43 to 10:33 and CI 43:32 to 21:24 on the first service, then 11:07 to 5:15 as the approach was adopted elsewhere. Sweeps run against a 90-day baseline, not by feel.</li>
-    <li><i>Local Development:</i> Built the unified CLI and local development platform so the team runs the stack locally instead of queueing for shared environments.</li>
-  </ul>
+    <div class="earlier-entry">
+      <div class="earlier-header">
+        <span class="earlier-company">Rephrase.ai</span>
+        <span class="entry-sep">•</span>
+        <span class="earlier-role">Software Development Intern</span>
+        <span class="earlier-period">Oct 2020 – Mar 2021</span>
+      </div>
+      <div class="earlier-summary">Built backend services for GenAI synthetic video generation using GraphQL, Python/Django, ffmpeg, and Stripe.</div>
+    </div>
+  
 
-  <div class="refs">
-    <h2>References</h2>
-    <div class="ref"><b>Tariq Iqbal</b> <span>| Senior Engineering Manager - Atlassian</span><a>linkedin.com/in/ta-riq</a></div>
-    <div class="ref"><b>Shubham Goyal</b> <span>| CTO - Powerplay</span><a>linkedin.com/in/shubham7stark</a></div>
-  </div>
-</main>
-</body></html>
+    <div class="earlier-entry">
+      <div class="earlier-header">
+        <span class="earlier-company">Powerplay</span>
+        <span class="entry-sep">•</span>
+        <span class="earlier-role">Software Engineering Intern</span>
+        <span class="earlier-period">Apr 2020 – Jun 2020</span>
+      </div>
+      <div class="earlier-summary">Developed RESTful APIs, JWT auth, and customizable UI component systems for real-time construction site tracking.</div>
+    </div>
+  
+
+    <div class="earlier-entry">
+      <div class="earlier-header">
+        <span class="earlier-company">MTX Global</span>
+        <span class="entry-sep">•</span>
+        <span class="earlier-role">Software Development Intern</span>
+        <span class="earlier-period">Jun 2021 – Aug 2021</span>
+      </div>
+      <div class="earlier-summary">Created streaming ETL pipeline PoCs using Apache Spark, Kafka, and Google Kubernetes Engine (GKE).</div>
+    </div>
+  
+  </section>
+
+  <section class="section">
+    <div class="section-title-bar">
+      <h2 class="section-title">TECHNICAL SKILLS</h2>
+      <span class="section-badge">CORE COMPETENCIES</span>
+    </div>
+    
+    <div class="skill-row">
+      <span class="skill-category">Languages & Systems:</span>
+      <span class="skill-items">Go, Java 17, TypeScript / JavaScript, Python, Rust (tooling/patches), SQL, C/C++</span>
+    </div>
+  
+
+    <div class="skill-row">
+      <span class="skill-category">Data & Streaming:</span>
+      <span class="skill-items">Kafka, Debezium (CDC), Temporal, Apache Spark, Postgres, MySQL, Snowflake, BigQuery, Redshift, Redis, SQLite</span>
+    </div>
+  
+
+    <div class="skill-row">
+      <span class="skill-category">Cloud & Infrastructure:</span>
+      <span class="skill-items">Docker, Kubernetes, AWS (Fargate, S3, Comprehend), Google Cloud Platform, Terraform, GitHub Actions, CircleCI, Linux</span>
+    </div>
+  
+
+    <div class="skill-row">
+      <span class="skill-category">AI & Agent Tooling:</span>
+      <span class="skill-items">Model Context Protocol (MCP), Agent Skills & Harnesses, LLM APIs, CLI / TUI Ergonomics, Claude Code, Antigravity CLI, Codex CLI</span>
+    </div>
+  
+
+    <div class="skill-row">
+      <span class="skill-category">Observability & Testing:</span>
+      <span class="skill-items">OpenTelemetry, Grafana, Testcontainers, JUnit, RE2J, k6, Continuous Release Gates</span>
+    </div>
+  
+  </section>
+
+  <section class="section">
+    <div class="section-title-bar">
+      <h2 class="section-title">EDUCATION</h2>
+      <span class="section-badge">FOUNDATION</span>
+    </div>
+    
+    <div class="education-row">
+      <div class="education-info">
+        <span class="education-main">Indian Institute of Technology, Roorkee</span>
+        <span class="sep">•</span>
+        <span class="education-degree">Bachelor of Technology (B.Tech)</span>
+      </div>
+      <div class="education-period">July 2018 – May 2022</div>
+    </div>
+  
+  </section>
+
+  <section class="section" style="margin-bottom:0">
+    <div class="section-title-bar">
+      <h2 class="section-title">REFERENCES</h2>
+      <span class="section-badge">RECOMMENDATIONS</span>
+    </div>
+    <div class="references-grid">
+      
+    <div class="ref-card">
+      <div class="ref-name">Tariq Iqbal</div>
+      <div class="ref-title">Senior Engineering Manager &bull; Atlassian</div>
+      <div class="ref-link"><a href="https://www.linkedin.com/in/ta-riq">linkedin.com/in/ta-riq</a></div>
+    </div>
+  
+
+    <div class="ref-card">
+      <div class="ref-name">Shubham Goyal</div>
+      <div class="ref-title">Chief Technology Officer &bull; Powerplay</div>
+      <div class="ref-link"><a href="https://www.linkedin.com/in/shubham7stark">linkedin.com/in/shubham7stark</a></div>
+    </div>
+  
+    </div>
+  </section>
+</div>
+</body>
+</html>
