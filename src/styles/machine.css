@@ -17,7 +17,9 @@
 html.machine-boot .human-view {
   display: none;
 }
-html.machine-boot .machine-view {
+html.machine-boot .machine-view,
+html.machine-mode .machine-view,
+body.machine-mode .machine-view {
   height: auto;
   opacity: 1;
   overflow: visible;
@@ -27,14 +29,14 @@ html.machine-boot .machine-view {
 /* === Machine content — matches parallel.ai exactly === */
 
 .machine-content-wrapper {
-  max-width: 640px;
+  max-width: 40rem;
   margin: 0 auto;
-  padding: 3rem 1.5rem 8rem;
+  padding: 4rem 1.5rem 12rem;
 }
 
 .machine-pre {
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.23;
   /* Token-driven so the terminal follows the active light/dark mode (canvas never changes
      across the human↔machine toggle → always-smooth crossfade). */

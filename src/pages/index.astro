@@ -68,10 +68,10 @@ const SOCIAL_ICON_PATHS = {
   <aside aria-label="View mode">
     <ViewToggle client:load />
   </aside>
+  <SideRail />
   <div class="machine-view" />
 
   <div class="human-view min-h-screen px-5 md:px-8">
-    <SideRail />
 
     <!-- Single centred column at the prototype's 46rem. Every other page on the
          site is already single-column (posts max-w-3xl, lists max-w-5xl), so
@@ -88,7 +88,7 @@ const SOCIAL_ICON_PATHS = {
              below is revealed by scrolling. -->
         <header class="flex min-h-[100dvh] flex-col justify-center pb-24 pt-32">
           <p class="mb-6 flex items-center gap-3 font-mono text-xs uppercase tracking-wider text-secondary-foreground">
-            <span class="live inline-block h-[5px] w-[5px] rounded-full bg-secondary-foreground"></span>
+            <span class="live inline-block h-[0.3125rem] w-[0.3125rem] rounded-full bg-secondary-foreground"></span>
             Bengaluru
           </p>
           <h1 class="text-6xl font-bold tracking-tight sm:text-7xl">
@@ -231,29 +231,25 @@ const SOCIAL_ICON_PATHS = {
           />
         </section>
 
-        <!-- Interests -->
-        <section id="interests" class="mb-12 scroll-mt-16 md:mb-16 lg:scroll-mt-24">
-          <div class="mb-3 font-mono text-xs uppercase tracking-wider text-muted-foreground" aria-hidden="true">07</div>
-          <h2 class="display-section mb-8">Interests</h2>
-          <div
-            class="prose prose-invert max-w-[35rem] text-[1.0625rem] leading-[1.7] text-foreground prose-p:text-foreground prose-li:text-foreground marker:text-muted-foreground prose-a:text-primary prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-foreground"
-            set:html={marked.parse(interests.content)}
-          />
-        </section>
+        <!-- Final viewport frame: Section 07 and footer framed together -->
+        <div class="flex min-h-[calc(100dvh-6rem)] flex-col justify-between">
+          <section id="interests" class="scroll-mt-16 lg:scroll-mt-24">
+            <div class="mb-3 font-mono text-xs uppercase tracking-wider text-muted-foreground" aria-hidden="true">07</div>
+            <h2 class="display-section mb-8">Interests</h2>
+            <div
+              class="prose prose-invert max-w-[35rem] text-[1.0625rem] leading-[1.7] text-foreground prose-p:text-foreground prose-li:text-foreground marker:text-muted-foreground prose-a:text-primary prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-foreground"
+              set:html={marked.parse(interests.content)}
+            />
+          </section>
 
-        {/* The gap above the rule is open sky, not slack. The orbital-mechanics
-            game plays over the whole viewport, so the page needs a stretch with
-            no prose under it — otherwise every sling is thrown across text.
-            Viewport-relative so the room is real on any screen. It sits BEFORE
-            the footer: past the last line there is nothing left to look at, so
-            the same space there just reads as the page failing to end. */}
-        <footer class="mt-[29vh] border-t border-border pt-12 pb-20 md:mt-[33vh] md:pb-24">
-          <p class="font-mono text-xs uppercase tracking-wider text-foreground">
-            <span class="text-primary">&#9656;</span> {STAR_COUNT} named stars at true J2000 positions
-            for your location. Every mark on the canvas is a catalogued object.
-          </p>
-          <p class="mt-2 font-mono text-xs uppercase tracking-wider text-foreground">Built with Astro.</p>
-        </footer>
+          <footer class="mt-auto border-t border-border pt-10 pb-16 md:pb-20">
+            <p class="font-mono text-xs uppercase tracking-wider text-foreground">
+              <span class="text-primary">&#9656;</span> {STAR_COUNT} named stars at true J2000 positions
+              for your location. Every mark on the canvas is a catalogued object.
+            </p>
+            <p class="mt-2 font-mono text-xs uppercase tracking-wider text-foreground">Built with Astro.</p>
+          </footer>
+        </div>
 
 
       </main>
