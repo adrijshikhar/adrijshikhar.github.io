@@ -26,6 +26,7 @@ assert.deepEqual(projectNames, ['Binsight', 'aim', 'cxstatusline', 'catalyst']);
 assert.ok(data.earlier_experience.length >= 4);
 assert.ok(data.skills.length >= 5);
 assert.equal(data.education.institution, 'Indian Institute of Technology, Roorkee');
+assert.ok(data.education.summary);
 assert.equal(data.references.length, 2);
 
 console.log('✓ test-resume-data passed: all schema requirements satisfied');

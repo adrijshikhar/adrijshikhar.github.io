@@ -53,6 +53,7 @@ export interface EducationEntry {
   institution: string;
   degree: string;
   period: string;
+  summary?: string;
 }
 
 export interface ReferenceEntry {

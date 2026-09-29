@@ -27,6 +27,8 @@ const CHROME = process.env.CHROME_BIN ||
     ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
     : 'google-chrome');
 
+const stripProtocol = (url) => url ? url.replace(/^https?:\/\/(www\.)?/, '') : '';
+
 function generateResumeHtml(data, rootDir) {
   const fontSG = pathToFileURL(join(rootDir, 'node_modules/@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2')).href;
   const fontFG = pathToFileURL(join(rootDir, 'node_modules/@fontsource-variable/familjen-grotesk/files/familjen-grotesk-latin-wght-normal.woff2')).href;
@@ -62,8 +64,8 @@ function generateResumeHtml(data, rootDir) {
 
   const projectsHtml = data.projects.map(proj => {
     const links = [];
-    if (proj.url) links.push(`<a href="${proj.url}">${proj.url.replace(/^https?:\/\/(www\.)?/, '')}</a>`);
-    if (proj.github) links.push(`<a href="${proj.github}">${proj.github.replace(/^https?:\/\/(www\.)?/, '')}</a>`);
+    if (proj.url) links.push(`<a href="${proj.url}">${stripProtocol(proj.url)}</a>`);
+    if (proj.github) links.push(`<a href="${proj.github}">${stripProtocol(proj.github)}</a>`);
     return `
       <div class="project-entry">
         <div class="entry-header">
@@ -110,7 +112,7 @@ function generateResumeHtml(data, rootDir) {
     <div class="ref-card">
       <div class="ref-name">${r.name}</div>
       <div class="ref-title">${r.title} &bull; ${r.company}</div>
-      <div class="ref-link"><a href="${r.linkedin}">${r.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</a></div>
+      <div class="ref-link"><a href="${r.linkedin}">${stripProtocol(r.linkedin)}</a></div>
     </div>
   `).join('\n');
 
@@ -580,11 +582,11 @@ html, body {
         <span>${p.location}</span>
       </div>
       <div class="telemetry-row">
-        <span><a href="${p.website}">${p.website.replace(/^https?:\/\/(www\.)?/, '')}</a></span>
+        <span><a href="${p.website}">${stripProtocol(p.website)}</a></span>
         <span class="dot">•</span>
-        <span><a href="${p.github}">${p.github.replace(/^https?:\/\/(www\.)?/, '')}</a></span>
+        <span><a href="${p.github}">${stripProtocol(p.github)}</a></span>
         <span class="dot">•</span>
-        <span><a href="${p.linkedin}">${p.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</a></span>
+        <span><a href="${p.linkedin}">${stripProtocol(p.linkedin)}</a></span>
       </div>
     </div>
   </header>
