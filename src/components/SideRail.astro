@@ -117,7 +117,6 @@ const sections = [
     margin: 0;
     padding: 0;
     list-style: none;
-    --i: 0;
   }
   .rail-stack li {
     height: var(--item-h);
@@ -189,7 +188,6 @@ const sections = [
 
 <script>
   const navLinks = document.querySelectorAll('.side-rail .nav-link');
-  const stack = document.querySelector('.rail-stack');
   const navIds = new Set([...navLinks].map((l) => l.getAttribute('data-section')));
   const sectionEls = [...document.querySelectorAll('section[id]')].filter((s) => navIds.has(s.id));
 
@@ -199,10 +197,6 @@ const sections = [
         if (!entry.isIntersecting) return;
         const idx = [...navLinks].findIndex((l) => l.getAttribute('data-section') === entry.target.id);
         navLinks.forEach((link, i) => link.classList.toggle('is-at', i === idx));
-        // Drives the window-centred stepping via CSS calc() — see .rail-stack.
-        // A no-op under reduced motion, where .rail-stack transform is forced
-        // to none regardless of --i.
-        if (idx !== -1) stack?.style.setProperty('--i', String(idx));
       });
     },
     { rootMargin: '-40% 0px -60% 0px' },

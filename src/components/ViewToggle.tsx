@@ -71,6 +71,36 @@ interface ObservatoryElements {
   otherInstruments: HTMLElement[];
 }
 
+const resetPlaneHidden = (plane: HTMLElement) => {
+  plane.style.display = 'none';
+  plane.style.position = '';
+  plane.style.top = '';
+  plane.style.left = '';
+  plane.style.width = '';
+  plane.style.height = '';
+  plane.style.overflow = '';
+  plane.style.opacity = '0';
+  plane.style.filter = '';
+  plane.style.transform = '';
+  plane.style.willChange = '';
+  plane.style.pointerEvents = 'none';
+};
+
+const resetPlaneVisible = (plane: HTMLElement) => {
+  plane.style.display = 'block';
+  plane.style.position = '';
+  plane.style.top = '';
+  plane.style.left = '';
+  plane.style.width = '';
+  plane.style.height = 'auto';
+  plane.style.overflow = 'visible';
+  plane.style.opacity = '1';
+  plane.style.filter = '';
+  plane.style.transform = '';
+  plane.style.willChange = '';
+  plane.style.pointerEvents = 'auto';
+};
+
 function applyOpticalProgress(
   p: number,
   humanPlane: HTMLElement,
@@ -263,52 +293,14 @@ function applyOpticalProgress(
 
   // State 1: Pin-sharp Human (settled at p=0)
   if (p === 0) {
-    humanPlane.style.display = 'block';
-    humanPlane.style.position = '';
-    humanPlane.style.opacity = '1';
-    humanPlane.style.filter = '';
-    humanPlane.style.transform = '';
-    humanPlane.style.willChange = '';
-    humanPlane.style.pointerEvents = 'auto';
-
-    machinePlane.style.display = 'none';
-    machinePlane.style.position = '';
-    machinePlane.style.top = '';
-    machinePlane.style.left = '';
-    machinePlane.style.width = '';
-    machinePlane.style.height = '';
-    machinePlane.style.overflow = '';
-    machinePlane.style.opacity = '0';
-    machinePlane.style.filter = '';
-    machinePlane.style.transform = '';
-    machinePlane.style.willChange = '';
-    machinePlane.style.pointerEvents = 'none';
-
+    resetPlaneVisible(humanPlane);
+    resetPlaneHidden(machinePlane);
     applyObservatory('1', 0, true);
   }
   // State 2: Pin-sharp Machine (settled at p=1)
   else if (p === 1) {
-    humanPlane.style.display = 'none';
-    humanPlane.style.position = '';
-    humanPlane.style.opacity = '0';
-    humanPlane.style.filter = '';
-    humanPlane.style.transform = '';
-    humanPlane.style.willChange = '';
-    humanPlane.style.pointerEvents = 'none';
-
-    machinePlane.style.display = 'block';
-    machinePlane.style.position = '';
-    machinePlane.style.top = '';
-    machinePlane.style.left = '';
-    machinePlane.style.width = '';
-    machinePlane.style.height = 'auto';
-    machinePlane.style.overflow = 'visible';
-    machinePlane.style.opacity = '1';
-    machinePlane.style.filter = '';
-    machinePlane.style.transform = '';
-    machinePlane.style.willChange = '';
-    machinePlane.style.pointerEvents = 'auto';
-
+    resetPlaneHidden(humanPlane);
+    resetPlaneVisible(machinePlane);
     applyObservatory('0', 0, true);
   }
   // State 3: Active Continuous Optical Transit (0 < p < 1)
@@ -325,11 +317,7 @@ function applyOpticalProgress(
         scale: !reduced && p > 0 ? 1 + p * 0.035 : 1,
       });
     } else {
-      humanPlane.style.display = 'none';
-      humanPlane.style.opacity = '0';
-      humanPlane.style.filter = '';
-      humanPlane.style.transform = '';
-      humanPlane.style.pointerEvents = 'none';
+      resetPlaneHidden(humanPlane);
     }
 
     if (machineOpacity > 0) {
@@ -348,17 +336,7 @@ function applyOpticalProgress(
         scale: !reduced && p < 1 ? 0.965 + p * 0.035 : 1,
       });
     } else {
-      machinePlane.style.display = 'none';
-      machinePlane.style.position = '';
-      machinePlane.style.top = '';
-      machinePlane.style.left = '';
-      machinePlane.style.width = '';
-      machinePlane.style.height = '';
-      machinePlane.style.overflow = '';
-      machinePlane.style.opacity = '0';
-      machinePlane.style.filter = '';
-      machinePlane.style.transform = '';
-      machinePlane.style.pointerEvents = 'none';
+      resetPlaneHidden(machinePlane);
     }
 
     applyObservatory(humanOpacity.toFixed(3), humanBlur, false);
@@ -816,7 +794,7 @@ export default function ViewToggle() {
               className={`font-mono text-[11px] tracking-[0.14em] uppercase whitespace-nowrap leading-none transition-colors text-right ${
                 activeMode === 'human'
                   ? 'text-foreground font-semibold'
-                  : 'text-muted-foreground/40 group-hover:text-muted-foreground'
+                  : 'text-muted-foreground group-hover:text-foreground'
               }`}
             >
               H
@@ -835,7 +813,7 @@ export default function ViewToggle() {
               className={`font-mono text-[11px] tracking-[0.14em] uppercase whitespace-nowrap leading-none transition-colors text-right ${
                 activeMode === 'machine'
                   ? 'text-foreground font-semibold'
-                  : 'text-muted-foreground/40 group-hover:text-muted-foreground'
+                  : 'text-muted-foreground group-hover:text-foreground'
               }`}
             >
               M
@@ -854,7 +832,7 @@ export default function ViewToggle() {
               className={`font-mono text-[9px] tracking-[0.18em] uppercase whitespace-nowrap leading-none mb-1.5 transition-colors text-right ${
                 activeMode === 'human'
                   ? 'text-primary font-medium'
-                  : 'text-muted-foreground/50 group-hover:text-muted-foreground'
+                  : 'text-muted-foreground group-hover:text-foreground'
               }`}
             >
               24MM
@@ -863,7 +841,7 @@ export default function ViewToggle() {
               className={`font-mono text-[11px] tracking-[0.14em] uppercase whitespace-nowrap leading-none transition-colors text-right ${
                 activeMode === 'human'
                   ? 'text-foreground font-semibold'
-                  : 'text-muted-foreground/40 group-hover:text-muted-foreground'
+                  : 'text-muted-foreground group-hover:text-foreground'
               }`}
             >
               HUMAN
@@ -882,7 +860,7 @@ export default function ViewToggle() {
               className={`font-mono text-[9px] tracking-[0.18em] uppercase whitespace-nowrap leading-none mb-1.5 transition-colors text-right ${
                 activeMode === 'machine'
                   ? 'text-primary font-medium'
-                  : 'text-muted-foreground/50 group-hover:text-muted-foreground'
+                  : 'text-muted-foreground group-hover:text-foreground'
               }`}
             >
               48MM
@@ -891,7 +869,7 @@ export default function ViewToggle() {
               className={`font-mono text-[11px] tracking-[0.14em] uppercase whitespace-nowrap leading-none transition-colors text-right ${
                 activeMode === 'machine'
                   ? 'text-foreground font-semibold'
-                  : 'text-muted-foreground/40 group-hover:text-muted-foreground'
+                  : 'text-muted-foreground group-hover:text-foreground'
               }`}
             >
               MACHINE
@@ -902,14 +880,7 @@ export default function ViewToggle() {
         {/* Desktop Vertical Textured Knob Track */}
         <div
           ref={desktopTrackRef}
-          className="relative w-4 h-[144px] overflow-hidden cursor-ns-resize select-none shrink-0"
-          style={{
-            touchAction: 'none',
-            maskImage:
-              'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.4) 10%, #000 24%, #000 76%, rgba(0,0,0,0.4) 90%, transparent 100%)',
-            WebkitMaskImage:
-              'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.4) 10%, #000 24%, #000 76%, rgba(0,0,0,0.4) 90%, transparent 100%)',
-          }}
+          className="focal-track-vert touch-none relative w-4 h-[144px] overflow-hidden cursor-ns-resize select-none shrink-0"
           role="slider"
           tabIndex={0}
           aria-label="Optical focal length"
@@ -927,7 +898,6 @@ export default function ViewToggle() {
           <div
             ref={desktopLinesRef}
             className="absolute top-0 left-0 w-full will-change-transform pointer-events-none"
-            style={{ transform: 'translate3d(0, 0px, 0)' }}
             aria-hidden="true"
           >
             <svg
@@ -945,8 +915,7 @@ export default function ViewToggle() {
                     y1={y}
                     x2="14"
                     y2={y}
-                    stroke={isHighlighter ? 'var(--primary)' : 'var(--muted-foreground)'}
-                    strokeOpacity={isHighlighter ? 1 : 0.4}
+                    stroke={isHighlighter ? 'var(--primary)' : 'var(--input)'}
                     strokeWidth={1}
                     shapeRendering="crispEdges"
                   />
@@ -970,14 +939,14 @@ export default function ViewToggle() {
         >
           <span
             className={`font-mono text-[9px] tracking-wider uppercase whitespace-nowrap leading-none mb-1 transition-colors ${
-              activeMode === 'human' ? 'text-primary font-medium' : 'text-muted-foreground/60'
+              activeMode === 'human' ? 'text-primary font-medium' : 'text-muted-foreground'
             }`}
           >
             24MM
           </span>
           <span
             className={`font-mono text-[10px] tracking-wider uppercase whitespace-nowrap leading-none transition-colors ${
-              activeMode === 'human' ? 'text-foreground font-semibold' : 'text-muted-foreground/50'
+              activeMode === 'human' ? 'text-foreground font-semibold' : 'text-muted-foreground'
             }`}
           >
             HUMAN
@@ -986,14 +955,7 @@ export default function ViewToggle() {
 
         <div
           ref={mobileTrackRef}
-          className="relative w-[144px] h-4 overflow-hidden cursor-ew-resize select-none shrink-0"
-          style={{
-            touchAction: 'none',
-            maskImage:
-              'linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.4) 10%, #000 24%, #000 76%, rgba(0,0,0,0.4) 90%, transparent 100%)',
-            WebkitMaskImage:
-              'linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.4) 10%, #000 24%, #000 76%, rgba(0,0,0,0.4) 90%, transparent 100%)',
-          }}
+          className="focal-track-horiz touch-none relative w-[144px] h-4 overflow-hidden cursor-ew-resize select-none shrink-0"
           role="slider"
           tabIndex={0}
           aria-label="Optical focal length"
@@ -1011,7 +973,6 @@ export default function ViewToggle() {
           <div
             ref={mobileLinesRef}
             className="absolute top-0 left-0 h-full will-change-transform pointer-events-none"
-            style={{ transform: 'translate3d(0px, 0, 0)' }}
             aria-hidden="true"
           >
             <svg
@@ -1029,8 +990,7 @@ export default function ViewToggle() {
                     y1="2"
                     x2={x}
                     y2="14"
-                    stroke={isHighlighter ? 'var(--primary)' : 'var(--muted-foreground)'}
-                    strokeOpacity={isHighlighter ? 1 : 0.4}
+                    stroke={isHighlighter ? 'var(--primary)' : 'var(--input)'}
                     strokeWidth={1}
                     shapeRendering="crispEdges"
                   />
@@ -1048,14 +1008,14 @@ export default function ViewToggle() {
         >
           <span
             className={`font-mono text-[9px] tracking-wider uppercase whitespace-nowrap leading-none mb-1 transition-colors ${
-              activeMode === 'machine' ? 'text-primary font-medium' : 'text-muted-foreground/60'
+              activeMode === 'machine' ? 'text-primary font-medium' : 'text-muted-foreground'
             }`}
           >
             48MM
           </span>
           <span
             className={`font-mono text-[10px] tracking-wider uppercase whitespace-nowrap leading-none transition-colors ${
-              activeMode === 'machine' ? 'text-foreground font-semibold' : 'text-muted-foreground/50'
+              activeMode === 'machine' ? 'text-foreground font-semibold' : 'text-muted-foreground'
             }`}
           >
             MACHINE
