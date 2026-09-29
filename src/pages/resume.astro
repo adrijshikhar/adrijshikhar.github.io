@@ -1,107 +1,365 @@
 ---
-import { readFileSync } from 'node:fs';
+import { existsSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import matter from 'gray-matter';
-import { marked } from 'marked';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { loadResumeData } from '../lib/resume';
 
-function readContent(filename: string) {
-  const raw = readFileSync(join(process.cwd(), 'src/content', filename), 'utf-8');
-  const { data, content } = matter(raw);
-  return { meta: data, content };
+const data = loadResumeData();
+const { personal, experience, projects, earlier_experience, skills, education, references } = data;
+
+// Compute PDF file size and last modified date if generated
+const pdfPath = join(process.cwd(), 'public/assets/resume.pdf');
+let pdfSize = '259 KB';
+let pdfDate = 'Sep 2026';
+
+if (existsSync(pdfPath)) {
+  const stats = statSync(pdfPath);
+  pdfSize = `${Math.round(stats.size / 1024)} KB`;
+  const mtime = stats.mtime;
+  const month = mtime.toLocaleString('en-US', { month: 'short' });
+  const year = mtime.getFullYear();
+  pdfDate = `${month} ${year}`;
 }
-
-function splitBySlug(content: string): Record<string, string> {
-  const sections: Record<string, string> = {};
-  const parts = content.split(/<!--\s*([\w-]+)\s*-->/);
-  for (let i = 1; i < parts.length; i += 2) {
-    sections[parts[i]] = parts[i + 1]?.trim() || '';
-  }
-  return sections;
-}
-
-const about = readContent('about.md');
-const experience = readContent('experience.md');
-const education = readContent('education.md');
-const skills = readContent('skills.md');
-const achievements = readContent('achievements.md');
-const expSections = splitBySlug(experience.content);
-
-const proseClass =
-  'prose prose-invert prose-sm max-w-none text-foreground prose-p:text-foreground prose-li:text-foreground ' +
-  'text-base leading-[1.65] prose-li:my-0.5 marker:text-muted-foreground prose-headings:text-foreground prose-headings:text-sm ' +
-  'prose-headings:font-semibold prose-headings:tracking-tighter prose-a:text-primary ' +
-  'prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-foreground prose-strong:font-medium';
 ---
 
-<BaseLayout title="Resume | adrijshikhar.dev">
-  <main id="content" class="reading-plane mx-auto min-h-screen max-w-3xl px-6 py-16 md:px-12 md:py-24">
+<BaseLayout title="Resume | Adrij Shikhar">
+  <main id="content" class="reading-plane mx-auto min-h-screen max-w-4xl px-4 py-12 md:px-8 md:py-20">
     <a class="link-back" href="/">
-      <span class="arrow">&larr;</span>
+      <span class="arrow" aria-hidden="true">&larr;</span>
       <span>adrij_shikhar</span>
     </a>
 
-    <header class="mt-10 flex flex-col gap-6 border-b border-border pb-10 md:flex-row md:items-end md:justify-between">
-      <div>
-        <h1 class="text-4xl font-bold tracking-tight">{about.meta.name ?? 'Adrij Shikhar'}</h1>
-        <p class="mt-2 font-heading text-base font-medium tracking-tighter text-foreground">Senior Software Engineer</p>
+    <!-- Header & Telemetry Grid -->
+    <header class="border-b border-border pb-8">
+      <div class="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h1 class="font-heading text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl">
+            {personal.name}
+          </h1>
+          <p class="mt-2 font-heading text-lg font-medium tracking-tight text-foreground md:text-xl">
+            {personal.title} <span class="font-normal text-muted-foreground">&mdash;</span> {personal.subtitle}
+          </p>
+          <div class="mt-2.5 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-xs text-muted-foreground">
+            <span class="inline-block size-2 shrink-0 rounded-full bg-secondary-foreground" aria-hidden="true"></span>
+            <span>{personal.location}</span>
+            <span class="hidden xs:inline">&middot;</span>
+            <span class="text-number-ink">Available for high-impact systems roles</span>
+          </div>
+        </div>
+
+        <div class="flex shrink-0 flex-col items-start gap-2 sm:items-end">
+          <a
+            href="/assets/resume.pdf"
+            download="Adrij_Shikhar_Resume.pdf"
+            class="group inline-flex items-center gap-2 rounded-sm border border-border bg-card px-4 py-2 font-mono text-xs uppercase tracking-wider text-foreground no-underline transition-all duration-200 hover:-translate-y-0.5 hover:border-input hover:text-primary motion-reduce:translate-none motion-reduce:transition-none"
+            aria-label="Download resume as PDF"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5 text-primary" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            <span>Download PDF</span>
+          </a>
+          <span class="font-mono text-xs text-muted-foreground">
+            {pdfSize} &middot; Updated {pdfDate}
+          </span>
+        </div>
       </div>
-      <a
-        href="/assets/resume.pdf"
-        download="Adrij Shikhar Resume.pdf"
-        class="group inline-flex shrink-0 items-center gap-2 border border-border px-4 py-2.5 font-mono text-xs uppercase tracking-[0.14em] text-foreground no-underline transition-colors duration-[120ms] hover:border-primary hover:text-primary"
-      >
-        <span class="text-primary">&#9662;</span> Download PDF
-      </a>
+
+      <!-- Telemetry Grid / Contact Bar in IBM Plex Mono -->
+      <nav aria-label="Contact channels" class="mt-6 grid grid-cols-1 gap-2.5 border-t border-border pt-4 font-mono text-xs sm:flex sm:flex-wrap sm:items-center sm:gap-x-6 sm:gap-y-2">
+        <a
+          href={`mailto:${personal.email}`}
+          class="flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-primary"
+        >
+          <span class="select-none text-sky-label">EMAIL:</span>
+          <span class="text-foreground transition-colors hover:text-primary">{personal.email}</span>
+        </a>
+        <a
+          href={`tel:${personal.phone.replace(/\s+/g, '')}`}
+          class="flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-primary"
+        >
+          <span class="select-none text-sky-label">TEL:</span>
+          <span class="text-foreground transition-colors hover:text-primary">{personal.phone}</span>
+        </a>
+        <a
+          href={personal.website}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-primary"
+        >
+          <span class="select-none text-sky-label">WEB:</span>
+          <span class="text-foreground transition-colors hover:text-primary">adrijshikhar.dev</span>
+        </a>
+        <a
+          href={personal.github}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-primary"
+        >
+          <span class="select-none text-sky-label">GIT:</span>
+          <span class="text-foreground transition-colors hover:text-primary">github.com/adrijshikhar</span>
+        </a>
+        <a
+          href={personal.linkedin}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-primary"
+        >
+          <span class="select-none text-sky-label">IN:</span>
+          <span class="text-foreground transition-colors hover:text-primary">linkedin.com/in/adrij-shikhar</span>
+        </a>
+      </nav>
     </header>
 
-    <!-- Experience -->
-    <section class="mt-12">
-      <p class="mb-6 font-mono text-xs uppercase tracking-wider text-foreground">experience</p>
-      <ul class="border-t border-border">
-        {experience.meta.entries.map((exp: any) => (
-          <li class="border-b border-border py-6">
-            <div class="flex flex-col gap-1 md:flex-row md:items-baseline md:justify-between">
-              <h2 class="font-heading text-base font-medium tracking-tighter text-foreground">
-                {exp.position} <span class="mx-1 text-foreground">/</span> {exp.company}
-              </h2>
-              <span class="shrink-0 font-mono text-xs uppercase tracking-wider text-number-ink">{exp.startDate} &ndash; {exp.endDate}</span>
-            </div>
-            {exp.location && <p class="mt-0.5 font-mono text-xs uppercase tracking-wider text-foreground">{exp.location}</p>}
-            {expSections[exp.slug] && (
-              <div class={`mt-3 ${proseClass}`} set:html={marked.parse(expSections[exp.slug])} />
-            )}
-          </li>
-        ))}
-      </ul>
-    </section>
+    <!-- 01 // Experience -->
+    <section class="mt-12 md:mt-16">
+      <div class="mb-6 flex flex-wrap items-baseline justify-between gap-2 border-b border-border pb-3">
+        <h2 class="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+          01 // Experience
+        </h2>
+        <span class="font-mono text-xs text-number-ink">Jun 2022 &ndash; Present</span>
+      </div>
 
-    <!-- Education -->
-    <section class="mt-12">
-      <p class="mb-6 font-mono text-xs uppercase tracking-wider text-foreground">education</p>
-      <ul class="border-t border-border">
-        {education.meta.entries.map((edu: any) => (
-          <li class="flex flex-col gap-1 border-b border-border py-5 md:flex-row md:items-baseline md:justify-between">
+      {experience.map((exp) => (
+        <div class="rounded-lg border border-border bg-card p-6 md:p-8">
+          <div class="flex flex-col gap-2 border-b border-border pb-5 sm:flex-row sm:items-baseline sm:justify-between">
             <div>
-              <h3 class="font-heading text-base font-medium tracking-tighter text-foreground">{edu.institution}</h3>
-              <p class="mt-0.5 text-sm text-foreground">{edu.degree}{edu.field && <span class="text-foreground"> &ndash; {edu.field}</span>}</p>
+              <h3 class="font-heading text-xl font-bold tracking-tight text-foreground md:text-2xl">
+                {exp.role}
+              </h3>
+              <p class="mt-1 font-mono text-sm text-primary">
+                {exp.company}
+                <span class="text-muted-foreground"> &middot; {exp.location}</span>
+              </p>
             </div>
-            <span class="shrink-0 font-mono text-xs uppercase tracking-wider text-number-ink">{edu.startDate} &ndash; {edu.endDate}</span>
-          </li>
+            <div class="shrink-0 font-mono text-xs text-number-ink">
+              {exp.period}
+            </div>
+          </div>
+
+          <!-- 6 Technical Domain Blocks -->
+          <div class="mt-6 flex flex-col divide-y divide-border">
+            {exp.domains.map((domain) => (
+              <div class="py-5 first:pt-0 last:pb-0">
+                <h4 class="mb-3 font-mono text-xs uppercase tracking-wider text-primary">
+                  :: {domain.title}
+                </h4>
+                <ul class="space-y-2.5">
+                  {domain.bullets.map((bullet) => (
+                    <li class="flex items-start gap-2.5 font-sans text-sm leading-relaxed text-foreground md:text-[0.9375rem]">
+                      <span class="mt-1 select-none font-mono text-xs text-muted-foreground">&ndash;</span>
+                      <span>{bullet}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </section>
+
+    <!-- 02 // Selected Systems Projects -->
+    <section class="mt-12 md:mt-16">
+      <div class="mb-6 flex flex-wrap items-baseline justify-between gap-2 border-b border-border pb-3">
+        <h2 class="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+          02 // Selected Systems Projects
+        </h2>
+        <span class="font-mono text-xs text-muted-foreground">4 Active Open Source Tools</span>
+      </div>
+
+      <div class="flex flex-col gap-5">
+        {projects.map((proj) => (
+          <article class="rounded-lg border border-border bg-card p-6 transition-all duration-200 hover:-translate-y-0.5 hover:border-input motion-reduce:translate-none">
+            <div class="flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
+              <div class="flex flex-wrap items-baseline gap-2.5">
+                <h3 class="font-heading text-lg font-bold tracking-tight text-foreground">
+                  {proj.name}
+                </h3>
+                <span class="font-mono text-xs text-muted-foreground">
+                  &middot; {proj.role}
+                </span>
+              </div>
+              <div class="flex shrink-0 items-center gap-4">
+                <span class="font-mono text-xs text-number-ink">
+                  {proj.period}
+                </span>
+                <div class="flex items-center gap-3 font-mono text-xs">
+                  {proj.url && (
+                    <a
+                      href={proj.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-primary underline underline-offset-4 transition-colors hover:text-foreground"
+                      aria-label={`${proj.name} live demo`}
+                    >
+                      live &rarr;
+                    </a>
+                  )}
+                  {proj.github && (
+                    <a
+                      href={proj.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-primary underline underline-offset-4 transition-colors hover:text-foreground"
+                      aria-label={`${proj.name} source code repository`}
+                    >
+                      src &rarr;
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <!-- Tech stack badges -->
+            <div class="mt-3 flex flex-wrap gap-1.5">
+              {proj.tech.map((t) => (
+                <span class="rounded-sm border border-border bg-background px-2 py-0.5 font-mono text-xs text-primary">
+                  {t}
+                </span>
+              ))}
+            </div>
+
+            <!-- Bullets -->
+            <ul class="mt-4 space-y-2">
+              {proj.bullets.map((bullet) => (
+                <li class="flex items-start gap-2.5 font-sans text-sm leading-relaxed text-foreground">
+                  <span class="mt-1 select-none font-mono text-xs text-muted-foreground">&ndash;</span>
+                  <span>{bullet}</span>
+                </li>
+              ))}
+            </ul>
+          </article>
         ))}
-      </ul>
+      </div>
     </section>
 
-    <!-- Skills -->
-    <section class="mt-12">
-      <p class="mb-6 font-mono text-xs uppercase tracking-wider text-foreground">skills</p>
-      <div class={proseClass} set:html={marked.parse(skills.content)} />
+    <!-- 03 // Earlier Experience -->
+    <section class="mt-12 md:mt-16">
+      <div class="mb-6 flex flex-wrap items-baseline justify-between gap-2 border-b border-border pb-3">
+        <h2 class="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+          03 // Earlier Experience
+        </h2>
+        <span class="font-mono text-xs text-muted-foreground">Internships &amp; Research</span>
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+        {earlier_experience.map((item) => (
+          <div class="rounded-lg border border-border bg-card p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-input motion-reduce:translate-none">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <h3 class="font-heading text-base font-semibold tracking-tight text-foreground">
+                  {item.company}
+                </h3>
+                <p class="mt-0.5 font-mono text-xs text-primary">{item.role}</p>
+              </div>
+              <span class="shrink-0 font-mono text-xs text-number-ink">{item.period}</span>
+            </div>
+            <p class="mt-3 font-sans text-xs leading-relaxed text-foreground">
+              {item.summary}
+            </p>
+          </div>
+        ))}
+      </div>
     </section>
 
-    <!-- Achievements -->
-    <section class="mt-12">
-      <p class="mb-6 font-mono text-xs uppercase tracking-wider text-foreground">achievements</p>
-      <div class={proseClass} set:html={marked.parse(achievements.content)} />
+    <!-- 04 // Technical Skills -->
+    <section class="mt-12 md:mt-16">
+      <div class="mb-6 flex flex-wrap items-baseline justify-between gap-2 border-b border-border pb-3">
+        <h2 class="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+          04 // Technical Skills
+        </h2>
+        <span class="font-mono text-xs text-muted-foreground">5 Core Domains</span>
+      </div>
+
+      <div class="divide-y divide-border rounded-lg border border-border bg-card p-6">
+        {skills.map((cat) => (
+          <div class="flex flex-col gap-3 py-4 first:pt-0 last:pb-0 md:flex-row md:items-start md:gap-6">
+            <span class="shrink-0 pt-1 font-mono text-xs uppercase tracking-wider text-primary md:w-48">
+              {cat.category}
+            </span>
+            <div class="flex flex-1 flex-wrap gap-1.5">
+              {cat.items.map((skill) => (
+                <span class="rounded-sm border border-border bg-background px-2.5 py-1 font-mono text-xs text-foreground">
+                  {skill}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
     </section>
+
+    <!-- 05 // Education & 06 // References -->
+    <div class="mt-12 grid grid-cols-1 gap-8 md:mt-16 md:grid-cols-2">
+      <!-- Education -->
+      <section class="flex flex-col">
+        <div class="mb-6 flex flex-wrap items-baseline justify-between gap-2 border-b border-border pb-3">
+          <h2 class="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+            05 // Education
+          </h2>
+        </div>
+        <div class="flex-1 rounded-lg border border-border bg-card p-6 transition-all duration-200 hover:-translate-y-0.5 hover:border-input motion-reduce:translate-none">
+          <div class="flex items-start justify-between gap-2">
+            <h3 class="font-heading text-lg font-bold tracking-tight text-foreground">
+              {education.institution}
+            </h3>
+            <span class="shrink-0 font-mono text-xs text-number-ink">{education.period}</span>
+          </div>
+          <p class="mt-2 font-mono text-sm text-primary">
+            {education.degree}
+          </p>
+          <p class="mt-3 font-sans text-xs leading-relaxed text-muted-foreground">
+            Graduated with strong foundations in computer science, distributed algorithms, data structures, and systems engineering.
+          </p>
+        </div>
+      </section>
+
+      <!-- References -->
+      <section class="flex flex-col">
+        <div class="mb-6 flex flex-wrap items-baseline justify-between gap-2 border-b border-border pb-3">
+          <h2 class="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+            06 // References
+          </h2>
+        </div>
+        <div class="flex flex-1 flex-col gap-3">
+          {references.map((ref) => (
+            <div class="flex-1 rounded-lg border border-border bg-card p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-input motion-reduce:translate-none">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <h3 class="font-heading text-base font-semibold tracking-tight text-foreground">
+                    {ref.name}
+                  </h3>
+                  <p class="mt-0.5 font-mono text-xs text-primary">{ref.title} &middot; {ref.company}</p>
+                </div>
+                <a
+                  href={ref.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="shrink-0 font-mono text-xs text-primary underline underline-offset-4 transition-colors hover:text-foreground"
+                  aria-label={`LinkedIn recommendation for ${ref.name}`}
+                >
+                  in &rarr;
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-16 flex flex-col items-center justify-between gap-4 border-t border-border pt-6 font-mono text-xs text-muted-foreground sm:flex-row md:mt-24">
+      <div class="flex items-center gap-2">
+        <span>&copy; {new Date().getFullYear()} Adrij Shikhar</span>
+        <span>&middot;</span>
+        <span>Spectral Observatory</span>
+      </div>
+      <a href="#content" class="text-primary transition-colors hover:text-foreground hover:underline">
+        &uarr; Back to top
+      </a>
+    </footer>
   </main>
 </BaseLayout>
