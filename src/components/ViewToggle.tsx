@@ -169,11 +169,12 @@ function applyOpticalProgress(
       });
     }
 
+    // Side navigation rail: stays pinned vertically centered at top: 50% without horizontal drift or vertical jumps
     if (obs.sideRail) {
       obs.sideRail.style.filter = filterVal;
+      obs.sideRail.style.transform = '';
       utils.set(obs.sideRail, {
         opacity: opacityStr,
-        translateX: -shift,
       });
       obs.sideRail.style.pointerEvents = p < 0.2 ? '' : 'none';
     }
