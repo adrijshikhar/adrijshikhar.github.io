@@ -231,25 +231,25 @@ const SOCIAL_ICON_PATHS = {
           />
         </section>
 
-        <!-- Interests -->
-        <section id="interests" class="mb-12 scroll-mt-16 md:mb-16 lg:scroll-mt-24 min-h-[calc(100dvh-6rem)]">
-          <div class="mb-3 font-mono text-xs uppercase tracking-wider text-muted-foreground" aria-hidden="true">07</div>
-          <h2 class="display-section mb-8">Interests</h2>
-          <div
-            class="prose prose-invert max-w-[35rem] text-[1.0625rem] leading-[1.7] text-foreground prose-p:text-foreground prose-li:text-foreground marker:text-muted-foreground prose-a:text-primary prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-foreground"
-            set:html={marked.parse(interests.content)}
-          />
-        </section>
+        <!-- Final viewport frame: Section 07 and footer framed together -->
+        <div class="flex min-h-[calc(100dvh-6rem)] flex-col justify-between">
+          <section id="interests" class="scroll-mt-16 lg:scroll-mt-24">
+            <div class="mb-3 font-mono text-xs uppercase tracking-wider text-muted-foreground" aria-hidden="true">07</div>
+            <h2 class="display-section mb-8">Interests</h2>
+            <div
+              class="prose prose-invert max-w-[35rem] text-[1.0625rem] leading-[1.7] text-foreground prose-p:text-foreground prose-li:text-foreground marker:text-muted-foreground prose-a:text-primary prose-a:underline prose-a:decoration-1 prose-a:underline-offset-[0.2em] prose-strong:text-foreground"
+              set:html={marked.parse(interests.content)}
+            />
+          </section>
 
-        {/* Section 07 frames the final viewport with open sky beneath its prose for
-            orbital mechanics, while the footer sits at the true end of the scroll. */}
-        <footer class="mt-16 border-t border-border pt-12 pb-32 md:mt-24 md:pb-28">
-          <p class="font-mono text-xs uppercase tracking-wider text-foreground">
-            <span class="text-primary">&#9656;</span> {STAR_COUNT} named stars at true J2000 positions
-            for your location. Every mark on the canvas is a catalogued object.
-          </p>
-          <p class="mt-2 font-mono text-xs uppercase tracking-wider text-foreground">Built with Astro.</p>
-        </footer>
+          <footer class="mt-auto border-t border-border pt-10 pb-16 md:pb-20">
+            <p class="font-mono text-xs uppercase tracking-wider text-foreground">
+              <span class="text-primary">&#9656;</span> {STAR_COUNT} named stars at true J2000 positions
+              for your location. Every mark on the canvas is a catalogued object.
+            </p>
+            <p class="mt-2 font-mono text-xs uppercase tracking-wider text-foreground">Built with Astro.</p>
+          </footer>
+        </div>
 
 
       </main>
