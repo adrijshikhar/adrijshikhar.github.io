@@ -85,8 +85,6 @@ const EGG_HINT_DELAY_MS = 10_000;
 
 export default function SkyField({ mode }: SkyFieldProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const cursorRingRef = useRef<HTMLDivElement>(null);
-  const cursorDotRef = useRef<HTMLDivElement>(null);
   const controlsRef = useRef<GameControls | null>(null);
   const eggRef = useRef<HTMLButtonElement>(null);
 
@@ -244,74 +242,6 @@ export default function SkyField({ mode }: SkyFieldProps) {
     return () => window.clearTimeout(id);
   }, [mode, coords]);
 
-  // Site-wide custom cursor, as the prototype had it — its own rAF, independent
-  // of the sky loop, so it runs on every page and in `quiet` mode where the sky
-  // does not animate. Skipped entirely on coarse pointers and under reduced
-  // motion: the ring's lag IS the motion, and a frozen ring beside a hidden
-  // native cursor is worse than no ring. `cursor-custom` (which sets
-  // `cursor: none`) is added only once the loop is confirmed running, so a
-  // failure here can never leave a visitor with no pointer at all.
-  useEffect(() => {
-    const fine = window.matchMedia('(hover: hover) and (pointer: fine)');
-    const still = window.matchMedia('(prefers-reduced-motion: reduce)');
-    if (!fine.matches || still.matches) return;
-
-    const ring = cursorRingRef.current;
-    const dot = cursorDotRef.current;
-    if (!ring || !dot) return;
-
-    let x = -100, y = -100, rx = -100, ry = -100, id = 0;
-    const INTERACTIVE = 'a,button,[role="button"],input,select,textarea,label,summary';
-    // Hide the native cursor only once we know where to draw the custom one.
-    // Hiding it on mount left the ring parked off-screen at -100,-100 until the
-    // first pointermove, so a visitor who loaded the page and did not move the
-    // mouse had no pointer at all.
-    let armed = false;
-    const onMove = (e: PointerEvent) => {
-      x = e.clientX;
-      y = e.clientY;
-      if (!armed) {
-        armed = true;
-        rx = x;
-        ry = y;
-        document.documentElement.classList.add('cursor-custom');
-      }
-      dot.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-      const t = e.target as Element | null;
-      document.body.classList.toggle('cur-ui', !!t?.closest?.(INTERACTIVE));
-      document.body.classList.toggle(
-        'cur-focal',
-        !!t?.closest?.('[aria-label="View mode"], [role="slider"], [aria-label*="Human view"], [aria-label*="Machine view"]'),
-      );
-    };
-    const onDown = () => { ring.style.opacity = '0.7'; };
-    const onUp = () => { ring.style.opacity = '1'; };
-    const onLeave = () => { ring.style.opacity = '0'; dot.style.opacity = '0'; };
-    const onEnter = () => { ring.style.opacity = '1'; dot.style.opacity = '1'; };
-
-    const follow = () => {
-      rx += (x - rx) * 0.22;
-      ry += (y - ry) * 0.22;
-      ring.style.transform = `translate3d(${rx.toFixed(2)}px, ${ry.toFixed(2)}px, 0) scale(var(--ring-s))`;
-      id = requestAnimationFrame(follow);
-    };
-    id = requestAnimationFrame(follow);
-
-    window.addEventListener('pointermove', onMove, { passive: true });
-    window.addEventListener('pointerdown', onDown, { passive: true });
-    window.addEventListener('pointerup', onUp, { passive: true });
-    document.addEventListener('pointerleave', onLeave);
-    document.addEventListener('pointerenter', onEnter);
-    return () => {
-      cancelAnimationFrame(id);
-      window.removeEventListener('pointermove', onMove);
-      window.removeEventListener('pointerdown', onDown);
-      window.removeEventListener('pointerup', onUp);
-      document.removeEventListener('pointerleave', onLeave);
-      document.removeEventListener('pointerenter', onEnter);
-      document.documentElement.classList.remove('cursor-custom');
-    };
-  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -439,6 +369,17 @@ export default function SkyField({ mode }: SkyFieldProps) {
       if (!col) return null;
       const r = col.getBoundingClientRect();
       if (r.width === 0 || r.bottom < 0 || r.top > window.innerHeight) return null;
+
+      // Dedicated reading planes (e.g. /resume/, /experience/, blog posts) contain dense prose
+      // and telemetry across the entire column. Keep out the full visible width and height
+      // so canvas ink, planets, and stars never collide with text.
+      if (col.classList.contains('reading-plane')) {
+        const y = Math.max(0, r.top);
+        const h = Math.min(window.innerHeight, r.bottom) - y;
+        if (h <= 0) return null;
+        return { x: r.left, y, w: r.width, h, strength: 0.98 };
+      }
+
       const hero = col.querySelector(':scope > header');
       const title = hero?.querySelector('h1');
       const intro = title?.nextElementSibling;
@@ -678,21 +619,10 @@ export default function SkyField({ mode }: SkyFieldProps) {
       if (e.key === 'Escape' && game?.playing) controlsRef.current?.exit();
     };
 
-    const onWindowPointerLeave = () => {
-      if (cursorRingRef.current) cursorRingRef.current.style.opacity = '0';
-      if (cursorDotRef.current) cursorDotRef.current.style.opacity = '0';
-    };
-    const onWindowPointerEnter = () => {
-      if (cursorRingRef.current) cursorRingRef.current.style.opacity = '1';
-      if (cursorDotRef.current) cursorDotRef.current.style.opacity = '1';
-    };
-
     if (mode === 'full' && game) {
       window.addEventListener('pointerdown', onPointerDown);
       window.addEventListener('pointerup', onPointerUp);
       window.addEventListener('keydown', onKeyDown);
-      window.addEventListener('pointerleave', onWindowPointerLeave);
-      window.addEventListener('pointerenter', onWindowPointerEnter);
 
       controlsRef.current = {
         enter: () => {
@@ -788,8 +718,6 @@ export default function SkyField({ mode }: SkyFieldProps) {
         window.removeEventListener('pointerdown', onPointerDown);
         window.removeEventListener('pointerup', onPointerUp);
         window.removeEventListener('keydown', onKeyDown);
-        window.removeEventListener('pointerleave', onWindowPointerLeave);
-        window.removeEventListener('pointerenter', onWindowPointerEnter);
         controlsRef.current = null;
       }
       scrollAnim?.revert(); // tears down the linked anime.js ScrollObserver too
@@ -1054,9 +982,6 @@ export default function SkyField({ mode }: SkyFieldProps) {
 
         </>
       )}
-
-      <div ref={cursorRingRef} id="sky-cursor-ring" aria-hidden="true" />
-      <div ref={cursorDotRef} id="sky-cursor-dot" aria-hidden="true" />
     </>
   );
 }

@@ -258,11 +258,21 @@ and a set of planning notes do not belong in a public Pages repo. They live at:
 `05-chrome-inventory.png` in that `design/` dir is the KEEP / MOVE / CUT audit of the
 sky chrome, and is worth reading before changing any readout.
 
+## Branching, Protected Branches & PR Guardrails (HARD CONTRACT)
+
+- **`content` is the sole protected production branch.** (`main`/`master` are not deployment targets).
+- **NEVER push directly to `content` or `main`.** Direct pushes to protected branches are strictly prohibited.
+- **NEVER merge locally into `content` or `main`.** Never execute `git merge` into `content` on your local checkout.
+- **NEVER offer "Merge locally" as an option.** Workflow tools or skills (e.g. `finishing-a-development-branch`) that suggest merging locally into `content` must be bypassed: the only valid integration path is creating a PR.
+- **ALWAYS create a Pull Request targeting `content`:**
+  1. All work must happen on a descriptive branch (`feat/...`, `fix/...`, `chore/...`, `docs/...`).
+  2. Push the branch to the remote origin (`git push -u origin <branch>`).
+  3. Open a Pull Request targeting `content` via `gh pr create --base content ...`.
+  4. Integration and deployment happen exclusively through GitHub PR review and merging into `content`.
+
 ## Deployment
 
-Push to the **`content`** branch → `.github/workflows/deploy.yml` builds with Bun and publishes
-`dist/` to GitHub Pages (`actions/deploy-pages`). `build.yml` runs the build on PRs into
-`content`. PRs target `content`, not `main`/`master`.
+Merging a PR into **`content`** triggers `.github/workflows/deploy.yml`, which builds with Bun and publishes `dist/` to GitHub Pages (`actions/deploy-pages`). `build.yml` runs the build on PRs targeting `content`. PRs target `content`, never `main`/`master`.
 
 Workflow conventions to preserve: **major-version action tags** (e.g. `@v6` — not SHA pins),
 **least-privilege `permissions:`** per workflow, and **never interpolate untrusted input into
