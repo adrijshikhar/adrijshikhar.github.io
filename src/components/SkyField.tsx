@@ -369,6 +369,17 @@ export default function SkyField({ mode }: SkyFieldProps) {
       if (!col) return null;
       const r = col.getBoundingClientRect();
       if (r.width === 0 || r.bottom < 0 || r.top > window.innerHeight) return null;
+
+      // Dedicated reading planes (e.g. /resume/, /experience/, blog posts) contain dense prose
+      // and telemetry across the entire column. Keep out the full visible width and height
+      // so canvas ink, planets, and stars never collide with text.
+      if (col.classList.contains('reading-plane')) {
+        const y = Math.max(0, r.top);
+        const h = Math.min(window.innerHeight, r.bottom) - y;
+        if (h <= 0) return null;
+        return { x: r.left, y, w: r.width, h, strength: 0.98 };
+      }
+
       const hero = col.querySelector(':scope > header');
       const title = hero?.querySelector('h1');
       const intro = title?.nextElementSibling;

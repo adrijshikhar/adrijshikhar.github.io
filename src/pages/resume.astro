@@ -22,48 +22,49 @@ if (existsSync(pdfPath)) {
 }
 ---
 
-<BaseLayout title="Resume | Adrij Shikhar" skyMode="none">
-  <main id="content" class="reading-plane mx-auto min-h-screen max-w-4xl px-4 py-12 md:px-8 md:py-20">
-    <a class="link-back" href="/">
-      <span class="arrow" aria-hidden="true">&larr;</span>
-      <span>adrij_shikhar</span>
-    </a>
+<BaseLayout title="Resume | Adrij Shikhar">
+  <main id="content" class="reading-plane mx-auto min-h-screen max-w-4xl px-4 py-8 md:px-8 md:py-14">
+    <!-- Top Utility Bar: Back to Home + Download PDF (sticky, always visible) -->
+    <div class="sticky top-0 z-30 -mx-4 mb-8 flex items-center justify-between border-b border-border/40 bg-background/85 px-4 py-3 backdrop-blur-md md:-mx-8 md:px-8">
+      <a class="link-back mb-0" href="/">
+        <span class="arrow" aria-hidden="true">&larr;</span>
+        <span>adrij_shikhar</span>
+      </a>
+
+      <div class="flex items-center gap-3">
+        <span class="hidden font-mono text-xs text-muted-foreground sm:inline">
+          {pdfSize} &middot; Updated {pdfDate}
+        </span>
+        <a
+          href="/assets/resume.pdf"
+          download="Adrij_Shikhar_Resume.pdf"
+          class="group inline-flex items-center gap-2 rounded-sm border border-border bg-card px-3.5 py-1.5 font-mono text-xs uppercase tracking-wider text-foreground no-underline shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-input hover:text-primary motion-reduce:translate-none motion-reduce:transition-none"
+          aria-label="Download resume as PDF"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5 text-primary" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          <span>Download PDF</span>
+        </a>
+      </div>
+    </div>
 
     <!-- Header & Telemetry Grid -->
     <header class="border-b border-border pb-8">
-      <div class="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h1 class="font-heading text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl">
-            {personal.name}
-          </h1>
-          <p class="mt-2 font-heading text-lg font-medium tracking-tight text-foreground md:text-xl">
-            {personal.title} <span class="font-normal text-muted-foreground">&mdash;</span> {personal.subtitle}
-          </p>
-          <div class="mt-2.5 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-xs text-muted-foreground">
-            <span class="inline-block size-2 shrink-0 rounded-full bg-secondary-foreground" aria-hidden="true"></span>
-            <span>{personal.location}</span>
-            <span class="hidden xs:inline">&middot;</span>
-            <span class="text-number-ink">Available for high-impact systems roles</span>
-          </div>
-        </div>
-
-        <div class="flex shrink-0 flex-col items-start gap-2 sm:items-end">
-          <a
-            href="/assets/resume.pdf"
-            download="Adrij_Shikhar_Resume.pdf"
-            class="group inline-flex items-center gap-2 rounded-sm border border-border bg-card px-4 py-2 font-mono text-xs uppercase tracking-wider text-foreground no-underline transition-all duration-200 hover:-translate-y-0.5 hover:border-input hover:text-primary motion-reduce:translate-none motion-reduce:transition-none"
-            aria-label="Download resume as PDF"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5 text-primary" aria-hidden="true">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
-            <span>Download PDF</span>
-          </a>
-          <span class="font-mono text-xs text-muted-foreground">
-            {pdfSize} &middot; Updated {pdfDate}
-          </span>
+      <div>
+        <h1 class="font-heading text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl">
+          {personal.name}
+        </h1>
+        <p class="mt-2 font-heading text-lg font-medium tracking-tight text-foreground md:text-xl">
+          {personal.title} <span class="font-normal text-muted-foreground">&mdash;</span> {personal.subtitle}
+        </p>
+        <div class="mt-2.5 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-xs text-muted-foreground">
+          <span class="inline-block size-2 shrink-0 rounded-full bg-secondary-foreground" aria-hidden="true"></span>
+          <span>{personal.location}</span>
+          <span class="hidden xs:inline">&middot;</span>
+          <span class="text-number-ink">Available for high-impact systems roles</span>
         </div>
       </div>
 
