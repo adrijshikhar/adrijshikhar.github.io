@@ -3,6 +3,7 @@ import { SITE_DESCRIPTION } from '../lib/site';
 import '../styles/globals.css';
 import '../styles/machine.css';
 import SkyField from '../components/SkyField.tsx';
+import CustomCursor from '../components/CustomCursor.tsx';
 
 interface Props {
   title: string;
@@ -105,6 +106,8 @@ const cfBeaconToken =
     >
       Skip to content
     </a>
+
+    <CustomCursor client:load />
     {
       skyMode !== 'none' && (
         <>

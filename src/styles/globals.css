@@ -444,17 +444,13 @@ body.cur-focal-dragging * {
    Hidden on touch devices, where a synthetic pointer ring means nothing, and
    skipped under reduced motion, where the ring's lag has nowhere to go. */
 @media (hover: hover) and (pointer: fine) {
-  /* `cursor-custom` is added by SkyField only after its rAF is confirmed
+  /* `cursor-custom` is added by CustomCursor only after its rAF is confirmed
      running, so a script failure never leaves the visitor with no cursor at
      all. Every element that sets its own `cursor` must be listed: an explicit
      `cursor: pointer` on a button beats the inherited `none` from body, which
-     is how the native arrow used to leak back in over the game bar. */
-  /* The native cursor IS hidden, so the ring and dot are the only pointer on
-     screen. Scoped to (hover: hover) and (pointer: fine), and `cursor-custom` is
-     added by SkyField only once its rAF loop is confirmed running — so a script
-     failure can never leave a visitor with no cursor at all.
+     is how the native arrow used to leak back in over interactive bars. */
 
-     Any element that sets its own `cursor` needs listing: an explicit
+  /* Any element that sets its own `cursor` needs listing: an explicit
      `cursor: pointer` on a button beats the inherited `none`, which is how the
      native arrow used to leak back in over the game bar. */
   /* Restored verbatim from 8b1fcff^ rather than rewritten. Two details in the
