@@ -53,7 +53,7 @@ function generateResumeHtml(data, rootDir) {
       </div>
       ${exp.domains.map(d => `
         <div class="domain-group">
-          <div class="domain-title"><span class="domain-marker">::</span> ${d.title}</div>
+          <div class="domain-title">${d.title}</div>
           <ul class="bullet-list">
             ${d.bullets.map(b => `<li>${b}</li>`).join('\n            ')}
           </ul>
@@ -74,12 +74,11 @@ function generateResumeHtml(data, rootDir) {
             <span class="entry-sep">•</span>
             <span class="entry-role">${proj.role}</span>
           </div>
-          <div class="entry-meta">
-            ${links.length ? links.join('<span class="sep-dot">•</span>') + '<span class="sep-dot">•</span>' : ''}
-            <span class="period">${proj.period}</span>
-          </div>
+          <span class="period">${proj.period}</span>
         </div>
+        ${links.length ? `<div class="entry-links">${links.join('<span class="sep-dot">•</span>')}</div>` : ''}
         <div class="tech-pills">
+          <span class="tech-label">Technologies:</span>
           ${proj.tech.map(t => `<span class="tech-pill">${t}</span>`).join('')}
         </div>
         <ul class="bullet-list">
@@ -110,20 +109,26 @@ function generateResumeHtml(data, rootDir) {
 
   const referencesHtml = data.references.map(r => `
     <div class="ref-card">
-      <div class="ref-name">${r.name}</div>
-      <div class="ref-title">${r.title} &bull; ${r.company}</div>
+      <div class="ref-main">
+        <span class="ref-name">${r.name}</span>
+        <span class="sep">•</span>
+        <span class="ref-title">${r.title}, ${r.company}</span>
+      </div>
       <div class="ref-link"><a href="${r.linkedin}">${stripProtocol(r.linkedin)}</a></div>
     </div>
   `).join('\n');
 
   const educationHtml = `
-    <div class="education-row">
-      <div class="education-info">
-        <span class="education-main">${data.education.institution}</span>
-        <span class="sep">•</span>
-        <span class="education-degree">${data.education.degree}</span>
+    <div class="education-block">
+      <div class="education-row">
+        <div class="education-info">
+          <span class="education-main">${data.education.institution}</span>
+          <span class="sep">•</span>
+          <span class="education-degree">${data.education.degree}</span>
+        </div>
+        <div class="education-period">${data.education.period}</div>
       </div>
-      <div class="education-period">${data.education.period}</div>
+      ${data.education.summary ? `<div class="education-summary">${data.education.summary}</div>` : ''}
     </div>
   `;
 
@@ -273,15 +278,12 @@ html, body {
 
 /* Section Common */
 .section {
-  margin-bottom: 2.6mm;
+  margin-bottom: 2.8mm;
 }
 .section-title-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
   border-bottom: 1px solid #CBD5E1;
-  padding-bottom: 0.9mm;
-  margin-bottom: 2.2mm;
+  padding-bottom: 0.8mm;
+  margin-bottom: 2mm;
 }
 .section-title {
   font-family: 'Space Grotesk', sans-serif;
@@ -290,13 +292,6 @@ html, body {
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: #0F172A;
-}
-.section-badge {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 6.8pt;
-  font-weight: 600;
-  color: #64748B;
-  letter-spacing: 0.04em;
 }
 
 /* Company / Entry Headers */
@@ -340,16 +335,7 @@ html, body {
   font-size: 8.8pt;
   font-weight: 700;
   color: #0F172A;
-  margin-bottom: 0.8mm;
-  display: flex;
-  align-items: center;
-}
-.domain-marker {
-  font-family: 'IBM Plex Mono', monospace;
-  color: #1D4ED8;
-  font-size: 7pt;
-  margin-right: 1.4mm;
-  font-weight: 600;
+  margin-bottom: 0.6mm;
 }
 .bullet-list {
   list-style: none;
@@ -362,18 +348,18 @@ html, body {
   font-size: 8.15pt;
   line-height: 1.34;
   color: #1E293B;
-  margin-bottom: 1mm;
+  margin-bottom: 0.8mm;
   text-align: justify;
 }
 .bullet-list li:last-child {
   margin-bottom: 0;
 }
 .bullet-list li::before {
-  content: '–';
+  content: '•';
   position: absolute;
   left: 0.5mm;
   color: #64748B;
-  font-weight: 600;
+  font-size: 8pt;
 }
 
 /* Page 2: Projects */
@@ -412,15 +398,19 @@ html, body {
   font-weight: 600;
   color: #475569;
 }
-.entry-meta {
+.entry-links {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 7pt;
+  font-size: 7.2pt;
   color: #475569;
-  white-space: nowrap;
+  margin-top: -0.4mm;
+  margin-bottom: 1.1mm;
 }
-.entry-meta a {
+.entry-links a {
   color: #1D4ED8;
   text-decoration: none;
+}
+.entry-links a:hover {
+  text-decoration: underline;
 }
 .sep-dot {
   color: #CBD5E1;
@@ -429,8 +419,18 @@ html, body {
 .tech-pills {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 1.2mm;
   margin-bottom: 1.1mm;
+}
+.tech-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 6.8pt;
+  font-weight: 600;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-right: 0.4mm;
 }
 .tech-pill {
   font-family: 'IBM Plex Mono', monospace;
@@ -524,18 +524,32 @@ html, body {
   font-size: 7.5pt;
   color: #64748B;
 }
+.education-summary {
+  font-family: 'Familjen Grotesk', sans-serif;
+  font-size: 8.15pt;
+  line-height: 1.34;
+  color: #334155;
+  margin-top: 1mm;
+}
 
 /* Page 2: References */
-.references-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 3.5mm;
+.references-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.8mm;
 }
 .ref-card {
   border: 1px solid #CBD5E1;
   background: #F8FAFC;
-  padding: 2mm 2.6mm;
+  padding: 1.8mm 2.8mm;
   border-radius: 3px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.ref-main {
+  display: flex;
+  align-items: baseline;
 }
 .ref-name {
   font-family: 'Space Grotesk', sans-serif;
@@ -547,16 +561,28 @@ html, body {
   font-family: 'Familjen Grotesk', sans-serif;
   font-size: 8pt;
   color: #334155;
-  margin-top: 0.4mm;
 }
 .ref-link {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 7.2pt;
-  margin-top: 0.8mm;
 }
 .ref-link a {
   color: #1D4ED8;
   text-decoration: none;
+}
+.ref-link a:hover {
+  text-decoration: underline;
+}
+
+/* Page 2 Spacing Rhythm */
+.page-2 .section {
+  margin-bottom: 3.6mm;
+}
+.page-2 .project-entry {
+  margin-bottom: 3.2mm;
+}
+.page-2 .project-entry:last-child {
+  margin-bottom: 0;
 }
 </style>
 </head>
@@ -577,7 +603,7 @@ html, body {
       <div class="telemetry-row">
         <span><a href="mailto:${p.email}">${p.email}</a></span>
         <span class="dot">•</span>
-        <span><a href="tel:${p.phone}">${p.phone}</a></span>
+        <span><a href="tel:${p.phone.replace(/\s+/g, '')}">${p.phone}</a></span>
         <span class="dot">•</span>
         <span>${p.location}</span>
       </div>
@@ -593,10 +619,23 @@ html, body {
 
   <section class="section">
     <div class="section-title-bar">
-      <h2 class="section-title">EXPERIENCE</h2>
-      <span class="section-badge">CORE SYSTEMS &amp; FLEET PLATFORM</span>
+      <h2 class="section-title">TECHNICAL SKILLS</h2>
+    </div>
+    ${skillsHtml}
+  </section>
+
+  <section class="section">
+    <div class="section-title-bar">
+      <h2 class="section-title">WORK EXPERIENCE</h2>
     </div>
     ${experienceHtml}
+  </section>
+
+  <section class="section" style="margin-bottom:0">
+    <div class="section-title-bar">
+      <h2 class="section-title">EARLIER ENGINEERING EXPERIENCE</h2>
+    </div>
+    ${earlierHtml}
   </section>
 </div>
 
@@ -604,31 +643,13 @@ html, body {
   <section class="section">
     <div class="section-title-bar">
       <h2 class="section-title">SELECTED SYSTEMS PROJECTS</h2>
-      <span class="section-badge">DISTRIBUTED SYSTEMS &amp; DEV TOOLS</span>
     </div>
     ${projectsHtml}
   </section>
 
   <section class="section">
     <div class="section-title-bar">
-      <h2 class="section-title">EARLIER ENGINEERING EXPERIENCE</h2>
-      <span class="section-badge">2020 – 2021 INTERNSHIPS</span>
-    </div>
-    ${earlierHtml}
-  </section>
-
-  <section class="section">
-    <div class="section-title-bar">
-      <h2 class="section-title">TECHNICAL SKILLS</h2>
-      <span class="section-badge">CORE COMPETENCIES</span>
-    </div>
-    ${skillsHtml}
-  </section>
-
-  <section class="section">
-    <div class="section-title-bar">
       <h2 class="section-title">EDUCATION</h2>
-      <span class="section-badge">FOUNDATION</span>
     </div>
     ${educationHtml}
   </section>
@@ -636,9 +657,8 @@ html, body {
   <section class="section" style="margin-bottom:0">
     <div class="section-title-bar">
       <h2 class="section-title">REFERENCES</h2>
-      <span class="section-badge">RECOMMENDATIONS</span>
     </div>
-    <div class="references-grid">
+    <div class="references-list">
       ${referencesHtml}
     </div>
   </section>

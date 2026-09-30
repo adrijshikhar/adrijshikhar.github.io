@@ -30,5 +30,12 @@ assert.ok(text.includes('catalyst'), 'Missing catalyst');
 assert.ok(text.includes('Indian Institute of Technology, Roorkee'), 'Missing education');
 assert.ok(text.includes('Tariq Iqbal'), 'Missing reference 1');
 assert.ok(text.includes('Shubham Goyal'), 'Missing reference 2');
+assert.ok(text.includes('TECHNICAL SKILLS'), 'Missing TECHNICAL SKILLS section');
+assert.ok(text.includes('WORK EXPERIENCE'), 'Missing WORK EXPERIENCE section');
+assert.ok(text.includes('EARLIER ENGINEERING EXPERIENCE'), 'Missing EARLIER ENGINEERING EXPERIENCE section');
+assert.ok(text.includes('SELECTED SYSTEMS PROJECTS'), 'Missing SELECTED SYSTEMS PROJECTS section');
+assert.ok(text.includes('EDUCATION'), 'Missing EDUCATION section');
+assert.ok(text.includes('REFERENCES'), 'Missing REFERENCES section');
+assert.ok(!text.includes('::'), 'Extracted text should not contain floating :: markers');
 
 console.log('✓ verify-resume-pdf passed: exactly 2 A4 pages with all required content');
