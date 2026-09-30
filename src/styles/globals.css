@@ -964,7 +964,12 @@ body.cur-focal-dragging * {
   .link-back:hover,
   .link-back:focus-visible {
     color: var(--primary);
+    text-decoration: none;
+  }
+  .link-back:hover > span:not(.arrow),
+  .link-back:focus-visible > span:not(.arrow) {
     text-decoration: underline;
+    text-underline-offset: 2px;
   }
   .link-back .arrow {
     display: inline-block;
