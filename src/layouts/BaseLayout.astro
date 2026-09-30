@@ -7,7 +7,7 @@ import SkyField from '../components/SkyField.tsx';
 interface Props {
   title: string;
   canonical?: string;
-  skyMode?: 'full' | 'quiet';
+  skyMode?: 'full' | 'quiet' | 'none';
   description?: string;
   /** 'article' for blog posts, so they can carry a published date. */
   ogType?: 'website' | 'article';
@@ -105,15 +105,21 @@ const cfBeaconToken =
     >
       Skip to content
     </a>
-    <aside aria-label="Sky instrument">
-      <SkyField client:visible mode={skyMode} />
-    </aside>
+    {
+      skyMode !== 'none' && (
+        <>
+          <aside aria-label="Sky instrument">
+            <SkyField client:visible mode={skyMode} />
+          </aside>
 
-    <!-- Viewfinder: corner brackets, ported from the prototype's `.frame`.
-         Decoration only — the sky carries the meaning; this just makes the page
-         read as something seen THROUGH an instrument rather than a document with
-         a sky behind it. -->
-    <div class="viewfinder" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+          {/* Viewfinder: corner brackets, ported from the prototype's `.frame`.
+              Decoration only — the sky carries the meaning; this just makes the page
+              read as something seen THROUGH an instrument rather than a document with
+              a sky behind it. */}
+          <div class="viewfinder" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+        </>
+      )
+    }
 
     <slot />
 
